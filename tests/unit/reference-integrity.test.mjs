@@ -19,10 +19,15 @@ for (const [name, digest] of expected) {
   });
 }
 
-test("the initial Session remains an exact copy of the seed", async () => {
+test("the extended Session preserves an explicit seed provenance marker", async () => {
   const [seed, session] = await Promise.all([
     readFile(resolve(root, "reference/nindova-demo.html")),
     readFile(resolve(root, "apps/session/index.html")),
   ]);
-  assert.deepEqual(session, seed);
+  assert.notDeepEqual(session, seed);
+  assert.match(
+    session.toString("utf8"),
+    /extended from reference\/nindova-demo\.html SHA-256 140c0e128be8e89dcd203c503ddc619c77cc0f732954631836b09f573f7791bf/,
+  );
+  assert.match(session.toString("utf8"), /window\.__ct\s*=\s*{/);
 });

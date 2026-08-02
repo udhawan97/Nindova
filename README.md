@@ -6,7 +6,7 @@ Nindova is a bounded late-night ritual: put away a small visible set, cross one 
 
 ## Current state
 
-This repository is at the browser-first foundation stage. It contains the supplied playable concept demo unchanged, an asserted browser arc, a Vite/TypeScript Session package, and an Astro/Starlight website and documentation shell. Portrait-first interaction, deterministic nightly memory, Dawn, and offline PWA behavior are planned but are not yet claimed as complete.
+This repository contains the supplied playable concept extended through the first approved slice: an act-aware portrait camera, semantic controls for every required action, accessible status output, reduced-motion handling, safe-area support, and pointer-cancellation recovery. The original desktop state engine and full asserted arc remain intact. Deterministic nightly memory, Dawn, the production self-closing polish, and offline PWA behavior are planned but are not yet claimed as complete.
 
 There is no public deployment yet. The GitHub repository being public does not imply that Pages, a release, or an App Store build exists.
 
@@ -48,6 +48,7 @@ npm run typecheck
 npm run test:unit
 npm run test:seed:observe
 npm run test:arc
+npm run test:portrait
 npm run build
 ```
 

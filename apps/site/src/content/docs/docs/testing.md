@@ -15,12 +15,15 @@ Nindova distinguishes three evidence levels:
 
 `npm run test:arc` asserts the state order, final `end` state, immutable end-card copy, zero console or page errors, screenshots, and the `window.__ct` contract. It is the regression gate for behavior-preserving slices.
 
+`npm run test:portrait` verifies 320×568, 375×812, 375×667, and desktop layouts; native semantic actions; keyboard operation; 200% page scale; rotation; virtual-keyboard height; reduced motion; held touch; pointer cancellation; safe 44×44-pixel targets; and the complete phone arc.
+
 ## Build gates
 
 ```sh
 npm run typecheck
 npm run test:unit
 npm run test:arc
+npm run test:portrait
 npm run build
 ```
 

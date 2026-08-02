@@ -1,31 +1,42 @@
 <!DOCTYPE html>
+<!-- Nindova Session · extended from reference/nindova-demo.html SHA-256 140c0e128be8e89dcd203c503ddc619c77cc0f732954631836b09f573f7791bf -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Nindova — a game that puts the day away</title>
 <style>
   :root{
     --ink:#e8d9c0; --ink-dim:#a89880; --bg:#12100d; --accent:#d99a5b;
+    --panel:rgba(18,14,10,.88); --rule:rgba(216,180,130,.28); --focus:#f3c98d;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html,body{height:100%;background:var(--bg);overflow:hidden;
+  html,body{height:100%;height:100dvh;background:var(--bg);overflow:hidden;
     font-family:Georgia,'Iowan Old Style','Times New Roman',serif;color:var(--ink);}
-  #stage{position:fixed;inset:0;touch-action:none;cursor:default;}
+  [hidden]{display:none!important;}
+  #stage{position:fixed;inset:0;width:100%;height:100%;touch-action:none;cursor:default;}
   .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
-    flex-direction:column;padding:24px;text-align:center;transition:opacity 1.2s ease;
+    flex-direction:column;padding:max(24px,env(safe-area-inset-top)) max(24px,env(safe-area-inset-right))
+      max(24px,env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left));
+    text-align:center;overflow-y:auto;transition:opacity 1.2s cubic-bezier(.16,1,.3,1),visibility 0s linear 0s;
     background:radial-gradient(ellipse at 50% 40%, rgba(30,24,18,.55), rgba(12,10,8,.92));}
-  .overlay.hidden{opacity:0;pointer-events:none;}
-  .card{max-width:560px;width:100%;}
+  .overlay.hidden{opacity:0;visibility:hidden;pointer-events:none;transition-delay:0s,1.2s;}
+  .card{max-width:560px;width:100%;margin:0 auto;}
+  #intake .card{margin:auto;}
+  #endCard{align-items:center;justify-content:flex-start;}
+  #endCard .card{padding-block:24px;}
   h1{font-weight:normal;font-size:clamp(26px,4.5vw,40px);letter-spacing:.04em;color:var(--ink);}
   .kicker{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:14px;}
   .prompt{font-size:clamp(16px,2.4vw,20px);color:var(--ink);margin:26px 0 18px;font-style:italic;}
   .inputrow{display:flex;gap:8px;justify-content:center;margin-bottom:14px;}
-  #taskInput{flex:1;max-width:340px;background:rgba(255,235,205,.06);border:1px solid rgba(216,180,130,.25);
-    border-radius:6px;padding:11px 14px;color:var(--ink);font-family:inherit;font-size:16px;outline:none;}
-  #taskInput:focus{border-color:rgba(216,180,130,.55);}
+  #taskInput{flex:1;max-width:340px;min-height:44px;background:rgba(255,235,205,.06);border:1px solid rgba(216,180,130,.25);
+    border-radius:6px;padding:11px 14px;color:var(--ink);font-family:inherit;font-size:16px;outline:2px solid transparent;outline-offset:2px;}
+  #taskInput:focus-visible{border-color:rgba(216,180,130,.55);outline-color:var(--focus);}
   #taskInput::placeholder{color:rgba(200,180,150,.35);font-style:italic;}
-  button{font-family:inherit;cursor:pointer;border:none;border-radius:6px;font-size:15px;}
+  button{min-height:44px;font-family:inherit;cursor:pointer;border:none;border-radius:6px;font-size:15px;}
+  button:focus-visible,input:focus-visible{outline:2px solid var(--focus);outline-offset:3px;}
+  button:active{transform:translateY(1px);}
+  button:disabled{opacity:.42;cursor:not-allowed;transform:none;}
   .btn-add{background:rgba(216,180,130,.14);color:var(--ink);padding:11px 16px;border:1px solid rgba(216,180,130,.25);}
   .btn-add:hover{background:rgba(216,180,130,.24);}
   .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:38px;margin-bottom:6px;}
@@ -39,7 +50,7 @@
   .example:hover{color:var(--ink);}
   #nameBox{position:fixed;display:none;z-index:20;width:190px;text-align:center;
     background:rgba(18,14,10,.66);border:none;border-bottom:1px solid rgba(216,180,130,.45);
-    border-radius:4px 4px 0 0;padding:7px 10px;color:var(--ink);font-family:inherit;
+    border-radius:4px 4px 0 0;padding:10px;color:var(--ink);font-family:inherit;min-height:44px;
     font-style:italic;font-size:15px;outline:none;backdrop-filter:blur(3px);}
   #nameBox::placeholder{color:rgba(200,180,150,.4);}
   .btn-begin{display:block;margin:22px auto 0;background:linear-gradient(180deg,#c9884e,#a96f3d);
@@ -48,9 +59,9 @@
   .btn-begin:hover{transform:translateY(-1px);}
   .btn-begin:disabled{opacity:.28;cursor:default;transform:none;}
   .footnote{margin-top:26px;font-size:12.5px;color:rgba(170,150,125,.6);line-height:1.7;}
-  .toggles{position:fixed;top:14px;right:16px;display:flex;gap:8px;z-index:30;}
+  .toggles{position:fixed;top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));display:flex;gap:8px;z-index:30;}
   .tg{background:rgba(20,16,12,.55);border:1px solid rgba(216,180,130,.18);color:var(--ink-dim);
-    font-size:11.5px;padding:6px 11px;border-radius:14px;letter-spacing:.05em;backdrop-filter:blur(4px);}
+    font-size:11.5px;padding:8px 12px;border-radius:22px;letter-spacing:.05em;backdrop-filter:blur(4px);}
   .tg:hover{color:var(--ink);border-color:rgba(216,180,130,.4);}
   /* end card */
   #endCard .card{max-width:600px;}
@@ -68,21 +79,71 @@
   /* soft hint text drawn over canvas */
   #hint{position:fixed;left:50%;bottom:5.5%;transform:translateX(-50%);font-style:italic;
     font-size:15px;color:rgba(232,217,192,.0);transition:color 2s ease;pointer-events:none;z-index:5;letter-spacing:.03em;}
-  @media (max-width:640px){ .inputrow{flex-direction:column;align-items:center;} #taskInput{max-width:100%;width:100%;} }
+  .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;
+    overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important;}
+  #actionDock{position:fixed;z-index:25;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);
+    width:min(560px,calc(100% - 24px));padding:14px 16px 16px;background:var(--panel);border:1px solid var(--rule);
+    border-radius:12px;backdrop-filter:blur(10px);text-align:left;}
+  #actName{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:4px;}
+  #actionPrompt{font-size:16px;line-height:1.35;color:var(--ink);margin-bottom:12px;}
+  .semantic-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+  .semantic-primary,.semantic-secondary{min-height:46px;padding:10px 15px;border:1px solid var(--rule);color:var(--ink);}
+  .semantic-primary{background:linear-gradient(180deg,#c9884e,#a96f3d);color:#241708;border-color:transparent;font-weight:bold;}
+  .semantic-secondary{background:rgba(216,180,130,.08);}
+  #semanticNameForm{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:12px;align-items:end;}
+  #semanticNameForm label{grid-column:1/-1;font-size:13px;color:var(--ink-dim);}
+  #semanticNameInput{min-width:0;min-height:46px;border:1px solid var(--rule);border-radius:6px;padding:10px 12px;
+    outline:2px solid transparent;outline-offset:1px;background:rgba(255,235,205,.06);color:var(--ink);font:inherit;}
+  #semanticNameInput:focus-visible{outline-color:var(--focus);}
+  @media (max-width:640px){
+    .inputrow{flex-direction:column;align-items:center;} #taskInput{max-width:100%;width:100%;}
+    .toggles{flex-direction:column;align-items:flex-end;}
+    .tg{max-width:148px;}
+    #hint{bottom:calc(170px + env(safe-area-inset-bottom));width:calc(100% - 32px);text-align:center;}
+    #actionDock{border-radius:10px;}
+    .semantic-actions>*{flex:1 1 auto;}
+    #semanticNameForm{grid-template-columns:1fr 1fr;}
+    #semanticNameInput{grid-column:1/-1;}
+  }
+  @media (max-height:620px) and (orientation:portrait){
+    #actionDock{padding:10px 12px;}
+    #actionPrompt{font-size:14px;margin-bottom:8px;}
+    .semantic-primary,.semantic-secondary{min-height:44px;padding:8px 11px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
+  }
 </style>
 </head>
 <body>
-<canvas id="stage"></canvas>
-<div id="hint"></div>
-<input id="nameBox" maxlength="24" autocomplete="off" spellcheck="false" placeholder="name it…">
+<canvas id="stage" role="img" aria-label="A dark room with a desk, a lamp, and a rain-lit window.">Nindova’s visual room. Use the controls below the scene to complete every action.</canvas>
+<div id="hint" aria-hidden="true"></div>
+<input id="nameBox" aria-label="Name this object" maxlength="24" autocomplete="off" spellcheck="false" placeholder="name it…">
 
 <div class="toggles">
-  <button class="tg" id="paceBtn">reviewer cut · ~4 min</button>
-  <button class="tg" id="muteBtn">sound on</button>
+  <button class="tg" id="paceBtn" aria-pressed="true">reviewer cut · ~4 min</button>
+  <button class="tg" id="muteBtn" aria-pressed="false">sound on</button>
 </div>
 
+<div id="srStatus" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+<section id="actionDock" aria-label="Session actions" hidden>
+  <div id="actName">Arrive</div>
+  <p id="actionPrompt">The room is waiting.</p>
+  <div class="semantic-actions">
+    <button class="semantic-primary" id="semanticPrimary" type="button">Continue</button>
+    <button class="semantic-secondary" id="nameNextBtn" type="button" hidden>Name the next thing</button>
+    <button class="semantic-secondary" id="changeVistaBtn" type="button" hidden>Change window</button>
+  </div>
+  <form id="semanticNameForm" hidden>
+    <label for="semanticNameInput">A name for this thing, if you want one</label>
+    <input id="semanticNameInput" maxlength="24" autocomplete="off" spellcheck="false">
+    <button class="semantic-secondary" type="submit">Keep name</button>
+    <button class="semantic-secondary" id="cancelSemanticName" type="button">Not now</button>
+  </form>
+</section>
+
 <!-- INTAKE -->
-<div class="overlay" id="intake">
+<div class="overlay" id="intake" aria-hidden="false">
   <div class="card">
     <div class="kicker">a bedtime game · concept demo</div>
     <h1>Nindova</h1>
@@ -93,7 +154,7 @@
 </div>
 
 <!-- END CARD -->
-<div class="overlay hidden" id="endCard">
+<div class="overlay hidden" id="endCard" aria-hidden="true">
   <div class="card">
     <div class="end-title">The session is over. That's the point.</div>
     <div class="end-sub">No score. No streak. Nothing owed tomorrow.</div>
@@ -130,14 +191,18 @@
 const VW = 1200, VH = 750;                 // virtual scene space
 const canvas = document.getElementById('stage');
 const ctx = canvas.getContext('2d');
-let scaleF = 1, offX = 0, offY = 0, dpr = 1;
+let scaleF = 1, offX = 0, offY = 0, dpr = 1, portraitMode=false, cameraCenterX=VW/2;
 
 function resize(){
   dpr = Math.min(window.devicePixelRatio||1, 2);
   canvas.width = innerWidth*dpr; canvas.height = innerHeight*dpr;
   canvas.style.width = innerWidth+'px'; canvas.style.height = innerHeight+'px';
-  scaleF = Math.min(innerWidth/VW, innerHeight/VH);
-  offX = (innerWidth - VW*scaleF)/2;
+  portraitMode = innerHeight > innerWidth*1.12;
+  scaleF = portraitMode
+    ? Math.max(innerWidth/540, (innerHeight/VH)*0.78)
+    : Math.min(innerWidth/VW, innerHeight/VH);
+  cameraCenterX = VW/2;
+  offX = portraitMode ? innerWidth/2-cameraCenterX*scaleF : (innerWidth-VW*scaleF)/2;
   offY = (innerHeight - VH*scaleF)/2;
 }
 addEventListener('resize', resize); resize();
@@ -170,7 +235,8 @@ let pointer={x:0,y:0,down:false};
 let wipeProg=0, lastWipe=null, motes=[];
 let signSwing=0, signHot=false, signDone=false;
 let darkT=0;
-let reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+let reduceMotion = motionPreference.matches;
 
 /* ---------------- scene geometry ---------------- */
 const WIN = {x:84, y:96, w:330, h:368};                  // window
@@ -302,7 +368,9 @@ function sfxSign(){
 }
 function setMuted(m){
   muted=m;
-  document.getElementById('muteBtn').textContent = m?'sound off':'sound on';
+  const muteButton=document.getElementById('muteBtn');
+  muteButton.textContent = m?'sound off':'sound on';
+  muteButton.setAttribute('aria-pressed',String(m));
   if(masterGain) masterGain.gain.linearRampToValueAtTime(m?0:0.9, AC.currentTime+0.3);
 }
 
@@ -319,11 +387,39 @@ function initRain(){
   for(let i=0;i<14;i++) motes.push({x:rnd(500,780),y:rnd(390,520),v:rnd(2,7),a:rnd(.05,.16),ph:rnd(0,6)});
 }
 initRain();
+motionPreference.addEventListener('change',event=>{
+  reduceMotion=event.matches;
+  initRain();
+});
+
+function portraitFocus(){
+  if(STATE==='approach') return WIN.x+WIN.w/2;
+  if(STATE==='vista') return FENCE_X;
+  if(STATE==='drift'||STATE==='return'){
+    return clamp(driftLight?.x ?? finalEntity?.x ?? FENCE_X,420,840);
+  }
+  if(STATE==='sign'||STATE==='dark'||STATE==='end') return SIGN.x+SIGN.w/2;
+  if(STATE==='play'||STATE==='wipe'){
+    const active=objects.find(object=>object.state==='drag')
+      ?? objects.find(object=>object.state==='desk')
+      ?? objects.find(object=>object.state==='settle');
+    return clamp(active?.x ?? LAMP.poolX,360,760);
+  }
+  return LAMP.poolX;
+}
+
+function updatePortraitCamera(){
+  if(!portraitMode) return;
+  const target=portraitFocus();
+  cameraCenterX=reduceMotion?target:lerp(cameraCenterX,target,0.12);
+  offX=innerWidth/2-cameraCenterX*scaleF;
+}
 
 /* ============================================================
    DRAWING
    ============================================================ */
 function draw(t,dt){
+  updatePortraitCamera();
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.fillStyle='#0c0a08'; ctx.fillRect(0,0,innerWidth,innerHeight);
   ctx.setTransform(dpr*scaleF,0,0,dpr*scaleF,offX*dpr,offY*dpr);
@@ -336,7 +432,7 @@ function draw(t,dt){
   if(STATE==='approach'){
     zoomK=easeInOut(clamp(approachT/2.7,0,1));
     const wc={x:WIN.x+WIN.w/2, y:WIN.y+WIN.h/2};
-    const s=1+zoomK*2.2;
+    const s=1+zoomK*(portraitMode?0.75:2.2);
     ctx.translate(wc.x,wc.y); ctx.scale(s,s); ctx.translate(-wc.x,-wc.y);
   }
 
@@ -1301,8 +1397,8 @@ function openNameBox(o){
   namingObj=o;
   const p=toScreen(o.x, o.y+o.labelDy-14);
   nameBox.style.display='block';
-  nameBox.style.left=(p.x-95)+'px';
-  nameBox.style.top=(p.y-18)+'px';
+  nameBox.style.left=clamp(p.x-95,12,innerWidth-202)+'px';
+  nameBox.style.top=clamp(p.y-18,12,innerHeight-68)+'px';
   nameBox.value=o.label||'';
   nameBox.focus();
 }
@@ -1319,17 +1415,139 @@ nameBox.addEventListener('keydown',e=>{
 });
 nameBox.addEventListener('blur',()=>closeNameBox(true));
 
-let hintTimer=null;
+let hintTimer=null, hintDelayTimer=null;
 function hint(text, delay=0, hold=5){
   const el=document.getElementById('hint');
   clearTimeout(hintTimer);
-  setTimeout(()=>{
+  clearTimeout(hintDelayTimer);
+  hintDelayTimer=setTimeout(()=>{
+    hintDelayTimer=null;
     el.textContent=text; el.style.color='rgba(232,217,192,0.75)';
     hintTimer=setTimeout(()=>{ el.style.color='rgba(232,217,192,0)'; }, hold*1000);
   }, delay*1000);
 }
 
 function storedCount(){ return objects.filter(o=>o.state==='stored').length; }
+
+const actionDock=document.getElementById('actionDock');
+const actName=document.getElementById('actName');
+const actionPrompt=document.getElementById('actionPrompt');
+const semanticPrimary=document.getElementById('semanticPrimary');
+const nameNextBtn=document.getElementById('nameNextBtn');
+const changeVistaBtn=document.getElementById('changeVistaBtn');
+const semanticNameForm=document.getElementById('semanticNameForm');
+const semanticNameInput=document.getElementById('semanticNameInput');
+const srStatus=document.getElementById('srStatus');
+let semanticRenderKey='', semanticNamingObjectId=null;
+
+const STATE_LABELS={
+  intake:'The Session has not begun.',
+  arrive:'The room is dark. The lamp is ready.',
+  play:'The desk is lit. Put away any remaining thing.',
+  wipe:'The desk is clear. Settle the dust.',
+  approach:'The window is opening.',
+  vista:'A Visitor is moving toward shelter.',
+  drift:'The last light is ready to return.',
+  return:'The light is returning on its own.',
+  sign:'The room is ready to close.',
+  dark:'The room is darkening.',
+  end:"The session is over. That's the point."
+};
+
+function helpNextVisitor(){
+  const entity=entities.find(candidate=>!candidate.crossed
+    && (candidate.phase==='wait'||candidate.phase==='approach'||candidate.phase==='linger'));
+  if(!entity) return false;
+  vistaTap({x:entity.x,y:entity.y});
+  return true;
+}
+
+function semanticConfig(){
+  if(STATE==='arrive') return {act:'Arrive',prompt:'The room is dark. Light the lamp when you are ready.',primary:'Light the lamp'};
+  if(STATE==='play'){
+    const hasDeskObject=objects.some(object=>object.state==='desk');
+    return {act:'Put away',prompt:hasDeskObject?'The desk still holds something. Name it if you want, then put it away.':'The last thing is settling.',
+      primary:hasDeskObject?'Put the next thing away':null,name:hasDeskObject,window:true};
+  }
+  if(STATE==='wipe') return {act:'Settle',prompt:'The desk is clear. One calm pass settles the dust.',primary:'Clear the dust'};
+  if(STATE==='approach') return {act:'Approach',prompt:'The window is opening. Nothing is required.'};
+  if(STATE==='vista') return {act:'Vista',prompt:'A Visitor is moving toward shelter. Your help can be one touch.',primary:'Help the next Visitor'};
+  if(STATE==='drift') return {act:'Drift',prompt:'The light will return whether or not you guide it.',primary:'Let the light return'};
+  if(STATE==='return') return {act:'Return',prompt:'The light is finding its own way home.'};
+  if(STATE==='sign') return {act:'Close',prompt:'Turn the sign. The room will go dark.',primary:'Turn the sign'};
+  return null;
+}
+
+function syncSemanticUI(force=false){
+  const config=semanticConfig();
+  const renderKey=`${STATE}:${storedCount()}:${objects.filter(object=>object.state==='desk').length}:${vistaChoice}`;
+  if(!force&&renderKey===semanticRenderKey) return;
+  semanticRenderKey=renderKey;
+  const stateText=STATE_LABELS[STATE]||'The Session is changing.';
+  document.querySelector('.toggles').hidden=STATE==='end';
+  srStatus.textContent=stateText;
+  canvas.setAttribute('aria-label',stateText+' Every required action is also available in the controls below the scene.');
+  actionDock.hidden=!config;
+  if(!config){
+    semanticNameForm.hidden=true;
+    semanticNamingObjectId=null;
+    return;
+  }
+  actName.textContent=config.act;
+  actionPrompt.textContent=config.prompt;
+  semanticPrimary.hidden=!config.primary;
+  semanticPrimary.disabled=!config.primary;
+  if(config.primary) semanticPrimary.textContent=config.primary;
+  nameNextBtn.hidden=!config.name;
+  changeVistaBtn.hidden=!config.window;
+  changeVistaBtn.textContent=`Change window · ${vistaChoice}`;
+  if(STATE!=='play'){
+    semanticNameForm.hidden=true;
+    semanticNamingObjectId=null;
+  }
+}
+
+semanticPrimary.addEventListener('click',()=>{
+  if(STATE==='arrive') lightLamp();
+  else if(STATE==='play') window.__ct.storeNext();
+  else if(STATE==='wipe') finishWipe();
+  else if(STATE==='vista') helpNextVisitor();
+  else if(STATE==='drift') window.__ct.finishDrift();
+  else if(STATE==='sign') tapSign();
+  syncSemanticUI(true);
+});
+
+nameNextBtn.addEventListener('click',()=>{
+  const object=objects.find(candidate=>candidate.state==='desk');
+  if(!object) return;
+  semanticNamingObjectId=object.id;
+  semanticNameInput.value=object.label||'';
+  semanticNameForm.hidden=false;
+  semanticNameInput.focus({preventScroll:true});
+});
+
+changeVistaBtn.addEventListener('click',()=>{
+  toggleVista();
+  syncSemanticUI(true);
+});
+
+semanticNameForm.addEventListener('submit',event=>{
+  event.preventDefault();
+  const object=objects.find(candidate=>candidate.id===semanticNamingObjectId);
+  const value=semanticNameInput.value.trim();
+  if(object&&value){ object.label=value; object.labelSetT=playT; object.labelA=1; }
+  semanticNameForm.hidden=true;
+  semanticNamingObjectId=null;
+  semanticPrimary.focus({preventScroll:true});
+  srStatus.textContent=value?'The name is kept.':'No name was added.';
+});
+
+document.getElementById('cancelSemanticName').addEventListener('click',()=>{
+  semanticNameForm.hidden=true;
+  semanticNamingObjectId=null;
+  semanticPrimary.focus({preventScroll:true});
+  srStatus.textContent='No name was added. You can still put the thing away.';
+});
 
 function nearestFreeSlot(x,y,r){
   let best=null,bd=r;
@@ -1450,7 +1668,9 @@ function update(dt,t){
     if(rainGain && AC) rainGain.gain.setTargetAtTime(0.055, AC.currentTime, 1.2);
     if(darkT>pace().darkHold){
       STATE='end';
-      document.getElementById('endCard').classList.remove('hidden');
+      const endCard=document.getElementById('endCard');
+      endCard.classList.remove('hidden');
+      endCard.setAttribute('aria-hidden','false');
       if(rainGain && AC) rainGain.gain.setTargetAtTime(0.03, AC.currentTime, 2);
     }
   }
@@ -1490,9 +1710,12 @@ function toggleVista(){
   sfxAcknowledge();
   hint(`${vistaChoice} tonight`, 0, 1.8);
 }
-let downV=null, downAt=0;
+let downV=null, downAt=0, activePointerId=null;
 
 canvas.addEventListener('pointerdown',e=>{
+  if(activePointerId!==null&&activePointerId!==e.pointerId) return;
+  activePointerId=e.pointerId;
+  try{ canvas.setPointerCapture(e.pointerId); }catch{}
   const v=toV(e.clientX,e.clientY);
   pointer.x=v.x; pointer.y=v.y; pointer.down=true;
   downV=v; downAt=performance.now();
@@ -1532,12 +1755,20 @@ canvas.addEventListener('pointermove',e=>{
   if(STATE==='drift' && pointer.down) driftPointer={x:v.x,y:v.y};
   pointer.x=v.x; pointer.y=v.y;
 });
-addEventListener('pointerup',()=>{
+
+function releasePointer(cancelled=false){
   pointer.down=false;
   canvas.style.cursor='default';
   if(STATE==='drift'){ driftPointer=null; }
   if(dragObj){
     const o=dragObj; dragObj=null;
+    if(cancelled){
+      o.state='rest'; o.settleT=0; o.sx=o.x; o.sy=o.y; o.srot=o.rot;
+      o.restTo={x:o.homeX,y:o.homeY};
+      o.tilt=0;
+      hoverSlot=null;
+      return;
+    }
     const wasTap = downV && dist(pointer.x,pointer.y,downV.x,downV.y)<9
                    && (performance.now()-downAt)<380;
     if(wasTap && decay<0.7){
@@ -1556,29 +1787,56 @@ addEventListener('pointerup',()=>{
       o.restTo={x:restX,y:restY};
     }
   }
+}
+
+addEventListener('pointerup',event=>{
+  if(activePointerId!==null&&event.pointerId!==activePointerId) return;
+  releasePointer(false);
+  if(activePointerId!==null&&canvas.hasPointerCapture(activePointerId)){
+    try{ canvas.releasePointerCapture(activePointerId); }catch{}
+  }
+  activePointerId=null;
+});
+canvas.addEventListener('pointercancel',event=>{
+  if(activePointerId!==null&&event.pointerId!==activePointerId) return;
+  releasePointer(true);
+  activePointerId=null;
+});
+canvas.addEventListener('lostpointercapture',()=>{
+  if(pointer.down) releasePointer(true);
+  activePointerId=null;
 });
 
 /* ---------------- entry ---------------- */
 const beginBtn=document.getElementById('beginBtn');
 beginBtn.onclick=()=>{
   initAudio(); // inside the user gesture, for autoplay policy
-  document.getElementById('intake').classList.add('hidden');
+  const intake=document.getElementById('intake');
+  intake.classList.add('hidden');
+  intake.setAttribute('aria-hidden','true');
   setTimeout(()=>beginArrive(), 600);
 };
 
 /* pacing + mute */
 function setPace(k){
   paceKey=k;
-  document.getElementById('paceBtn').textContent=pace().label;
+  const paceButton=document.getElementById('paceBtn');
+  paceButton.textContent=pace().label;
+  paceButton.setAttribute('aria-pressed',String(paceKey==='compressed'));
   document.getElementById('paceBtn2').textContent=pace().endLabel;
 }
 document.getElementById('paceBtn').onclick=()=>setPace(paceKey==='compressed'?'real':'compressed');
 document.getElementById('paceBtn2').onclick=()=>{ setPace(paceKey==='compressed'?'real':'compressed'); restart(); };
 document.getElementById('muteBtn').onclick=()=>{ if(!AC) initAudio(); setMuted(!muted); };
 document.getElementById('replayBtn').onclick=()=>restart();
+setPace(paceKey);
+setMuted(muted);
 
 function restart(){
-  document.getElementById('endCard').classList.add('hidden');
+  const endCard=document.getElementById('endCard');
+  const intake=document.getElementById('intake');
+  endCard.classList.add('hidden');
+  endCard.setAttribute('aria-hidden','true');
   closeNameBox(false); stopVistaAudio();
   objects=[]; slots=[]; dragObj=null; hoverSlot=null;
   wipeProg=0; lastWipe=null; signDone=false; signSwing=0; darkT=0;
@@ -1588,7 +1846,10 @@ function restart(){
   entities=[]; speciesBag=[]; finalEntity=null; vistaDone=false;
   driftLight=null; driftPointer=null;
   STATE='intake';
-  document.getElementById('intake').classList.remove('hidden');
+  intake.classList.remove('hidden');
+  intake.setAttribute('aria-hidden','false');
+  actionDock.hidden=true;
+  semanticRenderKey='';
 }
 
 /* ---------------- main loop ---------------- */
@@ -1596,7 +1857,7 @@ let last=performance.now();
 function frame(now){
   const dt=Math.min((now-last)/1000, 0.05); last=now;
   const t=now/1000;
-  update(dt,t); draw(t,dt);
+  update(dt,t); syncSemanticUI(); draw(t,dt);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
@@ -1609,6 +1870,10 @@ window.__ct = {
   get slots(){ return slots.map(s=>({x:s.x,y:s.y,drawer:s.drawer,occupied:s.occupied})); },
   get entities(){ return entities.map(e=>({kind:e.kind,x:e.x,y:e.y,phase:e.phase,final:e.final})); },
   get vistaT(){ return vistaT; },
+  get portraitMode(){ return portraitMode; },
+  get reduceMotion(){ return reduceMotion; },
+  get pointerDown(){ return pointer.down; },
+  get dragging(){ return Boolean(dragObj); },
   toScreen(x,y){ return {x:x*scaleF+offX, y:y*scaleF+offY}; },
   lightLamp(){ if(STATE==='arrive') lightLamp(); },
   nameObject(i,text){ const o=objects[i]; if(o){ o.label=text; o.labelSetT=playT; o.labelA=1; } },
@@ -1622,11 +1887,7 @@ window.__ct = {
   },
   setDecay(d){ playT = d*pace().decayTime; },
   finishWipe(){ if(STATE==='wipe') finishWipe(); },
-  vistaTapNext(){
-    const e=entities.find(e=>!e.crossed && (e.phase==='wait'||e.phase==='approach'||e.phase==='linger'));
-    if(!e) return false;
-    vistaTap({x:e.x,y:e.y}); return true;
-  },
+  vistaTapNext(){ return helpNextVisitor(); },
   setVistaT(frac){ vistaT = frac*pace().vistaTime; nextSpawn=0.05; },
   finishDrift(){ if(STATE==='drift'){ STATE='return'; returnT=0;
     if(finalEntity&&driftLight){ driftLight.tx=finalEntity.x; driftLight.ty=finalEntity.y-40; } } },

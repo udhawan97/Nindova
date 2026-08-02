@@ -37,6 +37,10 @@ export interface ClosingTimeDebug {
     final: boolean;
   }>;
   readonly vistaT: number;
+  readonly portraitMode: boolean;
+  readonly reduceMotion: boolean;
+  readonly pointerDown: boolean;
+  readonly dragging: boolean;
   toScreen(x: number, y: number): { x: number; y: number };
   lightLamp(): void;
   nameObject(index: number, text: string): void;
