@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Nindova window mark">
+  <rect width="64" height="64" rx="12" fill="#17120f"/>
+  <path d="M14 13h36v35H14zM32 13v35M14 31h36" fill="none" stroke="#eadbc3" stroke-width="3"/>
+  <path d="M23 53h18" stroke="#d89a58" stroke-width="4" stroke-linecap="round"/>
+</svg>

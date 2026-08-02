@@ -1,0 +1,3 @@
+# Paste this as your first message to Codex
+
+Read nindova-master-brief.md in full before doing anything. nindova-demo.html is the current working build — extend it, don't rewrite it. test-demo.mjs is the Playwright arc test; it must pass after every slice (`npm install playwright`, create a `shots/` folder next to the HTML). Follow §0 strictly: interview me first with the §12 questions (options with trade-offs), then propose a Must/Should/Could plan and wait for my sign-off before writing code. The Two-Loop Law in §3 and the one-line test in §0 override any idea you have that conflicts with them.

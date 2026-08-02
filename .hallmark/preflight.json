@@ -1,0 +1,20 @@
+{
+  "date": "2026-08-02",
+  "framework": "empty repository with a supplied standalone Canvas demo",
+  "font_stack": "seed uses Georgia and Iowan Old Style",
+  "palette": "seed uses warm near-black, parchment ink, and amber accent",
+  "motion": "seed uses Canvas animation and CSS transitions; no motion library",
+  "spacing": "no shared scale existed",
+  "preserve": [
+    "warm-dark palette direction",
+    "literary type voice",
+    "quiet restrained motion",
+    "supplied Session behavior"
+  ],
+  "introduce": [
+    "portable OKLCH tokens",
+    "atmospheric narrative macrostructure",
+    "semantic interaction states",
+    "responsive and slop-test gates"
+  ]
+}

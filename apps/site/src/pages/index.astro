@@ -1,0 +1,178 @@
+---
+import "../styles/global.css";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const href = (path: string) => `${base}${path}` || "/";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; base-uri 'self'; object-src 'none'; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    />
+    <meta
+      name="description"
+      content="Nindova is a quiet fifteen-minute ritual that puts the day away, crosses one Vista, and ends itself."
+    />
+    <link rel="icon" href={href("/favicon.svg")} type="image/svg+xml" />
+    <title>Nindova — put the day away</title>
+  </head>
+  <body class="landing">
+    <header class="nav-edge" aria-label="Primary navigation">
+      <a class="wordmark" href={href("/")} aria-label="Nindova home">Nindova</a>
+      <a class="nav-action" href={href("/play/")}>Play tonight</a>
+    </header>
+
+    <main>
+      <section class="window-hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="hero-premise">A small room after a long day.</p>
+          <h1 id="hero-title">Put the day away.</h1>
+          <p class="hero-lede">
+            A quiet fifteen-minute ritual: clear one desk, cross one changing Vista, follow the last
+            light home, and leave. The Session ends itself.
+          </p>
+          <div class="hero-actions">
+            <a class="action-primary" href={href("/play/")}>Enter Nindova</a>
+            <a class="action-text" href={href("/docs/")}>Read the contract <span aria-hidden="true">→</span></a>
+          </div>
+          <p class="trust-line">Nothing to win. Nothing tracked. Nothing you can do wrong.</p>
+        </div>
+
+        <figure class="window-art">
+          <svg viewBox="0 0 620 690" role="img" aria-labelledby="window-title window-desc">
+            <title id="window-title">A warm desk beneath a rain-dark window</title>
+            <desc id="window-desc">
+              A lamp lights a letter, key, mug, and book. Rain crosses the dark panes while a small
+              animal waits beyond the glass.
+            </desc>
+            <g class="window-sky">
+              <path d="M82 72H534V478H82Z" />
+              <path class="window-moon" d="M438 122a46 46 0 1 0 35 74 40 40 0 1 1-35-74Z" />
+              <path class="rain rain-a" d="m139 118-20 50m92-76-24 62m111-30-21 54m104-83-26 70m101-32-19 50" />
+              <path class="rain rain-b" d="m115 238-20 50m99-72-24 62m105-28-21 54m114-76-26 70m84-24-19 50" />
+              <path class="hill" d="M82 390c86-83 155-89 218-28 63-74 139-72 234 8v108H82Z" />
+              <path class="visitor" d="M392 376c5-24 20-38 42-38 26 0 44 21 45 54-19 13-63 12-87-1Z" />
+              <path class="visitor-detail" d="m405 347-7-22m51 18 9-23m-51 61c16 8 34 8 52 0" />
+            </g>
+            <g class="window-frame">
+              <path d="M62 52H554V498H62Z" />
+              <path d="M308 52V498M62 274H554" />
+              <path class="sill" d="M42 498H574V524H42Z" />
+            </g>
+            <g class="desk">
+              <path class="desk-top" d="M18 536H602V576H18Z" />
+              <path class="desk-face" d="M42 576H578V664H42Z" />
+              <path class="drawer" d="M400 590H548V640H400Z" />
+              <path class="drawer-pull" d="M457 606h34" />
+            </g>
+            <g class="lamp">
+              <path class="lamp-stem" d="m192 548 34-140 88-44" />
+              <path class="lamp-shade" d="m282 334 77 43-42 70-94-42Z" />
+              <ellipse class="lamp-pool" cx="315" cy="548" rx="151" ry="31" />
+              <path class="lamp-base" d="M146 548h94" />
+            </g>
+            <g class="objects">
+              <path class="object-letter" d="M275 524h86v35h-86Zm0 0 43 22 43-22" />
+              <path class="object-key" d="M396 546a14 14 0 1 1 12 13h45m-12 0v-12m12 12v-10" />
+              <path class="object-mug" d="M102 505h57v53h-57Zm57 12h13c15 0 15 26 0 26h-13" />
+              <path class="object-steam" d="M118 493c-7-10 8-17 0-29m22 29c-7-10 8-17 0-29" />
+              <path class="object-book" d="M475 529h74v29h-74Zm8-10h66v10h-66" />
+            </g>
+          </svg>
+          <figcaption>Tonight begins at the desk.</figcaption>
+        </figure>
+      </section>
+
+      <section class="arc" aria-labelledby="arc-title">
+        <header class="section-head">
+          <h2 id="arc-title">One fixed arc. No menu.</h2>
+          <p>The room changes. The promise does not.</p>
+        </header>
+        <ol class="arc-steps">
+          <li>
+            <span class="arc-mark" aria-hidden="true"></span>
+            <h3>Put away</h3>
+            <p>Name a thought if you want. Move each visible thing off the desk. Help increases as effort fades.</p>
+          </li>
+          <li>
+            <span class="arc-mark" aria-hidden="true"></span>
+            <h3>Cross</h3>
+            <p>The window opens to meadow or harbor. One small procession moves toward shelter.</p>
+          </li>
+          <li>
+            <span class="arc-mark" aria-hidden="true"></span>
+            <h3>Leave</h3>
+            <p>Follow the last light back. Turn the sign. The room goes dark, and the Session is over.</p>
+          </li>
+        </ol>
+      </section>
+
+      <section class="two-loops" aria-labelledby="loops-title">
+        <div class="loop-copy">
+          <h2 id="loops-title">Satisfying now.<br />Inviting later.</h2>
+          <p>
+            Nindova can feel good while it is happening. It must never use that feeling to make this
+            Session harder to leave.
+          </p>
+        </div>
+        <div class="loop-rules">
+          <p><strong>Inside tonight</strong><span>Touch, settle, cross, close.</span></p>
+          <p><strong>Between nights</strong><span>A changed window. A quiet trace. Nothing owed.</span></p>
+        </div>
+      </section>
+
+      <section class="dawn" aria-labelledby="dawn-title">
+        <div class="dawn-art" aria-hidden="true">
+          <div class="dawn-window">
+            <span class="dawn-sun"></span>
+            <span class="dawn-water"></span>
+            <span class="dawn-boat"></span>
+          </div>
+        </div>
+        <div class="dawn-copy">
+          <h2 id="dawn-title">Morning keeps one still.</h2>
+          <p>
+            After a completed Session, Dawn can return the Vista at first light as a local still and
+            a subtle silent loop. No notification brings you back. You choose whether to look.
+          </p>
+        </div>
+      </section>
+
+      <section class="local" aria-labelledby="local-title">
+        <p class="local-statement" id="local-title">Your night stays on this device.</p>
+        <div class="local-detail">
+          <p>No account.</p>
+          <p>No analytics.</p>
+          <p>No sleep score.</p>
+        </div>
+      </section>
+
+      <section class="closing" aria-labelledby="closing-title">
+        <h2 id="closing-title">Fifteen minutes. Then dark.</h2>
+        <p>
+          Nindova is behavioral design, not a sleep tracker or treatment. It is intended for ages 13
+          and up. Persistent sleep difficulty deserves evidence-based care such as CBT-I with a
+          qualified clinician.
+        </p>
+        <a class="action-primary" href={href("/play/")}>Play tonight</a>
+      </section>
+    </main>
+
+    <footer class="foot-stmt">
+      <p class="foot-stmt-line">The room goes dark.<br />Nindova stops.</p>
+      <div class="foot-meta">
+        <a class="wordmark" href={href("/")}>Nindova</a>
+        <nav aria-label="Footer navigation">
+          <a href={href("/docs/")}>Docs</a>
+          <a href="https://github.com/udhawan97/Nindova">GitHub</a>
+        </nav>
+        <span>Behavioral design study · 13+</span>
+      </div>
+    </footer>
+  </body>
+</html>

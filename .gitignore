@@ -1,0 +1,23 @@
+node_modules/
+.astro/
+.tmp/
+.DS_Store
+
+# Generated builds and browser evidence
+dist/
+apps/*/dist/
+artifacts/
+playwright-report/
+test-results/
+.playwright-cli/
+output/playwright/
+
+# Local runtime state and temporary exports
+*.local
+*.log
+*.tmp
+*.webm
+*.mp4
+*.png
+!apps/site/public/**/*.png
+!apps/site/public/**/*.webp
