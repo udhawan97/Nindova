@@ -13,6 +13,7 @@ export type SessionState =
 
 export interface SessionObjectSnapshot {
   id: number;
+  kind: string;
   x: number;
   y: number;
   state: string;
@@ -62,6 +63,30 @@ export interface ClosingTimeDebug {
     focus: number;
     veil: number;
   };
+  readonly night: null | {
+    nightId: string;
+    dawnDate: string;
+    timeZone: string;
+    recipeVersion: number;
+    startedAt: string;
+  };
+  readonly recipe: {
+    version: number;
+    weather: string;
+    moon: string;
+    objectKinds: readonly string[];
+    meadowSpecies: readonly string[];
+    harborBoats: readonly string[];
+    meadowAccent: string;
+    harborPaint: string;
+  };
+  readonly memory: {
+    version: number;
+    lastCompleted: Record<string, unknown> | null;
+    meadowEcho: Record<string, unknown> | null;
+    harborEchoes: ReadonlyArray<Record<string, unknown>>;
+  };
+  readonly localRecovery: { recovered: boolean; reason: string };
   toScreen(x: number, y: number): { x: number; y: number };
   lightLamp(): void;
   nameObject(index: number, text: string): void;
@@ -75,6 +100,7 @@ export interface ClosingTimeDebug {
   tapSign(): void;
   sampleAssistance(decay: number): ClosingTimeDebug["assistance"];
   sampleLightBudget(progress: number): Pick<ClosingTimeDebug["light"], "progress" | "meanBudget" | "peakBudget">;
+  recipeForNight(nightId: string): ClosingTimeDebug["recipe"];
   advanceBy(seconds: number): boolean;
 }
 

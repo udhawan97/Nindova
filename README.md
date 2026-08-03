@@ -6,7 +6,7 @@ Nindova is a bounded late-night ritual: put away a small visible set, cross one 
 
 ## Current state
 
-This repository contains the supplied playable concept extended into a portrait-first, semantically operable, self-closing Session. The current visual world draws from Punjabi material craft and Indian night landscapes: phulkari geometry, indigo, marigold, terracotta, carved wood, a mustard meadow, and a riverside harbor. The original desktop state order and full asserted arc remain intact. Deterministic nightly memory, Dawn, and offline PWA behavior are planned but are not yet claimed as complete.
+This repository contains the supplied playable concept extended into a portrait-first, semantically operable, self-closing Session. A captured local `nightId` now deterministically selects weather, moon, objects, Visitors, and Vista detail, while one versioned local record keeps only the scene facts needed for a meadow Echo, harbor boats, and the coming Dawn. The current visual world draws from Punjabi material craft and Indian night landscapes: phulkari geometry, indigo, marigold, terracotta, carved wood, a mustard meadow, and a riverside harbor. The original desktop state order and full asserted arc remain intact. Dawn and offline PWA behavior are planned but are not yet claimed as complete.
 
 There is no public deployment yet. The GitHub repository being public does not imply that Pages, a release, or an App Store build exists.
 
@@ -50,6 +50,7 @@ npm run test:seed:observe
 npm run test:arc
 npm run test:portrait
 npm run test:self-closing
+npm run test:night
 npm run build
 ```
 

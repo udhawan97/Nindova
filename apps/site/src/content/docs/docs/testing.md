@@ -19,6 +19,8 @@ Nindova distinguishes three evidence levels:
 
 `npm run test:self-closing` verifies the production/reviewer boundary, the fifteen-minute production cap contract, monotonic assistance and light envelopes, generated-sprite availability, authored accent inventory, and autonomous closure from no input, partial input, an open naming field, a held touch, lost focus, and a cancelled pointer.
 
+`npm run test:night` checks browser parity with fixed PRNG recipes, corrupt local-state recovery, recipe-to-object rendering, completion persistence, one meadow Echo, and idempotent same-night replay. Unit vectors separately cover the local-noon boundary, DST fallback, two IANA zones, bounded harbor memory, and unavailable storage.
+
 ## Build gates
 
 ```sh
@@ -27,6 +29,7 @@ npm run test:unit
 npm run test:arc
 npm run test:portrait
 npm run test:self-closing
+npm run test:night
 npm run build
 ```
 

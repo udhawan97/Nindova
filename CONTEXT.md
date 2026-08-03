@@ -28,6 +28,10 @@ _Avoid_: Reward, collectible, unlock
 A quiet, non-numeric trace of a previously settled Visitor that is unaffected by nights when no Session occurs.
 _Avoid_: Trophy, history count, attendance marker
 
+**Night ID**:
+The immutable Dawn date, captured IANA time zone, and recipe version that select one deterministic night. It is captured once when a Session begins and cannot change when midnight, daylight-saving time, or the device zone changes.
+_Avoid_: Daily seed, streak day, attendance date
+
 **Dawn**:
 The before-noon return to the previous Session's Vista, rendered at first light as the product's only reward-bearing surface.
 _Avoid_: Daily reward, check-in bonus, morning streak

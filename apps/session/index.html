@@ -180,6 +180,7 @@
   </div>
 </div>
 
+<script src="./night-core.js"></script>
 <script>
 'use strict';
 /* ============================================================
@@ -284,6 +285,39 @@ let lastAutoStoreAt=-Infinity, capClosing=false;
 let wipePending=false, wipePendingT=0, signCloseT=0, namingOpenedAt=0, endReason='completed';
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
 let reduceMotion = motionPreference.matches;
+const Night=globalThis.NindovaNight;
+if(!Night) throw new Error('Nindova night core did not load');
+let activeNight=null;
+let nightRecipe=Night.recipeForNight('nindova-preview|r1');
+let nightStorage=null;
+try{ nightStorage=globalThis.localStorage; }catch{}
+let nightRead=Night.readStorage(nightStorage);
+let nightMemory=nightRead.state;
+
+function startNight(){
+  if(!activeNight) activeNight=Night.captureNight(new Date());
+  nightRecipe=Night.recipeForNight(activeNight.nightId);
+  nightRead=Night.readStorage(nightStorage);
+  nightMemory=nightRead.state;
+  initRain();
+  if(nightRead.recovered) srStatus.textContent='Local scene memory started fresh.';
+}
+
+function recordNightCompletion(){
+  if(!activeNight) startNight();
+  const finalKind=finalEntity?.kind
+    ?? (vistaChoice==='meadow'?nightRecipe.meadowSpecies[0]:nightRecipe.harborBoats[0]);
+  const completion={
+    ...activeNight,
+    vista:vistaChoice,
+    finalKind,
+    completedAt:new Date().toISOString()
+  };
+  const result=Night.completeState(nightMemory,completion);
+  nightMemory=result.state;
+  if(result.changed) Night.writeStorage(nightStorage,nightMemory);
+  return result.changed;
+}
 
 /* ---------------- scene geometry ---------------- */
 const WIN = {x:84, y:96, w:330, h:368};                  // window
@@ -307,8 +341,7 @@ function buildSlots(n){
   return s;
 }
 
-/* object kinds — procedural sketches */
-const KINDS=['letter','key','mug','book','coin','spool','watch','photo','leaf','pencil'];
+/* illustrated focal sprites with procedural fallbacks */
 const FOCAL_SPRITES=new Image();
 FOCAL_SPRITES.decoding='async';
 FOCAL_SPRITES.src='./assets/focal-sprites.png';
@@ -328,7 +361,7 @@ function drawFocalSprite(kind,x,y,w,h){
 function makeObjects(n){
   const arr=[];
   const spread = Math.min(660, 110*n);
-  const kindsTonight = [...KINDS].sort(()=>Math.random()-0.5); // different objects each night
+  const kindsTonight = nightRecipe.objectKinds;
   let prevX = -999;
   for(let i=0;i<n;i++){
     let x = 170 + (i+0.5)*(spread/n) + rnd(-16,16);
@@ -444,11 +477,20 @@ function setMuted(m){
    RAIN + MOTES particles
    ============================================================ */
 const drops=[]; const streaks=[];
+function weatherScale(){
+  return ({
+    'soft-monsoon':1.2,
+    'distant-rain':.78,
+    'still-haze':.34,
+    'clear-indigo':.12
+  }[nightRecipe.weather]??.78);
+}
 function initRain(){
   drops.length=0; streaks.length=0;
-  const N = reduceMotion? 26: 60;
+  const density=weatherScale();
+  const N = Math.round((reduceMotion?26:60)*density);
   for(let i=0;i<N;i++) drops.push({x:rnd(WIN.x+6,WIN.x+WIN.w-6),y:rnd(WIN.y,WIN.y+WIN.h),v:rnd(160,300),l:rnd(8,18)});
-  for(let i=0;i<10;i++) streaks.push({x:rnd(WIN.x+8,WIN.x+WIN.w-8),y:rnd(WIN.y,WIN.y+WIN.h),v:rnd(6,16)});
+  for(let i=0;i<Math.max(2,Math.round(10*density));i++) streaks.push({x:rnd(WIN.x+8,WIN.x+WIN.w-8),y:rnd(WIN.y,WIN.y+WIN.h),v:rnd(6,16)});
   motes.length=0;
   for(let i=0;i<14;i++) motes.push({x:rnd(500,780),y:rnd(390,520),v:rnd(2,7),a:rnd(.05,.16),ph:rnd(0,6)});
 }
@@ -833,27 +875,34 @@ let entities=[], nextSpawn=1.5, speciesBag=[], finalEntity=null, vistaDone=false
 let fullRain=[], crickets=null, waterTimer=null;
 let driftLight=null, driftPointer=null, lastDriftTouch=0;
 
-let moonCv=null;
+const moonSprites=new Map();
 function moonSprite(){
-  if(moonCv) return moonCv;
-  moonCv=document.createElement('canvas'); moonCv.width=64; moonCv.height=64;
+  const phase=nightRecipe.moon;
+  if(moonSprites.has(phase)) return moonSprites.get(phase);
+  const moonCv=document.createElement('canvas'); moonCv.width=64; moonCv.height=64;
   const m=moonCv.getContext('2d');
   m.fillStyle='#d8cba8'; m.beginPath(); m.arc(32,32,26,0,Math.PI*2); m.fill();
   m.globalCompositeOperation='destination-out';
-  m.beginPath(); m.arc(43,23,23,0,Math.PI*2); m.fill();
+  if(phase==='half') m.fillRect(32,3,31,58);
+  else {
+    m.beginPath(); m.arc(phase==='veiled'?39:43,phase==='veiled'?27:23,phase==='veiled'?21:23,0,Math.PI*2); m.fill();
+  }
+  if(phase==='veiled'){
+    m.globalCompositeOperation='source-over';
+    m.fillStyle='rgba(24,31,48,.32)'; m.fillRect(4,24,56,12);
+  }
+  moonSprites.set(phase,moonCv);
   return moonCv;
 }
 
-const MEADOW_SPECIES=['sheep','goose','tortoise','rabbit'];
-const BOAT_KINDS=['skiff','tug'];
 const FENCE_X=740;
 
 function vDecay(){ return clamp(vistaT/pace().vistaTime,0,1); }
 
 function drawnBag(){
   if(!speciesBag.length){
-    const src = vistaChoice==='meadow'? MEADOW_SPECIES : BOAT_KINDS;
-    speciesBag = [...src].sort(()=>Math.random()-0.5);
+    const src = vistaChoice==='meadow'? nightRecipe.meadowSpecies : nightRecipe.harborBoats;
+    speciesBag = [...src];
   }
   return speciesBag.pop();
 }
@@ -862,7 +911,7 @@ function beginVista(){
   STATE='vista'; vistaT=0; entities=[]; speciesBag=[]; finalEntity=null; vistaDone=false;
   vistaFade=0; vistaCloseT=0; nextSpawn=1.2;
   fullRain=[];
-  const N=reduceMotion?18:40;
+  const N=Math.max(4,Math.round((reduceMotion?18:40)*weatherScale()));
   for(let i=0;i<N;i++) fullRain.push({x:rnd(0,VW),y:rnd(0,VH),v:rnd(110,210),l:rnd(10,20)});
   startVistaAudio();
   hint(vistaChoice==='meadow' ? 'Let them over, whenever you\'re ready.' : 'Bring each one in to its light.', 1.2, 5);
@@ -1129,16 +1178,22 @@ function drawMeadow(t,D){
     ctx.beginPath(); ctx.moveTo(gx,gy); ctx.quadraticCurveTo(gx+2,gy-10,gx+rnd2(i,-4,4),gy-14); ctx.stroke();
   }
   // mustard flowers read as a field, never as collectible markers
+  const accent={marigold:'216,161,48',saffron:'202,127,38',wheat:'191,164,91'}[nightRecipe.meadowAccent]??'216,161,48';
   ctx.lineWidth=1.2;
   for(let i=0;i<34;i++){
     const gx=rnd2(i*11+6,24,VW-24), gy=rnd2(i*17+9,610,718);
     const height=rnd2(i*19+4,10,24);
     ctx.strokeStyle='rgba(94,100,48,.55)';
     ctx.beginPath(); ctx.moveTo(gx,gy); ctx.lineTo(gx,gy-height); ctx.stroke();
-    ctx.fillStyle=`rgba(216,161,48,${.22+(1-D)*.16})`;
+    ctx.fillStyle=`rgba(${accent},${.22+(1-D)*.16})`;
     ctx.beginPath(); ctx.arc(gx,gy-height,2.1,0,7); ctx.arc(gx-3,gy-height+2,1.6,0,7); ctx.fill();
   }
-  // entities
+  if(nightMemory.meadowEcho){
+    ctx.save(); ctx.globalAlpha=.26;
+    drawAnimal({kind:nightMemory.meadowEcho.kind,x:FENCE_X+118,y:600,phase:'echo',t:0,bob:0},t);
+    ctx.restore();
+  }
+  // tonight's entities
   for(const e of entities) drawAnimal(e,t);
 }
 
@@ -1216,10 +1271,11 @@ function drawAnimal(e,t){
 
 function drawHarbor(t,D){
   // quiet Indian riverside landing, retaining the fixed harbor path
+  const paint={indigo:'74,91,132',madder:'133,62,49',marigold:'193,132,38'}[nightRecipe.harborPaint]??'74,91,132';
   const wg=ctx.createLinearGradient(0,470,0,VH);
   wg.addColorStop(0,'#141a1e'); wg.addColorStop(1,'#101211');
   ctx.fillStyle=wg; ctx.fillRect(0,470,VW,VH-470);
-  ctx.strokeStyle='rgba(160,180,190,0.08)';
+  ctx.strokeStyle=`rgba(${paint},0.10)`;
   for(let i=0;i<8;i++){
     const wy=500+i*30, ph=t*0.5+i;
     ctx.beginPath();
@@ -1233,6 +1289,12 @@ function drawHarbor(t,D){
   for(let i=0;i<5;i++){
     ctx.beginPath(); ctx.moveTo(0,486+i*22); ctx.lineTo(220-i*24,486+i*22); ctx.stroke();
   }
+  nightMemory.harborEchoes.forEach((echo,index,list)=>{
+    ctx.save();
+    ctx.globalAlpha=.10+.22*((index+1)/list.length);
+    drawBoat({kind:echo.kind,x:FENCE_X+150+index*64,y:560+index*17,bob:index,phase:'moored',lampA:.18},t);
+    ctx.restore();
+  });
   // far shore
   ctx.fillStyle='#131410';
   ctx.beginPath(); ctx.moveTo(0,470);
@@ -1680,6 +1742,7 @@ function closeOptionalNaming(){
 function showEnd(reason='completed'){
   if(STATE==='end') return;
   endReason=reason;
+  recordNightCompletion();
   releasePointer(true);
   closeOptionalNaming();
   stopVistaAudio();
@@ -2010,6 +2073,7 @@ document.addEventListener('visibilitychange',()=>{
 /* ---------------- entry ---------------- */
 const beginBtn=document.getElementById('beginBtn');
 beginBtn.onclick=()=>{
+  startNight();
   initAudio(); // inside the user gesture, for autoplay policy
   const intake=document.getElementById('intake');
   intake.classList.add('hidden');
@@ -2073,7 +2137,7 @@ requestAnimationFrame(frame);
 window.__ct = {
   get state(){ return STATE; },
   get decay(){ return decay; },
-  get objects(){ return objects.map(o=>({id:o.id,x:o.x,y:o.y,state:o.state,label:o.label})); },
+  get objects(){ return objects.map(o=>({id:o.id,kind:o.kind,x:o.x,y:o.y,state:o.state,label:o.label})); },
   get slots(){ return slots.map(s=>({x:s.x,y:s.y,drawer:s.drawer,occupied:s.occupied})); },
   get entities(){ return entities.map(e=>({kind:e.kind,x:e.x,y:e.y,phase:e.phase,final:e.final})); },
   get vistaT(){ return vistaT; },
@@ -2091,6 +2155,10 @@ window.__ct = {
   get authoredAccents(){ return Object.keys(AUTHORED_ACCENTS); },
   get assistance(){ return assistanceEnvelope(); },
   get light(){ return lightEnvelope(); },
+  get night(){ return activeNight?{...activeNight}:null; },
+  get recipe(){ return {...nightRecipe,objectKinds:[...nightRecipe.objectKinds],meadowSpecies:[...nightRecipe.meadowSpecies],harborBoats:[...nightRecipe.harborBoats]}; },
+  get memory(){ return JSON.parse(JSON.stringify(nightMemory)); },
+  get localRecovery(){ return {recovered:nightRead.recovered,reason:nightRead.reason}; },
   toScreen(x,y){ return {x:x*scaleF+offX, y:y*scaleF+offY}; },
   lightLamp(){ if(STATE==='arrive') lightLamp(); },
   nameObject(i,text){ const o=objects[i]; if(o){ o.label=text; o.labelSetT=playT; o.labelA=1; } },
@@ -2111,6 +2179,7 @@ window.__ct = {
   tapSign(){ if(STATE==='sign') tapSign(); },
   sampleAssistance(value){ return assistanceEnvelope(value); },
   sampleLightBudget(value){ return lightBudgetAt(value); },
+  recipeForNight(nightId){ return Night.recipeForNight(nightId); },
   advanceBy(seconds){
     if(!reviewerMode||!Number.isFinite(seconds)||seconds<0) return false;
     const steps=Math.ceil(seconds/.05);

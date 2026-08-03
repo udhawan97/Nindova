@@ -16,12 +16,12 @@ The build starts from the supplied standalone Canvas demo and extracts modules o
 - **Core** owns state order, clocks, decay, fallbacks, and closure.
 - **Stage** owns procedural Punjabi/Indian environments, composition, illustrated focal sprites with procedural fallbacks, and a monotonic luminance budget.
 - **Interaction** owns pointer and semantic equivalents, focus, and status output.
+- **Night** owns the immutable `nightId`, seeded recipe, versioned local schema, safe recovery, and idempotent Echo updates.
 
 The production clock defaults to the fifteen-minute cap. Reviewer pacing is available only through an explicit `?review=1` test switch; its visible evidence and replay controls never appear in production mode. The standalone build embeds the focal sprite sheet while the multi-file build loads the same checked asset.
 
 ## Planned boundaries
 
-- **Night** owns `nightId`, deterministic recipes, and quiet local memory.
 - **Dawn** owns morning eligibility, rendering, and local export.
 - **Browser** owns standalone output, PWA shell, service worker, and install/update behavior.
 

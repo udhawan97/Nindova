@@ -11,6 +11,7 @@ Nindova is a bounded late-night ritual. A person puts away a visible set, crosse
 
 - [Getting started](./getting-started/) explains the local workspace and commands.
 - [Product contract](./product-contract/) records the promises every implementation must keep.
+- [Night and local state](./night-and-local-state/) explains deterministic recipes, Echoes, and the bounded local schema.
 - [Accessibility](./accessibility/) explains the semantic action layer and alternate presentation.
 - [Architecture](./architecture/) describes the browser-first module boundaries.
 - [Testing](./testing/) separates observational evidence from regression gates.
