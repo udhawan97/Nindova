@@ -1,4 +1,4 @@
-export const RASOI_RECIPE_VERSION = 3;
+export const RASOI_RECIPE_VERSION = 4;
 
 export const RASOI_MOTIFS = Object.freeze([
   Object.freeze({ id: "belan", label: "belan rolling pin" }),
@@ -13,6 +13,22 @@ export const RASOI_MOTIFS = Object.freeze([
 ] as const);
 
 export type RasoiMotifId = (typeof RASOI_MOTIFS)[number]["id"];
+export type RasoiProfileId = "gentle" | "deeper";
+
+export const RASOI_PROFILES = Object.freeze([
+  Object.freeze({
+    id: "gentle" as const,
+    label: "Gentle stack",
+    description: "Broader openings and a quieter search.",
+    layers: 3,
+  }),
+  Object.freeze({
+    id: "deeper" as const,
+    label: "Deeper stack",
+    description: "More overlap and a little more looking ahead.",
+    layers: 4,
+  }),
+] as const);
 
 export interface RasoiTile {
   readonly id: string;
@@ -29,6 +45,7 @@ export interface RasoiTile {
 export interface RasoiBoard {
   readonly id: string;
   readonly recipeVersion: number;
+  readonly profile: RasoiProfileId;
   readonly motifOrder: readonly RasoiMotifId[];
   readonly tiles: readonly RasoiTile[];
 }
@@ -54,7 +71,7 @@ interface LayoutTile {
   readonly motifIndex: number;
 }
 
-const LAYOUT: readonly LayoutTile[] = Object.freeze([
+const GENTLE_LAYOUT: readonly LayoutTile[] = Object.freeze([
   { id: "b0-0", x: 0, y: 0, layer: 0, motifIndex: 3 },
   { id: "b0-1", x: 2, y: 0, layer: 0, motifIndex: 6 },
   { id: "b0-2", x: 4, y: 0, layer: 0, motifIndex: 6 },
@@ -93,6 +110,54 @@ const LAYOUT: readonly LayoutTile[] = Object.freeze([
   { id: "t-3", x: 8, y: 3, layer: 2, motifIndex: 4 },
 ].map((tile) => Object.freeze(tile)));
 
+const DEEPER_LAYOUT: readonly LayoutTile[] = Object.freeze([
+  { id: "b0-0", x: 0, y: 0, layer: 0, motifIndex: 6 },
+  { id: "b0-1", x: 2, y: 0, layer: 0, motifIndex: 0 },
+  { id: "b0-2", x: 4, y: 0, layer: 0, motifIndex: 5 },
+  { id: "b0-3", x: 6, y: 0, layer: 0, motifIndex: 0 },
+  { id: "b0-4", x: 8, y: 0, layer: 0, motifIndex: 6 },
+  { id: "b1-0", x: 0, y: 2, layer: 0, motifIndex: 7 },
+  { id: "b1-1", x: 2, y: 2, layer: 0, motifIndex: 6 },
+  { id: "b1-2", x: 4, y: 2, layer: 0, motifIndex: 5 },
+  { id: "b1-3", x: 6, y: 2, layer: 0, motifIndex: 6 },
+  { id: "b1-4", x: 8, y: 2, layer: 0, motifIndex: 7 },
+  { id: "b2-0", x: 0, y: 4, layer: 0, motifIndex: 2 },
+  { id: "b2-1", x: 2, y: 4, layer: 0, motifIndex: 1 },
+  { id: "b2-2", x: 4, y: 4, layer: 0, motifIndex: 3 },
+  { id: "b2-3", x: 6, y: 4, layer: 0, motifIndex: 1 },
+  { id: "b2-4", x: 8, y: 4, layer: 0, motifIndex: 2 },
+  { id: "b3-0", x: 0, y: 6, layer: 0, motifIndex: 4 },
+  { id: "b3-1", x: 2, y: 6, layer: 0, motifIndex: 7 },
+  { id: "b3-2", x: 4, y: 6, layer: 0, motifIndex: 3 },
+  { id: "b3-3", x: 6, y: 6, layer: 0, motifIndex: 7 },
+  { id: "b3-4", x: 8, y: 6, layer: 0, motifIndex: 4 },
+  { id: "m0-0", x: 1, y: 1, layer: 1, motifIndex: 8 },
+  { id: "m0-1", x: 3, y: 1, layer: 1, motifIndex: 5 },
+  { id: "m0-2", x: 5, y: 1, layer: 1, motifIndex: 4 },
+  { id: "m0-3", x: 7, y: 1, layer: 1, motifIndex: 5 },
+  { id: "m0-4", x: 9, y: 1, layer: 1, motifIndex: 8 },
+  { id: "m1-0", x: 1, y: 5, layer: 1, motifIndex: 2 },
+  { id: "m1-1", x: 3, y: 5, layer: 1, motifIndex: 8 },
+  { id: "m1-2", x: 5, y: 5, layer: 1, motifIndex: 4 },
+  { id: "m1-3", x: 7, y: 5, layer: 1, motifIndex: 8 },
+  { id: "m1-4", x: 9, y: 5, layer: 1, motifIndex: 2 },
+  { id: "u-0", x: 2, y: 3, layer: 2, motifIndex: 1 },
+  { id: "u-1", x: 4, y: 3, layer: 2, motifIndex: 0 },
+  { id: "u-2", x: 6, y: 3, layer: 2, motifIndex: 0 },
+  { id: "u-3", x: 8, y: 3, layer: 2, motifIndex: 1 },
+  { id: "c-0", x: 4, y: 3, layer: 3, motifIndex: 3 },
+  { id: "c-1", x: 6, y: 3, layer: 3, motifIndex: 3 },
+].map((tile) => Object.freeze(tile)));
+
+const LAYOUTS: Readonly<Record<RasoiProfileId, readonly LayoutTile[]>> = Object.freeze({
+  gentle: GENTLE_LAYOUT,
+  deeper: DEEPER_LAYOUT,
+});
+
+function profileDefinition(profile: RasoiProfileId) {
+  return RASOI_PROFILES.find((candidate) => candidate.id === profile)!;
+}
+
 function seedFrom(text: string) {
   let hash = 0x811c9dc5;
   for (let index = 0; index < text.length; index += 1) {
@@ -130,10 +195,11 @@ function motifOrderForNight(nightId: string): readonly RasoiMotifId[] {
   ));
 }
 
-function createBoard(nightId: string): RasoiBoard {
+function createBoard(nightId: string, profile: RasoiProfileId = "gentle"): RasoiBoard {
+  if (!(profile in LAYOUTS)) throw new TypeError(`Unknown Rasoi profile: ${profile}`);
   const motifOrder = motifOrderForNight(nightId);
   const layerSlots = new Map<number, number>();
-  const tiles = LAYOUT.map((layout) => {
+  const tiles = LAYOUTS[profile].map((layout) => {
     const slot = layerSlots.get(layout.layer) ?? 0;
     layerSlots.set(layout.layer, slot + 1);
     return Object.freeze({
@@ -148,8 +214,9 @@ function createBoard(nightId: string): RasoiBoard {
     });
   });
   return Object.freeze({
-    id: `rasoi-r${RASOI_RECIPE_VERSION}-${seedFrom(nightId).toString(36)}`,
+    id: `rasoi-r${RASOI_RECIPE_VERSION}-${profile}-${seedFrom(nightId).toString(36)}`,
     recipeVersion: RASOI_RECIPE_VERSION,
+    profile,
     motifOrder,
     tiles: Object.freeze(tiles),
   });
@@ -246,7 +313,7 @@ function isReachableState(board: RasoiBoard, removed: ReadonlySet<string>) {
 }
 
 function verifyBoard(board: RasoiBoard): BoardVerification {
-  if (board.tiles.length !== LAYOUT.length) {
+  if (!(board.profile in LAYOUTS) || board.tiles.length !== LAYOUTS[board.profile].length) {
     return Object.freeze({ valid: false, reachableStates: 0, terminalStates: 0, deadStates: 0, reason: "tile-count" });
   }
   const counts = new Map<string, number>();
@@ -289,6 +356,7 @@ function verifyBoard(board: RasoiBoard): BoardVerification {
 export const NindovaRasoi = Object.freeze({
   RASOI_RECIPE_VERSION,
   RASOI_MOTIFS,
+  RASOI_PROFILES,
   ROWS,
   SLOTS_PER_ROW,
   availabilityReason,
@@ -300,6 +368,7 @@ export const NindovaRasoi = Object.freeze({
   isReachableState,
   legalPairs,
   motifOrderForNight,
+  profileDefinition,
   removePair,
   seedFrom,
   verifyBoard,
