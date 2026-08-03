@@ -11,7 +11,7 @@ Crossing midnight, a daylight-saving transition, or changing device zone cannot 
 
 ## Deterministic recipe
 
-Recipe version 2 uses a stable seeded generator to permute the nine kitchen motifs and choose one cloth tone. It never changes the number of tiles, legal rule, effort envelope, cap, or ending. Pure unit tests pin deterministic recipes and exhaustive solvability for Chicago, Kolkata, and a daylight-saving boundary night.
+Recipe version 3 uses a stable seeded generator to permute the nine kitchen motifs over the fixed layered geometry and choose one cloth tone. It never changes the number of tiles, legal rule, effort envelope, cap, or ending. Pure unit tests pin deterministic recipes and exhaustive solvability for Chicago, Kolkata, and a daylight-saving boundary night.
 
 ## Long-lived state
 
@@ -21,7 +21,7 @@ Nindova writes one current key: `nindova:night-state:v3`. It keeps only:
 - a safely migrated legacy Dawn completion/memory when present; and
 - one optional local “Same time tomorrow?” intention.
 
-Version 1 and version 2 records copy into the v3 union without deleting their source keys. Interaction timestamps are sanitized out. Missing or corrupt state fails open to an empty local record.
+Version 1 and version 2 records copy into the v3 union without deleting their source keys. Existing recipe-two Rasoi completions remain valid for Dawn after the recipe-three board upgrade. Interaction timestamps are sanitized out. Missing or corrupt state fails open to an empty local record.
 
 ## Ephemeral resume
 

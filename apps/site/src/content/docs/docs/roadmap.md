@@ -1,17 +1,21 @@
 ---
 title: Roadmap
-description: What ships in v0.1.0 and what remains deliberately unclaimed.
+description: What exists in the v0.2.0 source candidate and what remains deliberately unclaimed.
 ---
 
-## In v0.1.0
+## In the v0.2.0 source candidate
 
-- Rasoi Pairs pure legality kernel and 36-tile semantic interface.
-- Deterministic recipe version 2 with exhaustive no-dead-state verification.
+- Masala Mound pure legality kernel and 36-Tile, 24/8/4-layer semantic interface.
+- Deterministic recipe version 3 with exhaustive 382-state, no-dead-state verification.
+- Deterministic brass-bloom match feedback with a reduced-motion opacity alternative.
+- Optional screen-away handoff and deliberate same-night return through intake.
 - Hidden twelve-minute automatic settle and fifteen-minute ceiling.
-- Version-3 local state with safe v1/v2 Dawn migration and same-tab resume.
+- Version-3 local state with safe v1/v2 Dawn migration, recipe-two completion preservation, and same-tab resume.
 - Redesigned first-light kitchen Dawn with local still and silent-loop export.
 - Self-contained standalone HTML and separately tested installable offline PWA.
-- Synchronized landing page, Starlight docs, rendered release media, checksums, and release notes.
+- Synchronized landing page, Starlight docs, rendered candidate media, Apache-2.0 licensing, direct QR, and Pages workflow.
+
+The public GitHub release remains v0.1.0 until this candidate is separately approved, tagged, and published.
 
 ## Next hardening
 

@@ -48,11 +48,11 @@ try {
   const registration = await page.evaluate(async () => {
     const ready = await navigator.serviceWorker.ready;
     const keys = await caches.keys();
-    const cache = await caches.open("nindova-session-v3");
+    const cache = await caches.open("nindova-session-v4");
     return { scope: ready.scope, keys, entries: (await cache.keys()).map((request) => request.url) };
   });
   assert.equal(registration.scope, base);
-  assert.ok(registration.keys.includes("nindova-session-v3"));
+  assert.ok(registration.keys.includes("nindova-session-v4"));
   assert.ok(registration.entries.every((url) => url.startsWith(base) && !url.includes("night-state") && !url.startsWith("blob:")));
 
   await page.click("#notNowBtn");

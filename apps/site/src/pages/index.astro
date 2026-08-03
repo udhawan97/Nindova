@@ -4,7 +4,8 @@ import "../styles/global.css";
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const href = (path: string) => `${base}${path}` || "/";
 const releaseUrl = "https://github.com/udhawan97/Nindova/releases/tag/v0.1.0";
-const standaloneUrl = "https://github.com/udhawan97/Nindova/releases/download/v0.1.0/nindova-v0.1.0.html";
+const standaloneUrl = href("/nindova.html");
+const canonicalPlayUrl = "https://udhawan97.github.io/Nindova/play/";
 ---
 
 <!doctype html>
@@ -16,13 +17,13 @@ const standaloneUrl = "https://github.com/udhawan97/Nindova/releases/download/v0
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; base-uri 'self'; object-src 'none'; connect-src 'self'; img-src 'self' data:; media-src 'self' blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
     />
-    <meta name="description" content="Rasoi Pairs is Nindova's calm, bounded pair-removal game made from Indian kitchen forms." />
-    <meta property="og:title" content="Nindova — Rasoi Pairs" />
-    <meta property="og:description" content="Find matching kitchen tiles. Let the board grow lighter. Leave when it closes." />
+    <meta name="description" content="Masala Mound is Nindova's calm, bounded layered pair-removal game made from Indian kitchen forms." />
+    <meta property="og:title" content="Nindova — Masala Mound" />
+    <meta property="og:description" content="Read the layers. Find matching kitchen tiles. Leave when it closes." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href={href("/favicon.svg")} type="image/svg+xml" />
-    <title>Nindova — Rasoi Pairs</title>
+    <title>Nindova — Masala Mound</title>
   </head>
   <body class="landing">
     <header class="site-nav" aria-label="Primary navigation">
@@ -32,7 +33,7 @@ const standaloneUrl = "https://github.com/udhawan97/Nindova/releases/download/v0
       </a>
       <nav>
         <a href={href("/docs/")}>Docs</a>
-        <a href={releaseUrl}>v0.1.0</a>
+        <a href={releaseUrl}>Release history</a>
         <a class="nav-play" href={href("/play/")}>Play this build</a>
       </nav>
     </header>
@@ -43,12 +44,12 @@ const standaloneUrl = "https://github.com/udhawan97/Nindova/releases/download/v0
           <p class="eyebrow">A small kitchen for the end of the day</p>
           <h1 id="hero-title">Find the pairs.<br />Let the kitchen quiet.</h1>
           <p class="hero-lede">
-            Rasoi Pairs is a calm 36-tile game inspired by Mahjong solitaire. Match familiar Indian
-            kitchen forms at the open ends of three racks. The board gets lighter, then the Session ends.
+            Masala Mound is a calm 36-tile game inspired by Mahjong solitaire. Read three overlapping
+            layers, match familiar Indian kitchen forms, and let the Session reach a real ending.
           </p>
           <div class="hero-actions">
-            <a class="button-primary" href={href("/play/")}>Play Rasoi Pairs</a>
-            <a class="button-secondary" href={standaloneUrl}>Download standalone</a>
+            <a class="button-primary" href={href("/play/")}>Play Masala Mound</a>
+            <a class="button-secondary" href={standaloneUrl} download>Download standalone</a>
           </div>
           <p class="trust-line">Nothing to win. Nothing tracked. Nothing you can do wrong.</p>
         </div>
@@ -58,11 +59,11 @@ const standaloneUrl = "https://github.com/udhawan97/Nindova/releases/download/v0
             <img
               src={href("/media/rasoi-board.png")}
               width="840"
-              height="384"
-              alt="The real Rasoi Pairs board with three shallow racks; exposed matching tiles are bright at each end."
+              height="476"
+              alt="The real Masala Mound board with three overlapping layers; six uncovered open-side tiles are bright."
             />
           </div>
-          <figcaption>Rendered from the release Session · no concept mockup</figcaption>
+          <figcaption>Rendered from the v0.2.0 source candidate · no concept mockup</figcaption>
         </figure>
 
         <div class="motif-line" aria-label="Kitchen motifs in Rasoi Pairs">
@@ -75,14 +76,14 @@ const standaloneUrl = "https://github.com/udhawan97/Nindova/releases/download/v0
           <p class="eyebrow">One rule, all night</p>
           <h2 id="rule-title">Easy to understand.<br />Impossible to spoil.</h2>
           <p>
-            A tile is free when it sits at an exposed rack end. Choose two free tiles showing the same
-            object. Every legal choice on the authored board keeps a path to the ending.
+            A tile is free when nothing overlaps it from above and either its left or right side is open.
+            Every legal choice on the authored board keeps a path to the ending.
           </p>
         </div>
         <ol class="rule-steps">
-          <li><span aria-hidden="true">01</span><div><h3>Look</h3><p>The brighter edge tiles are free.</p></div></li>
+          <li><span aria-hidden="true">01</span><div><h3>Look</h3><p>Read the overlaps. The brighter open-side tiles are free.</p></div></li>
           <li><span aria-hidden="true">02</span><div><h3>Pair</h3><p>Belan with belan. Chai with chai.</p></div></li>
-          <li><span aria-hidden="true">03</span><div><h3>Settle</h3><p>The pair lifts, sounds once if enabled, and leaves.</p></div></li>
+          <li><span aria-hidden="true">03</span><div><h3>Settle</h3><p>The pair folds inward through one dim brass bloom and leaves.</p></div></li>
         </ol>
       </section>
 
@@ -92,11 +93,11 @@ const standaloneUrl = "https://github.com/udhawan97/Nindova/releases/download/v0
             <img
               src={href("/media/rasoi-pairs-phone.png")}
               width="375"
-              height="815"
-              alt="The real Rasoi Pairs phone layout, with labeled kitchen tiles and a safe-pair help control."
+              height="812"
+              alt="The real Masala Mound phone layout, with labeled overlapping kitchen tiles and a safe-pair help control."
             />
           </div>
-          <figcaption>375px release surface</figcaption>
+          <figcaption>375px v0.2.0 candidate surface</figcaption>
         </figure>
         <div class="material-copy">
           <p class="eyebrow">Punjabi material, everyday kitchen</p>
@@ -123,11 +124,11 @@ const standaloneUrl = "https://github.com/udhawan97/Nindova/releases/download/v0
         <div class="boundary-grid">
           <div>
             <h3>While you play</h3>
-            <p>Predictable lift, one restrained clack, a warmer open rack. Help points; it never plays.</p>
+            <p>Predictable lift, one restrained brass bloom, and optional sound. Help points; it never plays.</p>
           </div>
           <div>
             <h3>When it ends</h3>
-            <p>No score, timer, streak, grade, collection, randomized reward, or promoted replay.</p>
+            <p>No score, timer, streak, grade, collection, randomized reward, or promoted continuation.</p>
           </div>
           <div>
             <h3>If you leave it</h3>
@@ -169,16 +170,34 @@ const standaloneUrl = "https://github.com/udhawan97/Nindova/releases/download/v0
         </ul>
       </section>
 
+      <section class="qr-section" aria-labelledby="qr-title">
+        <div class="qr-copy">
+          <p class="eyebrow">Free, open, and direct</p>
+          <h2 id="qr-title">Scan straight to the kitchen.</h2>
+          <p>
+            This QR contains the full canonical play address—no shortener, redirect tracker, account,
+            or advertising identifier. The same address is printed below for verification.
+          </p>
+          <a class="canonical-url" href={canonicalPlayUrl}>{canonicalPlayUrl}</a>
+          <p class="honesty-note">The Pages workflow is configured in this source candidate; live deployment remains separately verified after publication.</p>
+        </div>
+        <figure class="qr-art">
+          <img src={href("/play-qr.svg")} width="396" height="396" alt={`QR code for ${canonicalPlayUrl}`} />
+          <figcaption>Direct URL · no tracking parameters</figcaption>
+        </figure>
+      </section>
+
       <section class="closing-section" aria-labelledby="closing-title">
-        <p class="eyebrow">Release v0.1.0</p>
+        <p class="eyebrow">v0.2.0 source candidate</p>
         <h2 id="closing-title">One board. One ending.</h2>
         <p>
-          Nindova is a behavioral design study, not a sleep tracker or treatment. Rasoi Pairs has not
-          been clinically shown to make people sleepy or improve sleep.
+          Nindova is a behavioral design study, not a sleep tracker or treatment. Masala Mound uses
+          recognition, visual search, and spatial planning, but has not been clinically shown to make
+          people sleepy or improve general memory or sleep.
         </p>
         <div class="hero-actions">
           <a class="button-primary" href={href("/play/")}>Play this build</a>
-          <a class="button-secondary" href={releaseUrl}>Release notes and checksums</a>
+          <a class="button-secondary" href={releaseUrl}>Previous release and checksums</a>
         </div>
       </section>
     </main>
@@ -188,9 +207,9 @@ const standaloneUrl = "https://github.com/udhawan97/Nindova/releases/download/v0
       <nav aria-label="Footer navigation">
         <a href={href("/docs/")}>Documentation</a>
         <a href="https://github.com/udhawan97/Nindova">GitHub</a>
-        <a href={releaseUrl}>v0.1.0</a>
+        <a href={releaseUrl}>v0.1.0 history</a>
       </nav>
-      <p>Behavioral design study · 13+ · no public web deployment</p>
+      <p>Behavioral design study · 13+ · Apache-2.0</p>
     </footer>
   </body>
 </html>

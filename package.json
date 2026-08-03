@@ -1,6 +1,6 @@
 {
   "name": "nindova-workspace",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "packageManager": "npm@11.17.0",
@@ -12,7 +12,8 @@
     "apps/site"
   ],
   "scripts": {
-    "build": "npm run build:session && npm run build:site && node scripts/compose-build.mjs",
+    "build": "npm run build:qr && npm run build:session && npm run build:site && node scripts/compose-build.mjs",
+    "build:qr": "node scripts/generate-play-qr.mjs",
     "build:session": "npm --workspace @nindova/session run build",
     "build:site": "npm --workspace @nindova/site run build",
     "check": "npm run typecheck && npm run test:unit && npm run build",
@@ -36,6 +37,7 @@
     "@astrojs/check": "0.9.9",
     "@playwright/test": "1.61.1",
     "@types/node": "26.1.1",
+    "qrcode": "1.5.4",
     "typescript": "6.0.3"
   }
 }

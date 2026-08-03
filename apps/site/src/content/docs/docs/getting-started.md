@@ -1,11 +1,11 @@
 ---
 title: Getting started
-description: Download, run, build, and verify Nindova v0.1.0.
+description: Run, build, and verify the Nindova v0.2.0 source candidate.
 ---
 
 ## Fastest path
 
-Download `nindova-v0.1.0.html` from the [v0.1.0 GitHub release](https://github.com/udhawan97/Nindova/releases/tag/v0.1.0), then open it in a current browser. The file is self-contained and does not install a service worker.
+Build the current source, then open `dist/nindova.html` in a current browser. The file is self-contained and does not install a service worker. The [v0.1.0 GitHub release](https://github.com/udhawan97/Nindova/releases/tag/v0.1.0) remains available as the previous flat-rack build.
 
 ## Run from source
 
@@ -26,6 +26,8 @@ npm run preview
 ```
 
 The root `dist/` contains the landing page, `/docs/`, `/play/`, and `nindova.html`. Open `http://127.0.0.1:4173/play/` for the installable PWA. After one online load, its static shell can reopen offline.
+
+The build also generates a direct QR for `https://udhawan97.github.io/Nindova/play/`. That URL becomes public only after the included GitHub Pages workflow is published successfully; the local build does not claim live deployment.
 
 ## Verify
 

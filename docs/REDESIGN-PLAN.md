@@ -1,6 +1,6 @@
 # Rasoi Pairs redesign plan
 
-**Status:** Implemented and verified for v0.1.0.
+**Status:** Implemented and verified for v0.1.0. The flat rack geometry is superseded by the [Layered Rasoi plan](./LAYERED-RASOI-PLAN.md) for the v0.2.0 source candidate.
 
 ## Product promise
 

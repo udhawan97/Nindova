@@ -8,13 +8,13 @@ Rasoi Pairs uses native HTML buttons for every tile. The drawing, visible name, 
 ## Operable rule
 
 - Free tiles are the only tiles in the keyboard tab order.
-- Each tile announces its kitchen form and whether it is free, covered, selected, or settled.
+- Each tile announces its kitchen form and whether it is free, covered from above, blocked on both sides, selected, or settled.
 - Selection and removal work with pointer, touch, keyboard, switch-style activation, and programmatic semantic control.
 - All tile and toolbar targets are at least 44 by 44 CSS pixels.
 - Live status text describes selection, mismatch, match, help, automatic settlement, and closure.
 - Visible text names mean recognition does not depend on the illustration.
 
-Audio is off by default and optional. Animation is decorative. Precision movement and vision are not required.
+Audio is off by default and optional. The brass bloom is decorative; reduced motion replaces its translation and scale with a short opacity change. Precision movement and vision are not required.
 
 ## Alternate presentation
 

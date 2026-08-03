@@ -7,8 +7,8 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#11101d",
-  "theme_color": "#17172a",
+  "background_color": "#09080d",
+  "theme_color": "#09080d",
   "categories": ["lifestyle", "games"],
   "icons": [
     {

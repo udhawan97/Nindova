@@ -15,8 +15,8 @@ Version 1 and version 2 state is copied into the v3 union and sanitized. The sou
 
 ## Same-tab resume
 
-`nindova:active-session:v2` in session storage may contain the validated Night capture, board ID, reachable removed-tile state, settlement phase, and internal boundary times. It survives a reload in the same tab and disappears when that tab session ends. Invalid, unreachable, or impossible phase/reason combinations are discarded; a valid reload during settlement resumes the same quiet closure. The record is never sent anywhere and never becomes long-lived completion history.
+`nindova:active-session:v3` in session storage may contain the validated Night capture, recipe-three board ID, reachable removed-tile state, settlement phase, and internal boundary times. It survives a reload in the same tab and disappears when that tab session ends. Invalid, unreachable, old-recipe, or impossible phase/reason combinations are discarded; a valid reload during settlement resumes the same quiet closure. The record is never sent anywhere and never becomes long-lived completion history.
 
 ## Offline cache
 
-The `/play/` service worker precaches only its HTML, manifest, and install icon in `nindova-session-v3`. It cannot read local storage and does not cache state keys, Dawn blobs, share payloads, or pages outside its scope. The standalone `nindova.html` registers no worker.
+The `/play/` service worker precaches only its HTML, manifest, and install icon in `nindova-session-v4`. It cannot read local storage and does not cache state keys, Dawn blobs, share payloads, or pages outside its scope. The standalone `nindova.html` registers no worker.

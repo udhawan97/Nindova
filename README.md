@@ -1,28 +1,33 @@
 # Nindova
 
-Nindova is a calm, bounded pair-removal game for the end of the day. **Rasoi Pairs** borrows the readable edge-tile rule of Mahjong solitaire and fills the board with everyday Indian kitchen forms: belan, chakla, tawa, chimta, steel katori, tiffin, masala dabba, chai glass, and pressure cooker.
+Nindova is a calm, bounded pair-removal game for the end of the day. **Masala Mound** uses the uncovered-and-open-side rule of Mahjong solitaire and fills three overlapping layers with everyday Indian kitchen forms: belan, chakla, tawa, chimta, steel katori, tiffin, masala dabba, chai glass, and pressure cooker.
 
 > Nothing to win. Nothing tracked. Nothing you can do wrong.
 
-![The real Rasoi Pairs board, showing three shallow racks of Indian kitchen tiles](./apps/site/public/media/rasoi-board.png)
+![The real Masala Mound board, showing three overlapping layers of Indian kitchen tiles](./apps/site/public/media/rasoi-board.png)
 
 ## Get Nindova
 
-- [Download the standalone Nindova v0.1.0 HTML](https://github.com/udhawan97/Nindova/releases/download/v0.1.0/nindova-v0.1.0.html) — one self-contained file; open it directly in a current browser.
-- [Open the v0.1.0 release](https://github.com/udhawan97/Nindova/releases/tag/v0.1.0) — includes the composed website/docs/PWA bundle and checksums.
-- Build locally for the installable offline PWA and documentation.
+- Build the v0.2.0 source candidate locally for the layered Session, installable offline PWA, documentation, and self-contained `nindova.html`.
+- The direct, non-tracking QR targets `https://udhawan97.github.io/Nindova/play/`. A Pages workflow is configured, but the live deployment is not claimed until it is published and observed.
+- [Open the v0.1.0 release](https://github.com/udhawan97/Nindova/releases/tag/v0.1.0) for the previous flat-rack build and its checksums.
 
-There is no public web deployment. The GitHub release is the distribution surface; `/play/` works after serving the composed release bundle or a local build.
+Until the Pages candidate is published, `/play/` works after serving a local build and `dist/nindova.html` works as a self-contained file.
+
+<img src="./apps/site/public/play-qr.svg" width="180" alt="Direct QR for the canonical Nindova play URL">
+
+The QR encodes the full canonical URL with no shortener or tracking parameter. Keep the printed URL with the code so people can verify its destination.
 
 ## The experience
 
-- **A legible rule.** Choose two matching tiles only when they are free at the ends of their racks.
-- **Guaranteed closure.** The 36-tile board is exhaustively verified: every reachable nonterminal state has a legal pair, and every legal choice remains solvable.
+- **A spatial rule.** Choose two matching tiles only when nothing overlaps them from above and at least one horizontal side is open.
+- **Guaranteed closure.** The 36-tile, 24/8/4-layer board is exhaustively verified across 382 reachable states: every reachable nonterminal state has a legal pair, and every legal choice remains solvable.
+- **Clear match feedback.** Each legal pair folds inward through one brief, deterministic brass bloom; reduced motion uses opacity only and sound stays off by default.
 - **Quiet help.** “Show a safe pair” identifies a pair but never removes it.
 - **No performance layer.** No score, count, timer, streak, achievement, grade, collection, missed-night state, or randomized reward.
-- **A real ending.** Clearing the board closes the Session. If left unfinished, it settles itself before the hidden fifteen-minute ceiling.
+- **A real ending.** Clearing the board closes the Session. If left unfinished, it settles itself before the hidden fifteen-minute ceiling. The primary handoff asks the person to put the screen down.
 - **Dawn, by choice.** From 06:00 through 11:59 in the captured Night ID zone, the previous night’s kitchen forms return as a first-light still and optional silent loop.
-- **Voluntary return.** “Not now” leaves Nindova available later that same night; same-night replay uses the identical board and cannot multiply Dawn state.
+- **Voluntary return.** “Not now” leaves Nindova available later that same night. After completion, “Back to Nindova” makes another separately bounded Session possible without promoting one more board.
 
 ## Punjabi and Indian direction
 
@@ -69,7 +74,7 @@ npm test
 npm run test:wall-clock
 ```
 
-The main gates prove the exhaustive board invariant, deterministic Night ID, v1/v2-to-v3 local migration, idempotent same-night replay, Dawn eligibility/export fallback, 320–1440px rendered layouts, keyboard operation, 200% zoom, reduced motion, 44px targets, offline PWA closure, standalone independence, same-origin runtime requests, and the real production ceiling.
+The main gates prove the 382-state board invariant, deterministic Night ID, recipe-two Dawn preservation, v1/v2-to-v3 local migration, idempotent same-night return, layered rendering, brass-bloom/reduced-motion behavior, Dawn eligibility/export fallback, 320–1440px rendered layouts, keyboard operation, 200% zoom, 44px targets, offline PWA closure, standalone independence, same-origin runtime requests, and the real production ceiling.
 
 See [Testing](./apps/site/src/content/docs/docs/testing.md) and the [public-surface evidence ledger](./docs/PUBLIC-SURFACE-EVIDENCE.md) for evidence levels and remaining risk.
 
@@ -81,14 +86,14 @@ Long-lived local storage contains one version-3 record with only the latest comp
 
 ## Product and evidence boundary
 
-Nindova is a behavioral design study for people aged 13 and up. It is not a sleep tracker, sleep-performance tool, or treatment. Rasoi Pairs has not been clinically shown to make people sleepy, produce a specific dopamine response, or improve sleep. Persistent sleep difficulty deserves evidence-based care such as CBT-I with a qualified clinician.
+Nindova is a behavioral design study for people aged 13 and up. It is not a sleep tracker, sleep-performance tool, memory intervention, or treatment. Masala Mound uses recognition, visual search, and spatial planning, but has not been clinically shown to make people sleepy, produce a useful dopamine response, improve general memory, or improve sleep. Persistent sleep difficulty deserves evidence-based care such as CBT-I with a qualified clinician.
 
 The browser and standalone surfaces are implemented. The iOS Wall is deferred and is not represented as shipped. Chromium automation covers the release surfaces; broader installed Safari/Android proof, real-device VoiceOver/TalkBack acceptance, and human Punjabi cultural review remain open limitations.
 
 ## Contributing
 
-Read [CONTEXT.md](./CONTEXT.md), the [Rasoi redesign plan](./docs/REDESIGN-PLAN.md), and [ADR 0010](./docs/adr/0010-replace-the-vista-arc-with-rasoi-pairs.md) before changing a product boundary. Preserve the Two-Loop Law, the immutable language, zero telemetry, deterministic solvability, and rendered phone/desktop evidence.
+Read [CONTEXT.md](./CONTEXT.md), the [layered Rasoi plan](./docs/LAYERED-RASOI-PLAN.md), and [ADR 0011](./docs/adr/0011-layer-rasoi-and-keep-replay-deliberate.md) before changing a product boundary. Preserve the Two-Loop Law, the immutable language, zero telemetry, deterministic solvability, and rendered phone/desktop evidence.
 
 ## License
 
-No license has been selected. Public source availability does not grant reuse rights beyond applicable law.
+Nindova is licensed under the [Apache License 2.0](./LICENSE). It is free to use, modify, and distribute under that license and its notice requirements.
