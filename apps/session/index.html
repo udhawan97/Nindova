@@ -129,12 +129,12 @@
       min-height: calc(100dvh - 64px);
       padding: clamp(20px, 5vw, 52px) max(16px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
     }
-    .intro, .dismissed, .end, .rest {
+    .intro, .dismissed, .end, .drift, .rest {
       display: grid;
       place-items: center;
       text-align: center;
     }
-    .intro-card, .dismissed-card, .end-card, .rest-card {
+    .intro-card, .dismissed-card, .end-card, .drift-card, .rest-card {
       width: min(100%, 680px);
       padding: clamp(24px, 7vw, 54px);
       border: 1px solid rgba(227, 166, 66, .23);
@@ -144,6 +144,7 @@
       box-shadow: 18px 18px 0 rgba(83, 38, 41, .13);
     }
     body[data-view="rest"] { background: #09080d; }
+    body[data-view="drift"] { background: #0d0c14; }
     body[data-view="rest"] .shell::before, body[data-view="rest"] .shell::after { opacity: .035; }
     body[data-view="rest"] .topbar { opacity: .28; }
     .rest-card { border-color: rgba(201,151,69,.1); background: rgba(9,8,13,.92); box-shadow: none; }
@@ -174,11 +175,20 @@
     }
     .rule-note p { min-width: 0; margin: 0; padding: 14px; color: var(--quiet); background: rgba(17,16,29,.92); font-size: 13px; line-height: 1.45; }
     .rule-note strong { display: block; margin-bottom: 4px; color: var(--cream); }
+    .profile-picker { margin: 28px 0 0; padding: 0; border: 0; text-align: left; }
+    .profile-picker legend { width: 100%; margin-bottom: 10px; color: var(--quiet); text-align: center; font-size: 14px; }
+    .profile-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .profile-option { position: relative; display: grid; grid-template-columns: auto 1fr; gap: 11px; min-height: 84px; padding: 14px; border: 1px solid rgba(227,166,66,.18); border-radius: 14px; background: rgba(10,9,17,.38); cursor: pointer; }
+    .profile-option:has(input:checked) { border-color: rgba(240,189,97,.72); background: rgba(120,54,58,.18); box-shadow: inset 0 0 0 1px rgba(240,189,97,.16); }
+    .profile-option input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--marigold); }
+    .profile-option strong { display: block; color: var(--cream); }
+    .profile-option small { display: block; margin-top: 4px; color: var(--quiet); line-height: 1.35; }
 
     .play { display: flex; flex-direction: column; justify-content: center; }
     .play-head { width: min(100%, 820px); margin: 0 auto 18px; text-align: center; }
     .play-head h1 { font-size: clamp(30px, 6vw, 48px); }
     .play-instruction { margin: 9px auto 0; color: var(--quiet); line-height: 1.45; }
+    .profile-badge { display: inline-flex; margin-top: 10px; padding: 5px 10px; border: 1px solid rgba(227,166,66,.2); border-radius: 999px; color: #d9c7aa; font-size: 12px; }
     .play-toolbar { display: flex; justify-content: center; gap: 8px; margin-top: 14px; }
     .board-shell {
       --warmth: 0;
@@ -258,6 +268,7 @@
     .tile-label { max-width: 100%; overflow: hidden; color: #5d4437; font-size: clamp(8px, 2.1vw, 10px); font-weight: 760; letter-spacing: .02em; text-overflow: ellipsis; white-space: nowrap; }
     .tile[data-layer="1"] { margin-top: -3px; }
     .tile[data-layer="2"] { margin-top: -6px; }
+    .tile[data-layer="3"] { margin-top: -9px; }
     .tile:disabled { cursor: default; filter: brightness(.66) saturate(.64); }
     .tile.is-covered { filter: brightness(.48) saturate(.54); }
     .tile.is-side-blocked { filter: brightness(.62) saturate(.62); }
@@ -324,8 +335,16 @@
     .board-shell.is-settling .lid { opacity: .98; transform: translateY(38%) rotate(0); }
 
     .end-card .end-sub { margin: 14px 0 0; color: var(--quiet); font-size: 17px; }
+    .quiet-dabba { position: relative; width: 86px; height: 48px; margin: 0 auto 24px; border: 1px solid rgba(201,151,69,.48); border-radius: 50% 50% 14px 14px; background: linear-gradient(180deg, #c99443, #6d4a2a); box-shadow: inset 0 -12px 18px rgba(43,25,15,.36), 0 18px 34px rgba(0,0,0,.2); }
+    .quiet-dabba::before { position: absolute; inset: -9px 13px auto; height: 17px; border: 1px solid rgba(225,177,87,.56); border-radius: 50%; background: #8a6031; content: ""; }
     .tomorrow-status { min-height: 1.5em; margin: 14px 0 0; color: var(--quiet); }
     .disclaimer { max-width: 58ch; margin: 28px auto 0; color: #9e958a; font-size: 12px; line-height: 1.65; }
+
+    .drift-card { width: min(100%, 720px); text-align: center; }
+    .drift-objects { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 28px; }
+    .drift-object { display: grid; place-items: center; min-height: 132px; padding: 16px 8px; border: 1px solid rgba(201,151,69,.19); border-radius: 50% 50% 18px 18px; color: #c99745; background: rgba(13,12,20,.82); }
+    .drift-object svg { width: min(72px, 68%); height: 58px; }
+    .drift-object span { margin-top: 9px; color: #c9bcaa; font-size: 13px; }
 
     .dawn { display: grid; place-items: center; }
     .dawn-card { width: min(100%, 820px); text-align: center; }
@@ -348,8 +367,9 @@
     @media (max-width: 520px) {
       :root { --tile-w: clamp(46px, 14vw, 56px); }
       .view { padding-top: 18px; }
-      .intro-card, .dismissed-card, .end-card, .rest-card { padding: 24px 18px 28px; box-shadow: 10px 10px 0 rgba(83,38,41,.13); }
+      .intro-card, .dismissed-card, .end-card, .drift-card, .rest-card { padding: 24px 18px 28px; box-shadow: 10px 10px 0 rgba(83,38,41,.13); }
       .rule-note { grid-template-columns: 1fr; }
+      .profile-options { grid-template-columns: 1fr; }
       .play { justify-content: flex-start; }
       .play-head { margin-bottom: 12px; }
       .board-shell { padding-inline: 7px; border-radius: 18px 18px 10px 10px; }
@@ -385,6 +405,19 @@
         <p class="kicker">Rasoi Pairs · a bounded night game</p>
         <h1 id="intakeTitle">Find the pairs.<br>Let the kitchen quiet.</h1>
         <p class="lede">Uncover a mound of familiar kitchen forms. Match two equal tiles when nothing rests above them and one side is open.</p>
+        <fieldset class="profile-picker">
+          <legend>How should tonight's mound feel? This is a preference, not a test.</legend>
+          <div class="profile-options">
+            <label class="profile-option">
+              <input type="radio" name="rasoi-profile" value="gentle" checked>
+              <span><strong>Gentle stack</strong><small>Broader openings and a quieter search.</small></span>
+            </label>
+            <label class="profile-option">
+              <input type="radio" name="rasoi-profile" value="deeper">
+              <span><strong>Deeper stack</strong><small>More overlap and a little more looking ahead.</small></span>
+            </label>
+          </div>
+        </fieldset>
         <div class="entry-actions">
           <button class="primary-button" id="beginBtn" type="button">Enter the kitchen</button>
           <button class="text-button" id="notNowBtn" type="button">Not now</button>
@@ -413,6 +446,7 @@
         <p class="kicker">Tonight's kitchen</p>
         <h1 id="playTitle">Masala Mound</h1>
         <p class="play-instruction">Choose two matching tiles that are uncovered and open on one side.</p>
+        <p class="profile-badge" id="profileBadge">Gentle stack · three authored layers</p>
         <div class="play-toolbar"><button class="quiet-button" id="hintBtn" type="button">Show a safe pair</button></div>
       </header>
       <div class="board-shell" id="boardShell" aria-label="Masala Mound layered pair board">
@@ -424,15 +458,28 @@
 
     <section class="view end" id="end" aria-labelledby="endTitle" hidden>
       <div class="end-card">
+        <div class="quiet-dabba" aria-hidden="true"></div>
         <p class="kicker">The kitchen is quiet</p>
         <h2 id="endTitle">The session is over. That's the point.</h2>
         <p class="end-sub">No score. No streak. Nothing owed tomorrow.</p>
         <div class="end-actions">
           <button class="primary-button" id="dimRestBtn" type="button">Dim and rest</button>
+          <button class="quiet-button" id="driftBtn" type="button">Carry three objects</button>
           <button class="text-button" id="tomorrowBtn" type="button">Same time tomorrow?</button>
         </div>
         <p class="tomorrow-status" id="tomorrowStatus" role="status" aria-live="polite"></p>
         <p class="disclaimer">Nindova is a behavioral design study about ending an unbounded loop. It is not a sleep tracker or treatment, and Masala Mound has not been clinically shown to make people sleepy. Intended for ages 13 and up. Persistent sleep difficulty deserves evidence-based care such as CBT-I with a qualified clinician.</p>
+      </div>
+    </section>
+
+    <section class="view drift" id="drift" aria-labelledby="driftTitle" hidden>
+      <div class="drift-card">
+        <p class="kicker">Optional · Rasoi Image Drift</p>
+        <h2 id="driftTitle" tabindex="-1">Carry three ordinary objects.</h2>
+        <div class="drift-objects" id="driftObjects" role="list" aria-label="Three kitchen objects to carry away from the screen"></div>
+        <p class="lede">Put the phone down. Picture each one somewhere quiet—or remember how it feels in your hands. Stop whenever you like.</p>
+        <div class="end-actions"><button class="primary-button" id="skipDriftBtn" type="button">Skip and rest</button></div>
+        <p class="disclaimer">This response-free closing prompt is an unvalidated design experiment, not a sleep technique or treatment.</p>
       </div>
     </section>
 

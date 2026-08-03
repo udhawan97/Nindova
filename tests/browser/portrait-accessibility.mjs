@@ -67,9 +67,10 @@ try {
     if ((viewport.width === 320 && viewport.height === 568) || viewport.width === 375 || viewport.width === 1440) {
       await page.screenshot({ path: resolve(output, `board-${viewport.width}x${viewport.height}.png`), fullPage: true });
     }
-    await page.evaluate(() => window.__ct.advanceBy(window.__ct.hardCapSeconds));
+    await page.evaluate(() => window.__ct.finish());
     await page.waitForFunction(() => window.__ct.state === "end");
     await assertReachable(page, "#dimRestBtn", viewport);
+    await assertReachable(page, "#driftBtn", viewport);
     await assertReachable(page, "#tomorrowBtn", viewport);
     assert.deepEqual(errors, []);
     await context.close();

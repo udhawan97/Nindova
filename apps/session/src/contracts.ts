@@ -1,6 +1,6 @@
 import type { RasoiBoard, RasoiMotifId } from "./rasoi-core.js";
 
-export type SessionState = "intake" | "dismissed" | "play" | "settling" | "end" | "rest" | "dawn";
+export type SessionState = "intake" | "dismissed" | "play" | "settling" | "end" | "drift" | "rest" | "dawn";
 
 export interface RasoiTileSnapshot {
   readonly id: string;

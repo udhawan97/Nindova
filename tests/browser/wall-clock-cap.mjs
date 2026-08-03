@@ -42,7 +42,7 @@ try {
   await new Promise((resolveWait) => setTimeout(resolveWait, remaining));
   const observedWallSeconds = (Date.now() - startedAt) / 1000;
   assert.ok(observedWallSeconds >= 899.5 && observedWallSeconds <= 905, `${observedWallSeconds}s ceiling observation`);
-  assert.equal(await page.evaluate(() => window.__ct.state), "end");
+  assert.equal(await page.evaluate(() => window.__ct.state), "rest");
   assert.deepEqual(errors, []);
   console.log(JSON.stringify({ elapsedToEndSeconds, observedWallSeconds, resultAtEnd, errors }));
 } finally {

@@ -29,7 +29,7 @@ async function expectBoundaryCloses(instance, partial = false) {
     });
   }
   await instance.page.evaluate(() => window.__ct.advanceBy(window.__ct.hardCapSeconds));
-  await instance.page.waitForFunction(() => window.__ct.state === "end");
+  await instance.page.waitForFunction(() => window.__ct.state === "rest");
   assert.equal(await instance.page.evaluate(() => window.__ct.endReason), "production-cap");
   assert.equal((await instance.page.locator("#endTitle").textContent())?.trim(), "The session is over. That's the point.");
   assert.deepEqual(instance.errors, []);
@@ -65,7 +65,7 @@ try {
   await selected.page.click("#beginBtn");
   await selected.page.evaluate(() => window.__ct.selectTile(window.__ct.legalPairs[0][0]));
   await selected.page.evaluate(() => window.__ct.advanceBy(window.__ct.hardCapSeconds));
-  await selected.page.waitForFunction(() => window.__ct.state === "end");
+  await selected.page.waitForFunction(() => window.__ct.state === "rest");
   assert.equal(await selected.page.evaluate(() => window.__ct.endReason), "production-cap");
   await selected.context.close();
 
@@ -76,7 +76,7 @@ try {
     Date.now = () => realNow() - 7_200_000;
     window.__ct.advanceBy(window.__ct.hardCapSeconds);
   });
-  await rolledBackClock.page.waitForFunction(() => window.__ct.state === "end");
+  await rolledBackClock.page.waitForFunction(() => window.__ct.state === "rest");
   assert.equal(await rolledBackClock.page.evaluate(() => window.__ct.endReason), "production-cap");
   await rolledBackClock.context.close();
   console.log("Rasoi hint, no-input, partial-input, selected-tile, clock-rollback, and production-boundary checks passed.");

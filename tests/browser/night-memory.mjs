@@ -7,7 +7,8 @@ await import("../../apps/session/dist/night-core.js");
 const Night = globalThis.NindovaNight;
 const root = resolve(import.meta.dirname, "../..");
 const target = `${pathToFileURL(resolve(root, "apps/session/dist/nindova.html")).href}?review=1`;
-const activeSessionKey = "nindova:active-session:v3";
+const activeSessionKey = "nindova:active-session:v4";
+const legacyActiveSessionKey = "nindova:active-session:v3";
 const browser = await chromium.launch();
 const context = await browser.newContext({ viewport: { width: 375, height: 812 } });
 const page = await context.newPage();
@@ -20,6 +21,9 @@ try {
   await page.waitForFunction(() => Boolean(window.__ct));
   await page.evaluate(() => localStorage.setItem(NindovaNight.STORAGE_KEY, "{broken"));
   await page.reload();
+  await page.evaluate((key) => sessionStorage.setItem(key, "{stale"), legacyActiveSessionKey);
+  await page.reload();
+  assert.equal(await page.evaluate((key) => sessionStorage.getItem(key), legacyActiveSessionKey), null);
   assert.deepEqual(await page.evaluate(() => window.__ct.localRecovery), { recovered: true, reason: "corrupt" });
   await page.evaluate(() => localStorage.removeItem(NindovaNight.STORAGE_KEY));
   await page.reload();
@@ -41,7 +45,10 @@ try {
   assert.equal(await page.evaluate(() => window.__ct.board.id), started.board.id);
 
   const validActiveRecord = await page.evaluate((key) => sessionStorage.getItem(key), activeSessionKey);
-  assert.equal(JSON.parse(validActiveRecord).phase, "play");
+  assert.deepEqual(
+    { version: JSON.parse(validActiveRecord).version, phase: JSON.parse(validActiveRecord).phase, profile: JSON.parse(validActiveRecord).profile },
+    { version: 4, phase: "play", profile: "gentle" },
+  );
   const futureRecord = JSON.parse(validActiveRecord);
   futureRecord.startedAtMs += 86_400_000;
   futureRecord.windDownAtMs += 86_400_000;
@@ -52,6 +59,22 @@ try {
       sessionStorage.setItem("nindova:test:future-clock-injected", "1");
     }
   }, { key: activeSessionKey, value: JSON.stringify(futureRecord) });
+  await page.reload();
+  await page.waitForFunction(() => Boolean(window.__ct));
+  assert.equal(await page.evaluate(() => window.__ct.state), "intake");
+  assert.equal(await page.evaluate((key) => sessionStorage.getItem(key), activeSessionKey), null);
+
+  await page.evaluate(({ key, value }) => sessionStorage.setItem(key, value), { key: activeSessionKey, value: validActiveRecord });
+  await page.reload();
+  await page.waitForFunction(() => window.__ct.state === "play");
+  const invalidProfileRecord = JSON.parse(validActiveRecord);
+  invalidProfileRecord.profile = "expert";
+  await page.addInitScript(({ key, value }) => {
+    if (!sessionStorage.getItem("nindova:test:invalid-profile-injected")) {
+      sessionStorage.setItem(key, value);
+      sessionStorage.setItem("nindova:test:invalid-profile-injected", "1");
+    }
+  }, { key: activeSessionKey, value: JSON.stringify(invalidProfileRecord) });
   await page.reload();
   await page.waitForFunction(() => Boolean(window.__ct));
   assert.equal(await page.evaluate(() => window.__ct.state), "intake");
@@ -136,6 +159,21 @@ try {
   await page.waitForFunction(() => window.__ct.state === "end");
   assert.deepEqual(await page.evaluate(() => window.__ct.memory), firstMemory);
   assert.deepEqual(Object.keys(firstMemory).sort(), ["lastCompleted", "legacyMemory", "tomorrowIntention", "version"]);
+
+  await page.reload();
+  await page.check('input[name="rasoi-profile"][value="deeper"]');
+  await page.click("#beginBtn");
+  const deeperBoardId = await page.evaluate(() => window.__ct.board.id);
+  const deeperPair = await page.evaluate(() => window.__ct.legalPairs[0]);
+  await page.evaluate((pair) => { window.__ct.selectTile(pair[0]); window.__ct.selectTile(pair[1]); }, deeperPair);
+  await page.reload();
+  await page.waitForFunction(() => window.__ct.state === "play");
+  assert.equal(await page.evaluate(() => window.__ct.board.profile), "deeper");
+  assert.equal(await page.evaluate(() => window.__ct.board.id), deeperBoardId);
+  assert.equal(await page.evaluate(() => window.__ct.removedTileCount), 2);
+  await page.evaluate(() => window.__ct.advanceBy(window.__ct.hardCapSeconds));
+  await page.waitForFunction(() => window.__ct.state === "rest");
+
   assert.deepEqual(errors, []);
   assert.equal(Night.SCHEMA_VERSION, 3);
   console.log("Rasoi dismissal return, strict clock-bound resume, deterministic replay, and idempotent local memory checks passed.");

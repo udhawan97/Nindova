@@ -1,9 +1,10 @@
 import { NindovaDawn } from "./dawn-core.js";
 import { NindovaNight, type NightCapture, type NightCompletion, type NightState, type RasoiCompletion } from "./night-core.js";
-import { NindovaRasoi, type RasoiBoard, type RasoiMotifId } from "./rasoi-core.js";
+import { NindovaRasoi, type RasoiBoard, type RasoiMotifId, type RasoiProfileId } from "./rasoi-core.js";
 import type { RasoiDebug, SessionState } from "./contracts.js";
 
-const ACTIVE_SESSION_KEY = "nindova:active-session:v3";
+const ACTIVE_SESSION_KEY = "nindova:active-session:v4";
+const LEGACY_ACTIVE_SESSION_KEYS = ["nindova:active-session:v3"] as const;
 const PRODUCTION_CAP_SECONDS = 15 * 60;
 const PRODUCTION_WIND_DOWN_SECONDS = 12 * 60;
 const REVIEW_CAP_SECONDS = 120;
@@ -13,6 +14,8 @@ const reviewerMode = new URLSearchParams(location.search).get("review") === "1";
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const hardCapSeconds = reviewerMode ? REVIEW_CAP_SECONDS : PRODUCTION_CAP_SECONDS;
 const windDownSeconds = reviewerMode ? REVIEW_WIND_DOWN_SECONDS : PRODUCTION_WIND_DOWN_SECONDS;
+const END_AUTO_REST_MS = reviewerMode ? 4000 : 45_000;
+const DRIFT_AUTO_REST_MS = reviewerMode ? 4000 : 30_000;
 
 function element<T extends HTMLElement>(id: string) {
   const value = document.getElementById(id);
@@ -25,12 +28,15 @@ const views = {
   dismissed: element<HTMLElement>("dismissed"),
   play: element<HTMLElement>("play"),
   end: element<HTMLElement>("end"),
+  drift: element<HTMLElement>("drift"),
   rest: element<HTMLElement>("rest"),
   dawn: element<HTMLElement>("dawn"),
 };
 const boardElement = element<HTMLDivElement>("board");
 const boardShell = element<HTMLDivElement>("boardShell");
 const boardStatus = element<HTMLParagraphElement>("boardStatus");
+const profileBadge = element<HTMLParagraphElement>("profileBadge");
+const driftObjects = element<HTMLDivElement>("driftObjects");
 const muteButton = element<HTMLButtonElement>("muteBtn");
 const dawnButton = element<HTMLButtonElement>("dawnBtn");
 const dawnCanvas = element<HTMLCanvasElement>("dawnCanvas");
@@ -71,6 +77,8 @@ let settlementTimer: number | null = null;
 let dawnNowOverride: Date | null = null;
 let forceLoopUnsupported = false;
 let hintTimer: number | null = null;
+let endRestTimer: number | null = null;
+let driftRestTimer: number | null = null;
 let nightStateResult = NindovaNight.readStorage(safeStorage("local"));
 let nightState = nightStateResult.state;
 let loopResult: null | { blob: Blob; type: string; extension: string; durationMs: number } = null;
@@ -118,6 +126,10 @@ function iconSvg(motif: RasoiMotifId) {
 function createBoardDom() {
   if (!board) return;
   boardElement.replaceChildren();
+  const profile = NindovaRasoi.profileDefinition(board.profile);
+  boardElement.setAttribute("aria-label", `Thirty-six kitchen tiles in ${profile.layers} overlapping layers, ${profile.label}`);
+  boardShell.dataset.profile = board.profile;
+  profileBadge.textContent = `${profile.label} · ${profile.layers} authored layers`;
   for (const tile of board.tiles) {
     const button = document.createElement("button");
     button.type = "button";
@@ -169,7 +181,7 @@ function updateBoardDom(focusId: string | null = null) {
         : availability === "free"
           ? "free, uncovered with an open side"
           : "settled";
-    button.setAttribute("aria-label", `${motifNames[tile.motif]}, ${position}${isSelected ? ", selected" : ""}${isHinted ? ", suggested safe pair" : ""}`);
+    button.setAttribute("aria-label", `${motifNames[tile.motif]}, layer ${tile.layer + 1}, ${position}${isSelected ? ", selected" : ""}${isHinted ? ", suggested safe pair" : ""}`);
   }
   boardShell.style.setProperty("--warmth", String(1 - removed.size / board.tiles.length));
   if (focusId) requestAnimationFrame(() => tileButton(focusId)?.focus());
@@ -179,7 +191,8 @@ function persistActiveSession() {
   if (!board || !currentNight || (state !== "play" && state !== "settling")) return;
   try {
     safeStorage("session")?.setItem(ACTIVE_SESSION_KEY, JSON.stringify({
-      version: 3,
+      version: 4,
+      profile: board.profile,
       phase: state,
       endReason,
       night: currentNight,
@@ -195,7 +208,11 @@ function persistActiveSession() {
 }
 
 function clearActiveSession() {
-  try { safeStorage("session")?.removeItem(ACTIVE_SESSION_KEY); } catch { /* no-op */ }
+  try {
+    const storage = safeStorage("session");
+    storage?.removeItem(ACTIVE_SESSION_KEY);
+    LEGACY_ACTIVE_SESSION_KEYS.forEach((key) => storage?.removeItem(key));
+  } catch { /* no-op */ }
 }
 
 function anchorSessionClock(wallMs: number) {
@@ -205,17 +222,22 @@ function anchorSessionClock(wallMs: number) {
 
 function restoreActiveSession() {
   try {
-    const raw = safeStorage("session")?.getItem(ACTIVE_SESSION_KEY);
-    if (!raw) return false;
+    const storage = safeStorage("session");
+    const raw = storage?.getItem(ACTIVE_SESSION_KEY);
+    if (!raw) {
+      LEGACY_ACTIVE_SESSION_KEYS.forEach((key) => storage?.removeItem(key));
+      return false;
+    }
     const candidate = JSON.parse(raw);
     const restoredNight = NindovaNight.sanitizeCapture(candidate.night);
-    if (candidate.version !== 3 || !restoredNight || !Array.isArray(candidate.removed)
+    if (candidate.version !== 4 || !restoredNight || !Array.isArray(candidate.removed)
+      || (candidate.profile !== "gentle" && candidate.profile !== "deeper")
       || (candidate.phase !== "play" && candidate.phase !== "settling")
       || (candidate.endReason !== "completed" && candidate.endReason !== "production-cap")) {
       clearActiveSession();
       return false;
     }
-    const restoredBoard = NindovaRasoi.createBoard(restoredNight.nightId);
+    const restoredBoard = NindovaRasoi.createBoard(restoredNight.nightId, candidate.profile);
     if (restoredBoard.id !== candidate.boardId) {
       clearActiveSession();
       return false;
@@ -270,9 +292,15 @@ function restoreActiveSession() {
   }
 }
 
-function beginSession() {
+function chosenProfile() {
+  const value = document.querySelector<HTMLInputElement>('input[name="rasoi-profile"]:checked')?.value;
+  return value === "deeper" ? "deeper" : "gentle";
+}
+
+function beginSession(profile: RasoiProfileId = chosenProfile()) {
+  clearClosureTimers();
   currentNight = NindovaNight.captureNight();
-  board = NindovaRasoi.createBoard(currentNight.nightId);
+  board = NindovaRasoi.createBoard(currentNight.nightId, profile);
   const verification = NindovaRasoi.verifyBoard(board);
   if (!verification.valid) throw new Error(`Unverified Rasoi board: ${verification.reason}`);
   removed = new Set();
@@ -286,7 +314,8 @@ function beginSession() {
   boardShell.classList.remove("is-settling");
   showView("play");
   createBoardDom();
-  setStatus("Six free tiles sit above the quiet layers.");
+  const freeCount = NindovaRasoi.freeTiles(board, removed).length;
+  setStatus(`${freeCount} free tiles sit above the quiet layers.`);
   persistActiveSession();
 }
 
@@ -432,6 +461,7 @@ function finishSession() {
   showView("end");
   element<HTMLButtonElement>("dimRestBtn").focus();
   updateDawnButton();
+  scheduleRest(END_AUTO_REST_MS, "end");
 }
 
 function nowMs() {
@@ -439,11 +469,62 @@ function nowMs() {
   return Math.max(monotonicNow, Date.now()) + virtualOffsetMs;
 }
 
+function clearClosureTimers() {
+  if (endRestTimer !== null) window.clearTimeout(endRestTimer);
+  if (driftRestTimer !== null) window.clearTimeout(driftRestTimer);
+  endRestTimer = null;
+  driftRestTimer = null;
+}
+
+function enterRest() {
+  clearClosureTimers();
+  showView("rest");
+  element<HTMLElement>("restTitle").focus({ preventScroll: true });
+}
+
+function scheduleRest(delayMs: number, source: "end" | "drift") {
+  const remainingMs = Math.max(0, deadlineAtMs - nowMs());
+  const boundedDelay = Math.min(delayMs, remainingMs);
+  const callback = () => {
+    if (state === source) enterRest();
+  };
+  if (boundedDelay === 0) {
+    callback();
+    return;
+  }
+  if (source === "end") endRestTimer = window.setTimeout(callback, boundedDelay);
+  else driftRestTimer = window.setTimeout(callback, boundedDelay);
+}
+
+function renderDrift() {
+  if (!board) return;
+  const motifs = [board.motifOrder[0], board.motifOrder[4], board.motifOrder[8]] as const;
+  driftObjects.replaceChildren(...motifs.map((motif) => {
+    const item = document.createElement("div");
+    item.className = "drift-object";
+    item.setAttribute("role", "listitem");
+    item.innerHTML = `${iconSvg(motif)}<span>${motifNames[motif]}</span>`;
+    return item;
+  }));
+}
+
+function enterDrift() {
+  if (state !== "end" || !board) return;
+  clearClosureTimers();
+  renderDrift();
+  showView("drift");
+  element<HTMLElement>("driftTitle").focus({ preventScroll: true });
+  scheduleRest(DRIFT_AUTO_REST_MS, "drift");
+}
+
 function enforceBoundary() {
-  if (state !== "play") return false;
   const current = nowMs();
-  if (current >= deadlineAtMs || current >= windDownAtMs) {
+  if (state === "play" && (current >= deadlineAtMs || current >= windDownAtMs)) {
     settle("production-cap");
+    return true;
+  }
+  if ((state === "end" || state === "drift") && current >= deadlineAtMs) {
+    enterRest();
     return true;
   }
   return false;
@@ -632,17 +713,16 @@ function setLoopUnsupported(value: boolean) {
   return forceLoopUnsupported;
 }
 
-element<HTMLButtonElement>("beginBtn").addEventListener("click", beginSession);
+element<HTMLButtonElement>("beginBtn").addEventListener("click", () => beginSession());
 element<HTMLButtonElement>("notNowBtn").addEventListener("click", () => showView("dismissed"));
 element<HTMLButtonElement>("returnBtn").addEventListener("click", returnToIntake);
 element<HTMLButtonElement>("hintBtn").addEventListener("click", hint);
 muteButton.addEventListener("click", () => { audioEnabled = !audioEnabled; updateMuteButton(); });
 dawnButton.addEventListener("click", () => void openDawn());
 element<HTMLButtonElement>("closeDawnBtn").addEventListener("click", closeDawn);
-element<HTMLButtonElement>("dimRestBtn").addEventListener("click", () => {
-  showView("rest");
-  element<HTMLElement>("restTitle").focus({ preventScroll: true });
-});
+element<HTMLButtonElement>("dimRestBtn").addEventListener("click", enterRest);
+element<HTMLButtonElement>("driftBtn").addEventListener("click", enterDrift);
+element<HTMLButtonElement>("skipDriftBtn").addEventListener("click", enterRest);
 element<HTMLButtonElement>("tomorrowBtn").addEventListener("click", () => {
   if (!nightState.lastCompleted) return;
   const next = NindovaNight.setTomorrowIntention(nightState, nightState.lastCompleted.nightId);

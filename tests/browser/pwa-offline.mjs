@@ -108,8 +108,13 @@ try {
   await page.reload();
   await page.waitForFunction(() => window.__ct.state === "play");
   await page.evaluate(() => window.__ct.advanceBy(window.__ct.hardCapSeconds));
-  await page.waitForFunction(() => window.__ct.state === "end");
+  await page.waitForFunction(() => window.__ct.state === "rest");
   assert.equal(await page.evaluate(() => window.__ct.endReason), "production-cap");
+  await page.reload();
+  await page.waitForFunction(() => window.__ct.state === "intake");
+  await page.click("#beginBtn");
+  await page.evaluate(() => window.__ct.finish());
+  await page.waitForFunction(() => window.__ct.state === "end");
   await page.click("#tomorrowBtn");
   assert.equal(await page.evaluate(() => window.__ct.memory.tomorrowIntention.nightId === window.__ct.memory.lastCompleted.nightId), true);
 

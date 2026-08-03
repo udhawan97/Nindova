@@ -14,12 +14,14 @@ function watchPage(page, errors) {
 }
 
 async function open(options = {}) {
-  const context = await browser.newContext({ viewport: { width: 375, height: 812 }, ...options });
+  const { profile = "gentle", ...contextOptions } = options;
+  const context = await browser.newContext({ viewport: { width: 375, height: 812 }, ...contextOptions });
   const page = await context.newPage();
   const errors = [];
   watchPage(page, errors);
   await page.goto(target);
   await page.waitForFunction(() => Boolean(window.__ct));
+  await page.check(`input[name="rasoi-profile"][value="${profile}"]`);
   await page.click("#beginBtn");
   await page.waitForFunction(() => window.__ct.state === "play");
   return { context, page, errors };
@@ -89,10 +91,16 @@ try {
     await tapTile(normal.page, pair[1]);
   }
   await normal.page.waitForFunction(() => window.__ct.state === "end");
+  assert.equal((await normal.page.locator("#endTitle").textContent())?.trim(), "The session is over. That's the point.");
   const firstMemory = await normal.page.evaluate(() => window.__ct.memory);
   const completedBoard = await normal.page.evaluate(() => window.__ct.board.id);
   assert.equal(await normal.page.evaluate(() => document.activeElement?.id), "dimRestBtn");
-  await normal.page.click("#dimRestBtn");
+  await normal.page.click("#driftBtn");
+  assert.equal(await normal.page.evaluate(() => window.__ct.state), "drift");
+  assert.equal(await normal.page.locator(".drift-object").count(), 3);
+  assert.equal(await normal.page.locator('.drift-object[role="listitem"] span').count(), 3);
+  assert.match(await normal.page.locator("#drift").innerText(), /remember how it feels in your hands/i);
+  await normal.page.click("#skipDriftBtn");
   assert.equal(await normal.page.evaluate(() => window.__ct.state), "rest");
   assert.match(await normal.page.locator("#rest").innerText(), /Put the phone down/);
   assert.equal(await normal.page.locator("#rest button").count(), 0);
@@ -116,6 +124,27 @@ try {
   assert.deepEqual(normal.errors, []);
   await normal.context.close();
 
+  const deeper = await open({ profile: "deeper" });
+  assert.equal(await deeper.page.evaluate(() => window.__ct.board.profile), "deeper");
+  assert.deepEqual(await deeper.page.evaluate(() => [0, 1, 2, 3].map(
+    (layer) => window.__ct.tiles.filter((tile) => tile.layer === layer).length,
+  )), [20, 10, 4, 2]);
+  assert.equal(await deeper.page.evaluate(() => window.__ct.tiles.filter((tile) => tile.availability === "covered").length), 32);
+  assert.equal(await deeper.page.evaluate(() => window.__ct.legalPairs.length), 2);
+  assert.match(await deeper.page.locator("#profileBadge").innerText(), /Deeper stack · 4 authored layers/);
+  assert.match(await deeper.page.locator("#board").getAttribute("aria-label") ?? "", /four overlapping layers|4 overlapping layers/i);
+  assert.match(await deeper.page.locator('[data-layer="3"]').first().getAttribute("aria-label") ?? "", /layer 4/);
+  assert.deepEqual(deeper.errors, []);
+  await deeper.context.close();
+
+  const autoRest = await open();
+  await autoRest.page.evaluate(() => window.__ct.finish());
+  await autoRest.page.waitForFunction(() => window.__ct.state === "end");
+  await autoRest.page.click("#driftBtn");
+  await autoRest.page.waitForFunction(() => window.__ct.state === "rest", null, { timeout: 7000 });
+  assert.deepEqual(autoRest.errors, []);
+  await autoRest.context.close();
+
   const reduced = await open({ reducedMotion: "reduce" });
   const reducedPair = await reduced.page.evaluate(() => window.__ct.legalPairs[0]);
   await reduced.page.click(`[data-tile-id="${reducedPair[0]}"]`);
@@ -125,7 +154,7 @@ try {
   assert.deepEqual(reduced.errors, []);
   await reduced.context.close();
 
-  console.log("Layered occlusion, brass bloom, reduced motion, rest, and deliberate same-night return passed.");
+  console.log("Gentle/Deeper occlusion, brass bloom, optional Image Drift, reduced motion, Rest, and deliberate same-night return passed.");
 } finally {
   await browser.close();
 }
