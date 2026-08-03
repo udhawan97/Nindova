@@ -1,16 +1,16 @@
 # Graph Report - Nindova  (2026-08-03)
 
 ## Corpus Check
-- 89 files · ~64,836 words
+- 92 files · ~70,003 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 673 nodes · 831 edges · 58 communities (40 shown, 18 thin omitted)
-- Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 106 edges (avg confidence: 0.74)
+- 716 nodes · 893 edges · 59 communities (40 shown, 19 thin omitted)
+- Extraction: 88% EXTRACTED · 12% INFERRED · 0% AMBIGUOUS · INFERRED: 108 edges (avg confidence: 0.74)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `df6db1fb`
+- Built from commit: `62cbede0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -43,10 +43,12 @@
 - dawn.mjs
 - portrait-accessibility.mjs
 - seed-asserted.mjs
+- RasoiDebug
 - serve.mjs
 - self-closing.mjs
 - wall-clock-cap.mjs
 - Rasoi Pairs v0.1.0 Change Set
+- copy-contract.test.mjs
 - Punjabi and Indian Material World
 - night-memory.mjs
 - reference-integrity.test.mjs
@@ -62,25 +64,24 @@
 - Local-Only Privacy Boundary
 - Observational Test Limitation
 - Bedtime game evidence brief
-- Layered Rasoi plan
-- Nindova v0.2.0 — proposed candidate notes
+- Quiet Depth plan
+- Nindova v0.2.0 — Quiet Depth
 - Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?
 - layered-rasoi.mjs
 - generate-play-qr.mjs
 - devDependencies
-- THIRD_PARTY_NOTICES.md
 
 ## God Nodes (most connected - your core abstractions)
 1. `scripts` - 21 edges
-2. `Bedtime game evidence brief` - 12 edges
-3. `restoreActiveSession()` - 11 edges
-4. `Nindova Master Brief` - 11 edges
-5. `RasoiDebug` - 10 edges
-6. `selectTile()` - 10 edges
-7. `Layered Rasoi plan` - 10 edges
-8. `Rasoi Pairs` - 10 edges
-9. `Rasoi Pairs Redesign Evidence` - 10 edges
-10. `Rasoi Pairs v0.1.0 Change Set` - 10 edges
+2. `Bedtime game evidence brief` - 17 edges
+3. `restoreActiveSession()` - 12 edges
+4. `Quiet Depth plan` - 12 edges
+5. `Nindova Master Brief` - 11 edges
+6. `RasoiDebug` - 10 edges
+7. `showView()` - 10 edges
+8. `selectTile()` - 10 edges
+9. `Layered Rasoi plan` - 10 edges
+10. `Rasoi Pairs` - 10 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Fifteen-Minute Session Cap` --semantically_similar_to--> `Bounded Self-Ending Session`  [INFERRED] [semantically similar]
@@ -107,11 +108,11 @@
 - **Three Visible Free Kitchen Pairs** — apps_site_public_media_rasoi_pairs_phone_chimta_pair, apps_site_public_media_rasoi_pairs_phone_chai_pair, apps_site_public_media_rasoi_pairs_phone_katori_pair [EXTRACTED 1.00]
 - **Bounded Session Decision and Proof** — reference_nindova_master_brief_two_loop_law, reference_nindova_demo_fixed_session_state_arc, docs_adr_0005_cap_the_real_session_at_fifteen_minutes_fifteen_minute_session_cap [INFERRED 0.95]
 
-## Communities (58 total, 18 thin omitted)
+## Communities (59 total, 19 thin omitted)
 
 ### Community 0 - "session.ts"
-Cohesion: 0.07
-Nodes (58): NindovaDawn, NindovaNight, NindovaRasoi, advanceBy(), anchorSessionClock(), animatePair(), beginSession(), boardElement (+50 more)
+Cohesion: 0.06
+Nodes (71): RasoiTileSnapshot, SessionState, Window, NindovaDawn, NindovaNight, NindovaRasoi, RasoiBoard, RasoiMotifId (+63 more)
 
 ### Community 1 - "Rasoi Pairs"
 Cohesion: 0.06
@@ -127,15 +128,15 @@ Nodes (30): Active-record Recovery and Reload Settlement Tests, Full Keyboard Pa
 
 ### Community 4 - "scripts"
 Cohesion: 0.06
-Nodes (31): engines, node, name, packageManager, private, scripts, build, build:qr (+23 more)
+Nodes (32): engines, node, license, name, packageManager, private, scripts, build (+24 more)
 
 ### Community 5 - "Rasoi Pairs Session Interface"
 Cohesion: 0.06
 Nodes (36): Session Asset Provenance, First-Light Dawn Surface, Browser Dismissal Surface, Voluntary Intake Surface, Quiet End Card, Rasoi Pairs Session Interface, Semantic Rasoi Board, Captured-Zone Dawn Eligibility (+28 more)
 
 ### Community 6 - "rasoi-core.ts"
-Cohesion: 0.09
-Nodes (30): RasoiDebug, RasoiTileSnapshot, SessionState, Window, activeTiles(), availabilityReason(), BoardVerification, createBoard() (+22 more)
+Cohesion: 0.12
+Nodes (29): activeTiles(), availabilityReason(), BoardVerification, createBoard(), createPrng(), DEEPER_LAYOUT, freeTiles(), GENTLE_LAYOUT (+21 more)
 
 ### Community 7 - "Nindova Master Brief"
 Cohesion: 0.09
@@ -155,7 +156,7 @@ Nodes (19): compilerOptions, lib, module, moduleResolution, noEmit, skipLibCheck
 
 ### Community 11 - "site/package.json"
 Cohesion: 0.11
-Nodes (17): dependencies, astro, @astrojs/starlight, @fontsource-variable/geist, @fontsource-variable/newsreader, name, private, scripts (+9 more)
+Nodes (18): dependencies, astro, @astrojs/starlight, @fontsource-variable/geist, @fontsource-variable/newsreader, license, name, private (+10 more)
 
 ### Community 12 - "dawn-core.ts"
 Cohesion: 0.15
@@ -166,8 +167,8 @@ Cohesion: 0.15
 Nodes (16): Highlighted Outer Edge Tiles, Icon-and-Text Tile Labels, Warm Stone Indigo Brass Madder and Blue Palette, Mirrored Authored Motif Groups, Chimta Tiffin Belan Chai Masala Tawa Katori Chakla and Cooker, Nine Indian Kitchen Motifs, Redundant Pair Recognition Through Icons and Text, Indigo Phulkari-Inspired Lattice Background (+8 more)
 
 ### Community 14 - "session/package.json"
-Cohesion: 0.17
-Nodes (11): devDependencies, vite, name, private, scripts, build, dev, typecheck (+3 more)
+Cohesion: 0.15
+Nodes (12): devDependencies, vite, license, name, private, scripts, build, dev (+4 more)
 
 ### Community 15 - "compilerOptions"
 Cohesion: 0.18
@@ -230,16 +231,16 @@ Cohesion: 0.67
 Nodes (3): Cultural Visual Guardrails, Punjabi and Indian Material World, Theme and Behavior Independence
 
 ### Community 51 - "Bedtime game evidence brief"
-Cohesion: 0.09
-Nodes (22): 1. Interactive screen games and sleepiness, 2. Evening light, arousal, and media displacement, 3. Cognitive distraction and serial diverse imagining, 4. Memory evidence: pair matching is not general memory improvement, 5. Why “dopamine effect” is not supportable, Accessibility and trust, Allowed when the implementation is true, Bedtime game evidence brief (+14 more)
+Cohesion: 0.07
+Nodes (27): 0. Why sleep matters—and how to say it without fear, 1. Interactive screen games and sleepiness, 2. Evening light, arousal, and media displacement, 3. Cognitive distraction and serial diverse imagining, 4. Memory evidence: pair matching is not general memory improvement, 5. Why “dopamine effect” is not supportable, 6. Why rankings, streaks and weekly performance are the wrong layer, 7. Candidate post-board transitions (+19 more)
 
-### Community 52 - "Layered Rasoi plan"
-Cohesion: 0.10
-Nodes (18): Layer Rasoi and keep replay deliberate, Acceptance gates, Availability, Board contract, Desktop wireframe, Experience sequence, Explicitly out, Feedback contract (+10 more)
+### Community 52 - "Quiet Depth plan"
+Cohesion: 0.05
+Nodes (35): Layer Rasoi and keep replay deliberate, Add tonight-only depth and optional Image Drift, Acceptance gates, Availability, Board contract, Desktop wireframe, Experience sequence, Explicitly out (+27 more)
 
-### Community 53 - "Nindova v0.2.0 — proposed candidate notes"
+### Community 53 - "Nindova v0.2.0 — Quiet Depth"
 Cohesion: 0.40
-Nodes (4): Added, Evidence boundary, Improved, Nindova v0.2.0 — proposed candidate notes
+Nodes (4): Added, Evidence boundary, Improved, Nindova v0.2.0 — Quiet Depth
 
 ### Community 54 - "Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?"
 Cohesion: 0.40
@@ -254,23 +255,23 @@ Cohesion: 0.13
 Nodes (15): @astrojs/check, jsqr, devDependencies, @astrojs/check, jsqr, @playwright/test, pngjs, qrcode (+7 more)
 
 ## Knowledge Gaps
-- **290 isolated node(s):** `name`, `version`, `private`, `type`, `build` (+285 more)
+- **317 isolated node(s):** `name`, `version`, `license`, `private`, `type` (+312 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **19 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Rasoi Pairs` connect `Rasoi Pairs` to `Calm Bounded Pair-removal Promise`, `Rasoi Pairs v0.1.0 Change Set`?**
-  _High betweenness centrality (0.029) - this node is a cross-community bridge._
+  _High betweenness centrality (0.025) - this node is a cross-community bridge._
 - **Why does `Calm Bounded Pair-removal Promise` connect `Calm Bounded Pair-removal Promise` to `Rasoi Pairs`?**
-  _High betweenness centrality (0.021) - this node is a cross-community bridge._
+  _High betweenness centrality (0.019) - this node is a cross-community bridge._
 - **Why does `Nindova v0.1.0 Distribution` connect `Rasoi Pairs v0.1.0 Change Set` to `Rasoi Pairs`, `Automated Release Gates`?**
-  _High betweenness centrality (0.021) - this node is a cross-community bridge._
-- **What connects `name`, `version`, `private` to the rest of the system?**
-  _290 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _High betweenness centrality (0.018) - this node is a cross-community bridge._
+- **What connects `name`, `version`, `license` to the rest of the system?**
+  _317 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `session.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.07213114754098361 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05894736842105263 - nodes in this community are weakly interconnected._
 - **Should `Rasoi Pairs` be split into smaller, more focused modules?**
   _Cohesion score 0.05537098560354374 - nodes in this community are weakly interconnected._
 - **Should `night-core.ts` be split into smaller, more focused modules?**

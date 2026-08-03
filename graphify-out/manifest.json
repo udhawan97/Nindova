@@ -10,13 +10,13 @@
     "semantic_hash": "cc076f053865c0ca43c92a8b08bfb3f8"
   },
   "apps/session/package.json": {
-    "mtime": 1785779213.9143207,
-    "ast_hash": "e86fb7ec211117f0645e9ab2dcfb9067",
+    "mtime": 1785785744.0867126,
+    "ast_hash": "4089fb62c0f4c23798d47326a34a0bc7",
     "semantic_hash": ""
   },
   "apps/session/src/contracts.ts": {
-    "mtime": 1785778743.5234125,
-    "ast_hash": "18e307d66948df2bb63ed69188016f7c",
+    "mtime": 1785784576.7519474,
+    "ast_hash": "4cb7f00fa0279c6ac75ccf9d5e8ec46a",
     "semantic_hash": ""
   },
   "apps/session/sw.js": {
@@ -40,8 +40,8 @@
     "semantic_hash": ""
   },
   "apps/site/package.json": {
-    "mtime": 1785779213.9145615,
-    "ast_hash": "6b9cb91b52c063e47eb6b30eb511ccdc",
+    "mtime": 1785785744.086995,
+    "ast_hash": "c15e29ff9e38be0cb397eb24f241665b",
     "semantic_hash": ""
   },
   "apps/site/src/content.config.ts": {
@@ -50,13 +50,13 @@
     "semantic_hash": "9da5b344274fa94c0650dcb1a257aacc"
   },
   "apps/site/src/pages/index.astro": {
-    "mtime": 1785780773.616442,
-    "ast_hash": "f2303ef184489fbad91c90edf7d7b1f4",
+    "mtime": 1785785580.0749128,
+    "ast_hash": "187c9f74fd8e4356ebfb99dde6dc76f3",
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1785780969.9680028,
-    "ast_hash": "277525c00d1df2435f350d70aa750ce6",
+    "mtime": 1785785744.0863905,
+    "ast_hash": "7db5191d6192b2c21b2ce50723fa3724",
     "semantic_hash": ""
   },
   "reference/test-demo.mjs": {
@@ -85,18 +85,18 @@
     "semantic_hash": ""
   },
   "tests/browser/night-memory.mjs": {
-    "mtime": 1785780811.983226,
-    "ast_hash": "3a4407e9956c773b476f5f649fc1b0b1",
+    "mtime": 1785784746.0381093,
+    "ast_hash": "37b0a10af37cb1329511f4abd90adb64",
     "semantic_hash": ""
   },
   "tests/browser/portrait-accessibility.mjs": {
-    "mtime": 1785781472.6807966,
-    "ast_hash": "c7d64d21be0b8ee6782c81d264d281e9",
+    "mtime": 1785784827.792091,
+    "ast_hash": "048d91047bac6fcc917176a987171c2b",
     "semantic_hash": ""
   },
   "tests/browser/pwa-offline.mjs": {
-    "mtime": 1785781472.6811626,
-    "ast_hash": "b38607da204af2c9a12877cbad17304e",
+    "mtime": 1785785697.2489157,
+    "ast_hash": "802b08bcdbdbda161d32909b063994f7",
     "semantic_hash": ""
   },
   "tests/browser/seed-asserted.mjs": {
@@ -105,14 +105,14 @@
     "semantic_hash": "b930f213764efe550ff7e8bdda8204d9"
   },
   "tests/browser/self-closing.mjs": {
-    "mtime": 1785780283.053368,
-    "ast_hash": "ed07b40c58a22e1536990601082f2ac5",
+    "mtime": 1785784677.3296912,
+    "ast_hash": "b49dcd38bf884c0979a29b9f0db87ff6",
     "semantic_hash": ""
   },
   "tests/browser/wall-clock-cap.mjs": {
-    "mtime": 1785735243.2131245,
-    "ast_hash": "7d72a96f507a9f5c081cd2f5dd9b5ddb",
-    "semantic_hash": "7d72a96f507a9f5c081cd2f5dd9b5ddb"
+    "mtime": 1785784775.8989851,
+    "ast_hash": "66ddcfa99fe1173863636ffc7e6392c2",
+    "semantic_hash": ""
   },
   "tests/unit/color-contrast.test.mjs": {
     "mtime": 1785720534.8019617,
@@ -140,28 +140,28 @@
     "semantic_hash": "938df30602889721e037bc1f25fd53ed"
   },
   "CONTEXT.md": {
-    "mtime": 1785778540.8489943,
-    "ast_hash": "52ba08e8f698bad9b915a7387717c2d0",
+    "mtime": 1785784298.4344308,
+    "ast_hash": "c7b83c8905276cacc0b8b25d72d96e2d",
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1785780748.4090128,
-    "ast_hash": "c429b4e842f6d8572ab99ce6d937aab3",
+    "mtime": 1785786025.6487005,
+    "ast_hash": "b7de67b3fa6307f20a5c1e3e3eb49a6e",
     "semantic_hash": ""
   },
   "apps/session/index.html": {
-    "mtime": 1785780748.4094136,
-    "ast_hash": "4e9bce63a3d2a54590767b8e2ce238e0",
+    "mtime": 1785785827.717511,
+    "ast_hash": "931f3ce507c21ac90b26ce452d665900",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/accessibility.md": {
-    "mtime": 1785779371.3733523,
-    "ast_hash": "549819f2e9e513226a6d64b2b6364c06",
+    "mtime": 1785785042.8902833,
+    "ast_hash": "faaa786f608e7edf268c204c89025b81",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/architecture.md": {
-    "mtime": 1785779371.3736286,
-    "ast_hash": "cfaaa6bb5bff203a13a15b55166bd7ae",
+    "mtime": 1785785042.8907444,
+    "ast_hash": "55e8df403a047e1cae2b8a757eb50419",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/dawn.md": {
@@ -170,13 +170,13 @@
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/getting-started.md": {
-    "mtime": 1785780626.831691,
-    "ast_hash": "dc66c9e9e5ea2b050bf64a8ac2efdae0",
+    "mtime": 1785785580.0756829,
+    "ast_hash": "a053646f8af716a58083e9cf6912a7d3",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/index.md": {
-    "mtime": 1785779371.37295,
-    "ast_hash": "62a0345e8ce53b4963592b8251199bd7",
+    "mtime": 1785785175.2209218,
+    "ast_hash": "18267af09126b5172a97524608d82f45",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/ios-wall.md": {
@@ -185,43 +185,43 @@
     "semantic_hash": "d54f2070002b98fbf4784739a4d7191d"
   },
   "apps/site/src/content/docs/docs/known-limitations.md": {
-    "mtime": 1785780626.8319921,
-    "ast_hash": "41f2792ce3cea23f13249da59434e061",
+    "mtime": 1785785580.0758967,
+    "ast_hash": "385d63cf3aa03d1fc249efd9921e4a59",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/night-and-local-state.md": {
-    "mtime": 1785779388.2678025,
-    "ast_hash": "718dad2bd2ccc1b82dd17b9f2af899eb",
+    "mtime": 1785785175.2211683,
+    "ast_hash": "648d12d70a256c0cee67278aec55971c",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/nightly-arc.md": {
-    "mtime": 1785780390.3646293,
-    "ast_hash": "d11aa30995be2af6ccb57674da5dbf8b",
+    "mtime": 1785785042.8895996,
+    "ast_hash": "3c9f7e57f5e1eff6f7b57d9cce7aa27a",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/privacy-local-state.md": {
-    "mtime": 1785780361.2859015,
-    "ast_hash": "f2d9302cdc70c4e43847a6acb24706db",
+    "mtime": 1785784775.8993144,
+    "ast_hash": "881736a134e5c8f7f4b934df4eeb24ab",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/product-contract.md": {
-    "mtime": 1785780748.4100223,
-    "ast_hash": "981a45d8aee146bc5a030ab7a06db7bd",
+    "mtime": 1785784298.4348202,
+    "ast_hash": "458e1f1f48fc164e46c3266122153f35",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/research-receipts.md": {
-    "mtime": 1785779447.74054,
-    "ast_hash": "cf915ffbd83ae622c74c6d31374a8a68",
+    "mtime": 1785785117.9792273,
+    "ast_hash": "2ac18230e68019e27b5b15b1d07ee32f",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/roadmap.md": {
-    "mtime": 1785780626.8322432,
-    "ast_hash": "5bccbdfd14c93afbeaccfa0d8437bac2",
+    "mtime": 1785785580.0752625,
+    "ast_hash": "bcdec85e4994ea4b1f6a214c0cfe3206",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/testing.md": {
-    "mtime": 1785779426.2955678,
-    "ast_hash": "f7a966e4e0f6661ab612e3a49f902853",
+    "mtime": 1785785117.9801028,
+    "ast_hash": "57d891db6ddeceb97a4a0a07c5b7aea1",
     "semantic_hash": ""
   },
   "docs/BUILD-PLAN.md": {
@@ -350,8 +350,8 @@
     "semantic_hash": ""
   },
   "apps/session/src/session.ts": {
-    "mtime": 1785780443.7428868,
-    "ast_hash": "d70e836db8e25e82d3ce5b053d43c0e1",
+    "mtime": 1785784723.0733075,
+    "ast_hash": "eee3eda46c0356de6a307dc60447b1c6",
     "semantic_hash": ""
   },
   "apps/session/tsconfig.session.json": {
@@ -365,23 +365,23 @@
     "semantic_hash": "022e3dae2a62db1c26e6fa5017a39986"
   },
   "apps/session/src/rasoi-core.ts": {
-    "mtime": 1785779066.7280388,
-    "ast_hash": "8eea33531815c581cb7ec3a24e812556",
+    "mtime": 1785784410.5827377,
+    "ast_hash": "1b3ac8c9160cf5026d6ff281f735e258",
     "semantic_hash": ""
   },
   "tests/unit/rasoi-core.test.mjs": {
-    "mtime": 1785779066.7283456,
-    "ast_hash": "a9b255c524f3fc7d2d3b537bc572a767",
+    "mtime": 1785784443.1381638,
+    "ast_hash": "fabbd7692853c1e1884d35f58219baed",
     "semantic_hash": ""
   },
   "CHANGELOG.md": {
-    "mtime": 1785740432.2458327,
-    "ast_hash": "e703ccbe52d2b4437563b42b7f7b668f",
-    "semantic_hash": "e703ccbe52d2b4437563b42b7f7b668f"
+    "mtime": 1785785175.221586,
+    "ast_hash": "ea5517ab278fc1bc594672b7d3c69bc7",
+    "semantic_hash": ""
   },
   "docs/PUBLIC-SURFACE-EVIDENCE.md": {
-    "mtime": 1785782125.5522707,
-    "ast_hash": "7708035ac487a12738e1749691898cb8",
+    "mtime": 1785786434.506092,
+    "ast_hash": "ef53a7ed1c1bb1ca6c681af5cc81aa4f",
     "semantic_hash": ""
   },
   "docs/REDESIGN-PLAN.md": {
@@ -400,8 +400,8 @@
     "semantic_hash": "81d648bab384cc20dc03d966cddf829b"
   },
   "docs/testing/rasoi-redesign.md": {
-    "mtime": 1785782125.5515537,
-    "ast_hash": "594b8f07b4dd6cbde024881b7e9850f8",
+    "mtime": 1785786434.5064929,
+    "ast_hash": "819a543b3e655a60b23f383a668dba42",
     "semantic_hash": ""
   },
   "graphify-out/memory/query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for.md": {
@@ -410,8 +410,8 @@
     "semantic_hash": "2a1652b1bf1570a5d01c8e248948174e"
   },
   "apps/site/public/media/rasoi-board.png": {
-    "mtime": 1785781035.544589,
-    "ast_hash": "1950c3ec0efe37bfe41076bb972250c1",
+    "mtime": 1785785427.378385,
+    "ast_hash": "f38c121f8329443f582792065b2362a3",
     "semantic_hash": ""
   },
   "apps/site/public/media/rasoi-dawn.png": {
@@ -420,8 +420,8 @@
     "semantic_hash": "320e7e4127cfd5dd96ddeaf22d80e78a"
   },
   "apps/site/public/media/rasoi-pairs-phone.png": {
-    "mtime": 1785779494.1443653,
-    "ast_hash": "38ad70c3b85450ddf0d92252f71f839a",
+    "mtime": 1785785432.0045164,
+    "ast_hash": "a524df37cf4e05b185df3372cc825341",
     "semantic_hash": ""
   },
   "scripts/generate-play-qr.mjs": {
@@ -430,8 +430,8 @@
     "semantic_hash": ""
   },
   "tests/browser/layered-rasoi.mjs": {
-    "mtime": 1785781472.6803777,
-    "ast_hash": "03775f273e0c7293d26ac8e955cbeb5d",
+    "mtime": 1785784677.329247,
+    "ast_hash": "b171546db5925850d6c71c9ed6f86f9b",
     "semantic_hash": ""
   },
   "tests/unit/qr-route.test.mjs": {
@@ -450,13 +450,13 @@
     "semantic_hash": ""
   },
   "docs/releases/v0.2.0.md": {
-    "mtime": 1785780626.8324165,
-    "ast_hash": "965509e97c9cc5591c43e13727452cc6",
+    "mtime": 1785786025.6491137,
+    "ast_hash": "108f011254206e0c6ff8da30415bb7cd",
     "semantic_hash": ""
   },
   "docs/research/bedtime-game-evidence.md": {
-    "mtime": 1785780883.4112806,
-    "ast_hash": "5dab2119d1e4704218e9ae5d9dd9d73f",
+    "mtime": 1785783469.4122107,
+    "ast_hash": "dfccac40d76f9eed07086b462abd0455",
     "semantic_hash": ""
   },
   "graphify-out/memory/query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha.md": {
@@ -465,7 +465,7 @@
     "semantic_hash": ""
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1785781618.8709211,
+    "mtime": 1785786446.1820946,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": ""
   },
@@ -492,6 +492,21 @@
   "apps/site/public/licenses/newsreader-OFL-1.1.txt": {
     "mtime": 1785780338.9162185,
     "ast_hash": "1738a90899631a6ba5dff435d25a0627",
+    "semantic_hash": ""
+  },
+  "tests/unit/copy-contract.test.mjs": {
+    "mtime": 1785785175.2220333,
+    "ast_hash": "ebaf5c627e8c0e26cbeb4ab8ae3bb27d",
+    "semantic_hash": ""
+  },
+  "docs/QUIET-DEPTH-PLAN.md": {
+    "mtime": 1785784298.4331996,
+    "ast_hash": "951168922118a0502c3da911995ab675",
+    "semantic_hash": ""
+  },
+  "docs/adr/0012-add-tonight-only-depth-and-image-drift.md": {
+    "mtime": 1785784298.4338362,
+    "ast_hash": "a89f5f67cb3657152614b69170ac916b",
     "semantic_hash": ""
   }
 }
