@@ -7,7 +7,7 @@
   "5": "Rasoi Pairs Session Interface",
   "6": "rasoi-core.ts",
   "7": "Nindova Master Brief",
-  "8": "Rasoi Pairs v0.1.0 Change Set",
+  "8": "Calm Bounded Pair-removal Promise",
   "9": "Rasoi Pairs Accessibility",
   "10": "compilerOptions",
   "11": "site/package.json",
@@ -31,7 +31,7 @@
   "29": "serve.mjs",
   "30": "self-closing.mjs",
   "31": "wall-clock-cap.mjs",
-  "32": "night-core.test.mjs",
+  "32": "Rasoi Pairs v0.1.0 Change Set",
   "33": "vite.config.ts",
   "34": "index.astro",
   "35": "Punjabi and Indian Material World",
@@ -56,5 +56,7 @@
   "54": "Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?",
   "55": "layered-rasoi.mjs",
   "56": "generate-play-qr.mjs",
-  "57": "qr-route.test.mjs"
+  "57": "qr-route.test.mjs",
+  "58": "devDependencies",
+  "59": "THIRD_PARTY_NOTICES.md"
 }
