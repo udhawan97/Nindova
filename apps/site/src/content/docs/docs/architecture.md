@@ -17,7 +17,7 @@ The authored geometry has three 12-tile racks. The active tile with the lowest a
 
 ## Browser and local state
 
-`session.ts` renders semantic buttons, enforces the hidden wind-down/ceiling, manages same-tab resume, synthesizes optional audio, and maintains versioned `window.__rasoi`. `window.__ct` remains an alias for compatibility evidence.
+`session.ts` renders semantic buttons, begins the hidden automatic settle at twelve minutes, enforces the fifteen-minute ceiling, manages same-tab resume, synthesizes optional audio, and maintains versioned `window.__rasoi`. `window.__ct` remains an alias for compatibility evidence.
 
 `night-core.ts` owns Night ID, deterministic recipe version 2, v3 state sanitization, v1/v2 migration, and idempotent completion. `dawn-core.ts` owns captured-zone eligibility, still/loop capability handling, sharing, and temporary URL leases.
 

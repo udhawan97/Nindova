@@ -21,6 +21,14 @@ async function open(viewport, options = {}) {
   return { context, page, errors };
 }
 
+async function tabToTile(page, tileId) {
+  for (let step = 0; step < 24; step += 1) {
+    if (await page.evaluate((id) => document.activeElement?.getAttribute("data-tile-id") === id, tileId)) return;
+    await page.keyboard.press("Tab");
+  }
+  assert.fail(`Keyboard focus did not reach ${tileId}`);
+}
+
 try {
   for (const viewport of [
     { width: 320, height: 568 },
@@ -57,13 +65,15 @@ try {
   assert.equal(await keyboard.page.evaluate(() => document.documentElement.scrollWidth), 375);
   while (await keyboard.page.evaluate(() => window.__ct.state === "play")) {
     const pair = await keyboard.page.evaluate(() => window.__ct.legalPairs[0]);
-    await keyboard.page.locator(`[data-tile-id="${pair[0]}"]`).scrollIntoViewIfNeeded();
-    await keyboard.page.locator(`[data-tile-id="${pair[0]}"]`).focus();
+    await tabToTile(keyboard.page, pair[0]);
     await keyboard.page.keyboard.press("Enter");
     assert.equal(await keyboard.page.evaluate(() => window.__ct.selectedTile), pair[0]);
-    await keyboard.page.locator(`[data-tile-id="${pair[1]}"]`).scrollIntoViewIfNeeded();
-    await keyboard.page.locator(`[data-tile-id="${pair[1]}"]`).focus();
+    await tabToTile(keyboard.page, pair[1]);
     await keyboard.page.keyboard.press("Enter");
+    if (await keyboard.page.evaluate(() => window.__ct.state === "play")) {
+      const next = await keyboard.page.evaluate(() => window.__ct.legalPairs[0][0]);
+      await keyboard.page.waitForFunction((id) => document.activeElement?.getAttribute("data-tile-id") === id, next);
+    }
   }
   await keyboard.page.waitForFunction(() => window.__ct.state === "end");
   assert.equal(await keyboard.page.evaluate(() => window.__ct.removedTileCount), 36);

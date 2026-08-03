@@ -7,7 +7,7 @@
 - Rasoi Pairs, a deterministic 36-tile pair-removal Session using nine Indian kitchen motifs.
 - One shared legality kernel for rendering, input, help, removal, and exhaustive no-dead-state verification.
 - Native semantic tiles, visible object names, keyboard completion, reduced motion, 200% zoom, and 320–1440px responsive layouts.
-- Hidden twelve-minute wind-down, fifteen-minute ceiling, optional sound, same-tab resume, and voluntary same-night deterministic replay.
+- Hidden twelve-minute automatic settle, fifteen-minute ceiling, optional sound, same-tab resume, and voluntary same-night deterministic replay.
 - Version-3 local state with safe version-1/version-2 Dawn migration.
 - First-light kitchen Dawn with local PNG and silent-loop export.
 - Refreshed README, landing page, Starlight documentation, real rendered media, release notes, and checksummed artifacts.

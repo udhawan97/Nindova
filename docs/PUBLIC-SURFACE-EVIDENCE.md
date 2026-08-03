@@ -16,7 +16,7 @@
 - Long-lived state sanitization excludes interaction timestamps and safely copies v1/v2 Dawn state into a v3 union without deleting the source key.
 - Same-night completion is idempotent; voluntary replay selects the same board ID and motif order.
 - The runtime contains no analytics, account, advertising, remote-logging, or third-party request code. Browser request capture remains same-origin.
-- Production uses a hidden twelve-minute wind-down and hard fifteen-minute ceiling; reviewer timing compresses only the boundary.
+- Production begins its automatic settle at twelve minutes and has a hard fifteen-minute ceiling; reviewer timing compresses only those boundaries.
 
 ## Untested risk
 

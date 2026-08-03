@@ -8,7 +8,7 @@ npm test
 npm run test:wall-clock
 ```
 
-The gates cover TypeScript, builds, 39+ pure unit assertions, exhaustive Rasoi reachability, the complete pair-removal arc, 320–1440px responsive surfaces, native semantics, keyboard removal, 200% zoom, reduced motion, target size, closure boundaries, deterministic Night ID, local-state migration/recovery, same-tab resume, same-night replay, first-light Dawn and exports, manifest/worker scope, offline closure, same-origin requests, and standalone independence.
+The gates cover TypeScript, builds, 41+ pure unit assertions, exhaustive Rasoi reachability, the complete pair-removal arc, 320–1440px responsive surfaces, native semantics, continuous keyboard removal at 200% zoom, reduced motion, target size, closure boundaries, deterministic Night ID, strict active-record recovery, reload-during-settlement closure, same-tab resume, same-night replay, first-light Dawn and exports, manifest/worker scope, offline closure, same-origin requests, and standalone independence.
 
 ## Production wall-clock proof
 

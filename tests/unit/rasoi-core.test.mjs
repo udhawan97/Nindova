@@ -33,6 +33,15 @@ test("a legal pair reveals the next matching pair on its rack", () => {
   );
 });
 
+test("active-session removal state accepts only reachable legal histories", () => {
+  const board = Rasoi.createBoard("2026-08-04|America/Chicago|r2");
+  const first = Rasoi.removePair(board, new Set(), "r0-s0", "r0-s11").removed;
+  assert.equal(Rasoi.isReachableState(board, new Set()), true);
+  assert.equal(Rasoi.isReachableState(board, first), true);
+  assert.equal(Rasoi.isReachableState(board, new Set(["r0-s5", "r0-s6"])), false);
+  assert.equal(Rasoi.isReachableState(board, new Set(["not-a-tile"])), false);
+});
+
 test("an exhaustive reachability check finds no dead state after any legal choice", () => {
   for (const nightId of [
     "2026-08-04|America/Chicago|r2",

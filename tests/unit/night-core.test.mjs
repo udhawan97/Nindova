@@ -21,6 +21,15 @@ test("DST fallback does not split one local night", () => {
   assert.equal(first.nightId, second.nightId);
 });
 
+test("active-session Night captures are fully validated and normalized", () => {
+  const capture = Night.captureNight(new Date("2026-08-03T03:00:00Z"), "America/Chicago");
+  assert.deepEqual(Night.sanitizeCapture(capture), capture);
+  assert.equal(Night.sanitizeCapture({ ...capture, dawnDate: "2026-08-04" }), null);
+  assert.equal(Night.sanitizeCapture({ ...capture, timeZone: "Not/AZone" }), null);
+  assert.equal(Night.sanitizeCapture({ ...capture, startedAt: "not-an-instant" }), null);
+  assert.equal(Night.sanitizeCapture({ nightId: capture.nightId }), null);
+});
+
 test("the nightly Rasoi recipe is deterministic", () => {
   const first = Night.recipeForNight("2026-08-03|America/Chicago|r2");
   const replay = Night.recipeForNight("2026-08-03|America/Chicago|r2");

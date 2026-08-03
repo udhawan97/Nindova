@@ -47,6 +47,8 @@ try {
   await hintOnly.page.click("#hintBtn");
   assert.equal(await hintOnly.page.evaluate(() => window.__ct.removedTileCount), before);
   assert.equal(await hintOnly.page.locator(".is-hinted").count(), 2);
+  assert.equal(await hintOnly.page.locator('.is-hinted[aria-label*="suggested safe pair"]').count(), 2);
+  assert.match((await hintOnly.page.locator("#boardStatus").textContent()) ?? "", /^Hint: the two free .+ tiles are a safe pair\.$/);
   await hintOnly.page.evaluate(() => window.__ct.advanceBy(89));
   assert.equal(await hintOnly.page.evaluate(() => window.__ct.state), "play");
   await hintOnly.context.close();

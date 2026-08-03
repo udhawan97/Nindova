@@ -7,6 +7,7 @@ await import("../../apps/session/dist/night-core.js");
 const Night = globalThis.NindovaNight;
 const root = resolve(import.meta.dirname, "../..");
 const target = `${pathToFileURL(resolve(root, "apps/session/dist/nindova.html")).href}?review=1`;
+const activeSessionKey = "nindova:active-session:v2";
 const browser = await chromium.launch();
 const context = await browser.newContext({ viewport: { width: 375, height: 812 } });
 const page = await context.newPage();
@@ -39,8 +40,51 @@ try {
   assert.equal(await page.evaluate(() => window.__ct.removedTileCount), 2);
   assert.equal(await page.evaluate(() => window.__ct.board.id), started.board.id);
 
-  await page.evaluate(() => window.__ct.finish());
+  const validActiveRecord = await page.evaluate((key) => sessionStorage.getItem(key), activeSessionKey);
+  assert.equal(JSON.parse(validActiveRecord).phase, "play");
+  const corruptNightRecord = JSON.parse(validActiveRecord);
+  delete corruptNightRecord.night.dawnDate;
+  delete corruptNightRecord.night.timeZone;
+  await page.addInitScript(({ key, value }) => {
+    if (!sessionStorage.getItem("nindova:test:invalid-night-injected")) {
+      sessionStorage.setItem(key, value);
+      sessionStorage.setItem("nindova:test:invalid-night-injected", "1");
+    }
+  }, { key: activeSessionKey, value: JSON.stringify(corruptNightRecord) });
+  await page.reload();
+  await page.waitForFunction(() => Boolean(window.__ct));
+  assert.equal(await page.evaluate(() => window.__ct.state), "intake");
+  assert.equal(await page.evaluate((key) => sessionStorage.getItem(key), activeSessionKey), null);
+
+  await page.evaluate(({ key, value }) => sessionStorage.setItem(key, value), { key: activeSessionKey, value: validActiveRecord });
+  await page.reload();
+  await page.waitForFunction(() => window.__ct.state === "play");
+  const unreachableRecord = JSON.parse(validActiveRecord);
+  unreachableRecord.removed = ["r0-s5", "r0-s6"];
+  await page.addInitScript(({ key, value }) => {
+    if (!sessionStorage.getItem("nindova:test:unreachable-state-injected")) {
+      sessionStorage.setItem(key, value);
+      sessionStorage.setItem("nindova:test:unreachable-state-injected", "1");
+    }
+  }, { key: activeSessionKey, value: JSON.stringify(unreachableRecord) });
+  await page.reload();
+  await page.waitForFunction(() => Boolean(window.__ct));
+  assert.equal(await page.evaluate(() => window.__ct.state), "intake");
+  assert.equal(await page.evaluate((key) => sessionStorage.getItem(key), activeSessionKey), null);
+
+  await page.evaluate(({ key, value }) => sessionStorage.setItem(key, value), { key: activeSessionKey, value: validActiveRecord });
+  await page.reload();
+  await page.waitForFunction(() => window.__ct.state === "play");
+  await page.evaluate(() => {
+    while (window.__ct.state === "play") {
+      const pair = window.__ct.legalPairs[0];
+      window.__ct.selectTile(pair[0]);
+      window.__ct.selectTile(pair[1]);
+    }
+    location.reload();
+  }).catch(() => {});
   await page.waitForFunction(() => window.__ct.state === "end");
+  assert.equal(await page.evaluate((key) => sessionStorage.getItem(key), activeSessionKey), null);
   const firstMemory = await page.evaluate(() => window.__ct.memory);
   assert.equal(firstMemory.lastCompleted.kind, "rasoi-pairs");
   assert.equal(firstMemory.lastCompleted.boardId, started.board.id);

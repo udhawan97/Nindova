@@ -18,7 +18,7 @@ Nindova distinguishes three evidence levels:
 - `test:night` covers corrupt recovery, “Not now” return, reload resume, same-night board identity, v3 completion, and replay idempotence.
 - `test:dawn` serves the composed build and verifies morning boundaries, the rendered kitchen composition, local PNG download, share cancellation, loop fallback, and a real browser loop.
 - `test:pwa` verifies manifest/scope, offline cache ownership, denied-audio operation, same-tab resume, offline closure, quiet tomorrow intent, same-origin requests, and standalone independence.
-- `test:wall-clock` leaves a production Session untouched through wind-down and the absolute fifteen-minute ceiling.
+- `test:wall-clock` leaves a production Session untouched through its twelve-minute automatic settle and the absolute fifteen-minute ceiling.
 
 ## Release commands
 

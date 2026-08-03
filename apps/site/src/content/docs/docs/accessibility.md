@@ -11,7 +11,7 @@ Rasoi Pairs uses native HTML buttons for every tile. The drawing, visible name, 
 - Each tile announces its kitchen form and whether it is free, covered, selected, or settled.
 - Selection and removal work with pointer, touch, keyboard, switch-style activation, and programmatic semantic control.
 - All tile and toolbar targets are at least 44 by 44 CSS pixels.
-- Live status text describes selection, mismatch, match, help, wind-down, and closure.
+- Live status text describes selection, mismatch, match, help, automatic settlement, and closure.
 - Visible text names mean recognition does not depend on the illustration.
 
 Audio is off by default and optional. Animation is decorative. Precision movement and vision are not required.

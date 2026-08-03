@@ -24,4 +24,4 @@ The verifier explores all 343 reachable removal states for every tested board re
 
 ## Timing
 
-The production clock has a hidden fifteen-minute ceiling. At twelve minutes an unfinished board begins its wind-down and closes under the same lid. The reviewer switch `?review=1` compresses those boundaries without changing order or outcome.
+The production clock begins an unfinished board's automatic settle at twelve minutes and has a hidden fifteen-minute ceiling. The remaining kitchen closes under the same lid. The reviewer switch `?review=1` compresses those boundaries without changing order or outcome.

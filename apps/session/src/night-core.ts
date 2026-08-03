@@ -149,6 +149,25 @@ function validBase(value: any) {
   return Boolean(value && isText(value.nightId) && /^\d{4}-\d{2}-\d{2}$/.test(value.dawnDate) && isText(value.timeZone));
 }
 
+function sanitizeCapture(value: any): Readonly<NightCapture> | null {
+  if (!validBase(value) || value.recipeVersion !== RECIPE_VERSION || !isText(value.startedAt)) return null;
+  try {
+    const startedAt = new Date(value.startedAt);
+    if (Number.isNaN(startedAt.getTime())) return null;
+    const expected = captureNight(startedAt, value.timeZone);
+    if (value.nightId !== expected.nightId || value.dawnDate !== expected.dawnDate) return null;
+    return Object.freeze({
+      nightId: expected.nightId,
+      dawnDate: expected.dawnDate,
+      timeZone: expected.timeZone,
+      recipeVersion: RECIPE_VERSION,
+      startedAt: expected.startedAt,
+    });
+  } catch {
+    return null;
+  }
+}
+
 function validRasoiCompletion(value: any): value is RasoiCompletion {
   return Boolean(
     validBase(value) && value.kind === "rasoi-pairs" && value.recipeVersion === RECIPE_VERSION && isText(value.boardId)
@@ -313,6 +332,7 @@ export const NindovaNight = Object.freeze({
   emptyState,
   readStorage,
   recipeForNight,
+  sanitizeCapture,
   seedFrom,
   setTomorrowIntention,
   writeStorage,

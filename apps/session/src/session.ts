@@ -3,7 +3,7 @@ import { NindovaNight, type NightCapture, type NightCompletion, type NightState,
 import { NindovaRasoi, type RasoiBoard, type RasoiMotifId } from "./rasoi-core.js";
 import type { RasoiDebug, SessionState } from "./contracts.js";
 
-const ACTIVE_SESSION_KEY = "nindova:active-session:v1";
+const ACTIVE_SESSION_KEY = "nindova:active-session:v2";
 const PRODUCTION_CAP_SECONDS = 15 * 60;
 const PRODUCTION_WIND_DOWN_SECONDS = 12 * 60;
 const REVIEW_CAP_SECONDS = 120;
@@ -30,7 +30,6 @@ const views = {
 const boardElement = element<HTMLDivElement>("board");
 const boardShell = element<HTMLDivElement>("boardShell");
 const boardStatus = element<HTMLParagraphElement>("boardStatus");
-const srStatus = element<HTMLParagraphElement>("srStatus");
 const muteButton = element<HTMLButtonElement>("muteBtn");
 const dawnButton = element<HTMLButtonElement>("dawnBtn");
 const dawnCanvas = element<HTMLCanvasElement>("dawnCanvas");
@@ -68,6 +67,7 @@ let endReason: "completed" | "production-cap" = "completed";
 let settlementTimer: number | null = null;
 let dawnNowOverride: Date | null = null;
 let forceLoopUnsupported = false;
+let hintTimer: number | null = null;
 let nightStateResult = NindovaNight.readStorage(safeStorage("local"));
 let nightState = nightStateResult.state;
 let loopResult: null | { blob: Blob; type: string; extension: string; durationMs: number } = null;
@@ -83,7 +83,6 @@ function safeStorage(kind: "local" | "session") {
 
 function setStatus(message: string) {
   boardStatus.textContent = message;
-  srStatus.textContent = message;
 }
 
 function showView(next: SessionState) {
@@ -154,21 +153,24 @@ function updateBoardDom(focusId: string | null = null) {
     const isRemoved = removed.has(tile.id);
     const isFree = freeIds.has(tile.id);
     const isSelected = selectedTile === tile.id;
+    const isHinted = button.classList.contains("is-hinted");
     button.disabled = !isFree || isRemoved || state !== "play";
     button.classList.toggle("is-removed", isRemoved);
     button.classList.toggle("is-selected", isSelected);
     button.setAttribute("aria-pressed", String(isSelected));
-    button.setAttribute("aria-label", `${motifNames[tile.motif]}, ${isRemoved ? "settled" : isFree ? "free at the rack edge" : "covered by neighboring tiles"}${isSelected ? ", selected" : ""}`);
+    button.setAttribute("aria-label", `${motifNames[tile.motif]}, ${isRemoved ? "settled" : isFree ? "free at the rack edge" : "covered by neighboring tiles"}${isSelected ? ", selected" : ""}${isHinted ? ", suggested safe pair" : ""}`);
   }
   boardShell.style.setProperty("--warmth", String(removed.size / board.tiles.length));
   if (focusId) requestAnimationFrame(() => tileButton(focusId)?.focus());
 }
 
 function persistActiveSession() {
-  if (!board || !currentNight || state === "end") return;
+  if (!board || !currentNight || (state !== "play" && state !== "settling")) return;
   try {
     safeStorage("session")?.setItem(ACTIVE_SESSION_KEY, JSON.stringify({
-      version: 1,
+      version: 2,
+      phase: state,
+      endReason,
       night: currentNight,
       boardId: board.id,
       removed: [...removed],
@@ -190,21 +192,48 @@ function restoreActiveSession() {
     const raw = safeStorage("session")?.getItem(ACTIVE_SESSION_KEY);
     if (!raw) return false;
     const candidate = JSON.parse(raw);
-    if (candidate.version !== 1 || !candidate.night?.nightId || !Array.isArray(candidate.removed)) return false;
-    const restoredBoard = NindovaRasoi.createBoard(candidate.night.nightId);
-    if (restoredBoard.id !== candidate.boardId) return false;
+    const restoredNight = NindovaNight.sanitizeCapture(candidate.night);
+    if (candidate.version !== 2 || !restoredNight || !Array.isArray(candidate.removed)
+      || (candidate.phase !== "play" && candidate.phase !== "settling")
+      || (candidate.endReason !== "completed" && candidate.endReason !== "production-cap")) {
+      clearActiveSession();
+      return false;
+    }
+    const restoredBoard = NindovaRasoi.createBoard(restoredNight.nightId);
+    if (restoredBoard.id !== candidate.boardId) {
+      clearActiveSession();
+      return false;
+    }
     const allowed = new Set(restoredBoard.tiles.map((tile) => tile.id));
-    if (candidate.removed.some((tileId: string) => !allowed.has(tileId))) return false;
-    currentNight = candidate.night;
+    if (candidate.removed.some((tileId: unknown) => typeof tileId !== "string" || !allowed.has(tileId))
+      || new Set(candidate.removed).size !== candidate.removed.length) {
+      clearActiveSession();
+      return false;
+    }
+    const restoredRemoved = new Set<string>(candidate.removed);
+    if (!NindovaRasoi.isReachableState(restoredBoard, restoredRemoved)) {
+      clearActiveSession();
+      return false;
+    }
+    currentNight = restoredNight;
     board = restoredBoard;
-    removed = new Set(candidate.removed);
+    removed = restoredRemoved;
     selectedTile = null;
     startedAtMs = Number(candidate.startedAtMs);
     deadlineAtMs = Number(candidate.deadlineAtMs);
     windDownAtMs = Number(candidate.windDownAtMs);
-    if (![startedAtMs, deadlineAtMs, windDownAtMs].every(Number.isFinite)) return false;
+    if (![startedAtMs, deadlineAtMs, windDownAtMs].every(Number.isFinite)
+      || deadlineAtMs - startedAtMs !== hardCapSeconds * 1000
+      || windDownAtMs - startedAtMs !== windDownSeconds * 1000) {
+      clearActiveSession();
+      return false;
+    }
     showView("play");
     createBoardDom();
+    if (candidate.phase === "settling" || NindovaRasoi.isComplete(restoredBoard, restoredRemoved)) {
+      settle(candidate.endReason);
+      return true;
+    }
     setStatus("The same kitchen is still here.");
     enforceBoundary();
     return true;
@@ -288,7 +317,8 @@ function selectTile(tileId: string, restoreFocus = false) {
   selectedTile = null;
   void playPairSound(tile.row);
   setStatus(`${motifShortNames[tile.motif]} settles with its pair.`);
-  updateBoardDom();
+  const nextFocus = restoreFocus ? NindovaRasoi.hintPair(board, removed)?.[0] ?? null : null;
+  updateBoardDom(nextFocus);
   persistActiveSession();
   if (NindovaRasoi.isComplete(board, removed)) settle("completed");
   return true;
@@ -297,11 +327,18 @@ function selectTile(tileId: string, restoreFocus = false) {
 function hint() {
   if (!board || state !== "play") return null;
   const pair = NindovaRasoi.hintPair(board, removed);
+  if (hintTimer !== null) window.clearTimeout(hintTimer);
   boardElement.querySelectorAll(".is-hinted").forEach((tile) => tile.classList.remove("is-hinted"));
   if (!pair) return null;
   pair.forEach((tileId) => tileButton(tileId)?.classList.add("is-hinted"));
-  setStatus("A safe pair is breathing at the rack edges.");
-  window.setTimeout(() => pair.forEach((tileId) => tileButton(tileId)?.classList.remove("is-hinted")), reduceMotion ? 30 : 2600);
+  updateBoardDom();
+  const motif = tileById(pair[0])?.motif;
+  setStatus(`Hint: the two free ${motif ? motifShortNames[motif] : "matching"} tiles are a safe pair.`);
+  hintTimer = window.setTimeout(() => {
+    pair.forEach((tileId) => tileButton(tileId)?.classList.remove("is-hinted"));
+    updateBoardDom();
+    hintTimer = null;
+  }, reduceMotion ? 30 : 2600);
   return pair;
 }
 
@@ -313,6 +350,7 @@ function settle(reason: "completed" | "production-cap") {
   boardShell.classList.add("is-settling");
   updateBoardDom();
   setStatus(reason === "completed" ? "The last pair rests. The kitchen is closing." : "The kitchen is settling under its lid.");
+  persistActiveSession();
   if (settlementTimer !== null) clearTimeout(settlementTimer);
   settlementTimer = window.setTimeout(finishSession, reduceMotion || reviewerMode ? 80 : 1300);
 }

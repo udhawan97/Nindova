@@ -7,7 +7,7 @@ description: What ships in v0.1.0 and what remains deliberately unclaimed.
 
 - Rasoi Pairs pure legality kernel and 36-tile semantic interface.
 - Deterministic recipe version 2 with exhaustive no-dead-state verification.
-- Hidden twelve-minute wind-down and fifteen-minute ceiling.
+- Hidden twelve-minute automatic settle and fifteen-minute ceiling.
 - Version-3 local state with safe v1/v2 Dawn migration and same-tab resume.
 - Redesigned first-light kitchen Dawn with local still and silent-loop export.
 - Self-contained standalone HTML and separately tested installable offline PWA.

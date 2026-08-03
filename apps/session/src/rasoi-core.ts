@@ -154,6 +154,26 @@ function stateKey(removed: ReadonlySet<string>) {
   return [...removed].sort().join(",");
 }
 
+function isReachableState(board: RasoiBoard, removed: ReadonlySet<string>) {
+  const knownIds = new Set(board.tiles.map((tile) => tile.id));
+  if (removed.size > board.tiles.length || [...removed].some((tileId) => !knownIds.has(tileId))) return false;
+  const target = stateKey(removed);
+  const queue: Array<ReadonlySet<string>> = [new Set()];
+  const seen = new Set<string>();
+  while (queue.length) {
+    const current = queue.shift()!;
+    const key = stateKey(current);
+    if (key === target) return true;
+    if (seen.has(key) || current.size >= removed.size) continue;
+    seen.add(key);
+    for (const pair of legalPairs(board, current)) {
+      const next = removePair(board, current, pair[0], pair[1]).removed;
+      if ([...next].every((tileId) => removed.has(tileId))) queue.push(next);
+    }
+  }
+  return false;
+}
+
 function verifyBoard(board: RasoiBoard): BoardVerification {
   if (board.tiles.length !== ROWS * SLOTS_PER_ROW) {
     return Object.freeze({ valid: false, reachableStates: 0, terminalStates: 0, deadStates: 0, reason: "tile-count" });
@@ -205,6 +225,7 @@ export const NindovaRasoi = Object.freeze({
   hintPair,
   isComplete,
   isFree,
+  isReachableState,
   legalPairs,
   motifOrderForNight,
   removePair,
