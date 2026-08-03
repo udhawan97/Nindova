@@ -45,13 +45,13 @@ try {
     play: await page.locator('a.button-primary').first().getAttribute("href"),
     docs: await page.locator('nav a[href$="/docs/"]').first().getAttribute("href"),
     standalone: await page.locator("a[download]").first().getAttribute("href"),
-    release: await page.locator('a[href*="/releases/tag/"]').first().getAttribute("href"),
+    release: await page.locator('a[href*="/releases"]').first().getAttribute("href"),
   };
   assert.deepEqual(landingLinks, {
     play: `${rootPath}play/`,
     docs: `${rootPath}docs/`,
     standalone: `${rootPath}nindova.html`,
-    release: "https://github.com/udhawan97/Nindova/releases/tag/v0.1.0",
+    release: "https://github.com/udhawan97/Nindova/releases",
   });
   for (const href of [landingLinks.docs, landingLinks.standalone]) {
     const linkedPage = await context.newPage();

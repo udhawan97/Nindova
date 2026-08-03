@@ -1,21 +1,21 @@
 ---
 title: Roadmap
-description: What exists in the v0.2.0 source candidate and what remains deliberately unclaimed.
+description: What exists in the v0.2.0 source release and what remains deliberately unclaimed.
 ---
 
-## In the v0.2.0 source candidate
+## In the v0.2.0 source release
 
-- Masala Mound pure legality kernel and 36-Tile, 24/8/4-layer semantic interface.
-- Deterministic recipe version 3 with exhaustive 382-state, no-dead-state verification.
+- Masala Mound pure legality kernel and two equal 36-Tile board profiles: three-layer Gentle and four-layer Deeper.
+- Deterministic recipe version 4 with exhaustive 382-state Gentle and 517-state Deeper verification, one ending each, and zero dead states.
 - Deterministic brass-bloom match feedback with a reduced-motion opacity alternative.
-- Optional screen-away handoff and deliberate same-night return through intake.
+- Primary Rest handoff, one optional response-free Rasoi Image Drift, and deliberate same-night return through intake.
 - Hidden twelve-minute automatic settle and fifteen-minute ceiling.
-- Version-3 local state with safe v1/v2 Dawn migration, recipe-two completion preservation, and same-tab resume.
+- Version-3 long-lived state with safe v1/v2 Dawn migration and recipe-two completion preservation; version-4 same-tab resume restores the chosen profile without creating history.
 - Redesigned first-light kitchen Dawn with local still and silent-loop export.
 - Self-contained standalone HTML and separately tested installable offline PWA.
-- Synchronized landing page, Starlight docs, rendered candidate media, Apache-2.0 licensing, and a locally verified QR artifact for a proposed future public route.
+- Synchronized landing page, Starlight docs, rendered source media, Apache-2.0 licensing, and a locally verified QR artifact for the canonical public route.
 
-The public GitHub release remains v0.1.0 until this candidate is separately approved, tagged, and published.
+Public hosting and a physical-device QR scan remain separate verification lanes; the source release does not claim either.
 
 ## Next hardening
 

@@ -1,31 +1,32 @@
 # Nindova
 
-Nindova is a calm, bounded pair-removal game for the end of the day. **Masala Mound** uses the uncovered-and-open-side rule of Mahjong solitaire and fills three overlapping layers with everyday Indian kitchen forms: belan, chakla, tawa, chimta, steel katori, tiffin, masala dabba, chai glass, and pressure cooker.
+Nindova is a calm, bounded pair-removal game for the end of the day. **Masala Mound** uses the uncovered-and-open-side rule of Mahjong solitaire and fills authored overlapping layers with everyday Indian kitchen forms: belan, chakla, tawa, chimta, steel katori, tiffin, masala dabba, chai glass, and pressure cooker.
 
 > Nothing to win. Nothing tracked. Nothing you can do wrong.
 
-![The real Masala Mound board, showing three overlapping layers of Indian kitchen tiles](./apps/site/public/media/rasoi-board.png)
+![The real Deeper Masala Mound board, showing four overlapping layers of Indian kitchen tiles](./apps/site/public/media/rasoi-board.png)
 
 ## Get Nindova
 
-- Build the v0.2.0 source candidate locally for the layered Session, installable offline PWA, documentation, and self-contained `nindova.html`.
-- The proposed direct, non-tracking QR targets `https://udhawan97.github.io/Nindova/play/`. Public hosting is not configured by this candidate, so that route and a real scan remain unavailable until publication is separately authorized and observed.
-- [Open the v0.1.0 release](https://github.com/udhawan97/Nindova/releases/tag/v0.1.0) for the previous flat-rack build and its checksums.
+- [Download v0.2.0](https://github.com/udhawan97/Nindova/releases/tag/v0.2.0) for the checksummed self-contained HTML file and complete web/PWA archive, or build the same source locally.
+- The direct, non-tracking QR targets `https://udhawan97.github.io/Nindova/play/`. This source release does not configure or claim public hosting; the route and a physical-device scan remain a separate verification lane.
+- [Open the release history](https://github.com/udhawan97/Nindova/releases) for the previous flat-rack build and its checksums.
 
-Until a public build is separately authorized and published, `/play/` works after serving a local build and `dist/nindova.html` works as a self-contained file.
+Until public hosting is separately configured and observed, `/play/` works after serving a local build and `dist/nindova.html` works as a self-contained file.
 
-<img src="./apps/site/public/play-qr.svg" width="180" alt="Proposed direct QR for the future canonical Nindova play URL">
+<img src="./apps/site/public/play-qr.svg" width="180" alt="Direct QR for the canonical Nindova play URL">
 
-The QR artifact encodes the full proposed URL with no shortener or tracking parameter. Keep the printed URL with the code so people can verify its destination after publication.
+The QR artifact encodes the full canonical URL with no shortener or tracking parameter. Keep the printed URL with the code so people can verify its destination when hosting is available.
 
 ## The experience
 
 - **A spatial rule.** Choose two matching tiles only when nothing overlaps them from above and at least one horizontal side is open.
-- **Guaranteed closure.** The 36-tile, 24/8/4-layer board is exhaustively verified across 382 reachable states: every reachable nonterminal state has a legal pair, and every legal choice remains solvable.
+- **A tonight-only choice.** Gentle stack has three more-open layers. Deeper stack uses four layers and more look-ahead. They are equal preferences, not levels or ability labels.
+- **Guaranteed closure.** Gentle is exhaustively verified across 382 reachable states; Deeper across 517. Each has one terminal state, zero dead states, and no losing legal choice.
 - **Clear match feedback.** Each legal pair folds inward through one brief, deterministic brass bloom; reduced motion uses opacity only and sound stays off by default.
 - **Quiet help.** “Show a safe pair” identifies a pair but never removes it.
-- **No performance layer.** No score, count, timer, streak, achievement, grade, collection, missed-night state, or randomized reward.
-- **A real ending.** Clearing the board closes the Session. If left unfinished, it settles itself before the hidden fifteen-minute ceiling. The primary handoff asks the person to put the screen down.
+- **No performance layer.** No score, weekly rank, history, count, timer, streak, achievement, grade, collection, missed-night state, or randomized reward.
+- **A real ending.** Clearing the board closes the Session. If left unfinished, it settles itself before the hidden fifteen-minute ceiling. Rest is primary; optional Rasoi Image Drift carries three familiar forms away from the screen and never routes back into play.
 - **Dawn, by choice.** From 06:00 through 11:59 in the captured Night ID zone, the previous night’s kitchen forms return as a first-light still and optional silent loop.
 - **Voluntary return.** “Not now” leaves Nindova available later that same night. After completion, closing and deliberately reopening Nindova starts another separately bounded Session on the identical board without multiplying Dawn.
 
@@ -74,7 +75,7 @@ npm test
 npm run test:wall-clock
 ```
 
-The main gates prove the 382-state board invariant, deterministic Night ID, recipe-two Dawn preservation, v1/v2-to-v3 local migration, idempotent same-night return, layered rendering, brass-bloom/reduced-motion behavior, Dawn eligibility/export fallback, 320–1440px rendered layouts, keyboard operation, 200% zoom, 44px targets, offline PWA closure, standalone independence, same-origin runtime requests, and the real production ceiling.
+The main gates prove the 382-state Gentle and 517-state Deeper invariants, deterministic Night ID, recipe-two Dawn preservation, v1/v2-to-v3 local migration, profile-bound same-tab recovery, idempotent same-night return, layered rendering, brass-bloom/Image-Drift/reduced-motion behavior, Dawn eligibility/export fallback, 320–1440px rendered layouts, keyboard operation, 200% zoom, 44px targets, offline PWA closure, standalone independence, same-origin runtime requests, and the real production ceiling.
 
 See [Testing](./apps/site/src/content/docs/docs/testing.md) and the [public-surface evidence ledger](./docs/PUBLIC-SURFACE-EVIDENCE.md) for evidence levels and remaining risk.
 
@@ -82,7 +83,7 @@ See [Testing](./apps/site/src/content/docs/docs/testing.md) and the [public-surf
 
 Nindova has no account, analytics, app telemetry, ads, app-controlled remote logging, or third-party runtime request. The production Session is static and same-origin. A static host may keep its own operational access logs outside the app's control.
 
-Long-lived local storage contains one version-3 record with only the latest completion facts needed by Dawn, a safely migrated legacy Dawn variant when present, and the optional local “Same time tomorrow?” intention. Interaction timing exists only in same-tab session storage to enforce resume and closure; it is not written to the long-lived record. Generated images and loops remain local blobs unless the person explicitly saves or shares them.
+Long-lived local storage contains one version-3 record with only the latest completion facts needed by Dawn, a safely migrated legacy Dawn variant when present, and the optional local “Same time tomorrow?” intention. The selected board profile and interaction timing exist only in version-4 same-tab session storage to enforce deterministic resume and closure; neither becomes history. Generated images and loops remain local blobs unless the person explicitly saves or shares them.
 
 ## Product and evidence boundary
 
@@ -92,7 +93,7 @@ The browser and standalone surfaces are implemented. The iOS Wall is deferred an
 
 ## Contributing
 
-Read [CONTEXT.md](./CONTEXT.md), the [layered Rasoi plan](./docs/LAYERED-RASOI-PLAN.md), and [ADR 0011](./docs/adr/0011-layer-rasoi-and-keep-replay-deliberate.md) before changing a product boundary. Preserve the Two-Loop Law, the immutable language, zero telemetry, deterministic solvability, and rendered phone/desktop evidence.
+Read [CONTEXT.md](./CONTEXT.md), the [Quiet Depth plan](./docs/QUIET-DEPTH-PLAN.md), and [ADR 0012](./docs/adr/0012-add-tonight-only-depth-and-image-drift.md) before changing a product boundary. Preserve the Two-Loop Law, the immutable language, zero telemetry, deterministic solvability, and rendered phone/desktop evidence.
 
 ## License
 

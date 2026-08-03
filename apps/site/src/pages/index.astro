@@ -4,7 +4,7 @@ import publicFacts from "../../../../public-facts.json";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const href = (path: string) => `${base}${path}` || "/";
-const releaseUrl = "https://github.com/udhawan97/Nindova/releases/tag/v0.1.0";
+const releaseUrl = "https://github.com/udhawan97/Nindova/releases";
 const standaloneUrl = href("/nindova.html");
 const { canonicalPlayUrl } = publicFacts;
 ---
@@ -45,8 +45,8 @@ const { canonicalPlayUrl } = publicFacts;
           <p class="eyebrow">A small kitchen for the end of the day</p>
           <h1 id="hero-title">Find the pairs.<br />Let the kitchen quiet.</h1>
           <p class="hero-lede">
-            Masala Mound is a calm 36-tile game inspired by Mahjong solitaire. Read three overlapping
-            layers, match familiar Indian kitchen forms, and let the Session reach a real ending.
+            Masala Mound is a calm 36-tile game inspired by Mahjong solitaire. Choose a Gentle or
+            Deeper stack, read the overlaps, and let the Session reach a real ending.
           </p>
           <div class="hero-actions">
             <a class="button-primary" href={href("/play/")}>Play Masala Mound</a>
@@ -61,10 +61,10 @@ const { canonicalPlayUrl } = publicFacts;
               src={href("/media/rasoi-board.png")}
               width="840"
               height="476"
-              alt="The real Masala Mound board with three overlapping layers; six uncovered open-side tiles are bright."
+              alt="The real Deeper Masala Mound board with four overlapping layers; four uncovered open-side tiles are bright."
             />
           </div>
-          <figcaption>Rendered from the v0.2.0 source candidate · no concept mockup</figcaption>
+          <figcaption>Rendered from the v0.2.0 source · no concept mockup</figcaption>
         </figure>
 
         <div class="motif-line" aria-label="Kitchen motifs in Rasoi Pairs">
@@ -74,17 +74,19 @@ const { canonicalPlayUrl } = publicFacts;
 
       <section class="rule-section" aria-labelledby="rule-title">
         <div class="rule-intro">
-          <p class="eyebrow">One rule, all night</p>
+          <p class="eyebrow">One rule, two tonight-only profiles</p>
           <h2 id="rule-title">Easy to understand.<br />Impossible to spoil.</h2>
           <p>
             A tile is free when nothing overlaps it from above and either its left or right side is open.
-            Every legal choice on the authored board keeps a path to the ending.
+            Gentle gives the mound broader openings; Deeper adds a fourth layer and more look-ahead.
+            Every legal choice on either authored board keeps a path to the ending.
           </p>
         </div>
         <ol class="rule-steps">
-          <li><span aria-hidden="true">01</span><div><h3>Look</h3><p>Read the overlaps. The brighter open-side tiles are free.</p></div></li>
-          <li><span aria-hidden="true">02</span><div><h3>Pair</h3><p>Belan with belan. Chai with chai.</p></div></li>
-          <li><span aria-hidden="true">03</span><div><h3>Settle</h3><p>The pair folds inward through one dim brass bloom and leaves.</p></div></li>
+          <li><span aria-hidden="true">01</span><div><h3>Choose tonight</h3><p>Gentle or Deeper. A preference, not a test.</p></div></li>
+          <li><span aria-hidden="true">02</span><div><h3>Look</h3><p>Read the overlaps. The brighter open-side tiles are free.</p></div></li>
+          <li><span aria-hidden="true">03</span><div><h3>Pair</h3><p>Belan with belan. Chai with chai.</p></div></li>
+          <li><span aria-hidden="true">04</span><div><h3>Settle</h3><p>The pair folds inward through one dim brass bloom and leaves.</p></div></li>
         </ol>
       </section>
 
@@ -98,7 +100,7 @@ const { canonicalPlayUrl } = publicFacts;
               alt="The real Masala Mound phone layout, with labeled overlapping kitchen tiles and a safe-pair help control."
             />
           </div>
-          <figcaption>375px v0.2.0 candidate surface</figcaption>
+          <figcaption>375px v0.2.0 source surface</figcaption>
         </figure>
         <div class="material-copy">
           <p class="eyebrow">Punjabi material, everyday kitchen</p>
@@ -129,12 +131,30 @@ const { canonicalPlayUrl } = publicFacts;
           </div>
           <div>
             <h3>When it ends</h3>
-            <p>No score, timer, streak, grade, collection, randomized reward, or promoted continuation.</p>
+            <p>Rest is primary. An optional three-object Image Drift leads away from the screen, never back to play.</p>
           </div>
           <div>
             <h3>If you leave it</h3>
             <p>The kitchen settles itself before the hidden fifteen-minute ceiling. The ending stays the same.</p>
           </div>
+        </div>
+      </section>
+
+      <section class="sleep-section" aria-labelledby="sleep-title">
+        <div>
+          <p class="eyebrow">Why sleep matters</p>
+          <h2 id="sleep-title">Your brain is brilliant.<br />It is also allowed to clock out.</h2>
+        </div>
+        <div class="sleep-fact">
+          <p>
+            Sleep supports attention, learning, decision-making, mood, reaction time, and physical
+            health. The CDC lists 8–10 hours for ages 13–17 and at least 7 hours for adults 18–60;
+            needs vary, and Nindova does not measure yours.
+          </p>
+          <p class="source-line">
+            Sources: <a href="https://www.cdc.gov/sleep/about/index.html">CDC sleep guidance</a>
+            · <a href="https://www.nhlbi.nih.gov/health/sleep-deprivation/health-effects">NIH/NHLBI health effects</a>
+          </p>
         </div>
       </section>
 
@@ -176,11 +196,11 @@ const { canonicalPlayUrl } = publicFacts;
           <p class="eyebrow">Free, open, and direct</p>
           <h2 id="qr-title">A direct QR, ready for publication.</h2>
           <p>
-            This source candidate generates a QR containing the proposed canonical play address—no
+            This source release generates a QR containing the canonical play address—no
             shortener, campaign parameter, account, or advertising identifier. The same address is printed below for verification.
           </p>
           <code class="canonical-url">{canonicalPlayUrl}</code>
-          <p class="honesty-note">Public hosting is not configured by this candidate. The address and scan path remain unavailable until a separate publication is authorized and observed.</p>
+          <p class="honesty-note">This source release does not configure or claim public hosting. The live address and a physical-device scan remain a separate verification lane.</p>
         </div>
         <figure class="qr-art">
           <img src={href("/play-qr.svg")} width="396" height="396" alt={`QR code for ${canonicalPlayUrl}`} />
@@ -189,8 +209,8 @@ const { canonicalPlayUrl } = publicFacts;
       </section>
 
       <section class="closing-section" aria-labelledby="closing-title">
-        <p class="eyebrow">v0.2.0 source candidate</p>
-        <h2 id="closing-title">One board. One ending.</h2>
+        <p class="eyebrow">v0.2.0 · Quiet Depth</p>
+        <h2 id="closing-title">Two profiles. One ending.</h2>
         <p>
           Nindova is a behavioral design study, not a sleep tracker or treatment. Masala Mound uses
           recognition, visual search, and spatial planning, but has not been clinically shown to make
@@ -198,7 +218,7 @@ const { canonicalPlayUrl } = publicFacts;
         </p>
         <div class="hero-actions">
           <a class="button-primary" href={href("/play/")}>Play this build</a>
-          <a class="button-secondary" href={releaseUrl}>Previous release and checksums</a>
+          <a class="button-secondary" href={releaseUrl}>Release history and checksums</a>
         </div>
       </section>
     </main>
@@ -209,7 +229,7 @@ const { canonicalPlayUrl } = publicFacts;
         <a href={href("/docs/")}>Documentation</a>
         <a href="https://github.com/udhawan97/Nindova">GitHub</a>
         <a href={href("/licenses/geist-OFL-1.1.txt")}>Third-party notices</a>
-        <a href={releaseUrl}>v0.1.0 history</a>
+        <a href={releaseUrl}>Release history</a>
       </nav>
       <p>Behavioral design study · 13+ · Apache-2.0</p>
     </footer>

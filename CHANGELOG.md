@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.2.0 — 2026-08-03
+
+### Added
+
+- Gentle and Deeper tonight-only Masala Mound profiles with three- and four-layer authored geometry.
+- Exhaustive proof of 382 Gentle and 517 Deeper reachable states, one terminal state each, and zero dead states.
+- Optional Rasoi Image Drift: three deterministic board forms, a response-free screen-away prompt, and an immediate Rest exit.
+- Calm, attributed CDC and NIH/NHLBI sleep education outside the nightly Session.
+
+### Changed
+
+- Extended the one global Session deadline through the end surface, optional Image Drift, and near-black Rest.
+- Added version-4 same-tab recovery for exact profile/board restoration while keeping long-lived Dawn state and same-night completion idempotent.
+- Made profile and layer distinctions explicit in native controls and semantic Tile labels.
+
+### Not added
+
+- No weekly ranking, score, streak, personal best, history, sleep grade, memory grade, randomized reward, or improvement claim.
+- No runtime service, account, paid API, free-tier dependency, third-party asset, analytics, or remote resource.
+
 ## 0.1.0 — 2026-08-03
 
 ### Added

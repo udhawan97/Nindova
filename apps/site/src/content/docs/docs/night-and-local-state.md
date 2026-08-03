@@ -21,7 +21,7 @@ Nindova writes one current key: `nindova:night-state:v3`. It keeps only:
 - a safely migrated legacy Dawn completion/memory when present; and
 - one optional local “Same time tomorrow?” intention.
 
-Version 1 and version 2 records copy into the v3 union without deleting their source keys. Existing recipe-two Rasoi completions remain valid for Dawn after the recipe-three board upgrade. Interaction timestamps are sanitized out. Missing or corrupt state fails open to an empty local record.
+Version 1 and version 2 records copy into the v3 union without deleting their source keys. Existing recipe-two Rasoi completions remain valid for Dawn after the recipe-four board upgrade. The active version-4 same-tab record adds only the chosen board profile needed to restore exact geometry. Interaction timestamps and profiles are excluded from long-lived history. Missing or corrupt state fails open to an empty local record.
 
 ## Ephemeral resume
 

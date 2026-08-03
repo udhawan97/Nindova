@@ -3,7 +3,7 @@ title: Nindova documentation
 description: Product contract and implementation notes for Rasoi Pairs and its browser-first release.
 ---
 
-Nindova is a bounded late-night game. **Masala Mound** presents 36 Indian kitchen tiles across three overlapping layers. Match two identical tiles when nothing covers them and one side is open; the board grows lighter and then the Session closes.
+Nindova is a bounded late-night game. **Masala Mound** presents 36 Indian kitchen tiles in a Gentle three-layer or Deeper four-layer profile. Match two identical tiles when nothing covers them and one side is open; the board grows lighter and then the Session closes.
 
 > Nothing to win. Nothing tracked. Nothing you can do wrong.
 

@@ -1,6 +1,6 @@
 ---
 title: Getting started
-description: Run, build, and verify the Nindova v0.2.0 source candidate.
+description: Run, build, and verify the Nindova v0.2.0 source release.
 ---
 
 ## Fastest path
@@ -27,7 +27,7 @@ npm run preview
 
 The root `dist/` contains the landing page, `/docs/`, `/play/`, and `nindova.html`. Open `http://127.0.0.1:4173/play/` for the installable PWA. After one online load, its static shell can reopen offline.
 
-The build also generates a proposed direct QR for `https://udhawan97.github.io/Nindova/play/`. This candidate does not configure public hosting. The URL and real scan path remain unavailable until publication is separately authorized and observed.
+The build also generates a direct QR for `https://udhawan97.github.io/Nindova/play/`. This source release does not configure or claim public hosting; the live URL and a physical-device scan remain separate verification lanes.
 
 ## Verify
 
