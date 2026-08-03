@@ -1,27 +1,22 @@
 ---
 title: Privacy and local state
-description: What Nindova stores, what the offline cache contains, and what never leaves the device.
+description: What Rasoi Pairs stores, what the offline cache contains, and what never leaves the device.
 ---
 
 ## Runtime boundary
 
-The Session makes same-origin static requests only. It has no account, analytics, telemetry, advertising, remote logging, social SDK, or third-party runtime dependency. Generated Dawn stills and loops exist only as in-memory blobs until the person explicitly saves or shares them; temporary object URLs are revoked after replacement, cancellation, closing Dawn, or leaving the page.
+The Session makes same-origin static requests only. It has no account, analytics, telemetry, advertising, remote logging, social SDK, or third-party runtime dependency. Generated Dawn stills and loops remain in-memory blobs until the person explicitly saves or shares them.
 
-## One bounded record
+## Long-lived record
 
-Nindova writes `nindova:night-state:v2` in browser local storage. It keeps only:
+`nindova:night-state:v3` stores the latest completion facts needed for Dawn, an optional legacy Dawn variant, and the quiet tomorrow intention. It stores no tile-selection history, interaction timing, score, attendance, sleep data, exported file, label typed by the person, or device identifier.
 
-- the last completed Session facts needed to determine Dawn;
-- one meadow Echo;
-- up to five harbor boats; and
-- an optional local “Same time tomorrow?” intention for the completed `nightId`.
+Version 1 and version 2 state is copied into the v3 union and sanitized. The source key is retained as a migration safety measure. Missing, corrupt, unsupported, or unavailable storage fails open without blocking play.
 
-The intention sends no notification and requests no notification permission. Repeating it in the same night is idempotent. Completing a later night clears the earlier intention.
+## Same-tab resume
 
-Version 1 migrates once to version 2, preserving its bounded scene memory and removing the old key. Missing, corrupt, unsupported, or unavailable state fails open to an empty local scene. No counts, labels typed during a Session, timing metrics, sleep data, exports, or attendance history are stored.
+`nindova:active-session:v1` in session storage may contain the current Night ID, board ID, removed tile IDs, and internal boundary times. It survives a reload in the same tab and disappears when that tab session ends. It is never sent anywhere and never becomes completion history.
 
 ## Offline cache
 
-The service worker is scoped to `/play/`. Its versioned precache contains the Session HTML with its compiled TypeScript runtime, manifest, icon, and focal sprite sheet. It never receives or caches local storage, generated blobs, share payloads, or pages outside its scope. A newly installed worker becomes active after the previous Session tabs release the old worker; cache activation removes older `nindova-session-*` shell versions deterministically and preserves caches owned by other projects on the same origin.
-
-The standalone `nindova.html` embeds its engines and focal sprites and does not register a service worker.
+The `/play/` service worker precaches only its HTML, manifest, and install icon in `nindova-session-v3`. It cannot read local storage and does not cache state keys, Dawn blobs, share payloads, or pages outside its scope. The standalone `nindova.html` registers no worker.

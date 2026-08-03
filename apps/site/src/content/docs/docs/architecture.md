@@ -1,30 +1,28 @@
 ---
 title: Architecture
-description: Browser-first boundaries for the Session, site, PWA, and Dawn.
+description: Browser-first boundaries for Rasoi legality, Night state, Dawn, PWA, and the public site.
 ---
-
-The build starts from the supplied standalone Canvas demo and extracts modules only when an approved Must slice touches the behavior. This keeps each change reviewable and avoids a parallel rewrite.
 
 ## Workspace
 
-- **Session** — Vite-compiled TypeScript modules for the fixed state machine, Canvas stage, interactions, sound, Night state, Dawn export, and `window.__ct` evidence hook. Night and Dawn APIs pass the strict TypeScript gate; the behavior-preserving seed migration has a separate compatibility type-check gate.
-- **Site** — Astro landing page and Starlight documentation.
-- **Composition** — one static root artifact containing the site, `/docs/`, `/play/`, and portable `nindova.html`.
+- **Session** — Vite-compiled TypeScript for the pure Rasoi kernel, native tile interface, boundary clock, optional audio, Night state, and Dawn export.
+- **Site** — Astro landing page and Starlight documentation built from verified product facts and rendered release media.
+- **Composition** — one static root artifact containing the landing page, `/docs/`, `/play/`, and portable `nindova.html`.
 
-## Implemented boundaries
+## Legality kernel
 
-- **Core** owns state order, clocks, decay, fallbacks, and closure.
-- **Stage** owns procedural Punjabi/Indian environments, composition, illustrated focal sprites with procedural fallbacks, and a monotonic luminance budget.
-- **Interaction** owns pointer and semantic equivalents, focus, and status output.
-- **Night** owns the immutable `nightId`, seeded recipe, versioned local schema, safe recovery, and idempotent Echo updates.
-- **Dawn** owns captured-zone morning eligibility, first-light rendering, PNG export, silent loop recording, sharing, and temporary URL cleanup.
+`rasoi-core.ts` owns motif identity, deterministic board creation, free-tile calculation, legal-pair enumeration, pair removal, help selection, completion, and exhaustive reachability verification. Rendering and input do not duplicate its legality rule.
 
-The production clock defaults to the fifteen-minute cap. Reviewer pacing is available only through an explicit `?review=1` test switch; its visible evidence and replay controls never appear in production mode. Vite compiles the shared TypeScript graph once and the build inlines that module into both browser artifacts. The standalone additionally embeds the focal sprite sheet while the multi-file build loads the same checked asset.
+The authored geometry has three 12-tile racks. The active tile with the lowest and highest slot on each rack is free. Motifs occupy two consecutive pairs on exactly one rack, which makes all interleavings of legal rack choices safe. The verifier confirms 343 reachable states, one terminal state, and zero dead states.
 
-The multi-file build registers a versioned service worker scoped to `/play/` and precaches only same-origin static shell files. The standalone removes its manifest and worker registration during composition. Updating the cache name installs a new shell; the old worker remains in control until existing tabs release it, then activation removes only older `nindova-session-*` caches. Cache Storage belonging to another project on the same origin is preserved.
+## Browser and local state
 
-## Deferred native boundary
+`session.ts` renders semantic buttons, enforces the hidden wind-down/ceiling, manages same-tab resume, synthesizes optional audio, and maintains versioned `window.__rasoi`. `window.__ct` remains an alias for compatibility evidence.
 
-- **iOS Wall** may eventually own the user-chosen schedule and one quiet Gate dismissal, but it is not part of this browser/PWA implementation and requires a separately entitled native proof track.
+`night-core.ts` owns Night ID, deterministic recipe version 2, v3 state sanitization, v1/v2 migration, and idempotent completion. `dawn-core.ts` owns captured-zone eligibility, still/loop capability handling, sharing, and temporary URL leases.
 
-The same source of truth must drive the portable HTML and the multi-file PWA. The site may explain the experience but cannot claim a capability that the shipped Session has not proved.
+## Distribution boundary
+
+The `/play/` build registers a versioned service worker scoped to its own static shell. The standalone removes its manifest and worker registration during composition. Both artifacts inline the same compiled Session runtime; neither requires an account or third-party runtime service.
+
+The deferred iOS Wall is a separate native boundary and is not implemented by the browser dismissal surface.

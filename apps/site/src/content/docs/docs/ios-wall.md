@@ -3,7 +3,7 @@ title: Deferred iOS Wall
 description: The user-chosen Screen Time concept that is not implemented in this repository.
 ---
 
-The Wall is a future native iOS precommitment surface. It is not part of the browser Session, PWA, standalone HTML, or public deployment.
+The Wall is a future native iOS precommitment surface. It is not part of the browser Session, PWA, standalone HTML, release, or public deployment.
 
 ## Frozen agency contract
 
@@ -17,3 +17,5 @@ The Wall is a future native iOS precommitment surface. It is not part of the bro
 Native Screen Time behavior depends on Apple Family Controls entitlements, managed settings, distribution approval, and OS-version behavior that cannot be proved by a web implementation. The browser experience must stand on its own before the Wall is built.
 
 No current screenshot, test, or repository artifact should be read as evidence that the iOS Wall ships.
+
+The browser intake includes a non-persistent “Not now” demonstration and a voluntary return button. That proves the wording and agency path only; it does not dismiss a native Gate or intercept another app.

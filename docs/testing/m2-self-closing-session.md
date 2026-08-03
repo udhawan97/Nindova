@@ -1,5 +1,7 @@
 # M2 tactile and self-closing checkpoint
 
+> Historical Vista-arc evidence. Superseded for the active product by [ADR 0010](../adr/0010-replace-the-vista-arc-with-rasoi-pairs.md) and [Rasoi redesign evidence](./rasoi-redesign.md).
+
 ## Implementation
 
 - Production pacing is the default and enforces a monotonic fifteen-minute cap without displaying a timer.

@@ -1,10 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
-  <title id="title">Nindova</title>
-  <desc id="desc">A brass lamp inside an indigo phulkari diamond.</desc>
-  <rect width="512" height="512" rx="112" fill="#17263b"/>
-  <path d="M256 66 446 256 256 446 66 256Z" fill="#8f3f2e" stroke="#e2a83f" stroke-width="18"/>
-  <path d="m256 96 42 42-42 42-42-42Zm118 118 42 42-42 42-42-42ZM256 332l42 42-42 42-42-42ZM96 256l42-42 42 42-42 42Z" fill="#f0c75e"/>
-  <path d="M194 205h124l-28 76h-68Z" fill="#e2a83f" stroke="#2a1a14" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M256 281v86m-48 0h96" fill="none" stroke="#e2a83f" stroke-width="16" stroke-linecap="round"/>
-  <circle cx="256" cy="230" r="24" fill="#fff1bd" opacity=".9"/>
+  <title id="title">Nindova Rasoi Pairs</title>
+  <desc id="desc">A brass masala dabba inside an indigo and madder phulkari-inspired diamond.</desc>
+  <rect width="512" height="512" rx="112" fill="#17172a"/>
+  <path d="M256 54 458 256 256 458 54 256Z" fill="#202858" stroke="#e3a642" stroke-width="18"/>
+  <path d="m256 82 42 42-42 42-42-42Zm132 132 42 42-42 42-42-42ZM256 346l42 42-42 42-42-42ZM82 256l42-42 42 42-42 42Z" fill="#8c3b39" stroke="#e3a642" stroke-width="8"/>
+  <circle cx="256" cy="256" r="112" fill="#d4a956" stroke="#f3ead8" stroke-width="12"/>
+  <circle cx="256" cy="256" r="28" fill="#8c3b39"/>
+  <circle cx="256" cy="184" r="25" fill="#f3ead8" stroke="#8c3b39" stroke-width="8"/>
+  <circle cx="324" cy="234" r="25" fill="#f3ead8" stroke="#8c3b39" stroke-width="8"/>
+  <circle cx="298" cy="314" r="25" fill="#f3ead8" stroke="#8c3b39" stroke-width="8"/>
+  <circle cx="214" cy="314" r="25" fill="#f3ead8" stroke="#8c3b39" stroke-width="8"/>
+  <circle cx="188" cy="234" r="25" fill="#f3ead8" stroke="#8c3b39" stroke-width="8"/>
 </svg>

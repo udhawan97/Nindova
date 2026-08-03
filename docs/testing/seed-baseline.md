@@ -1,5 +1,7 @@
 # Supplied seed baseline
 
+> Historical evidence for the original supplied prototype. The active product intentionally supersedes that experience through [ADR 0010](../adr/0010-replace-the-vista-arc-with-rasoi-pairs.md).
+
 ## Safety preflight
 
 The four supplied artifacts were hashed and copied into `reference/` before use. Static inspection found no shell execution, credential access, browser credential APIs, cookie access, or non-local network requests in the executable demo or test.

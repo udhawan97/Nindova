@@ -1,12 +1,6 @@
-# M6 — Browser-first release hardening
+# v0.1.0 release hardening
 
-## Production wall-clock proof
-
-After the Session runtime moved into the compiled TypeScript graph, `npm run test:wall-clock` rebuilt the composed production artifact, opened `/play/` at 375×812 with reviewer mode absent, and left the Session untouched. The Session ended naturally at 637.062 wall-clock seconds with `sessionElapsed` 636.894, `endReason` `completed`, and no console or page errors. The same page remained in `end/completed` at 900.003 seconds.
-
-This distinguishes the product contract correctly: fifteen minutes is a ceiling, not a target duration. Reviewer-mode tests separately force 900 simulated seconds and require the `production-cap` path.
-
-## Final automated gates
+## Automated gates
 
 ```sh
 npm run check
@@ -14,27 +8,20 @@ npm test
 npm run test:wall-clock
 ```
 
-The suites cover the Vite-compiled TypeScript/Canvas runtime; unit/type/build checks; the asserted arc; portrait, 200% scale, rotation, virtual-keyboard height, reduced motion, keyboard, semantic controls, pointer cancellation, and target size; autonomous closure; deterministic night and local-state recovery; Dawn still/loop export and URL cleanup; immutable product language; base-path routing; PWA installability, online cache refresh, origin-safe cache cleanup, offline completion, and same-night voluntary replay; plus standalone independence.
+The gates cover TypeScript, builds, 39+ pure unit assertions, exhaustive Rasoi reachability, the complete pair-removal arc, 320–1440px responsive surfaces, native semantics, keyboard removal, 200% zoom, reduced motion, target size, closure boundaries, deterministic Night ID, local-state migration/recovery, same-tab resume, same-night replay, first-light Dawn and exports, manifest/worker scope, offline closure, same-origin requests, and standalone independence.
 
-## Repository and architecture proof
+## Production wall-clock proof
 
-- The focused commit series preserves one major Must slice per commit.
-- The generated `graphify-out/` map includes source, docs, tests, ADRs, and rendered assets. `GRAPH_REPORT.md` is the canonical current node, edge, and community count.
-- A scoped graph query traces the standalone Session, deterministic Night state, Dawn exporter, PWA shell, and their local-only boundary.
-- Raw extraction diagnostics flag unresolved import targets (mostly external packages, plus a few local asset/style references) as dangling and a small number of same-endpoint edges as collapsed by the undirected export; there are zero missing endpoints and zero self-loops. This is a documented graph limitation, not runtime proof.
+The final v0.1.0 wall-clock observation is a release gate. Its exact measured wind-down and fifteen-minute ceiling timestamps are recorded here after the run completes; the release must not be published while this section remains pending.
 
-## Family-repository references
+**Status:** Pending final v0.1.0 wall-clock run.
 
-The repository presentation was checked against Orifold, Dusori, Voyalier, and Codemble. Nindova adopts their strongest structural conventions—trust-first README sections, a separate Starlight documentation surface, explicit privacy and authority boundaries, base-path-safe static hosting, hand-authored navigation, and rendered-product evidence—without borrowing their visual identities.
+## Graph and repository proof
 
-## Rendered proof
+Graphify is incrementally refreshed after source and docs changes. A scoped query must connect `rasoi-core.ts`, `session.ts`, `night-core.ts`, `dawn-core.ts`, the PWA shell, public site, and browser gates before the tag is created.
 
-- Session media: 375×812 production portrait.
-- Dawn media: 712×446 production canvas render.
-- Landing page inspection: 320×568, 375×812, 1280×800, and 1440×900.
-- Responsive automation: 320×568, 375×667, 375×812, 414, 768, and 1280 CSS-pixel widths as applicable.
-- Hallmark visual gate: 58/58 checks passed.
+The release inventory is scanned for credentials, machine-specific paths, generated browser profiles, stale Vista media, and untracked Graphify learning sidecars. Only product source, synchronized docs/media, and explicit release records are committed.
 
 ## Honest boundary
 
-Chromium verifies the rendered browser surfaces, installability criteria, offline operation, and accessibility semantics. A real installed Safari/Android PWA and real-device VoiceOver/TalkBack acceptance remain untested risks. The iOS Wall remains a documented, unshipped native follow-up. No deployment, tag, or release is claimed by this checkpoint.
+Chromium automation verifies the rendered and offline browser surfaces. Real-device VoiceOver/TalkBack, installed Safari/Android, human Punjabi cultural review, human calmness/sleep-compatibility evidence, and public website deployment remain untested. The iOS Wall is not shipped.

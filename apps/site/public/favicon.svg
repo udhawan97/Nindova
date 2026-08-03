@@ -1,5 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Nindova window mark">
-  <rect width="64" height="64" rx="12" fill="#17120f"/>
-  <path d="M14 13h36v35H14zM32 13v35M14 31h36" fill="none" stroke="#eadbc3" stroke-width="3"/>
-  <path d="M23 53h18" stroke="#d89a58" stroke-width="4" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Nindova Rasoi diamond">
+  <rect width="64" height="64" rx="12" fill="#17172a"/>
+  <path d="M32 8 56 32 32 56 8 32Z" fill="#202858" stroke="#e3a642" stroke-width="3"/>
+  <circle cx="32" cy="32" r="11" fill="#d4a956" stroke="#f3ead8" stroke-width="2"/>
+  <circle cx="32" cy="32" r="3" fill="#8c3b39"/>
+  <circle cx="32" cy="24" r="2" fill="#8c3b39"/>
+  <circle cx="39" cy="30" r="2" fill="#8c3b39"/>
+  <circle cx="36" cy="39" r="2" fill="#8c3b39"/>
+  <circle cx="25" cy="35" r="2" fill="#8c3b39"/>
 </svg>

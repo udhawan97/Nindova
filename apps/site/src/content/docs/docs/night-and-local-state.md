@@ -1,29 +1,28 @@
 ---
 title: Night and local state
-description: Immutable night IDs, deterministic Punjabi and Indian scene recipes, and quiet Echo memory.
+description: Immutable Night IDs, deterministic Rasoi boards, and safe legacy Dawn migration.
 ---
 
 ## One captured night
 
-Nindova captures one immutable `nightId` when a Session begins. Before local noon, its Dawn date is the current local civil date; from noon onward, its Dawn date is the next local civil date. The ID also records the device’s IANA time zone and recipe version.
+Nindova captures one immutable `nightId` when a Session begins. Before local noon, its Dawn date is the current civil date; from noon onward, its Dawn date is the next civil date. The ID also includes the device’s IANA time zone and recipe version.
 
-Crossing midnight, a daylight-saving transition, or changing the device zone cannot mutate an active Session. Reopening Nindova for the same Dawn date and captured zone selects the same night.
+Crossing midnight, a daylight-saving transition, or changing device zone cannot mutate an active Session. Voluntarily reopening during the same Night ID selects the identical board.
 
 ## Deterministic recipe
 
-The versioned seeded recipe selects weather, moon, five desk objects, meadow species order, harbor boat order, and small Vista color details. It never changes the path, required effort, cap, or ending.
+Recipe version 2 uses a stable seeded generator to permute the nine kitchen motifs and choose one cloth tone. It never changes the number of tiles, legal rule, effort envelope, cap, or ending. Pure unit tests pin deterministic recipes and exhaustive solvability for Chicago, Kolkata, and a daylight-saving boundary night.
 
-Published parity vectors in the unit suite pin the PRNG output and representative recipes for `America/Chicago` and `Asia/Kolkata` so a future native core can match the browser.
+## Long-lived state
 
-## Quiet memory
+Nindova writes one current key: `nindova:night-state:v3`. It keeps only:
 
-Nindova writes one local key: `nindova:night-state:v2`. The schema keeps only:
+- the latest completion’s Night ID, Dawn date, captured zone, board ID, and motif order;
+- a safely migrated legacy Dawn completion/memory when present; and
+- one optional local “Same time tomorrow?” intention.
 
-- the last completed Session facts required by Dawn;
-- one meadow Echo; and
-- up to five harbor boats, with the oldest removed only when another completed harbor Session adds one.
-- one optional local “Same time tomorrow?” intention for the last completed `nightId`.
+Version 1 and version 2 records copy into the v3 union without deleting their source keys. Interaction timestamps are sanitized out. Missing or corrupt state fails open to an empty local record.
 
-Skipped nights do not age or mutate either memory. Replaying the same `nightId` is idempotent: it cannot add another Echo, boat, completion, or return marker.
+## Ephemeral resume
 
-Version 1 migrates once and removes its old key. Missing state starts empty. Corrupt, stale, unavailable, or unsupported state fails open to a fresh local scene without blocking the Session. No count, history, collection, attendance, or missed-night language is shown. The optional return intention requests no notification and creates no scheduled prompt.
+Same-tab session storage may hold the active board ID, removed tile IDs, and internal boundary timestamps. This exists only to resume a reload and enforce the Session ceiling. Closing the tab abandons the unfinished Session; it does not create a Dawn completion.

@@ -1,5 +1,7 @@
 # M4 Dawn keepsake checkpoint
 
+> Historical Vista-Dawn evidence. The first-light kitchen Dawn is documented in [Rasoi redesign evidence](./rasoi-redesign.md).
+
 ## Implementation
 
 - Added a standalone Dawn module shared by the source Session, built `/play/`, embedded portable HTML, and unit tests.

@@ -5,7 +5,6 @@ const base = process.env.NINDOVA_BASE_PATH ?? "/";
 
 export default defineConfig({
   base,
-  site: "https://udhawan97.github.io",
   vite: {
     build: {
       assetsInlineLimit: 0,
@@ -14,7 +13,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "Nindova",
-      description: "Product and implementation notes for a bounded nightly ritual.",
+      description: "Product and implementation notes for Rasoi Pairs, Nindova's bounded nightly game.",
       customCss: ["./src/styles/global.css"],
       social: [
         {
@@ -30,7 +29,7 @@ export default defineConfig({
             { label: "Documentation", slug: "docs" },
             { label: "Getting started", slug: "docs/getting-started" },
             { label: "Product contract", slug: "docs/product-contract" },
-            { label: "Nightly arc", slug: "docs/nightly-arc" },
+            { label: "Rasoi Pairs Session", slug: "docs/nightly-arc" },
             { label: "Night and local state", slug: "docs/night-and-local-state" },
             { label: "Privacy and local state", slug: "docs/privacy-local-state" },
             { label: "Dawn", slug: "docs/dawn" },

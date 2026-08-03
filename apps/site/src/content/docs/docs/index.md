@@ -1,25 +1,24 @@
 ---
 title: Nindova documentation
-description: Product contract and implementation notes for the browser-first Nindova build.
+description: Product contract and implementation notes for Rasoi Pairs and its browser-first release.
 ---
 
-Nindova is a bounded late-night ritual. A person puts away a visible set, crosses one Vista, follows the last light home, turns a sign, and reaches darkness. The product is designed around an ending—not continued engagement.
+Nindova is a bounded late-night game. **Rasoi Pairs** presents 36 Indian kitchen tiles on three shallow racks. Match two identical tiles when they are free at the rack ends; the board grows lighter and then the Session closes.
 
 > Nothing to win. Nothing tracked. Nothing you can do wrong.
 
 ## Start here
 
-- [Getting started](./getting-started/) explains the local workspace and commands.
+- [Getting started](./getting-started/) covers the standalone file, local workspace, and composed PWA build.
 - [Product contract](./product-contract/) records the promises every implementation must keep.
-- [Nightly arc](./nightly-arc/) names every fixed act and closure guarantee.
-- [Night and local state](./night-and-local-state/) explains deterministic recipes, Echoes, and the bounded local schema.
-- [Privacy and local state](./privacy-local-state/) inventories the one local record and offline cache.
-- [Dawn](./dawn/) records the morning window, first-light renderer, and local export behavior.
-- [Accessibility](./accessibility/) explains the semantic action layer and alternate presentation.
-- [Architecture](./architecture/) describes the browser-first module boundaries.
-- [Testing](./testing/) separates observational evidence from regression gates.
-- [Research receipts](./research-receipts/) separates source evidence from design inference.
-- [Roadmap](./roadmap/) and [Deferred iOS Wall](./ios-wall/) distinguish built capabilities from direction.
-- [Known limitations](./known-limitations/) states what the current build does not yet prove.
+- [Rasoi Pairs Session](./nightly-arc/) defines free tiles, pairing, help, settlement, and closure.
+- [Night and local state](./night-and-local-state/) explains deterministic boards and safe v1/v2 migration.
+- [Privacy and local state](./privacy-local-state/) inventories long-lived, ephemeral, and cached data.
+- [Dawn](./dawn/) describes the first-light kitchen composition and local exports.
+- [Accessibility](./accessibility/) explains the native tile controls and alternate presentation.
+- [Architecture](./architecture/) maps the legality kernel, browser shell, PWA, site, and Dawn.
+- [Testing](./testing/) separates rendered evidence, source proof, and untested risk.
+- [Research receipts](./research-receipts/) states the behavioral evidence and its limits.
+- [Roadmap](./roadmap/), [Known limitations](./known-limitations/), and [Deferred iOS Wall](./ios-wall/) distinguish the release from future work.
 
-The proposed iOS Wall is intentionally deferred. This documentation must not describe it as shipped until it passes entitled real-device verification.
+The iOS Wall remains deferred. “Not now” in the browser demonstrates voluntary re-entry; it is not proof of native Screen Time interception.

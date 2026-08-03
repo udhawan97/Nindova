@@ -1,5 +1,7 @@
 # M5 — Website, docs, and offline PWA evidence
 
+> Historical Vista-arc public-surface evidence. Current release-facing proof is recorded in [Rasoi redesign evidence](./rasoi-redesign.md) and the [public-surface ledger](../PUBLIC-SURFACE-EVIDENCE.md).
+
 ## Implemented
 
 - Replaced the generic public illustration with real 375×812 Session media and a real Dawn canvas render.

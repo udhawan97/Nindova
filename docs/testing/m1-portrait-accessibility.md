@@ -1,5 +1,7 @@
 # M1 portrait and accessibility checkpoint
 
+> Historical Vista-arc evidence. Superseded for the active product by [ADR 0010](../adr/0010-replace-the-vista-arc-with-rasoi-pairs.md) and [Rasoi redesign evidence](./rasoi-redesign.md).
+
 ## Implementation
 
 - Extended the supplied Canvas state engine with act-specific portrait camera framing while preserving its desktop composition.

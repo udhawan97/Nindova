@@ -3,6 +3,8 @@ import "../styles/global.css";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const href = (path: string) => `${base}${path}` || "/";
+const releaseUrl = "https://github.com/udhawan97/Nindova/releases/tag/v0.1.0";
+const standaloneUrl = "https://github.com/udhawan97/Nindova/releases/download/v0.1.0/nindova-v0.1.0.html";
 ---
 
 <!doctype html>
@@ -12,152 +14,183 @@ const href = (path: string) => `${base}${path}` || "/";
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; base-uri 'self'; object-src 'none'; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
+      content="default-src 'self'; base-uri 'self'; object-src 'none'; connect-src 'self'; img-src 'self' data:; media-src 'self' blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
     />
-    <meta
-      name="description"
-      content="Nindova is a quiet fifteen-minute ritual that puts the day away, crosses one Vista, and ends itself."
-    />
+    <meta name="description" content="Rasoi Pairs is Nindova's calm, bounded pair-removal game made from Indian kitchen forms." />
+    <meta property="og:title" content="Nindova — Rasoi Pairs" />
+    <meta property="og:description" content="Find matching kitchen tiles. Let the board grow lighter. Leave when it closes." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href={href("/favicon.svg")} type="image/svg+xml" />
-    <title>Nindova — put the day away</title>
+    <title>Nindova — Rasoi Pairs</title>
   </head>
   <body class="landing">
-    <header class="nav-edge" aria-label="Primary navigation">
-      <a class="wordmark" href={href("/")} aria-label="Nindova home">Nindova</a>
-      <a class="nav-action" href={href("/play/")}>Play tonight</a>
+    <header class="site-nav" aria-label="Primary navigation">
+      <a class="brand" href={href("/")} aria-label="Nindova home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Nindova</span>
+      </a>
+      <nav>
+        <a href={href("/docs/")}>Docs</a>
+        <a href={releaseUrl}>v0.1.0</a>
+        <a class="nav-play" href={href("/play/")}>Play this build</a>
+      </nav>
     </header>
 
     <main>
-      <section class="window-hero" aria-labelledby="hero-title">
+      <section class="rasoi-hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="hero-premise">A Punjabi night room after a long day.</p>
-          <h1 id="hero-title">Put the day away.</h1>
+          <p class="eyebrow">A small kitchen for the end of the day</p>
+          <h1 id="hero-title">Find the pairs.<br />Let the kitchen quiet.</h1>
           <p class="hero-lede">
-            A quiet fifteen-minute ritual: clear one desk, cross one changing Vista, follow the last
-            light home, and leave. The Session ends itself.
+            Rasoi Pairs is a calm 36-tile game inspired by Mahjong solitaire. Match familiar Indian
+            kitchen forms at the open ends of three racks. The board gets lighter, then the Session ends.
           </p>
           <div class="hero-actions">
-            <a class="action-primary" href={href("/play/")}>Enter Nindova</a>
-            <a class="action-text" href={href("/docs/")}>Read the contract <span aria-hidden="true">→</span></a>
+            <a class="button-primary" href={href("/play/")}>Play Rasoi Pairs</a>
+            <a class="button-secondary" href={standaloneUrl}>Download standalone</a>
           </div>
           <p class="trust-line">Nothing to win. Nothing tracked. Nothing you can do wrong.</p>
         </div>
 
-        <figure class="window-art">
-          <div class="phulkari-frame">
+        <figure class="hero-board">
+          <div class="board-frame">
             <img
-              src={href("/media/session-punjabi-portrait.png")}
-              width="375"
-              height="812"
-              alt="The real Nindova Session: an indigo rain window, phulkari border, lamp-lit desk, letter, and mustard-field Vista controls."
+              src={href("/media/rasoi-board.png")}
+              width="840"
+              height="384"
+              alt="The real Rasoi Pairs board with three shallow racks; exposed matching tiles are bright at each end."
             />
           </div>
-          <figcaption>Rendered Session · Punjabi night room</figcaption>
+          <figcaption>Rendered from the release Session · no concept mockup</figcaption>
         </figure>
-      </section>
 
-      <section class="material-world" aria-labelledby="world-title">
-        <div>
-          <p class="section-kicker">The visual world</p>
-          <h2 id="world-title">Indigo night. Marigold thread. Earth after rain.</h2>
-        </div>
-        <p>
-          Nindova draws from Punjabi material craft and Indian landscapes: phulkari geometry, carved
-          jali rhythm, brass, terracotta, mustard fields, and a quiet riverside harbor. The references
-          stay specific and everyday—never religious decoration or generic “exotic” styling.
-        </p>
-        <div class="material-key" aria-label="Visual materials">
-          <span>Phulkari</span><span>Indigo</span><span>Terracotta</span><span>Brass</span>
+        <div class="motif-line" aria-label="Kitchen motifs in Rasoi Pairs">
+          <span>Belan</span><span>Chakla</span><span>Tawa</span><span>Chimta</span><span>Katori</span><span>Tiffin</span><span>Masala dabba</span><span>Chai</span><span>Cooker</span>
         </div>
       </section>
 
-      <section class="arc" aria-labelledby="arc-title">
-        <header class="section-head">
-          <h2 id="arc-title">One fixed arc. No menu.</h2>
-          <p>The room changes. The promise does not.</p>
-        </header>
-        <ol class="arc-steps">
-          <li>
-            <span class="arc-mark" aria-hidden="true"></span>
-            <h3>Put away</h3>
-            <p>Name a thought if you want. Move each visible thing off the desk. Help increases as effort fades.</p>
-          </li>
-          <li>
-            <span class="arc-mark" aria-hidden="true"></span>
-            <h3>Cross</h3>
-            <p>The window opens to meadow or harbor. One small procession moves toward shelter.</p>
-          </li>
-          <li>
-            <span class="arc-mark" aria-hidden="true"></span>
-            <h3>Leave</h3>
-            <p>Follow the last light back. Turn the sign. The room goes dark, and the Session is over.</p>
-          </li>
+      <section class="rule-section" aria-labelledby="rule-title">
+        <div class="rule-intro">
+          <p class="eyebrow">One rule, all night</p>
+          <h2 id="rule-title">Easy to understand.<br />Impossible to spoil.</h2>
+          <p>
+            A tile is free when it sits at an exposed rack end. Choose two free tiles showing the same
+            object. Every legal choice on the authored board keeps a path to the ending.
+          </p>
+        </div>
+        <ol class="rule-steps">
+          <li><span aria-hidden="true">01</span><div><h3>Look</h3><p>The brighter edge tiles are free.</p></div></li>
+          <li><span aria-hidden="true">02</span><div><h3>Pair</h3><p>Belan with belan. Chai with chai.</p></div></li>
+          <li><span aria-hidden="true">03</span><div><h3>Settle</h3><p>The pair lifts, sounds once if enabled, and leaves.</p></div></li>
         </ol>
       </section>
 
-      <section class="two-loops" aria-labelledby="loops-title">
-        <div class="loop-copy">
-          <h2 id="loops-title">Satisfying now.<br />Inviting later.</h2>
+      <section class="material-section" aria-labelledby="material-title">
+        <figure class="phone-art">
+          <div class="phone-frame">
+            <img
+              src={href("/media/rasoi-pairs-phone.png")}
+              width="375"
+              height="815"
+              alt="The real Rasoi Pairs phone layout, with labeled kitchen tiles and a safe-pair help control."
+            />
+          </div>
+          <figcaption>375px release surface</figcaption>
+        </figure>
+        <div class="material-copy">
+          <p class="eyebrow">Punjabi material, everyday kitchen</p>
+          <h2 id="material-title">Indigo cloth. Madder thread. Steel and brass.</h2>
           <p>
-            Nindova can feel good while it is happening. It must never use that feeling to make this
-            Session harder to leave.
+            The visual system draws from Punjabi material craft without turning it into decoration for
+            decoration's sake. Restrained phulkari-inspired geometry frames ordinary kitchen forms; the
+            object name remains visible so recognition never depends on illustration alone.
           </p>
-        </div>
-        <div class="loop-rules">
-          <p><strong>Inside tonight</strong><span>Touch, settle, cross, close.</span></p>
-          <p><strong>Between nights</strong><span>A changed window. A quiet trace. Nothing owed.</span></p>
+          <dl class="material-ledger">
+            <div><dt>Palette</dt><dd>Indigo, madder, marigold, cream, brass</dd></div>
+            <div><dt>Objects</dt><dd>Everyday cooking and tea forms</dd></div>
+            <div><dt>Excluded</dt><dd>Flags, sacred symbols, festival collage</dd></div>
+          </dl>
+          <p class="honesty-note">Punjabi-inspired direction; completed human cultural-authenticity review is not claimed.</p>
         </div>
       </section>
 
-      <section class="dawn" aria-labelledby="dawn-title">
+      <section class="boundary-section" aria-labelledby="boundary-title">
+        <header>
+          <p class="eyebrow">A game with an exit</p>
+          <h2 id="boundary-title">Satisfaction stays inside the Session.</h2>
+        </header>
+        <div class="boundary-grid">
+          <div>
+            <h3>While you play</h3>
+            <p>Predictable lift, one restrained clack, a warmer open rack. Help points; it never plays.</p>
+          </div>
+          <div>
+            <h3>When it ends</h3>
+            <p>No score, timer, streak, grade, collection, randomized reward, or promoted replay.</p>
+          </div>
+          <div>
+            <h3>If you leave it</h3>
+            <p>The kitchen settles itself before the hidden fifteen-minute ceiling. The ending stays the same.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="dawn-section" aria-labelledby="dawn-title">
+        <div class="dawn-copy">
+          <p class="eyebrow">Morning, only if you return</p>
+          <h2 id="dawn-title">First light keeps the forms, not the result.</h2>
+          <p>
+            From 06:00 through 11:59 in the captured Night ID zone, Dawn rearranges last night's kitchen
+            forms as a quiet local still. Save it, make a subtle silent loop, or leave it there. No notification asks you back.
+          </p>
+        </div>
         <figure class="dawn-art">
           <img
-            src={href("/media/dawn-punjabi.png")}
+            src={href("/media/rasoi-dawn.png")}
             width="712"
-            height="446"
-            alt="Nindova Dawn rendered over a Punjabi mustard meadow, with a rabbit beside a wooden fence and a phulkari border."
+            height="452"
+            alt="The real Dawn canvas: nine kitchen forms resting on brass plates in warm first light."
           />
-          <figcaption>Rendered Dawn · first light in the mustard meadow</figcaption>
+          <figcaption>Rendered Dawn canvas · local export surface</figcaption>
         </figure>
-        <div class="dawn-copy">
-          <h2 id="dawn-title">Morning keeps one still.</h2>
-          <p>
-            After a completed Session, Dawn can return the Vista at first light as a local still and
-            a subtle silent loop. No notification brings you back. You choose whether to look.
-          </p>
-        </div>
       </section>
 
-      <section class="local" aria-labelledby="local-title">
-        <p class="local-statement" id="local-title">Your night stays on this device.</p>
-        <div class="local-detail">
-          <p>No account.</p>
-          <p>No analytics.</p>
-          <p>No sleep score.</p>
+      <section class="trust-section" aria-labelledby="trust-title">
+        <div>
+          <p class="eyebrow">The technical promise</p>
+          <h2 id="trust-title">Your night stays on your device.</h2>
         </div>
+        <ul>
+          <li><strong>No account</strong><span>Open the file or PWA and begin.</span></li>
+          <li><strong>Zero telemetry</strong><span>No analytics, ads, or remote logging.</span></li>
+          <li><strong>Offline-ready</strong><span>Installable PWA plus a standalone HTML.</span></li>
+          <li><strong>Accessible rule</strong><span>Native buttons, 44px targets, keyboard, reduced motion, and visible names.</span></li>
+        </ul>
       </section>
 
-      <section class="closing" aria-labelledby="closing-title">
-        <h2 id="closing-title">Fifteen minutes. Then dark.</h2>
+      <section class="closing-section" aria-labelledby="closing-title">
+        <p class="eyebrow">Release v0.1.0</p>
+        <h2 id="closing-title">One board. One ending.</h2>
         <p>
-          Nindova is behavioral design, not a sleep tracker or treatment. It is intended for ages 13
-          and up. Persistent sleep difficulty deserves evidence-based care such as CBT-I with a
-          qualified clinician.
+          Nindova is a behavioral design study, not a sleep tracker or treatment. Rasoi Pairs has not
+          been clinically shown to make people sleepy or improve sleep.
         </p>
-        <a class="action-primary" href={href("/play/")}>Play tonight</a>
+        <div class="hero-actions">
+          <a class="button-primary" href={href("/play/")}>Play this build</a>
+          <a class="button-secondary" href={releaseUrl}>Release notes and checksums</a>
+        </div>
       </section>
     </main>
 
-    <footer class="foot-stmt">
-      <p class="foot-stmt-line">The room goes dark.<br />Nindova stops.</p>
-      <div class="foot-meta">
-        <a class="wordmark" href={href("/")}>Nindova</a>
-        <nav aria-label="Footer navigation">
-          <a href={href("/docs/")}>Docs</a>
-          <a href="https://github.com/udhawan97/Nindova">GitHub</a>
-        </nav>
-        <span>Behavioral design study · 13+</span>
-      </div>
+    <footer class="site-footer">
+      <a class="brand" href={href("/")}><span class="brand-mark" aria-hidden="true"></span><span>Nindova</span></a>
+      <nav aria-label="Footer navigation">
+        <a href={href("/docs/")}>Documentation</a>
+        <a href="https://github.com/udhawan97/Nindova">GitHub</a>
+        <a href={releaseUrl}>v0.1.0</a>
+      </nav>
+      <p>Behavioral design study · 13+ · no public web deployment</p>
     </footer>
   </body>
 </html>

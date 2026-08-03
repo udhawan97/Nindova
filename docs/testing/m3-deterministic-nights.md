@@ -1,5 +1,7 @@
 # M3 deterministic nights and quiet memory checkpoint
 
+> Historical recipe-v1 evidence. The v2 Rasoi recipe and v3 state schema are documented in [Rasoi redesign evidence](./rasoi-redesign.md).
+
 ## Implementation
 
 - Added a standalone Night module, now Vite-compiled from TypeScript for the Session, multi-file build, embedded portable HTML, and Node parity tests.

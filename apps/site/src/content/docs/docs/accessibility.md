@@ -1,26 +1,23 @@
 ---
 title: Accessibility
-description: Semantic actions, portrait composition, and alternate presentation in the Nindova Session.
+description: Native tile controls, text labels, keyboard completion, and alternate presentation in Rasoi Pairs.
 ---
 
-Nindova keeps Canvas as its atmosphere, not as its only interface. Every action required to finish the nightly arc also has a native HTML control with a visible focus state, a keyboard path, and a short non-visual status update.
+Rasoi Pairs uses native HTML buttons for every tile. The drawing, visible name, accessible name, free/covered state, selected state, and settled state come from the same motif registry and board kernel.
 
-## Required actions
+## Operable rule
 
-- Light the lamp.
-- Put the next object away; naming it remains optional.
-- Change the window.
-- Clear the dust.
-- Help the next Visitor.
-- Let the returning light continue.
-- Turn the sign and close the room.
+- Free tiles are the only tiles in the keyboard tab order.
+- Each tile announces its kitchen form and whether it is free, covered, selected, or settled.
+- Selection and removal work with pointer, touch, keyboard, switch-style activation, and programmatic semantic control.
+- All tile and toolbar targets are at least 44 by 44 CSS pixels.
+- Live status text describes selection, mismatch, match, help, wind-down, and closure.
+- Visible text names mean recognition does not depend on the illustration.
 
-Targets are at least 44 by 44 CSS pixels and remain within thumb reach in the verified portrait layouts. Required progress does not rely on precise dragging, multi-touch, sound, or sight.
+Audio is off by default and optional. Animation is decorative. Precision movement and vision are not required.
 
 ## Alternate presentation
 
-The Session provides act-specific portrait framing rather than shrinking a desktop canvas into a narrow strip. It supports safe areas, dynamic viewport height, rotation, held-touch cancellation, and browser zoom. When reduced motion is requested, camera movement snaps and ambient particle activity is reduced.
+The release is browser-verified at 320×568, 375×812, 414×896, 768×1024, and 1440×900. It covers 200% page scale, reduced motion, keyboard pairing, target size, visible focus, and horizontal-overflow checks.
 
-## Current evidence
-
-Automated browser coverage exercises the complete semantic arc at 320×568, 375×812, 375×667, and desktop sizes. It also covers 200% zoom, rotation, a shortened virtual-keyboard viewport, reduced motion, held touch, and pointer cancellation. Real-device VoiceOver and TalkBack acceptance remains a release gate, not a claimed capability.
+Real-device VoiceOver and TalkBack acceptance remains an untested release limitation. Automated semantic checks are not a substitute for that human proof.

@@ -1,45 +1,31 @@
 ---
 title: Testing
-description: Evidence levels and verification commands for Nindova.
+description: Evidence levels and release verification commands for Rasoi Pairs.
 ---
 
 Nindova distinguishes three evidence levels:
 
-- **Verified** — observed on the rendered or installed user-facing surface.
-- **Source-proven** — directly supported by code or deterministic tests, but not yet observed on every target surface.
-- **Untested risk** — plausible behavior that still lacks direct evidence.
+- **Verified** — directly observed on a rendered or release-facing surface.
+- **Source-proven** — supported by code or deterministic tests but not observed on every target device.
+- **Untested risk** — plausible behavior that still lacks the required human/device evidence.
 
-## Seed baseline
+## Gates
 
-`npm run test:seed:observe` runs a disposable copy of the supplied Playwright script after changing only its local file target and screenshot output directory. It records state and screenshots but intentionally remains observational.
+- `test:unit` proves motif counts, free-edge behavior, deterministic recipes, exhaustive 343-state solvability, state sanitization/migration, captured-zone Dawn boundaries, and export utilities.
+- `test:arc` removes all 18 pairs through `window.__ct`, asserts `intake → play → settling → end`, immutable copy, local completion, screenshots, and zero browser errors.
+- `test:portrait` covers 320, 375, 414, 768, and 1440px surfaces, 44px targets, semantic labels, keyboard pairing, 200% zoom, reduced motion, and horizontal overflow.
+- `test:self-closing` proves help does not play, reviewer and production caps remain distinct, and no-input/partial/selected-tile paths converge on the same ending.
+- `test:night` covers corrupt recovery, “Not now” return, reload resume, same-night board identity, v3 completion, and replay idempotence.
+- `test:dawn` serves the composed build and verifies morning boundaries, the rendered kitchen composition, local PNG download, share cancellation, loop fallback, and a real browser loop.
+- `test:pwa` verifies manifest/scope, offline cache ownership, denied-audio operation, same-tab resume, offline closure, quiet tomorrow intent, same-origin requests, and standalone independence.
+- `test:wall-clock` leaves a production Session untouched through wind-down and the absolute fifteen-minute ceiling.
 
-`npm run test:arc` asserts the state order, final `end` state, immutable end-card copy, zero console or page errors, screenshots, and the `window.__ct` contract. It is the regression gate for behavior-preserving slices.
-
-`npm run test:portrait` verifies 320×568, 375×812, 375×667, and desktop layouts; native semantic actions; keyboard operation; 200% page scale; rotation; virtual-keyboard height; reduced motion; held touch; pointer cancellation; safe 44×44-pixel targets; and the complete phone arc.
-
-`npm run test:self-closing` verifies the production/reviewer boundary, the fifteen-minute production cap contract, monotonic assistance and light envelopes, generated-sprite availability, authored accent inventory, and autonomous closure from no input, partial input, an open naming field, a held touch, lost focus, and a cancelled pointer.
-
-`npm run test:night` checks browser parity with fixed PRNG recipes, corrupt local-state recovery, recipe-to-object rendering, completion persistence, one meadow Echo, and idempotent same-night replay. Unit vectors separately cover the local-noon boundary, DST fallback, two IANA zones, bounded harbor memory, and unavailable storage.
-
-`npm run test:dawn` builds and serves the production surface, then verifies missing/before-window/valid/noon/skipped/corrupt eligibility; rendered first light; a downloaded PNG; cancelled sharing; unsupported clip encoding; an actual silent 3000 ms browser loop; and preview URL cleanup. Unit vectors pin Chicago and Kolkata zone evaluation and the 06:00–11:59 boundary.
-
-`npm run test:pwa` builds the composed artifact, verifies manifest and `/play/` worker scope, proves an online load refreshes a deliberately stale shell entry, exercises v1-to-v2 state migration and corruption recovery, re-enters an unfinished night, completes an offline Session with audio unavailable, records the notification-free return intention, replays idempotently, inspects cache contents and request origins, and proves that the standalone has no PWA dependency.
-
-`npm run test:wall-clock` leaves the production Session untouched in a real browser, verifies its natural closure before the absolute fifteen-minute ceiling, and confirms it remains ended through that ceiling with no browser errors. The faster reviewer-mode suite separately forces the `production-cap` path.
-
-## Build gates
+## Release commands
 
 ```sh
-npm run typecheck
-npm run test:unit
-npm run test:arc
-npm run test:portrait
-npm run test:self-closing
-npm run test:night
-npm run test:dawn
-npm run test:pwa
+npm run check
+npm test
 npm run test:wall-clock
-npm run build
 ```
 
-Interface slices also require rendered inspection at phone and desktop widths. A green source test alone is not shipped-surface proof.
+Interface changes also require visual inspection at phone and desktop widths. Automation cannot close the current real-device screen-reader or Punjabi cultural-review limitations.

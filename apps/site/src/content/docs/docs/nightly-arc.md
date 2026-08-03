@@ -1,25 +1,27 @@
 ---
-title: Nightly arc
-description: The fixed path from an untidy desk to a room that closes itself.
+title: Rasoi Pairs Session
+description: The fixed path from voluntary entry through pair removal to a quiet ending.
 ---
 
-Nindova has one route. Weather, objects, Visitors, and small Vista details vary by night; the order, effort envelope, fifteen-minute cap, and ending do not.
+Rasoi Pairs is inspired by the readable free-tile rule of Mahjong solitaire. It is not traditional four-player Mahjong and does not copy a Mahjong tile set.
 
-## The acts
+## The path
 
-1. **Intake** — Enter voluntarily. There is no score, streak, countdown, or sleep goal.
-2. **Arrive** — Light the brass lamp. If no input arrives, the room continues on its own.
-3. **Put away** — Name a visible thing if you want, then place each thing on a shelf or in a drawer. A semantic button can perform every required action.
-4. **Settle** — One wipe clears the desk. Distance and timing demands decrease as the Session progresses.
-5. **Approach** — The carved window opens to a mustard meadow or riverside harbor.
-6. **Vista** — A small procession moves toward shelter. One touch can help; no touch is also valid.
-7. **Drift and Return** — The last light crosses back toward the room. It returns autonomously if left alone.
-8. **Close** — Turn the sign. The room darkens and the Session ends.
+1. **Enter or decline** — “Not now” opens a quiet dismissal surface. Nindova stays voluntarily available later that night.
+2. **Look at the rack ends** — six tiles are free: the exposed tile at each end of three racks.
+3. **Choose a pair** — select two free tiles showing the same kitchen form. A mismatch simply lifts the newer tile; there is no penalty.
+4. **Settle** — a match leaves with one predictable visual response and an optional restrained sound. Newly exposed tiles become free.
+5. **Ask for help if wanted** — a safe pair breathes briefly at the edges. Help never removes tiles.
+6. **Close** — the cleared board settles under its brass lid. If the hidden production boundary arrives first, the remaining kitchen settles under the same lid and reaches the same end card.
 
-The end card begins: “The session is over. That's the point.” It does not promote replay. Reopening later that same night is always a voluntary choice and uses the same deterministic night without adding another Echo or boat.
+The end card begins: “The session is over. That's the point.” It does not promote replay.
+
+## Board guarantee
+
+The board has 36 tiles: four copies of each of nine motifs. Each motif is confined to one rack in two consecutive pairs. The same legality kernel drives rendering, input, help, and exhaustive verification.
+
+The verifier explores all 343 reachable removal states for every tested board recipe. Every nonterminal state has at least one legal pair; every legal choice reaches the single terminal state. Nightly variation only permutes motif placement and cloth tone.
 
 ## Timing
 
-Production pacing has a monotonic fifteen-minute hard cap that is never displayed. Every no-input, partial-input, held-pointer, cancelled-pointer, lost-focus, and optional-naming path must converge on the same ending within that cap.
-
-The compressed reviewer cut is available only through `?review=1`. It preserves the state order and closure outcome but is not a production feature.
+The production clock has a hidden fifteen-minute ceiling. At twelve minutes an unfinished board begins its wind-down and closes under the same lid. The reviewer switch `?review=1` compresses those boundaries without changing order or outcome.

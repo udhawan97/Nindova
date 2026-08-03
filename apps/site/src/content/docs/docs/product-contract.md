@@ -1,24 +1,26 @@
 ---
 title: Product contract
-description: The promises Nindova must keep for the person using it tonight.
+description: The promises Rasoi Pairs must keep for the person using it tonight.
 ---
 
 ## The Two-Loop Law
 
-Nindova may be satisfying during the current Session. It may be inviting when a person returns on another night. It must never use satisfaction to make the current Session harder to leave.
+Nindova may be satisfying during the current Session. It may be inviting when a person returns another night. It must never use satisfaction to make the current Session harder to leave.
 
 Anything that makes tonight harder to leave is a bug.
 
 ## Non-negotiable behavior
 
-- One fixed arc; no game-select menu, rounds, or levels.
-- A production Session ends itself within fifteen minutes.
-- No score, streak, achievement, countdown, collection, missed-night state, sleep score, or randomized reward.
-- Audio, precise dragging, animation, and sight are optional capabilities, never completion requirements.
-- State stays local. There is no analytics, advertising, telemetry, remote logging, or account.
-- Same-night voluntary replay is possible, quiet, and idempotent.
-- “Same time tomorrow?” records only a local intention, requests no notification, and creates no urgency.
-- If the deferred native Wall is built, choosing “Not now” must dismiss it for the rest of that night without guilt while leaving Nindova manually available later that night. This is a frozen future-native contract, not implemented web behavior.
+- One Rasoi Pairs rule; no game menu, rounds, levels, or escalating difficulty.
+- A production Session closes itself within fifteen minutes.
+- No score, visible count, timer, countdown, streak, grade, achievement, collection, missed-night state, sleep score, or randomized reward.
+- The board is authored and deterministic. Every reachable nonterminal state exposes a legal pair, and every legal choice preserves solvability.
+- Help identifies a safe pair but does not remove it.
+- Audio, animation, precision movement, and sight are optional; native controls and visible text names carry the rule.
+- State stays local. There is no account, analytics, advertising, telemetry, remote logging, or third-party runtime request.
+- Same-night voluntary replay is quiet, identical, and idempotent.
+- “Not now” never prevents a voluntary return later that night.
+- “Same time tomorrow?” stores a local intention, sends no notification, and creates no urgency.
 
 ## Immutable language
 
@@ -26,10 +28,10 @@ The intake promise is: “Nothing to win. Nothing tracked. Nothing you can do wr
 
 The end card begins: “The session is over. That's the point.”
 
-Nindova is a behavioral design study for people aged 13 and up. It is not a sleep tracker, a sleep-performance tool, or a treatment for insomnia. Persistent sleep difficulty deserves evidence-based care such as CBT-I with a qualified clinician.
+Nindova is a behavioral design study for people aged 13 and up. It is not a sleep tracker, sleep-performance tool, or treatment. Rasoi Pairs has not been clinically shown to make people sleepy or improve sleep. Persistent sleep difficulty deserves evidence-based care such as CBT-I with a qualified clinician.
 
-## Visual world
+## Cultural direction
 
-Nindova is grounded in Punjabi material craft and Indian night landscapes. Phulkari geometry, carved wood, brass, terracotta, indigo, marigold, mustard fields, and a quiet riverside harbor may shape the room and Vistas. These cues must remain specific and respectful, never collapse into generic “exotic” styling, religious decoration, or a change in the product’s behavioral claims.
+The motifs are everyday forms: belan, chakla, tawa, chimta, steel katori, tiffin, masala dabba, chai glass, and pressure cooker. Indigo, madder, marigold, brass, wood, and restrained phulkari-inspired geometry shape the surface.
 
-The current interface remains in English. Visual theming does not imply language localization.
+Sacred symbols, flags, festival collage, and generic “exotic” styling are excluded. The direction is Punjabi-inspired; completed human cultural-authenticity review is not claimed.

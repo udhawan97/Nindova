@@ -1,23 +1,25 @@
 ---
 title: Roadmap
-description: What exists in the browser build and what remains deliberately deferred.
+description: What ships in v0.1.0 and what remains deliberately unclaimed.
 ---
 
-## Built in this repository
+## In v0.1.0
 
-- Portrait-first Canvas Session with semantic controls and a fifteen-minute production cap.
-- Punjabi and Indian visual world with deterministic nightly recipes.
-- Bounded local Echo memory, v1-to-v2 migration, and quiet return intention.
-- Morning Dawn still and capability-appropriate silent three-second loop.
+- Rasoi Pairs pure legality kernel and 36-tile semantic interface.
+- Deterministic recipe version 2 with exhaustive no-dead-state verification.
+- Hidden twelve-minute wind-down and fifteen-minute ceiling.
+- Version-3 local state with safe v1/v2 Dawn migration and same-tab resume.
+- Redesigned first-light kitchen Dawn with local still and silent-loop export.
 - Self-contained standalone HTML and separately tested installable offline PWA.
-- Custom public page, calmer documentation, and rendered-surface browser gates.
+- Synchronized landing page, Starlight docs, rendered release media, checksums, and release notes.
 
 ## Next hardening
 
-- Test with more real mobile browsers and installed-device configurations.
-- Complete broader assistive-technology testing, especially mobile screen readers.
-- Continue profiling the Canvas renderer on low-power devices without increasing visual stimulation.
-- Publish only after the source, public assets, installation path, and installed surface have each passed their own evidence gate.
+- Human Punjabi cultural-authenticity review before making a stronger authenticity claim.
+- Real-device VoiceOver and TalkBack acceptance.
+- Installed Safari and additional Android browser/PWA proof.
+- Facilitated human prototype sessions to learn whether the matching exercise actually feels calm, legible, and worth returning to.
+- Performance profiling on low-power phones without adding visual stimulation.
 
 ## Deliberately deferred
 

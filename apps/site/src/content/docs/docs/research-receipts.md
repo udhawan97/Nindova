@@ -1,36 +1,28 @@
 ---
 title: Research receipts
-description: Evidence Nindova draws from, the design inference made, and the claim boundary.
+description: The stopping-behavior evidence Nindova draws from and the claims Rasoi Pairs cannot make.
 ---
 
-Nindova is a behavioral design study, not a clinical intervention. These receipts explain why a feature was considered; they do not establish that Nindova improves sleep.
+Nindova is a behavioral design study, not a clinical intervention. No cited study tested Rasoi Pairs, a matching game, or this product’s ability to make someone sleepy.
 
-## Specific unfinished tasks
+## Bedtime delay and interactive screens
 
-[Scullin et al. (2018)](https://pubmed.ncbi.nlm.nih.gov/29058942/) randomly assigned 57 healthy young adults to write a future to-do list or a completed-activity list before laboratory polysomnography. The to-do-list group fell asleep faster, and specificity was associated with faster sleep onset.
+[Hill et al. (2022)](https://pubmed.ncbi.nlm.nih.gov/36375334/) reported a moderate association between bedtime procrastination and evening chronotype in a systematic review and meta-analysis. [Brosnan et al. (2024)](https://pubmed.ncbi.nlm.nih.gov/39226046/) found that interactive screen use in bed was associated with later sleep onset and shorter sleep time in repeated objective observations of youths.
 
-**Design inference:** optional naming can make one unfinished thing specific before it is put away. **Limit:** Nindova is not the studied five-minute writing task and cannot claim the same outcome.
+**Design inference:** if a person is already using a screen, an authored interaction can target the intention-to-stop gap with a fixed path and hard ending.
 
-## Specific imagery
-
-[Harvey and Payne (2002)](https://pubmed.ncbi.nlm.nih.gov/11863237/) compared imagery distraction, general distraction, and no instruction among 41 people with insomnia. The specific imagery task reduced reported pre-sleep cognitive activity and sleep-onset latency relative to no instruction.
-
-**Design inference:** one concrete procession is preferable to vague prompts. **Limit:** the Vista is interactive media, not the study protocol, and Nindova is not insomnia treatment.
-
-## Bedtime delay
-
-[Hill et al. (2022)](https://pubmed.ncbi.nlm.nih.gov/36375334/) found a moderate association between bedtime procrastination and evening chronotype in a systematic review and meta-analysis. [Brosnan et al. (2024)](https://pubmed.ncbi.nlm.nih.gov/39226046/) used repeated objective observations in youths and found that interactive screen use in bed was associated with later sleep onset and shorter sleep time.
-
-**Design inference:** target the intention-to-stop gap with one bounded path and a hard ending. **Limit:** Nindova does not change chronotype, and using another screen has costs. The claim is “earlier stopping,” not “better sleep.”
+**Limit:** another screen still has costs. These studies do not show that a game improves sleep, creates a useful dopamine response, or outperforms putting the device away.
 
 ## Evening light and age boundary
 
 [Hartstein et al. (2022)](https://pubmed.ncbi.nlm.nih.gov/34997782/) found high melatonin suppression across evening light intensities in a small study of preschool-aged children.
 
-**Design inference:** use real brightness decay and do not market Nindova as a children's bedtime product. **Limit:** Nindova is positioned for ages 13+ and has not measured biological outcomes.
+**Design inference:** do not market Nindova as a children’s bedtime product; keep the interface dim and bounded.
+
+**Limit:** Nindova is positioned for ages 13+ and has not measured biological outcomes.
 
 ## Clinical boundary
 
-The [American College of Physicians clinical guideline](https://pubmed.ncbi.nlm.nih.gov/27136449/) recommends CBT-I as the initial treatment for adults with chronic insomnia disorder.
+The [American College of Physicians guideline](https://pubmed.ncbi.nlm.nih.gov/27136449/) recommends CBT-I as the initial treatment for adults with chronic insomnia disorder.
 
-**Product boundary:** persistent sleep difficulty deserves evidence-based care with a qualified clinician. Nindova does not diagnose, score, monitor, or treat insomnia.
+**Product boundary:** persistent sleep difficulty deserves evidence-based care with a qualified clinician. Nindova does not diagnose, monitor, score, or treat insomnia.

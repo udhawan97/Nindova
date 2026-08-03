@@ -1,12 +1,13 @@
 ---
 title: Known limitations
-description: Honest boundaries of the current browser-first foundation.
+description: Honest evidence and product limits for the v0.1.0 browser release.
 ---
 
-The current browser build is functional and bounded; its proof surface still has explicit limits.
+- Rasoi Pairs is a product hypothesis. No human study in this repository proves that it makes people sleepy, creates a particular dopamine effect, or improves sleep.
+- The Punjabi-inspired material direction has not completed human Punjabi cultural-authenticity review.
+- Browser automation verifies native semantics, keyboard operation, reduced motion, 200% zoom, and target size; real-device VoiceOver and TalkBack acceptance remains pending.
+- Chromium verifies the offline PWA and release surfaces. Broader installed Safari and Android proof remains pending.
+- The website is included in the release bundle but is not publicly deployed.
+- The iOS Wall is deferred. No Family Controls entitlement, native interception, notification, or App Store capability is claimed.
 
-- The portrait camera and semantic controls are browser-verified, but real-device VoiceOver and TalkBack acceptance is still pending.
-- Installation and offline behavior are browser-tested in Chromium, but installed-device behavior still needs broader Safari and Android proof.
-- The iOS Wall is deferred. No entitlement, native interception, notification, or App Store capability is claimed.
-
-These are visible hardening gates, not hidden follow-ups or shipped native claims.
+These are visible limits, not shipped claims hidden in a backlog.
