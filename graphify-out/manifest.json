@@ -90,9 +90,9 @@
     "semantic_hash": "50e50d13672cfe69b238e322942cc950"
   },
   "tests/browser/portrait-accessibility.mjs": {
-    "mtime": 1785735262.9674747,
-    "ast_hash": "88ac104d1c4c5efcd0459f6cbbabe6f0",
-    "semantic_hash": "88ac104d1c4c5efcd0459f6cbbabe6f0"
+    "mtime": 1785738112.06217,
+    "ast_hash": "71aa992c893332674657fded7446cc5c",
+    "semantic_hash": ""
   },
   "tests/browser/pwa-offline.mjs": {
     "mtime": 1785735243.2122443,
@@ -385,9 +385,9 @@
     "semantic_hash": "e42427b44b9d18d0dace850ec6049e27"
   },
   "docs/REDESIGN-PLAN.md": {
-    "mtime": 1785734614.6163092,
-    "ast_hash": "f307da10ce5813217aea75cd3f873367",
-    "semantic_hash": "f307da10ce5813217aea75cd3f873367"
+    "mtime": 1785738112.061571,
+    "ast_hash": "309ca5c3c34aeb85d75ede8d2421abbf",
+    "semantic_hash": ""
   },
   "docs/adr/0010-replace-the-vista-arc-with-rasoi-pairs.md": {
     "mtime": 1785734614.6161625,

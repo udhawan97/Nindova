@@ -1,6 +1,6 @@
 # Rasoi Pairs redesign plan
 
-**Status:** Approved and in implementation.
+**Status:** Implemented and verified for v0.1.0.
 
 ## Product promise
 

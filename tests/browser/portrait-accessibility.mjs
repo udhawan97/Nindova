@@ -51,17 +51,23 @@ try {
   const keyboard = await open({ width: 375, height: 812 });
   await keyboard.page.click("#beginBtn");
   await keyboard.page.waitForFunction(() => window.__ct.state === "play");
-  const pair = await keyboard.page.evaluate(() => window.__ct.legalPairs[0]);
-  await keyboard.page.locator(`[data-tile-id="${pair[0]}"]`).focus();
-  await keyboard.page.keyboard.press("Enter");
-  assert.equal(await keyboard.page.evaluate(() => window.__ct.selectedTile), pair[0]);
-  await keyboard.page.locator(`[data-tile-id="${pair[1]}"]`).focus();
-  await keyboard.page.keyboard.press("Enter");
-  assert.equal(await keyboard.page.evaluate(() => window.__ct.removedTileCount), 2);
   const cdp = await keyboard.context.newCDPSession(keyboard.page);
   await cdp.send("Emulation.setPageScaleFactor", { pageScaleFactor: 2 });
   assert.equal(await keyboard.page.evaluate(() => visualViewport?.scale), 2);
-  assert.equal(await keyboard.page.evaluate(() => document.documentElement.scrollWidth >= document.documentElement.clientWidth), true);
+  assert.equal(await keyboard.page.evaluate(() => document.documentElement.scrollWidth), 375);
+  while (await keyboard.page.evaluate(() => window.__ct.state === "play")) {
+    const pair = await keyboard.page.evaluate(() => window.__ct.legalPairs[0]);
+    await keyboard.page.locator(`[data-tile-id="${pair[0]}"]`).scrollIntoViewIfNeeded();
+    await keyboard.page.locator(`[data-tile-id="${pair[0]}"]`).focus();
+    await keyboard.page.keyboard.press("Enter");
+    assert.equal(await keyboard.page.evaluate(() => window.__ct.selectedTile), pair[0]);
+    await keyboard.page.locator(`[data-tile-id="${pair[1]}"]`).scrollIntoViewIfNeeded();
+    await keyboard.page.locator(`[data-tile-id="${pair[1]}"]`).focus();
+    await keyboard.page.keyboard.press("Enter");
+  }
+  await keyboard.page.waitForFunction(() => window.__ct.state === "end");
+  assert.equal(await keyboard.page.evaluate(() => window.__ct.removedTileCount), 36);
+  assert.deepEqual(keyboard.errors, []);
   await keyboard.context.close();
 
   const reduced = await open({ width: 375, height: 812 }, { reducedMotion: "reduce" });
