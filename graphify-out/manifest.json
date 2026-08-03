@@ -90,13 +90,13 @@
     "semantic_hash": ""
   },
   "tests/browser/portrait-accessibility.mjs": {
-    "mtime": 1785780309.8617868,
-    "ast_hash": "7dd7569d6b5b5c3de8b3a81bfcea26b7",
+    "mtime": 1785781472.6807966,
+    "ast_hash": "c7d64d21be0b8ee6782c81d264d281e9",
     "semantic_hash": ""
   },
   "tests/browser/pwa-offline.mjs": {
-    "mtime": 1785780670.3190606,
-    "ast_hash": "6d91d20ba498b4a3f0c5683e93cb5e2a",
+    "mtime": 1785781472.6811626,
+    "ast_hash": "b38607da204af2c9a12877cbad17304e",
     "semantic_hash": ""
   },
   "tests/browser/seed-asserted.mjs": {
@@ -380,8 +380,8 @@
     "semantic_hash": "e703ccbe52d2b4437563b42b7f7b668f"
   },
   "docs/PUBLIC-SURFACE-EVIDENCE.md": {
-    "mtime": 1785780883.4128892,
-    "ast_hash": "24daf8d363dedf62fa3b7b3ba80df315",
+    "mtime": 1785781472.6814141,
+    "ast_hash": "378582246951bb7feae547debcc6a4ed",
     "semantic_hash": ""
   },
   "docs/REDESIGN-PLAN.md": {
@@ -400,8 +400,8 @@
     "semantic_hash": "81d648bab384cc20dc03d966cddf829b"
   },
   "docs/testing/rasoi-redesign.md": {
-    "mtime": 1785780883.4119017,
-    "ast_hash": "7e65e420367005e551aee8d69cccad75",
+    "mtime": 1785781472.681874,
+    "ast_hash": "93e12e7e4cbc39549f32f82472b7bc51",
     "semantic_hash": ""
   },
   "graphify-out/memory/query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for.md": {
@@ -430,8 +430,8 @@
     "semantic_hash": ""
   },
   "tests/browser/layered-rasoi.mjs": {
-    "mtime": 1785780670.319551,
-    "ast_hash": "528fdcbdb0f024ef3eddf3384cadefc6",
+    "mtime": 1785781472.6803777,
+    "ast_hash": "03775f273e0c7293d26ac8e955cbeb5d",
     "semantic_hash": ""
   },
   "tests/unit/qr-route.test.mjs": {
@@ -465,7 +465,7 @@
     "semantic_hash": ""
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1785781033.2066538,
+    "mtime": 1785781483.3069131,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": ""
   },

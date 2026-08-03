@@ -2621,8 +2621,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "apps_site_src_pages_index",
-      "community": 34,
-      "community_name": "index.astro",
+      "community": 19,
+      "community_name": "pwa-offline.mjs",
       "norm_label": "index.astro"
     },
     {
@@ -2632,8 +2632,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "apps_site_src_pages_index_base",
-      "community": 34,
-      "community_name": "index.astro",
+      "community": 19,
+      "community_name": "pwa-offline.mjs",
       "norm_label": "base"
     },
     {
@@ -2643,8 +2643,8 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "apps_site_src_pages_index_href",
-      "community": 34,
-      "community_name": "index.astro",
+      "community": 19,
+      "community_name": "pwa-offline.mjs",
       "norm_label": "href()"
     },
     {
@@ -2654,8 +2654,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "apps_site_src_pages_index_standaloneurl",
-      "community": 34,
-      "community_name": "index.astro",
+      "community": 19,
+      "community_name": "pwa-offline.mjs",
       "norm_label": "standaloneurl"
     },
     {
@@ -3182,8 +3182,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "reference_test_demo",
-      "community": 28,
-      "community_name": "test-demo.mjs",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "test-demo.mjs"
     },
     {
@@ -3193,8 +3193,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "reference_test_demo_errors",
-      "community": 28,
-      "community_name": "test-demo.mjs",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "errors"
     },
     {
@@ -3204,8 +3204,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "reference_test_demo_page",
-      "community": 28,
-      "community_name": "test-demo.mjs",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "page"
     },
     {
@@ -3215,8 +3215,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "reference_test_demo_state",
-      "community": 28,
-      "community_name": "test-demo.mjs",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "state()"
     },
     {
@@ -3517,10 +3517,21 @@
       "norm_label": "root"
     },
     {
-      "label": "open()",
+      "label": "watchPage()",
       "file_type": "code",
       "source_file": "tests/browser/layered-rasoi.mjs",
       "source_location": "L11",
+      "_origin": "ast",
+      "id": "tests_browser_layered_rasoi_watchpage",
+      "community": 55,
+      "community_name": "layered-rasoi.mjs",
+      "norm_label": "watchpage()"
+    },
+    {
+      "label": "open()",
+      "file_type": "code",
+      "source_file": "tests/browser/layered-rasoi.mjs",
+      "source_location": "L16",
       "_origin": "ast",
       "id": "tests_browser_layered_rasoi_open",
       "community": 55,
@@ -3531,7 +3542,7 @@
       "label": "tapTile()",
       "file_type": "code",
       "source_file": "tests/browser/layered-rasoi.mjs",
-      "source_location": "L24",
+      "source_location": "L28",
       "_origin": "ast",
       "id": "tests_browser_layered_rasoi_taptile",
       "community": 55,
@@ -3542,7 +3553,7 @@
       "label": "meanLuminance()",
       "file_type": "code",
       "source_file": "tests/browser/layered-rasoi.mjs",
-      "source_location": "L30",
+      "source_location": "L34",
       "_origin": "ast",
       "id": "tests_browser_layered_rasoi_meanluminance",
       "community": 55,
@@ -3636,6 +3647,17 @@
       "community": 26,
       "community_name": "portrait-accessibility.mjs",
       "norm_label": "tabtotile()"
+    },
+    {
+      "label": "assertReachable()",
+      "file_type": "code",
+      "source_file": "tests/browser/portrait-accessibility.mjs",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "tests_browser_portrait_accessibility_assertreachable",
+      "community": 26,
+      "community_name": "portrait-accessibility.mjs",
+      "norm_label": "assertreachable()"
     },
     {
       "label": "pwa-offline.mjs",
@@ -12692,6 +12714,18 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/browser/pwa-offline.mjs",
+      "source_location": "L58",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_pwa_offline",
+      "target": "apps_site_src_pages_index_href"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -13487,7 +13521,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/browser/layered-rasoi.mjs",
-      "source_location": "L30",
+      "source_location": "L34",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_browser_layered_rasoi",
@@ -13498,7 +13532,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/browser/layered-rasoi.mjs",
-      "source_location": "L11",
+      "source_location": "L16",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_browser_layered_rasoi",
@@ -13520,11 +13554,34 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/browser/layered-rasoi.mjs",
-      "source_location": "L24",
+      "source_location": "L28",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_browser_layered_rasoi",
       "target": "tests_browser_layered_rasoi_taptile",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/layered-rasoi.mjs",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_layered_rasoi",
+      "target": "tests_browser_layered_rasoi_watchpage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/layered-rasoi.mjs",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_layered_rasoi_open",
+      "target": "tests_browser_layered_rasoi_watchpage",
       "confidence_score": 1.0
     },
     {
@@ -13547,6 +13604,17 @@
       "_origin": "ast",
       "source": "tests_browser_night_memory",
       "target": "tests_browser_night_memory_root",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/portrait-accessibility.mjs",
+      "source_location": "L32",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_portrait_accessibility",
+      "target": "tests_browser_portrait_accessibility_assertreachable",
       "confidence_score": 1.0
     },
     {
@@ -17452,5 +17520,5 @@
       "source_file": "reference/nindova-master-brief.md"
     }
   ],
-  "built_at_commit": "67e97302135a2b8cbafa303dea53cd2746b56f0e"
+  "built_at_commit": "df6db1fb19131b0747609f5826a46aa13750f45f"
 }

@@ -1,16 +1,16 @@
 # Graph Report - Nindova  (2026-08-03)
 
 ## Corpus Check
-- 89 files · ~64,696 words
+- 89 files · ~64,836 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 671 nodes · 827 edges · 60 communities (40 shown, 20 thin omitted)
-- Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 105 edges (avg confidence: 0.74)
+- 673 nodes · 831 edges · 58 communities (40 shown, 18 thin omitted)
+- Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 106 edges (avg confidence: 0.74)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `67e97302`
+- Built from commit: `df6db1fb`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -43,12 +43,10 @@
 - dawn.mjs
 - portrait-accessibility.mjs
 - seed-asserted.mjs
-- test-demo.mjs
 - serve.mjs
 - self-closing.mjs
 - wall-clock-cap.mjs
 - Rasoi Pairs v0.1.0 Change Set
-- index.astro
 - Punjabi and Indian Material World
 - night-memory.mjs
 - reference-integrity.test.mjs
@@ -89,12 +87,12 @@
   docs/adr/0005-cap-the-real-session-at-fifteen-minutes.md → reference/nindova-master-brief.md
 - `Sound Off Control` --conceptually_related_to--> `Rasoi Pairs`  [INFERRED]
   apps/site/public/media/rasoi-pairs-phone.png → CONTEXT.md
-- `persistActiveSession()` --indirect_call--> `state()`  [INFERRED]
-  apps/session/src/session.ts → reference/test-demo.mjs
 - `User-Chosen Unguilted Wall` --semantically_similar_to--> `Between-Session Return System`  [INFERRED] [semantically similar]
   docs/adr/0003-keep-the-wall-user-chosen-and-unguilted.md → reference/nindova-master-brief.md
 - `Asymmetric Vista Memory` --semantically_similar_to--> `Between-Session Return System`  [INFERRED] [semantically similar]
   docs/adr/0004-use-asymmetric-vista-memory.md → reference/nindova-master-brief.md
+- `Browser and PWA Before iOS Wall` --semantically_similar_to--> `Browser Front Door`  [INFERRED] [semantically similar]
+  docs/adr/0007-ship-browser-and-pwa-before-the-ios-wall.md → reference/nindova-master-brief.md
 
 ## Import Cycles
 - None detected.
@@ -109,11 +107,11 @@
 - **Three Visible Free Kitchen Pairs** — apps_site_public_media_rasoi_pairs_phone_chimta_pair, apps_site_public_media_rasoi_pairs_phone_chai_pair, apps_site_public_media_rasoi_pairs_phone_katori_pair [EXTRACTED 1.00]
 - **Bounded Session Decision and Proof** — reference_nindova_master_brief_two_loop_law, reference_nindova_demo_fixed_session_state_arc, docs_adr_0005_cap_the_real_session_at_fifteen_minutes_fifteen_minute_session_cap [INFERRED 0.95]
 
-## Communities (60 total, 20 thin omitted)
+## Communities (58 total, 18 thin omitted)
 
 ### Community 0 - "session.ts"
-Cohesion: 0.08
-Nodes (55): NindovaDawn, NindovaNight, NindovaRasoi, advanceBy(), anchorSessionClock(), animatePair(), beginSession(), boardElement (+47 more)
+Cohesion: 0.07
+Nodes (58): NindovaDawn, NindovaNight, NindovaRasoi, advanceBy(), anchorSessionClock(), animatePair(), beginSession(), boardElement (+50 more)
 
 ### Community 1 - "Rasoi Pairs"
 Cohesion: 0.06
@@ -188,8 +186,8 @@ Cohesion: 0.33
 Nodes (7): Brass Circular Spice Box, Compact Geometric Legibility, Indigo Brass Cream and Madder Palette, Indigo Rasoi Diamond, Dark Rounded-Square Field, Radial Madder Spice Wells, Nindova Rasoi Diamond Favicon
 
 ### Community 19 - "pwa-offline.mjs"
-Cohesion: 0.29
-Nodes (5): DeniedAudioContext, errors, requests, root, server
+Cohesion: 0.18
+Nodes (8): base, href(), standaloneUrl, DeniedAudioContext, errors, requests, root, server
 
 ### Community 20 - "sw.js"
 Cohesion: 0.53
@@ -214,10 +212,6 @@ Nodes (5): errors, output, root, server, recipeTwoCompletion
 ### Community 27 - "seed-asserted.mjs"
 Cohesion: 0.40
 Nodes (4): errors, output, root, states
-
-### Community 28 - "test-demo.mjs"
-Cohesion: 0.50
-Nodes (3): errors, page, state()
 
 ### Community 29 - "serve.mjs"
 Cohesion: 0.50
@@ -251,6 +245,10 @@ Nodes (4): Added, Evidence boundary, Improved, Nindova v0.2.0 — proposed candi
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?, Source Nodes
 
+### Community 55 - "layered-rasoi.mjs"
+Cohesion: 0.40
+Nodes (3): open(), root, watchPage()
+
 ### Community 58 - "devDependencies"
 Cohesion: 0.13
 Nodes (15): @astrojs/check, jsqr, devDependencies, @astrojs/check, jsqr, @playwright/test, pngjs, qrcode (+7 more)
@@ -258,7 +256,7 @@ Nodes (15): @astrojs/check, jsqr, devDependencies, @astrojs/check, jsqr, @playwr
 ## Knowledge Gaps
 - **290 isolated node(s):** `name`, `version`, `private`, `type`, `build` (+285 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -272,7 +270,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **What connects `name`, `version`, `private` to the rest of the system?**
   _290 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `session.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.08020050125313283 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07213114754098361 - nodes in this community are weakly interconnected._
 - **Should `Rasoi Pairs` be split into smaller, more focused modules?**
   _Cohesion score 0.05537098560354374 - nodes in this community are weakly interconnected._
 - **Should `night-core.ts` be split into smaller, more focused modules?**
