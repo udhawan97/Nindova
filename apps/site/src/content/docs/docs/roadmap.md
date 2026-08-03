@@ -15,7 +15,7 @@ description: What exists in the v0.2.0 source release and what remains deliberat
 - Self-contained standalone HTML and separately tested installable offline PWA.
 - Synchronized landing page, Starlight docs, rendered source media, Apache-2.0 licensing, and a locally verified QR artifact for the canonical public route.
 
-The pinned GitHub Pages workflow publishes the static build from `main`. Live-route observation and a physical-device QR scan remain separate verification lanes until recorded.
+The pinned GitHub Pages workflow publishes the static build from `main`. The live route, rendered QR destination, service-worker control, and offline reload are browser-verified; a physical-device QR scan remains pending.
 
 ## Next hardening
 

@@ -32,7 +32,7 @@
 - Browser evidence covers captured-zone morning boundaries, PNG download, sharing cancellation, unsupported loop fallback, and supported loop preview.
 - The `/play/` worker replaces a seeded v3 cache with the v4 static shell without clearing local storage. Offline closure works with audio construction denied.
 - The standalone has the same compiled Night, Rasoi, and Dawn globals without a manifest or service worker.
-- Automation decodes the rendered QR to the shared proposed canonical URL and fetches both redistributed OFL license texts from the composed site. Public hosting and a physical-device scan remain unverified.
+- Automation decodes the rendered QR to the shared canonical URL and fetches both redistributed OFL license texts from the composed site. The deployed route, service-worker control, same-origin requests, and offline reload are browser-verified; a physical-device scan remains unverified.
 
 ## Honest limits
 

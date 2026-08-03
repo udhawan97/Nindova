@@ -13,6 +13,7 @@
 - The PWA manifest and service worker are scoped to `/play/`; the v4 cache replaces a seeded v3 cache, retains local storage, and contains static same-origin shell URLs only. The Session resumes and closes offline with audio denied.
 - Rest is the primary completion action. Optional Rasoi Image Drift presents three deterministic kitchen forms, accepts no response, supports names and tactile wording as alternatives to visual imagery, and proceeds only to Rest. End, Drift, and Rest do not route back into play. A page close/reopen returns to intake and can begin another separately bounded Session with the same profile and board and cleared ephemeral state.
 - The landing page and docs build under `/` and `/Nindova/`; automation traverses the local `/play/`, `/docs/`, standalone artifact, and font-license paths. It also decodes the rendered QR to the single shared proposed canonical URL. Fresh committed 840×476 and 375×812 captures show the real Deeper source surface.
+- GitHub Pages run `30848519494` deployed source SHA `373e688` successfully. The landing page, `/play/`, manifest, and standalone file returned HTTP 200; a 375×812 Chromium pass decoded the rendered QR to the canonical URL, obtained service-worker control, began Deeper, reloaded that active Session offline, observed only same-origin requests, and recorded no console or page errors.
 - The production application reached `end` at 722.388 seconds through the `production-cap` path, reached near-black `rest` by 900.001 observed seconds, and reported no browser errors in the unaccelerated wall-clock gate.
 
 ## Source-proven
@@ -30,4 +31,4 @@
 - Installed Safari and broader Android PWA behavior.
 - Human Punjabi cultural-authenticity review.
 - Human evidence that Masala Mound feels calm, legible, sleep-compatible, or improves general memory. No sleep, memory, or dopamine outcome is claimed.
-- Public deployment and real-device QR scanning. The canonical `/play/` URL returned HTTP 404 before the pinned GitHub Pages workflow was enabled; live-route proof must replace this note after the final `main` deployment is observed.
+- Physical-device QR scanning. Automated decode and live navigation pass, but a camera scan on a real phone remains unverified.
