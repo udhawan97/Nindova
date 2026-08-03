@@ -6,7 +6,7 @@
 
 Replace the three flat racks with **Masala Mound**, a 36-tile, three-layer pair-removal board. The board should ask for visual search and spatial planning while preserving Nindova's promise that a legal choice cannot produce failure. Add one authored match response that feels clear and satisfying, then hand the person toward rest. Make another same-night Session possible only through a deliberate return to the intake.
 
-Nindova remains a bounded wind-down game, not a treatment or a performance tool. The evidence review in [bedtime-game-evidence.md](./research/bedtime-game-evidence.md) does not support claims that this exact game makes people sleepy, improves sleep, improves general memory, or produces a beneficial dopamine response.
+Nindova remains a bounded wind-down game for people aged 13 and up, not a treatment or a performance tool. The evidence review in [bedtime-game-evidence.md](./research/bedtime-game-evidence.md) does not support claims that this exact game makes people sleepy, improves sleep, improves general memory, or produces a beneficial dopamine response at any age.
 
 ## Experience sequence
 
@@ -14,8 +14,8 @@ Nindova remains a bounded wind-down game, not a treatment or a performance tool.
 2. **Read the mound:** a Tile is free when no active Tile overlaps it from a higher layer and its left or right side is open.
 3. **Pair:** select two matching free Tiles. Covered and side-blocked Tiles remain visible but quiet.
 4. **Brass bloom:** the matched pair moves slightly inward and compresses into one dim brass ring before settling. The response is deterministic, local, brief, and optional through reduced motion and sound controls.
-5. **Close:** completion or the production cap reaches the same end card. “Dim and rest” is primary. “Back to Nindova” is secondary.
-6. **Return deliberately:** the intake can start another identical board for the same Night ID. Each start is a new bounded Session; the end card never promotes “one more.”
+5. **Close:** completion or the production cap reaches the same end card. “Dim and rest” is the only continuation from the end surface.
+6. **Return deliberately:** closing and reopening Nindova returns to intake, which can start another identical board for the same Night ID. Each open begins a new bounded Session; the end and rest surfaces never route back into play.
 
 ## Board contract
 
@@ -58,7 +58,7 @@ Reduced motion uses a short opacity change with no translation or scale. Engine 
 
 The end card keeps the immutable first line: “The session is over. That's the point.” Its primary action opens a nearly dark, optional screen-away handoff: put the phone down, close the eyes, picture one ordinary kitchen object, and let it go. This is an unvalidated product hypothesis, not CBT-I or a sleep treatment.
 
-The secondary “Back to Nindova” action returns to intake. Intake may start another Session. There is no Replay button, board counter, escalating variation, reward, missed-night language, or pressure to continue. Same-night Sessions remain deterministic and idempotent for Dawn.
+The end and rest surfaces provide no route back to intake. If the person later closes and deliberately reopens Nindova, intake may start another Session. There is no Replay button, board counter, escalating variation, reward, missed-night language, or pressure to continue. Same-night Sessions remain deterministic and idempotent for Dawn.
 
 ## Visual system
 
@@ -110,7 +110,7 @@ Nindova                                                   sound off
 - The layer structure must read without relying on drop shadows alone; overlap, vertical offset, z-order, brightness, and semantic state all need to agree.
 - The bloom can become stimulating if it is large or bright. Keep it inside the board, below full Tile luminance, and uniform for every pair.
 - A dark palette does not make the screen biologically safe. Documentation must still encourage low device brightness and the screen-away ending without making blue-light claims.
-- “More play” can undermine stopping. Support it through a neutral return to intake, not a promoted continuation action.
+- “More play” can undermine stopping. Require an actual close/reopen before intake can offer another Session.
 
 ## Open access
 
@@ -122,7 +122,7 @@ Nindova                                                   sound off
 ## Acceptance gates
 
 - Unit tests prove geometry, availability reasons, determinism, migration, reachability, and zero dead states.
-- Browser tests prove overlap/z-order, keyboard access, semantic descriptions, synchronous match state, visible brass bloom, reduced-motion fallback, rest handoff, return to intake, same-night voluntary replay, and cap preservation.
+- Browser tests prove overlap/z-order, keyboard access, semantic descriptions, synchronous match state, visible brass bloom, reduced-motion fallback, rest handoff, close/reopen same-night return, and cap preservation.
 - Rendered checks cover 320×568, 375×667, 375×812, and 1440px desktop without horizontal scroll or hidden actions.
 - Standalone HTML and composed PWA pass independently, including offline and same-origin request checks.
 - One production wall-clock Session closes within fifteen minutes.

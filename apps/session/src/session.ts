@@ -61,6 +61,8 @@ let selectedTile: string | null = null;
 let startedAtMs = 0;
 let deadlineAtMs = 0;
 let windDownAtMs = 0;
+let clockAnchorWallMs = 0;
+let clockAnchorMonotonicMs = 0;
 let virtualOffsetMs = 0;
 let audioEnabled = false;
 let audioContext: AudioContext | null = null;
@@ -169,7 +171,7 @@ function updateBoardDom(focusId: string | null = null) {
           : "settled";
     button.setAttribute("aria-label", `${motifNames[tile.motif]}, ${position}${isSelected ? ", selected" : ""}${isHinted ? ", suggested safe pair" : ""}`);
   }
-  boardShell.style.setProperty("--warmth", String(removed.size / board.tiles.length));
+  boardShell.style.setProperty("--warmth", String(1 - removed.size / board.tiles.length));
   if (focusId) requestAnimationFrame(() => tileButton(focusId)?.focus());
 }
 
@@ -194,6 +196,11 @@ function persistActiveSession() {
 
 function clearActiveSession() {
   try { safeStorage("session")?.removeItem(ACTIVE_SESSION_KEY); } catch { /* no-op */ }
+}
+
+function anchorSessionClock(wallMs: number) {
+  clockAnchorWallMs = wallMs;
+  clockAnchorMonotonicMs = performance.now();
 }
 
 function restoreActiveSession() {
@@ -237,12 +244,17 @@ function restoreActiveSession() {
     startedAtMs = Number(candidate.startedAtMs);
     deadlineAtMs = Number(candidate.deadlineAtMs);
     windDownAtMs = Number(candidate.windDownAtMs);
+    const expectedStartedAtMs = Date.parse(restoredNight.startedAt);
+    const restoredAtMs = Date.now();
     if (![startedAtMs, deadlineAtMs, windDownAtMs].every(Number.isFinite)
+      || startedAtMs !== expectedStartedAtMs
+      || startedAtMs > restoredAtMs + 5000
       || deadlineAtMs - startedAtMs !== hardCapSeconds * 1000
       || windDownAtMs - startedAtMs !== windDownSeconds * 1000) {
       clearActiveSession();
       return false;
     }
+    anchorSessionClock(Math.max(restoredAtMs, startedAtMs));
     showView("play");
     createBoardDom();
     if (candidate.phase === "settling" || restoredComplete) {
@@ -265,9 +277,10 @@ function beginSession() {
   if (!verification.valid) throw new Error(`Unverified Rasoi board: ${verification.reason}`);
   removed = new Set();
   selectedTile = null;
-  startedAtMs = Date.now();
+  startedAtMs = Date.parse(currentNight.startedAt);
   deadlineAtMs = startedAtMs + hardCapSeconds * 1000;
   windDownAtMs = startedAtMs + windDownSeconds * 1000;
+  anchorSessionClock(Date.now());
   virtualOffsetMs = 0;
   endReason = "completed";
   boardShell.classList.remove("is-settling");
@@ -422,7 +435,8 @@ function finishSession() {
 }
 
 function nowMs() {
-  return Date.now() + virtualOffsetMs;
+  const monotonicNow = clockAnchorWallMs + (performance.now() - clockAnchorMonotonicMs);
+  return Math.max(monotonicNow, Date.now()) + virtualOffsetMs;
 }
 
 function enforceBoundary() {
@@ -627,10 +641,8 @@ dawnButton.addEventListener("click", () => void openDawn());
 element<HTMLButtonElement>("closeDawnBtn").addEventListener("click", closeDawn);
 element<HTMLButtonElement>("dimRestBtn").addEventListener("click", () => {
   showView("rest");
-  element<HTMLButtonElement>("restBackBtn").focus();
+  element<HTMLElement>("restTitle").focus({ preventScroll: true });
 });
-element<HTMLButtonElement>("endBackBtn").addEventListener("click", returnToIntake);
-element<HTMLButtonElement>("restBackBtn").addEventListener("click", returnToIntake);
 element<HTMLButtonElement>("tomorrowBtn").addEventListener("click", () => {
   if (!nightState.lastCompleted) return;
   const next = NindovaNight.setTomorrowIntention(nightState, nightState.lastCompleted.nightId);

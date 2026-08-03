@@ -32,6 +32,7 @@ async function tabToTile(page, tileId) {
 try {
   for (const viewport of [
     { width: 320, height: 568 },
+    { width: 375, height: 667 },
     { width: 375, height: 812 },
     { width: 414, height: 896 },
     { width: 768, height: 1024 },
@@ -49,7 +50,15 @@ try {
     }));
     assert.equal(freeBoxes.length, 6);
     assert.ok(freeBoxes.every((box) => box.width >= 44 && box.height >= 44 && box.label?.includes("free, uncovered with an open side")));
-    if (viewport.width === 375 || viewport.width === 1440) {
+    for (const selector of ["#muteBtn", "#hintBtn", ".tile:not(:disabled)"]) {
+      const reachable = await page.locator(selector).first().evaluate((action) => {
+        action.scrollIntoView({ block: "center" });
+        const box = action.getBoundingClientRect();
+        return box.width >= 44 && box.height >= 44 && box.top >= 0 && box.bottom <= innerHeight;
+      });
+      assert.equal(reachable, true, `${selector} should be reachable at ${viewport.width}x${viewport.height}`);
+    }
+    if ((viewport.width === 320 && viewport.height === 568) || viewport.width === 375 || viewport.width === 1440) {
       await page.screenshot({ path: resolve(output, `board-${viewport.width}x${viewport.height}.png`), fullPage: true });
     }
     assert.deepEqual(errors, []);
@@ -66,6 +75,10 @@ try {
   while (await keyboard.page.evaluate(() => window.__ct.state === "play")) {
     const pair = await keyboard.page.evaluate(() => window.__ct.legalPairs[0]);
     await tabToTile(keyboard.page, pair[0]);
+    assert.equal(await keyboard.page.evaluate(() => {
+      const style = getComputedStyle(document.activeElement);
+      return style.outlineStyle !== "none" && Number.parseFloat(style.outlineWidth) >= 3;
+    }), true);
     await keyboard.page.keyboard.press("Enter");
     assert.equal(await keyboard.page.evaluate(() => window.__ct.selectedTile), pair[0]);
     await tabToTile(keyboard.page, pair[1]);

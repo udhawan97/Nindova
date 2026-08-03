@@ -10,28 +10,29 @@
 ## Rendered Session
 
 - Asserted arc: `intake → play → settling → end` after 18 legal pair removals.
-- Responsive inspection and automation: 320×568, 375×812, 414×896, 768×1024, and 1440×900.
+- Responsive inspection and automation: 320×568, 375×667, 375×812, and 1440×900, with retained 414×896 and 768×1024 coverage.
 - Native tile buttons expose form, free/covered, selected, and settled state; six starting tiles are at least 44×44 CSS pixels.
-- Keyboard-only pair removal, 200% zoom, reduced motion, visible focus, and horizontal-overflow checks pass.
+- Keyboard-only pair removal, two full touch journeys through every newly exposed layer, 200% zoom, reduced motion, computed visible focus, action reachability, and horizontal-overflow checks pass.
 - Help identifies two tiles and leaves the board unchanged.
-- A legal pair leaves through the deterministic brass bloom; reduced motion uses opacity only.
+- A legal pair leaves through a bounded, computed-visible deterministic brass bloom; reduced motion uses opacity only. Settled board screenshots and the decreasing warmth token verify that the mean board luminance does not increase after a pair leaves.
 - No-input, partial, and selected-tile paths converge through the same production-cap ending.
 
 ## Night, privacy, and return
 
-- Same-tab reload restores the exact board and removed-tile set from ephemeral session storage.
+- Same-tab reload restores the exact board and removed-tile set from ephemeral session storage. Active clocks are bound to the captured Night instant; future-corrupt and rollback cases fail safe or still close at the boundary.
 - Same-night voluntary replay selects the same Night ID, board ID, and motif order.
-- The completed Session offers a screen-away handoff and a neutral return to intake; a new same-night Session resets ephemeral board state without multiplying Dawn.
+- The completed Session offers a screen-away handoff with no route back into play; closing/reopening resets ephemeral board state without multiplying Dawn.
 - Version-3 completion is idempotent and contains no interaction timestamps.
-- Version-1/version-2 Dawn data copies into an explicit legacy completion variant without pretending it was Rasoi play.
+- Version-1 legacy Dawn data copies into an explicit legacy completion variant without pretending it was Rasoi play. A literal v0.1.0 recipe-two completion passes storage restoration, Dawn eligibility, and Dawn rendering under recipe three.
 - Browser “Not now” leaves a same-page voluntary return path. No persistence, guilt language, or native-interception claim is added.
 
 ## Dawn and distribution
 
 - Dawn uses the stored Rasoi motif order in a first-light kitchen canvas.
 - Browser evidence covers captured-zone morning boundaries, PNG download, sharing cancellation, unsupported loop fallback, and supported loop preview.
-- The `/play/` worker owns only the v4 static shell cache. Offline closure works with audio construction denied.
+- The `/play/` worker replaces a seeded v3 cache with the v4 static shell without clearing local storage. Offline closure works with audio construction denied.
 - The standalone has the same compiled Night, Rasoi, and Dawn globals without a manifest or service worker.
+- Automation decodes the rendered QR to the shared proposed canonical URL and fetches both redistributed OFL license texts from the composed site. Public hosting and a physical-device scan remain unverified.
 
 ## Honest limits
 

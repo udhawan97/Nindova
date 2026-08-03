@@ -3,6 +3,7 @@ import { spawn } from "node:child_process";
 import { mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import { chromium } from "playwright";
+import { recipeTwoCompletion } from "../fixtures/recipe-two.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const output = resolve(root, "artifacts/rasoi-dawn");
@@ -31,20 +32,9 @@ try {
   await page.goto(`http://127.0.0.1:${port}/play/?review=1`);
   await page.waitForFunction(() => Boolean(window.__ct));
   assert.equal(await page.locator("#dawnBtn").isHidden(), true);
-  await page.evaluate(() => {
-    const nightId = "2026-08-03|America/Chicago|r2";
-    const recipe = NindovaNight.recipeForNight(nightId);
-    const completion = {
-      kind: "rasoi-pairs",
-      nightId,
-      dawnDate: "2026-08-03",
-      timeZone: "America/Chicago",
-      recipeVersion: 2,
-      boardId: recipe.boardId,
-      motifOrder: recipe.motifOrder,
-    };
+  await page.evaluate((completion) => {
     NindovaNight.writeStorage(localStorage, NindovaNight.completeState(NindovaNight.emptyState(), completion).state);
-  });
+  }, recipeTwoCompletion);
   await page.reload();
   await page.evaluate((instant) => window.__ct.setDawnNow(instant), validNow);
   assert.equal(await page.locator("#dawnBtn").isVisible(), true);

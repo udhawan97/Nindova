@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { recipeTwoCompletion } from "../fixtures/recipe-two.mjs";
 
 await import("../../apps/session/dist/night-core.js");
 const Night = globalThis.NindovaNight;
@@ -103,16 +104,17 @@ test("v2 Dawn data migrates into the v3 union without deleting its source", () =
 });
 
 test("recipe-two Rasoi completion remains available after the layered recipe upgrade", () => {
-  const previous = rasoiCompletion("2026-08-03|America/Chicago|r2");
-  previous.recipeVersion = 2;
-  previous.boardId = "rasoi-r2-previous";
-  const decoded = Night.decodeState(JSON.stringify({
+  const values = new Map([[Night.STORAGE_KEY, JSON.stringify({
     ...Night.emptyState(),
-    lastCompleted: previous,
-  }));
-  assert.equal(decoded.reason, "ok");
-  assert.equal(decoded.state.lastCompleted.recipeVersion, 2);
-  assert.equal(decoded.state.lastCompleted.boardId, "rasoi-r2-previous");
+    lastCompleted: recipeTwoCompletion,
+  })]]);
+  const storage = {
+    getItem(name) { return values.get(name) ?? null; },
+    setItem(name, value) { values.set(name, value); },
+  };
+  const restored = Night.readStorage(storage);
+  assert.equal(restored.reason, "ok");
+  assert.deepEqual(restored.state.lastCompleted, { ...recipeTwoCompletion, motifOrder: [...recipeTwoCompletion.motifOrder] });
 });
 
 test("tomorrow intention is quiet, completion-bound, and idempotent", () => {

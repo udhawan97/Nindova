@@ -14,7 +14,7 @@ Rasoi Pairs is inspired by the readable free-tile rule of Mahjong solitaire. It 
 5. **Ask for help if wanted** — a safe pair breathes briefly. Help never removes tiles.
 6. **Close** — the cleared board settles under its brass lid. If the hidden production boundary arrives first, the remaining kitchen settles under the same lid and reaches the same end card.
 
-The end card begins: “The session is over. That's the point.” Its primary action opens an optional screen-away handoff. “Back to Nindova” returns to intake, where another separately bounded same-night Session is possible without a promoted replay action.
+The end card begins: “The session is over. That's the point.” Its primary action opens an optional screen-away handoff. Neither surface routes back into play. Closing and deliberately reopening Nindova returns to intake, where another separately bounded same-night Session is possible.
 
 ## Board guarantee
 

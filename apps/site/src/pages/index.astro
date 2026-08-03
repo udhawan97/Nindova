@@ -1,11 +1,12 @@
 ---
 import "../styles/global.css";
+import publicFacts from "../../../../public-facts.json";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const href = (path: string) => `${base}${path}` || "/";
 const releaseUrl = "https://github.com/udhawan97/Nindova/releases/tag/v0.1.0";
 const standaloneUrl = href("/nindova.html");
-const canonicalPlayUrl = "https://udhawan97.github.io/Nindova/play/";
+const { canonicalPlayUrl } = publicFacts;
 ---
 
 <!doctype html>
@@ -119,7 +120,7 @@ const canonicalPlayUrl = "https://udhawan97.github.io/Nindova/play/";
       <section class="boundary-section" aria-labelledby="boundary-title">
         <header>
           <p class="eyebrow">A game with an exit</p>
-          <h2 id="boundary-title">Satisfaction stays inside the Session.</h2>
+          <h2 id="boundary-title">Feedback stays inside the Session.</h2>
         </header>
         <div class="boundary-grid">
           <div>
@@ -164,7 +165,7 @@ const canonicalPlayUrl = "https://udhawan97.github.io/Nindova/play/";
         </div>
         <ul>
           <li><strong>No account</strong><span>Open the file or PWA and begin.</span></li>
-          <li><strong>Zero telemetry</strong><span>No analytics, ads, or remote logging.</span></li>
+          <li><strong>Zero app telemetry</strong><span>No analytics, ads, or app-controlled remote logging.</span></li>
           <li><strong>Offline-ready</strong><span>Installable PWA plus a standalone HTML.</span></li>
           <li><strong>Accessible rule</strong><span>Native buttons, 44px targets, keyboard, reduced motion, and visible names.</span></li>
         </ul>
@@ -173,17 +174,17 @@ const canonicalPlayUrl = "https://udhawan97.github.io/Nindova/play/";
       <section class="qr-section" aria-labelledby="qr-title">
         <div class="qr-copy">
           <p class="eyebrow">Free, open, and direct</p>
-          <h2 id="qr-title">Scan straight to the kitchen.</h2>
+          <h2 id="qr-title">A direct QR, ready for publication.</h2>
           <p>
-            This QR contains the full canonical play address—no shortener, redirect tracker, account,
-            or advertising identifier. The same address is printed below for verification.
+            This source candidate generates a QR containing the proposed canonical play address—no
+            shortener, campaign parameter, account, or advertising identifier. The same address is printed below for verification.
           </p>
-          <a class="canonical-url" href={canonicalPlayUrl}>{canonicalPlayUrl}</a>
-          <p class="honesty-note">The Pages workflow is configured in this source candidate; live deployment remains separately verified after publication.</p>
+          <code class="canonical-url">{canonicalPlayUrl}</code>
+          <p class="honesty-note">Public hosting is not configured by this candidate. The address and scan path remain unavailable until a separate publication is authorized and observed.</p>
         </div>
         <figure class="qr-art">
           <img src={href("/play-qr.svg")} width="396" height="396" alt={`QR code for ${canonicalPlayUrl}`} />
-          <figcaption>Direct URL · no tracking parameters</figcaption>
+          <figcaption>Proposed direct URL · no tracking parameters</figcaption>
         </figure>
       </section>
 
@@ -207,6 +208,7 @@ const canonicalPlayUrl = "https://udhawan97.github.io/Nindova/play/";
       <nav aria-label="Footer navigation">
         <a href={href("/docs/")}>Documentation</a>
         <a href="https://github.com/udhawan97/Nindova">GitHub</a>
+        <a href={href("/licenses/geist-OFL-1.1.txt")}>Third-party notices</a>
         <a href={releaseUrl}>v0.1.0 history</a>
       </nav>
       <p>Behavioral design study · 13+ · Apache-2.0</p>

@@ -68,7 +68,18 @@ try {
   await selected.page.waitForFunction(() => window.__ct.state === "end");
   assert.equal(await selected.page.evaluate(() => window.__ct.endReason), "production-cap");
   await selected.context.close();
-  console.log("Rasoi hint and no-input, partial-input, selected-tile, and production-boundary checks passed.");
+
+  const rolledBackClock = await open();
+  await rolledBackClock.page.click("#beginBtn");
+  await rolledBackClock.page.evaluate(() => {
+    const realNow = Date.now;
+    Date.now = () => realNow() - 7_200_000;
+    window.__ct.advanceBy(window.__ct.hardCapSeconds);
+  });
+  await rolledBackClock.page.waitForFunction(() => window.__ct.state === "end");
+  assert.equal(await rolledBackClock.page.evaluate(() => window.__ct.endReason), "production-cap");
+  await rolledBackClock.context.close();
+  console.log("Rasoi hint, no-input, partial-input, selected-tile, clock-rollback, and production-boundary checks passed.");
 } finally {
   await browser.close();
 }

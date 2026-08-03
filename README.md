@@ -9,14 +9,14 @@ Nindova is a calm, bounded pair-removal game for the end of the day. **Masala Mo
 ## Get Nindova
 
 - Build the v0.2.0 source candidate locally for the layered Session, installable offline PWA, documentation, and self-contained `nindova.html`.
-- The direct, non-tracking QR targets `https://udhawan97.github.io/Nindova/play/`. A Pages workflow is configured, but the live deployment is not claimed until it is published and observed.
+- The proposed direct, non-tracking QR targets `https://udhawan97.github.io/Nindova/play/`. Public hosting is not configured by this candidate, so that route and a real scan remain unavailable until publication is separately authorized and observed.
 - [Open the v0.1.0 release](https://github.com/udhawan97/Nindova/releases/tag/v0.1.0) for the previous flat-rack build and its checksums.
 
-Until the Pages candidate is published, `/play/` works after serving a local build and `dist/nindova.html` works as a self-contained file.
+Until a public build is separately authorized and published, `/play/` works after serving a local build and `dist/nindova.html` works as a self-contained file.
 
-<img src="./apps/site/public/play-qr.svg" width="180" alt="Direct QR for the canonical Nindova play URL">
+<img src="./apps/site/public/play-qr.svg" width="180" alt="Proposed direct QR for the future canonical Nindova play URL">
 
-The QR encodes the full canonical URL with no shortener or tracking parameter. Keep the printed URL with the code so people can verify its destination.
+The QR artifact encodes the full proposed URL with no shortener or tracking parameter. Keep the printed URL with the code so people can verify its destination after publication.
 
 ## The experience
 
@@ -27,7 +27,7 @@ The QR encodes the full canonical URL with no shortener or tracking parameter. K
 - **No performance layer.** No score, count, timer, streak, achievement, grade, collection, missed-night state, or randomized reward.
 - **A real ending.** Clearing the board closes the Session. If left unfinished, it settles itself before the hidden fifteen-minute ceiling. The primary handoff asks the person to put the screen down.
 - **Dawn, by choice.** From 06:00 through 11:59 in the captured Night ID zone, the previous night’s kitchen forms return as a first-light still and optional silent loop.
-- **Voluntary return.** “Not now” leaves Nindova available later that same night. After completion, “Back to Nindova” makes another separately bounded Session possible without promoting one more board.
+- **Voluntary return.** “Not now” leaves Nindova available later that same night. After completion, closing and deliberately reopening Nindova starts another separately bounded Session on the identical board without multiplying Dawn.
 
 ## Punjabi and Indian direction
 
@@ -80,13 +80,13 @@ See [Testing](./apps/site/src/content/docs/docs/testing.md) and the [public-surf
 
 ## Privacy and local state
 
-Nindova has no account, analytics, telemetry, ads, remote logging, or third-party runtime request. The production Session is static and same-origin.
+Nindova has no account, analytics, app telemetry, ads, app-controlled remote logging, or third-party runtime request. The production Session is static and same-origin. A static host may keep its own operational access logs outside the app's control.
 
 Long-lived local storage contains one version-3 record with only the latest completion facts needed by Dawn, a safely migrated legacy Dawn variant when present, and the optional local “Same time tomorrow?” intention. Interaction timing exists only in same-tab session storage to enforce resume and closure; it is not written to the long-lived record. Generated images and loops remain local blobs unless the person explicitly saves or shares them.
 
 ## Product and evidence boundary
 
-Nindova is a behavioral design study for people aged 13 and up. It is not a sleep tracker, sleep-performance tool, memory intervention, or treatment. Masala Mound uses recognition, visual search, and spatial planning, but has not been clinically shown to make people sleepy, produce a useful dopamine response, improve general memory, or improve sleep. Persistent sleep difficulty deserves evidence-based care such as CBT-I with a qualified clinician.
+Nindova is a behavioral design study for people aged 13 and up. It is not a sleep tracker, sleep-performance tool, memory intervention, or treatment. Masala Mound uses recognition, visual search, and spatial planning, but has not been clinically shown to make people sleepy, produce a useful dopamine response, improve general memory, or improve sleep at any age. Persistent sleep difficulty deserves evidence-based care such as CBT-I with a qualified clinician.
 
 The browser and standalone surfaces are implemented. The iOS Wall is deferred and is not represented as shipped. Chromium automation covers the release surfaces; broader installed Safari/Android proof, real-device VoiceOver/TalkBack acceptance, and human Punjabi cultural review remain open limitations.
 
@@ -97,3 +97,5 @@ Read [CONTEXT.md](./CONTEXT.md), the [layered Rasoi plan](./docs/LAYERED-RASOI-P
 ## License
 
 Nindova is licensed under the [Apache License 2.0](./LICENSE). It is free to use, modify, and distribute under that license and its notice requirements.
+
+Redistributed font licenses are listed in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md) and shipped with the composed site.

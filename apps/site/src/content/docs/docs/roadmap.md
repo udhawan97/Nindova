@@ -13,7 +13,7 @@ description: What exists in the v0.2.0 source candidate and what remains deliber
 - Version-3 local state with safe v1/v2 Dawn migration, recipe-two completion preservation, and same-tab resume.
 - Redesigned first-light kitchen Dawn with local still and silent-loop export.
 - Self-contained standalone HTML and separately tested installable offline PWA.
-- Synchronized landing page, Starlight docs, rendered candidate media, Apache-2.0 licensing, direct QR, and Pages workflow.
+- Synchronized landing page, Starlight docs, rendered candidate media, Apache-2.0 licensing, and a locally verified QR artifact for a proposed future public route.
 
 The public GitHub release remains v0.1.0 until this candidate is separately approved, tagged, and published.
 

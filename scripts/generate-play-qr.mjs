@@ -1,8 +1,9 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import QRCode from "qrcode";
+import publicFacts from "../public-facts.json" with { type: "json" };
 
-const canonicalPlayUrl = "https://udhawan97.github.io/Nindova/play/";
+const { canonicalPlayUrl } = publicFacts;
 const output = resolve(import.meta.dirname, "../apps/site/public/play-qr.svg");
 const svg = await QRCode.toString(canonicalPlayUrl, {
   type: "svg",
@@ -13,4 +14,4 @@ const svg = await QRCode.toString(canonicalPlayUrl, {
 
 await mkdir(resolve(output, ".."), { recursive: true });
 await writeFile(output, svg.endsWith("\n") ? svg : `${svg}\n`, "utf8");
-console.log(`Generated direct play QR for ${canonicalPlayUrl}`);
+console.log(`Generated proposed direct play QR for ${canonicalPlayUrl}`);

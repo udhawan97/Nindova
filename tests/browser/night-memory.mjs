@@ -42,6 +42,24 @@ try {
 
   const validActiveRecord = await page.evaluate((key) => sessionStorage.getItem(key), activeSessionKey);
   assert.equal(JSON.parse(validActiveRecord).phase, "play");
+  const futureRecord = JSON.parse(validActiveRecord);
+  futureRecord.startedAtMs += 86_400_000;
+  futureRecord.windDownAtMs += 86_400_000;
+  futureRecord.deadlineAtMs += 86_400_000;
+  await page.addInitScript(({ key, value }) => {
+    if (!sessionStorage.getItem("nindova:test:future-clock-injected")) {
+      sessionStorage.setItem(key, value);
+      sessionStorage.setItem("nindova:test:future-clock-injected", "1");
+    }
+  }, { key: activeSessionKey, value: JSON.stringify(futureRecord) });
+  await page.reload();
+  await page.waitForFunction(() => Boolean(window.__ct));
+  assert.equal(await page.evaluate(() => window.__ct.state), "intake");
+  assert.equal(await page.evaluate((key) => sessionStorage.getItem(key), activeSessionKey), null);
+
+  await page.evaluate(({ key, value }) => sessionStorage.setItem(key, value), { key: activeSessionKey, value: validActiveRecord });
+  await page.reload();
+  await page.waitForFunction(() => window.__ct.state === "play");
   const corruptNightRecord = JSON.parse(validActiveRecord);
   delete corruptNightRecord.night.dawnDate;
   delete corruptNightRecord.night.timeZone;
@@ -120,7 +138,7 @@ try {
   assert.deepEqual(Object.keys(firstMemory).sort(), ["lastCompleted", "legacyMemory", "tomorrowIntention", "version"]);
   assert.deepEqual(errors, []);
   assert.equal(Night.SCHEMA_VERSION, 3);
-  console.log("Rasoi dismissal return, reload resume, deterministic replay, and idempotent local memory checks passed.");
+  console.log("Rasoi dismissal return, strict clock-bound resume, deterministic replay, and idempotent local memory checks passed.");
 } finally {
   await context.close();
   await browser.close();

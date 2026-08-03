@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { resolve } from "node:path";
+import jsQR from "jsqr";
+import { PNG } from "pngjs";
 import { chromium } from "playwright";
+import publicFacts from "../../public-facts.json" with { type: "json" };
 
 const root = resolve(import.meta.dirname, "../..");
 const port = 4189;
@@ -37,6 +40,20 @@ try {
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 375);
   const publicCopy = await page.locator("body").innerText();
   assert.ok(publicCopy.includes("Nothing to win. Nothing tracked. Nothing you can do wrong."));
+  assert.equal(await page.locator('a.button-primary').first().getAttribute("href"), `${mountPath ? `/${mountPath}` : ""}/play/`);
+  const qrPng = PNG.sync.read(await page.locator(".qr-art img").screenshot());
+  const decodedQr = jsQR(new Uint8ClampedArray(qrPng.data), qrPng.width, qrPng.height);
+  assert.equal(decodedQr?.data, publicFacts.canonicalPlayUrl);
+  for (const licensePath of ["licenses/geist-OFL-1.1.txt", "licenses/newsreader-OFL-1.1.txt"]) {
+    const license = await page.evaluate((url) => fetch(url).then(async (response) => ({ ok: response.ok, text: await response.text() })), licensePath);
+    assert.equal(license.ok, true);
+    assert.match(license.text, /SIL OPEN FONT LICENSE Version 1\.1/);
+  }
+  await page.evaluate(async () => {
+    const legacy = await caches.open("nindova-session-v3");
+    await legacy.put(new Request(`${location.origin}/legacy-shell`), new Response("old"));
+    localStorage.setItem("nindova:test:update-sentinel", "kept");
+  });
 
   await page.goto(`${base}?review=1`);
   await page.waitForFunction(() => Boolean(window.__ct));
@@ -53,7 +70,9 @@ try {
   });
   assert.equal(registration.scope, base);
   assert.ok(registration.keys.includes("nindova-session-v4"));
+  assert.equal(registration.keys.includes("nindova-session-v3"), false);
   assert.ok(registration.entries.every((url) => url.startsWith(base) && !url.includes("night-state") && !url.startsWith("blob:")));
+  assert.equal(await page.evaluate(() => localStorage.getItem("nindova:test:update-sentinel")), "kept");
 
   await page.click("#notNowBtn");
   await page.click("#returnBtn");
@@ -90,7 +109,7 @@ try {
   assert.deepEqual(portableErrors, []);
   assert.ok(requests.every((url) => new URL(url).origin === new URL(base).origin));
   assert.deepEqual(errors, []);
-  console.log("Rasoi PWA install, same-tab resume, denied audio, offline closure, local return, privacy, and standalone checks passed.");
+  console.log("Rasoi PWA update, QR decode, license, same-tab resume, denied audio, offline closure, privacy, and standalone checks passed.");
 } finally {
   await context.setOffline(false).catch(() => {});
   await context.close();

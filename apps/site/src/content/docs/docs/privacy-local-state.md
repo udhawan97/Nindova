@@ -5,7 +5,7 @@ description: What Rasoi Pairs stores, what the offline cache contains, and what 
 
 ## Runtime boundary
 
-The Session makes same-origin static requests only. It has no account, analytics, telemetry, advertising, remote logging, social SDK, or third-party runtime dependency. Generated Dawn stills and loops remain in-memory blobs until the person explicitly saves or shares them.
+The Session makes same-origin static requests only. It has no account, analytics, app telemetry, advertising, app-controlled remote logging, social SDK, or third-party runtime dependency. A static host may retain operational access logs outside the app's control. Generated Dawn stills and loops remain in-memory blobs until the person explicitly saves or shares them.
 
 ## Long-lived record
 

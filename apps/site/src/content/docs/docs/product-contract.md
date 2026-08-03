@@ -17,7 +17,7 @@ Anything that makes tonight harder to leave is a bug.
 - The board is authored and deterministic. Every reachable nonterminal state exposes a legal pair, and every legal choice preserves solvability.
 - Help identifies a safe pair but does not remove it.
 - Audio, animation, precision movement, and sight are optional; native controls and visible text names carry the rule.
-- State stays local. There is no account, analytics, advertising, telemetry, remote logging, or third-party runtime request.
+- State stays local. There is no account, analytics, advertising, app telemetry, app-controlled remote logging, or third-party runtime request. Static-host operational logs are outside the app boundary.
 - Same-night voluntary return is quiet, identical, idempotent, and starts from intake rather than a promoted replay button.
 - “Not now” never prevents a voluntary return later that night.
 - “Same time tomorrow?” stores a local intention, sends no notification, and creates no urgency.
@@ -29,7 +29,7 @@ The intake promise is: “Nothing to win. Nothing tracked. Nothing you can do wr
 
 The end card begins: “The session is over. That's the point.”
 
-Nindova is a behavioral design study for people aged 13 and up. It is not a sleep tracker, sleep-performance tool, memory intervention, or treatment. Masala Mound has not been clinically shown to make people sleepy, improve sleep, improve general memory, or create a useful dopamine response. Persistent sleep difficulty deserves evidence-based care such as CBT-I with a qualified clinician.
+Nindova is a behavioral design study for people aged 13 and up. It is not a sleep tracker, sleep-performance tool, memory intervention, or treatment. Masala Mound has not been clinically shown to make people sleepy, improve sleep, improve general memory, or create a useful dopamine response at any age. Persistent sleep difficulty deserves evidence-based care such as CBT-I with a qualified clinician.
 
 ## Cultural direction
 

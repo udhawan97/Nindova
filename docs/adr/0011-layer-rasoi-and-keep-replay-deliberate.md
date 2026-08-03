@@ -6,7 +6,7 @@ Nindova will replace the racks with **Masala Mound**, an authored three-layer bo
 
 Each pair receives one restrained, deterministic **brass bloom**. The paired Tiles move slightly toward their midpoint, compress, and leave a dim ring before settling. Sound remains optional and reduced motion removes translation and scale. Nindova does not describe this response as a dopamine effect or randomized reward.
 
-The completed Session first offers a screen-away rest handoff. A secondary “Back to Nindova” action returns to intake, where the person may deliberately begin another separately bounded Session. Replay is therefore possible later that night but is not promoted on the end card. Same-night repetition cannot multiply Dawn state or change the deterministic board.
+The completed Session offers only a screen-away rest handoff. The end and rest surfaces contain no route back into play. Closing and deliberately reopening Nindova returns to intake, where the person may begin another separately bounded Session. Same-night repetition cannot multiply Dawn state or change the deterministic board.
 
 This decision is informed by [the bedtime-game evidence review](../research/bedtime-game-evidence.md). Current evidence does not establish this game as a sleep, memory, or dopamine intervention. Product copy will describe its observable behavior: a calm, bounded recognition and spatial-planning exercise designed to be easier to stop.
 

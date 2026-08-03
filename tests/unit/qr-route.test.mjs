@@ -2,10 +2,11 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import QRCode from "qrcode";
+import publicFacts from "../../public-facts.json" with { type: "json" };
 
-const canonicalPlayUrl = "https://udhawan97.github.io/Nindova/play/";
+const { canonicalPlayUrl } = publicFacts;
 
-test("the published QR is deterministic, direct, and contains no runtime content", async () => {
+test("the proposed QR is deterministic, direct, and contains no runtime content", async () => {
   const url = new URL(canonicalPlayUrl);
   assert.deepEqual(
     { protocol: url.protocol, host: url.host, path: url.pathname, query: url.search, hash: url.hash },
