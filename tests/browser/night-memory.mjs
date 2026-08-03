@@ -75,6 +75,23 @@ try {
   await page.evaluate(({ key, value }) => sessionStorage.setItem(key, value), { key: activeSessionKey, value: validActiveRecord });
   await page.reload();
   await page.waitForFunction(() => window.__ct.state === "play");
+  const impossibleSettlement = JSON.parse(validActiveRecord);
+  impossibleSettlement.phase = "settling";
+  impossibleSettlement.endReason = "completed";
+  await page.addInitScript(({ key, value }) => {
+    if (!sessionStorage.getItem("nindova:test:impossible-settlement-injected")) {
+      sessionStorage.setItem(key, value);
+      sessionStorage.setItem("nindova:test:impossible-settlement-injected", "1");
+    }
+  }, { key: activeSessionKey, value: JSON.stringify(impossibleSettlement) });
+  await page.reload();
+  await page.waitForFunction(() => Boolean(window.__ct));
+  assert.equal(await page.evaluate(() => window.__ct.state), "intake");
+  assert.equal(await page.evaluate((key) => sessionStorage.getItem(key), activeSessionKey), null);
+
+  await page.evaluate(({ key, value }) => sessionStorage.setItem(key, value), { key: activeSessionKey, value: validActiveRecord });
+  await page.reload();
+  await page.waitForFunction(() => window.__ct.state === "play");
   await page.evaluate(() => {
     while (window.__ct.state === "play") {
       const pair = window.__ct.legalPairs[0];

@@ -215,6 +215,12 @@ function restoreActiveSession() {
       clearActiveSession();
       return false;
     }
+    const restoredComplete = NindovaRasoi.isComplete(restoredBoard, restoredRemoved);
+    if ((candidate.phase === "play" && candidate.endReason !== "completed")
+      || (candidate.phase === "settling" && candidate.endReason === "completed" && !restoredComplete)) {
+      clearActiveSession();
+      return false;
+    }
     currentNight = restoredNight;
     board = restoredBoard;
     removed = restoredRemoved;
@@ -230,7 +236,7 @@ function restoreActiveSession() {
     }
     showView("play");
     createBoardDom();
-    if (candidate.phase === "settling" || NindovaRasoi.isComplete(restoredBoard, restoredRemoved)) {
+    if (candidate.phase === "settling" || restoredComplete) {
       settle(candidate.endReason);
       return true;
     }

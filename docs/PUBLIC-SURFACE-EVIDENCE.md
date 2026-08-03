@@ -15,7 +15,7 @@
 
 - Long-lived state sanitization excludes interaction timestamps and safely copies v1/v2 Dawn state into a v3 union without deleting the source key.
 - Same-night completion is idempotent; voluntary replay selects the same board ID and motif order.
-- Same-tab active state accepts only a complete Night capture, exact boundary times, and a reachable legal removal history. Invalid records fail open, and reload during settlement resumes closure instead of restoring a dead board.
+- Same-tab active state accepts only a complete Night capture, exact boundary times, a reachable legal removal history, and a possible phase/reason combination. Invalid records fail open, and reload during settlement resumes closure instead of restoring a dead board.
 - The runtime contains no analytics, account, advertising, remote-logging, or third-party request code. Browser request capture remains same-origin.
 - Production begins its automatic settle at twelve minutes and has a hard fifteen-minute ceiling; reviewer timing compresses only those boundaries.
 

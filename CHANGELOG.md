@@ -17,7 +17,7 @@
 - Replaced the rejected desk, Vista, Visitor, and Drift game with the approved Rasoi Pairs experience.
 - Reframed the Punjabi/Indian direction around everyday kitchen forms and restrained material craft.
 - Tightened product claims: no clinical sleep, dopamine, CBT-I endorsement, or completed cultural-authenticity claim.
-- Hardened same-tab resume to reject incomplete, invalid, duplicate, or unreachable ephemeral records and to continue quiet closure after a reload during settlement.
+- Hardened same-tab resume to reject incomplete, invalid, duplicate, unreachable, or impossible phase/reason records and to continue quiet closure after a reload during settlement.
 - Moved keyboard focus deterministically to the next free tile after each pair and exposed hints through both live text and tile labels.
 
 ### Removed

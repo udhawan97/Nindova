@@ -1,7 +1,7 @@
-# Graph Report - .  (2026-08-03)
+# Graph Report - Nindova  (2026-08-03)
 
 ## Corpus Check
-- 85 files · ~50,487 words
+- 78 files · ~50,593 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -9,16 +9,21 @@
 - Extraction: 86% EXTRACTED · 14% INFERRED · 0% AMBIGUOUS · INFERRED: 107 edges (avg confidence: 0.76)
 - Token cost: 0 input · 0 output
 
+## Graph Freshness
+- Built from commit: `094d680e`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
+
 ## Community Hubs (Navigation)
 - session.ts
-- Community 1
+- Rasoi Pairs
 - night-core.ts
-- Community 6
+- Release Automated Gates
 - scripts
-- Community 3
+- Rasoi Pairs Session Interface
 - rasoi-core.ts
 - Nindova Master Brief
-- Community 8
+- Calm Bounded Pair-removal Promise
 - Rasoi Pairs v0.1.0 Change Set
 - compilerOptions
 - site/package.json
@@ -34,11 +39,11 @@
 - color-contrast.test.mjs
 - dawn-core.test.mjs
 - Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks
-- Composed Build Script
+- compose-build.mjs
 - dawn.mjs
 - portrait-accessibility.mjs
 - seed-asserted.mjs
-- session.ts
+- test-demo.mjs
 - serve.mjs
 - self-closing.mjs
 - wall-clock-cap.mjs
@@ -52,10 +57,10 @@
 - Hybrid Procedural and Composed Audio
 - Portrait-First Session
 - Public Site and Session Separation
-- Rasoi Pairs Product Promise
-- Untested Public-surface Risks
-- Universal 343-State Solvability
-- Privacy and Local State
+- Monotonic Fifteen-minute Session Cap
+- M5 Honest Verification Boundary
+- Deterministic Solvable Closure
+- Local-Only Privacy Boundary
 - Observational Test Limitation
 
 ## God Nodes (most connected - your core abstractions)
@@ -101,7 +106,7 @@
 Cohesion: 0.08
 Nodes (52): NindovaDawn, NindovaNight, NindovaRasoi, advanceBy(), beginSession(), boardElement, boardShell, boardStatus (+44 more)
 
-### Community 1 - "Community 1"
+### Community 1 - "Rasoi Pairs"
 Cohesion: 0.06
 Nodes (43): Chai Tile Pair, Chimta Tile Pair, The Edge Tiles Are Ready Status, Visible Free Edge Pairs, Katori Tile Pair, Indian Kitchen Tile Motifs, Match Free Edge Tiles, Punjabi-inspired Material Direction (+35 more)
 
@@ -109,7 +114,7 @@ Nodes (43): Chai Tile Pair, Chimta Tile Pair, The Edge Tiles Are Ready Status, V
 Cohesion: 0.10
 Nodes (37): addCivilDays(), captureNight(), CLOTHS, completeState(), createPrng(), decodeState(), emptyState(), isText() (+29 more)
 
-### Community 3 - "Community 6"
+### Community 3 - "Release Automated Gates"
 Cohesion: 0.06
 Nodes (39): Rasoi Pairs Accessibility, Accessible Alternate Presentation, Live Semantic Selection and Hint Feedback, Real-device Assistive Technology Limit, Semantic Tile Controls, Nindova Getting Started, Standalone and Composed Release Surfaces, Active-record Recovery and Reload Settlement Tests (+31 more)
 
@@ -117,7 +122,7 @@ Nodes (39): Rasoi Pairs Accessibility, Accessible Alternate Presentation, Live S
 Cohesion: 0.05
 Nodes (38): @astrojs/check, devDependencies, @astrojs/check, @playwright/test, @types/node, typescript, engines, node (+30 more)
 
-### Community 5 - "Community 3"
+### Community 5 - "Rasoi Pairs Session Interface"
 Cohesion: 0.06
 Nodes (38): Session Asset Provenance, First-Light Dawn Surface, Browser Dismissal Surface, Voluntary Intake Surface, Scoped PWA Bootstrap, Quiet End Card, Rasoi Pairs Session Interface, Semantic Rasoi Board (+30 more)
 
@@ -129,7 +134,7 @@ Nodes (25): RasoiDebug, RasoiTileSnapshot, SessionState, Window, activeTiles(), 
 Cohesion: 0.09
 Nodes (30): User-Chosen Unguilted Wall, Asymmetric Vista Memory, Fifteen-Minute Session Cap, Browser and PWA Before iOS Wall, Codex Kickoff Protocol, Decay-Driven Assistance, Dual Pacing Profiles, Fixed Session State Arc (+22 more)
 
-### Community 8 - "Community 8"
+### Community 8 - "Calm Bounded Pair-removal Promise"
 Cohesion: 0.08
 Nodes (26): Universal 343-state Board Guarantee, Deliberately Deferred iOS Wall, Human and Device Hardening, Nindova v0.1.0 Roadmap, Shipped Rasoi v0.1.0 Surface, 343-state Verified Browser Arc, All Eighteen Pairs by Keyboard at 200 Percent Zoom, Production Fifteen-minute Hard Ceiling (+18 more)
 
@@ -189,7 +194,7 @@ Nodes (5): bodyPairs, luminance(), ratio(), root, token()
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks, Source Nodes
 
-### Community 24 - "Composed Build Script"
+### Community 24 - "compose-build.mjs"
 Cohesion: 0.40
 Nodes (4): output, root, sessionOutput, siteOutput
 
@@ -201,7 +206,7 @@ Nodes (4): errors, output, root, server
 Cohesion: 0.40
 Nodes (4): errors, output, root, states
 
-### Community 28 - "session.ts"
+### Community 28 - "test-demo.mjs"
 Cohesion: 0.50
 Nodes (3): errors, page, state()
 
@@ -225,17 +230,17 @@ Nodes (3): Cultural Visual Guardrails, Punjabi and Indian Material World, Theme 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Rasoi Pairs` connect `Community 1` to `Community 8`, `Community 6`?**
+- **Why does `Rasoi Pairs` connect `Rasoi Pairs` to `Calm Bounded Pair-removal Promise`, `Release Automated Gates`?**
   _High betweenness centrality (0.028) - this node is a cross-community bridge._
-- **Why does `Calm Bounded Pair-removal Promise` connect `Community 8` to `Community 1`?**
+- **Why does `Calm Bounded Pair-removal Promise` connect `Calm Bounded Pair-removal Promise` to `Rasoi Pairs`?**
   _High betweenness centrality (0.020) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `private` to the rest of the system?**
   _233 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `session.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.08315863032844165 - nodes in this community are weakly interconnected._
-- **Should `Community 1` be split into smaller, more focused modules?**
+- **Should `Rasoi Pairs` be split into smaller, more focused modules?**
   _Cohesion score 0.05537098560354374 - nodes in this community are weakly interconnected._
 - **Should `night-core.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.10128205128205128 - nodes in this community are weakly interconnected._
-- **Should `Community 6` be split into smaller, more focused modules?**
+- **Should `Release Automated Gates` be split into smaller, more focused modules?**
   _Cohesion score 0.0553306342780027 - nodes in this community are weakly interconnected._

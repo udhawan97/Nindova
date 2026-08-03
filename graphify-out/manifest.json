@@ -85,9 +85,9 @@
     "semantic_hash": "dbec1146f0f301e0d52aee55c0842475"
   },
   "tests/browser/night-memory.mjs": {
-    "mtime": 1785738750.9547331,
-    "ast_hash": "e259acaca547aa5efb858d72fe6e78c7",
-    "semantic_hash": "e259acaca547aa5efb858d72fe6e78c7"
+    "mtime": 1785740432.2445982,
+    "ast_hash": "f6d08af3219f9275901d4e84a22aeee6",
+    "semantic_hash": ""
   },
   "tests/browser/portrait-accessibility.mjs": {
     "mtime": 1785738709.7915328,
@@ -200,9 +200,9 @@
     "semantic_hash": "27b3cfd221240c94c1a5fdc684363d53"
   },
   "apps/site/src/content/docs/docs/privacy-local-state.md": {
-    "mtime": 1785738781.791586,
-    "ast_hash": "b15657d0952afd187122fc80a29f16d1",
-    "semantic_hash": "b15657d0952afd187122fc80a29f16d1"
+    "mtime": 1785740432.245115,
+    "ast_hash": "90a4699b1fae546251356e9b1e547f83",
+    "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/product-contract.md": {
     "mtime": 1785735891.8480024,
@@ -350,9 +350,9 @@
     "semantic_hash": "c7072745b36f3b1c36b9e02dbb63e137"
   },
   "apps/session/src/session.ts": {
-    "mtime": 1785739252.5935807,
-    "ast_hash": "85514552b4dac86c3a916661be6b7f71",
-    "semantic_hash": "85514552b4dac86c3a916661be6b7f71"
+    "mtime": 1785740432.2441893,
+    "ast_hash": "4c8507470e741dab73e70f16dd261496",
+    "semantic_hash": ""
   },
   "apps/session/tsconfig.session.json": {
     "mtime": 1785726495.2841625,
@@ -375,14 +375,14 @@
     "semantic_hash": "c09125587bf96d226cfb1880f8512b7d"
   },
   "CHANGELOG.md": {
-    "mtime": 1785738967.8982255,
-    "ast_hash": "56ad2e9c9478536d7a1dc2c623cf567d",
-    "semantic_hash": "56ad2e9c9478536d7a1dc2c623cf567d"
+    "mtime": 1785740432.2458327,
+    "ast_hash": "e703ccbe52d2b4437563b42b7f7b668f",
+    "semantic_hash": ""
   },
   "docs/PUBLIC-SURFACE-EVIDENCE.md": {
-    "mtime": 1785738967.8992908,
-    "ast_hash": "94d2f8a9db19cf6e1cbc84ccf304f7c2",
-    "semantic_hash": "94d2f8a9db19cf6e1cbc84ccf304f7c2"
+    "mtime": 1785740432.245588,
+    "ast_hash": "639c6f802a475f4cd4fa87625b807d7c",
+    "semantic_hash": ""
   },
   "docs/REDESIGN-PLAN.md": {
     "mtime": 1785738112.061571,
