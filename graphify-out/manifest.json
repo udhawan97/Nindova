@@ -87,12 +87,12 @@
   "tests/browser/night-memory.mjs": {
     "mtime": 1785738750.9547331,
     "ast_hash": "e259acaca547aa5efb858d72fe6e78c7",
-    "semantic_hash": ""
+    "semantic_hash": "e259acaca547aa5efb858d72fe6e78c7"
   },
   "tests/browser/portrait-accessibility.mjs": {
     "mtime": 1785738709.7915328,
     "ast_hash": "fc6039f0f65340439cce47ae36358da1",
-    "semantic_hash": ""
+    "semantic_hash": "fc6039f0f65340439cce47ae36358da1"
   },
   "tests/browser/pwa-offline.mjs": {
     "mtime": 1785735243.2122443,
@@ -107,7 +107,7 @@
   "tests/browser/self-closing.mjs": {
     "mtime": 1785738709.7922254,
     "ast_hash": "bd62cd676165404c73df9c0b53c77610",
-    "semantic_hash": ""
+    "semantic_hash": "bd62cd676165404c73df9c0b53c77610"
   },
   "tests/browser/wall-clock-cap.mjs": {
     "mtime": 1785735243.2131245,
@@ -127,7 +127,7 @@
   "tests/unit/night-core.test.mjs": {
     "mtime": 1785738660.2982755,
     "ast_hash": "159162bc7d6c3ab1a3db2349336ad109",
-    "semantic_hash": ""
+    "semantic_hash": "159162bc7d6c3ab1a3db2349336ad109"
   },
   "tests/unit/reference-integrity.test.mjs": {
     "mtime": 1785735243.2133677,
@@ -152,17 +152,17 @@
   "apps/session/index.html": {
     "mtime": 1785738598.685361,
     "ast_hash": "845addf66d80d7718b4cd4f592d6a8f8",
-    "semantic_hash": ""
+    "semantic_hash": "845addf66d80d7718b4cd4f592d6a8f8"
   },
   "apps/site/src/content/docs/docs/accessibility.md": {
     "mtime": 1785738387.8277495,
     "ast_hash": "7a9f3cf00cc51af6a10acc1d3972f2c4",
-    "semantic_hash": ""
+    "semantic_hash": "7a9f3cf00cc51af6a10acc1d3972f2c4"
   },
   "apps/site/src/content/docs/docs/architecture.md": {
     "mtime": 1785738387.8272495,
     "ast_hash": "af9aa1a1f86337e33f70bfb193695048",
-    "semantic_hash": ""
+    "semantic_hash": "af9aa1a1f86337e33f70bfb193695048"
   },
   "apps/site/src/content/docs/docs/dawn.md": {
     "mtime": 1785735958.222244,
@@ -197,12 +197,12 @@
   "apps/site/src/content/docs/docs/nightly-arc.md": {
     "mtime": 1785738387.827478,
     "ast_hash": "27b3cfd221240c94c1a5fdc684363d53",
-    "semantic_hash": ""
+    "semantic_hash": "27b3cfd221240c94c1a5fdc684363d53"
   },
   "apps/site/src/content/docs/docs/privacy-local-state.md": {
     "mtime": 1785738781.791586,
     "ast_hash": "b15657d0952afd187122fc80a29f16d1",
-    "semantic_hash": ""
+    "semantic_hash": "b15657d0952afd187122fc80a29f16d1"
   },
   "apps/site/src/content/docs/docs/product-contract.md": {
     "mtime": 1785735891.8480024,
@@ -217,12 +217,12 @@
   "apps/site/src/content/docs/docs/roadmap.md": {
     "mtime": 1785738387.8278599,
     "ast_hash": "da27b7e559757b55261a5a4334a99170",
-    "semantic_hash": ""
+    "semantic_hash": "da27b7e559757b55261a5a4334a99170"
   },
   "apps/site/src/content/docs/docs/testing.md": {
     "mtime": 1785738387.8276055,
     "ast_hash": "2281a2df9487de0c2cbd54cd7b17927c",
-    "semantic_hash": ""
+    "semantic_hash": "2281a2df9487de0c2cbd54cd7b17927c"
   },
   "docs/BUILD-PLAN.md": {
     "mtime": 1785734614.6165836,
@@ -335,9 +335,9 @@
     "semantic_hash": "0ab56034e62e9a7b81ed0e8530e26115"
   },
   "docs/testing/m6-release-hardening.md": {
-    "mtime": 1785738781.7923336,
-    "ast_hash": "36f45501e1a030bb485c8b62095f3e63",
-    "semantic_hash": ""
+    "mtime": 1785739726.0940895,
+    "ast_hash": "21cf7e2036f331d66c204e5f75c595a1",
+    "semantic_hash": "21cf7e2036f331d66c204e5f75c595a1"
   },
   "apps/session/src/dawn-core.ts": {
     "mtime": 1785736369.2670968,
@@ -347,12 +347,12 @@
   "apps/session/src/night-core.ts": {
     "mtime": 1785738598.6842186,
     "ast_hash": "c7072745b36f3b1c36b9e02dbb63e137",
-    "semantic_hash": ""
+    "semantic_hash": "c7072745b36f3b1c36b9e02dbb63e137"
   },
   "apps/session/src/session.ts": {
-    "mtime": 1785738638.6358044,
+    "mtime": 1785739252.5935807,
     "ast_hash": "85514552b4dac86c3a916661be6b7f71",
-    "semantic_hash": ""
+    "semantic_hash": "85514552b4dac86c3a916661be6b7f71"
   },
   "apps/session/tsconfig.session.json": {
     "mtime": 1785726495.2841625,
@@ -367,27 +367,27 @@
   "apps/session/src/rasoi-core.ts": {
     "mtime": 1785738598.6847708,
     "ast_hash": "3e61a6c5dff7b2b3eedcf800dae81331",
-    "semantic_hash": ""
+    "semantic_hash": "3e61a6c5dff7b2b3eedcf800dae81331"
   },
   "tests/unit/rasoi-core.test.mjs": {
     "mtime": 1785738660.2984746,
     "ast_hash": "c09125587bf96d226cfb1880f8512b7d",
-    "semantic_hash": ""
+    "semantic_hash": "c09125587bf96d226cfb1880f8512b7d"
   },
   "CHANGELOG.md": {
-    "mtime": 1785738387.8262203,
-    "ast_hash": "0a2ba30b292dd5d7c5a489426180bb37",
-    "semantic_hash": ""
+    "mtime": 1785738967.8982255,
+    "ast_hash": "56ad2e9c9478536d7a1dc2c623cf567d",
+    "semantic_hash": "56ad2e9c9478536d7a1dc2c623cf567d"
   },
   "docs/PUBLIC-SURFACE-EVIDENCE.md": {
-    "mtime": 1785738387.8265924,
-    "ast_hash": "0891287cc95acf68befd676f705e4ac4",
-    "semantic_hash": ""
+    "mtime": 1785738967.8992908,
+    "ast_hash": "94d2f8a9db19cf6e1cbc84ccf304f7c2",
+    "semantic_hash": "94d2f8a9db19cf6e1cbc84ccf304f7c2"
   },
   "docs/REDESIGN-PLAN.md": {
     "mtime": 1785738112.061571,
     "ast_hash": "309ca5c3c34aeb85d75ede8d2421abbf",
-    "semantic_hash": ""
+    "semantic_hash": "309ca5c3c34aeb85d75ede8d2421abbf"
   },
   "docs/adr/0010-replace-the-vista-arc-with-rasoi-pairs.md": {
     "mtime": 1785734614.6161625,
@@ -395,9 +395,9 @@
     "semantic_hash": "01814e6eec29112ba71ac152bc266938"
   },
   "docs/releases/v0.1.0.md": {
-    "mtime": 1785738387.8268607,
-    "ast_hash": "e0d7a089ed391d3c0041bea9bf9572f5",
-    "semantic_hash": ""
+    "mtime": 1785738967.898989,
+    "ast_hash": "81d648bab384cc20dc03d966cddf829b",
+    "semantic_hash": "81d648bab384cc20dc03d966cddf829b"
   },
   "docs/testing/rasoi-redesign.md": {
     "mtime": 1785736158.271829,
