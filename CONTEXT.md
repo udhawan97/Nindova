@@ -21,8 +21,13 @@ _Avoid_: Prize, collectible, card
 
 **Masala Mound**
 
-The fixed three-layer Rasoi board. A Tile is free when no Tile overlaps it from above and at least one horizontal side is open.
+The 36-Tile Rasoi board. A Tile is free when no Tile overlaps it from above and at least one horizontal side is open.
 _Avoid_: Level, rack, challenge board
+
+**Board profile**
+
+The equal, tonight-only shape of Masala Mound: Gentle stack or Deeper stack. A profile changes authored occlusion, never rank, payout, deadline, or ending.
+_Avoid_: Level, ability, beginner, expert, unlock
 
 **Safe pair**
 
@@ -33,6 +38,11 @@ _Avoid_: Winning move, hint currency
 
 The brief, uniform visual and optional sound response when a legal pair leaves the board. It is predictable confirmation, not a prize or dopamine claim.
 _Avoid_: Kaboom, reward burst, combo
+
+**Rasoi Image Drift**
+
+The optional response-free closing prompt that carries three deterministic kitchen forms away from the board and toward Rest. It is an unvalidated screen-away design hypothesis.
+_Avoid_: Sleep technique, cognitive shuffle, memory test, second level
 
 **Settle**
 

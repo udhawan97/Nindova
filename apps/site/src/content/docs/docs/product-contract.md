@@ -11,7 +11,7 @@ Anything that makes tonight harder to leave is a bug.
 
 ## Non-negotiable behavior
 
-- One Rasoi Pairs rule; no game menu, rounds, levels, or escalating difficulty.
+- One Rasoi Pairs rule and two equal tonight-only board profiles; no game menu, rounds, progression levels, unlocks, or escalating difficulty.
 - A production Session closes itself within fifteen minutes.
 - No score, visible count, timer, countdown, streak, grade, achievement, collection, missed-night state, sleep score, or randomized reward.
 - The board is authored and deterministic. Every reachable nonterminal state exposes a legal pair, and every legal choice preserves solvability.
@@ -22,6 +22,8 @@ Anything that makes tonight harder to leave is a bug.
 - “Not now” never prevents a voluntary return later that night.
 - “Same time tomorrow?” stores a local intention, sends no notification, and creates no urgency.
 - Match feedback is deterministic and bounded; no flash, screen shake, particle shower, combo, or randomized effect may turn it into a reward schedule.
+- Gentle and Deeper alter authored occlusion only. They never create a stored result, ability label, history, rank, payout, longer deadline, or different ending.
+- “Dim and rest” remains the primary completion action. Optional Rasoi Image Drift collects no response and contains no route back to play.
 
 ## Immutable language
 
