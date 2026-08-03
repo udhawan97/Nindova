@@ -380,8 +380,8 @@
     "semantic_hash": "e703ccbe52d2b4437563b42b7f7b668f"
   },
   "docs/PUBLIC-SURFACE-EVIDENCE.md": {
-    "mtime": 1785781472.6814141,
-    "ast_hash": "378582246951bb7feae547debcc6a4ed",
+    "mtime": 1785782125.5522707,
+    "ast_hash": "7708035ac487a12738e1749691898cb8",
     "semantic_hash": ""
   },
   "docs/REDESIGN-PLAN.md": {
@@ -400,8 +400,8 @@
     "semantic_hash": "81d648bab384cc20dc03d966cddf829b"
   },
   "docs/testing/rasoi-redesign.md": {
-    "mtime": 1785781472.681874,
-    "ast_hash": "93e12e7e4cbc39549f32f82472b7bc51",
+    "mtime": 1785782125.5515537,
+    "ast_hash": "594b8f07b4dd6cbde024881b7e9850f8",
     "semantic_hash": ""
   },
   "graphify-out/memory/query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for.md": {
@@ -465,7 +465,7 @@
     "semantic_hash": ""
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1785781483.3069131,
+    "mtime": 1785781618.8709211,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": ""
   },
