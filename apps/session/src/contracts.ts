@@ -1,13 +1,17 @@
 import type { RasoiBoard, RasoiMotifId } from "./rasoi-core.js";
 
-export type SessionState = "intake" | "dismissed" | "play" | "settling" | "end" | "dawn";
+export type SessionState = "intake" | "dismissed" | "play" | "settling" | "end" | "rest" | "dawn";
 
 export interface RasoiTileSnapshot {
   readonly id: string;
   readonly row: number;
   readonly slot: number;
   readonly depth: number;
+  readonly x: number;
+  readonly y: number;
+  readonly layer: number;
   readonly motif: RasoiMotifId;
+  readonly availability: "free" | "covered" | "side-blocked" | "removed" | "missing";
   readonly free: boolean;
   readonly removed: boolean;
   readonly selected: boolean;

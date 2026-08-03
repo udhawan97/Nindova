@@ -48,7 +48,7 @@ try {
       return { width: box.width, height: box.height, label: button.getAttribute("aria-label") };
     }));
     assert.equal(freeBoxes.length, 6);
-    assert.ok(freeBoxes.every((box) => box.width >= 44 && box.height >= 44 && box.label?.includes("free at the rack edge")));
+    assert.ok(freeBoxes.every((box) => box.width >= 44 && box.height >= 44 && box.label?.includes("free, uncovered with an open side")));
     if (viewport.width === 375 || viewport.width === 1440) {
       await page.screenshot({ path: resolve(output, `board-${viewport.width}x${viewport.height}.png`), fullPage: true });
     }

@@ -41,7 +41,7 @@ The same function drives rendering, semantic descriptions, pointer and keyboard 
 The authored motif kernel is mapped through the nightly deterministic motif order. Exhaustive search must prove:
 
 - 36 Tiles and nine motifs appearing four times each;
-- 28 initially covered or side-blocked Tiles, 6 free Tiles, and 3 legal pairs;
+- 28 initially covered Tiles, 2 side-blocked Tiles, 6 free Tiles, and 3 legal pairs;
 - exactly 382 reachable states;
 - one terminal state and zero dead states; and
 - every legal choice from every reachable state retains a path to closure.

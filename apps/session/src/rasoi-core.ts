@@ -1,4 +1,4 @@
-export const RASOI_RECIPE_VERSION = 2;
+export const RASOI_RECIPE_VERSION = 3;
 
 export const RASOI_MOTIFS = Object.freeze([
   Object.freeze({ id: "belan", label: "belan rolling pin" }),
@@ -16,9 +16,13 @@ export type RasoiMotifId = (typeof RASOI_MOTIFS)[number]["id"];
 
 export interface RasoiTile {
   readonly id: string;
+  /** Legacy debug aliases retained for the version 1 window.__ct contract. */
   readonly row: number;
   readonly slot: number;
   readonly depth: number;
+  readonly x: number;
+  readonly y: number;
+  readonly layer: number;
   readonly motif: RasoiMotifId;
 }
 
@@ -39,6 +43,55 @@ export interface BoardVerification {
 
 const ROWS = 3;
 const SLOTS_PER_ROW = 12;
+
+export type TileAvailability = "free" | "covered" | "side-blocked" | "removed" | "missing";
+
+interface LayoutTile {
+  readonly id: string;
+  readonly x: number;
+  readonly y: number;
+  readonly layer: number;
+  readonly motifIndex: number;
+}
+
+const LAYOUT: readonly LayoutTile[] = Object.freeze([
+  { id: "b0-0", x: 0, y: 0, layer: 0, motifIndex: 3 },
+  { id: "b0-1", x: 2, y: 0, layer: 0, motifIndex: 6 },
+  { id: "b0-2", x: 4, y: 0, layer: 0, motifIndex: 6 },
+  { id: "b0-3", x: 6, y: 0, layer: 0, motifIndex: 7 },
+  { id: "b0-4", x: 8, y: 0, layer: 0, motifIndex: 2 },
+  { id: "b0-5", x: 10, y: 0, layer: 0, motifIndex: 0 },
+  { id: "b1-0", x: 0, y: 2, layer: 0, motifIndex: 7 },
+  { id: "b1-1", x: 2, y: 2, layer: 0, motifIndex: 5 },
+  { id: "b1-2", x: 4, y: 2, layer: 0, motifIndex: 5 },
+  { id: "b1-3", x: 6, y: 2, layer: 0, motifIndex: 8 },
+  { id: "b1-4", x: 8, y: 2, layer: 0, motifIndex: 2 },
+  { id: "b1-5", x: 10, y: 2, layer: 0, motifIndex: 1 },
+  { id: "b2-0", x: 0, y: 4, layer: 0, motifIndex: 1 },
+  { id: "b2-1", x: 2, y: 4, layer: 0, motifIndex: 6 },
+  { id: "b2-2", x: 4, y: 4, layer: 0, motifIndex: 8 },
+  { id: "b2-3", x: 6, y: 4, layer: 0, motifIndex: 0 },
+  { id: "b2-4", x: 8, y: 4, layer: 0, motifIndex: 8 },
+  { id: "b2-5", x: 10, y: 4, layer: 0, motifIndex: 3 },
+  { id: "b3-0", x: 0, y: 6, layer: 0, motifIndex: 4 },
+  { id: "b3-1", x: 2, y: 6, layer: 0, motifIndex: 3 },
+  { id: "b3-2", x: 4, y: 6, layer: 0, motifIndex: 8 },
+  { id: "b3-3", x: 6, y: 6, layer: 0, motifIndex: 4 },
+  { id: "b3-4", x: 8, y: 6, layer: 0, motifIndex: 0 },
+  { id: "b3-5", x: 10, y: 6, layer: 0, motifIndex: 2 },
+  { id: "m0-0", x: 1, y: 1, layer: 1, motifIndex: 6 },
+  { id: "m0-1", x: 3, y: 1, layer: 1, motifIndex: 4 },
+  { id: "m0-2", x: 5, y: 1, layer: 1, motifIndex: 5 },
+  { id: "m0-3", x: 7, y: 1, layer: 1, motifIndex: 3 },
+  { id: "m1-0", x: 3, y: 5, layer: 1, motifIndex: 2 },
+  { id: "m1-1", x: 5, y: 5, layer: 1, motifIndex: 5 },
+  { id: "m1-2", x: 7, y: 5, layer: 1, motifIndex: 1 },
+  { id: "m1-3", x: 9, y: 5, layer: 1, motifIndex: 7 },
+  { id: "t-0", x: 2, y: 3, layer: 2, motifIndex: 0 },
+  { id: "t-1", x: 4, y: 3, layer: 2, motifIndex: 1 },
+  { id: "t-2", x: 6, y: 3, layer: 2, motifIndex: 7 },
+  { id: "t-3", x: 8, y: 3, layer: 2, motifIndex: 4 },
+].map((tile) => Object.freeze(tile)));
 
 function seedFrom(text: string) {
   let hash = 0x811c9dc5;
@@ -79,20 +132,21 @@ function motifOrderForNight(nightId: string): readonly RasoiMotifId[] {
 
 function createBoard(nightId: string): RasoiBoard {
   const motifOrder = motifOrderForNight(nightId);
-  const tiles: RasoiTile[] = [];
-  for (let row = 0; row < ROWS; row += 1) {
-    for (let slot = 0; slot < SLOTS_PER_ROW; slot += 1) {
-      const depth = Math.min(slot, SLOTS_PER_ROW - 1 - slot);
-      const motifIndex = row * 3 + Math.floor(depth / 2);
-      tiles.push(Object.freeze({
-        id: `r${row}-s${slot}`,
-        row,
-        slot,
-        depth,
-        motif: motifOrder[motifIndex],
-      }));
-    }
-  }
+  const layerSlots = new Map<number, number>();
+  const tiles = LAYOUT.map((layout) => {
+    const slot = layerSlots.get(layout.layer) ?? 0;
+    layerSlots.set(layout.layer, slot + 1);
+    return Object.freeze({
+      id: layout.id,
+      row: layout.layer,
+      slot,
+      depth: layout.layer,
+      x: layout.x,
+      y: layout.y,
+      layer: layout.layer,
+      motif: motifOrder[layout.motifIndex],
+    });
+  });
   return Object.freeze({
     id: `rasoi-r${RASOI_RECIPE_VERSION}-${seedFrom(nightId).toString(36)}`,
     recipeVersion: RASOI_RECIPE_VERSION,
@@ -105,16 +159,33 @@ function activeTiles(board: RasoiBoard, removed: ReadonlySet<string>) {
   return board.tiles.filter((tile) => !removed.has(tile.id));
 }
 
-function freeTiles(board: RasoiBoard, removed: ReadonlySet<string>) {
+function overlaps(lower: RasoiTile, higher: RasoiTile) {
+  return higher.layer > lower.layer
+    && Math.abs(higher.x - lower.x) < 2
+    && Math.abs(higher.y - lower.y) <= 2;
+}
+
+function availabilityReason(
+  board: RasoiBoard,
+  removed: ReadonlySet<string>,
+  tileId: string,
+): TileAvailability {
+  const tile = board.tiles.find((candidate) => candidate.id === tileId);
+  if (!tile) return "missing";
+  if (removed.has(tileId)) return "removed";
   const active = activeTiles(board, removed);
-  const rowEdges = Array.from({ length: ROWS }, () => ({ min: Infinity, max: -Infinity }));
-  for (const tile of active) {
-    rowEdges[tile.row].min = Math.min(rowEdges[tile.row].min, tile.slot);
-    rowEdges[tile.row].max = Math.max(rowEdges[tile.row].max, tile.slot);
-  }
-  return active.filter((tile) => (
-    tile.slot === rowEdges[tile.row].min || tile.slot === rowEdges[tile.row].max
+  if (active.some((candidate) => overlaps(tile, candidate))) return "covered";
+  const leftBlocked = active.some((candidate) => (
+    candidate.layer === tile.layer && candidate.y === tile.y && candidate.x === tile.x - 2
   ));
+  const rightBlocked = active.some((candidate) => (
+    candidate.layer === tile.layer && candidate.y === tile.y && candidate.x === tile.x + 2
+  ));
+  return leftBlocked && rightBlocked ? "side-blocked" : "free";
+}
+
+function freeTiles(board: RasoiBoard, removed: ReadonlySet<string>) {
+  return activeTiles(board, removed).filter((tile) => availabilityReason(board, removed, tile.id) === "free");
 }
 
 function isFree(board: RasoiBoard, removed: ReadonlySet<string>, tileId: string) {
@@ -175,7 +246,7 @@ function isReachableState(board: RasoiBoard, removed: ReadonlySet<string>) {
 }
 
 function verifyBoard(board: RasoiBoard): BoardVerification {
-  if (board.tiles.length !== ROWS * SLOTS_PER_ROW) {
+  if (board.tiles.length !== LAYOUT.length) {
     return Object.freeze({ valid: false, reachableStates: 0, terminalStates: 0, deadStates: 0, reason: "tile-count" });
   }
   const counts = new Map<string, number>();
@@ -220,6 +291,7 @@ export const NindovaRasoi = Object.freeze({
   RASOI_MOTIFS,
   ROWS,
   SLOTS_PER_ROW,
+  availabilityReason,
   createBoard,
   freeTiles,
   hintPair,

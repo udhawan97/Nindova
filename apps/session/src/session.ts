@@ -3,7 +3,7 @@ import { NindovaNight, type NightCapture, type NightCompletion, type NightState,
 import { NindovaRasoi, type RasoiBoard, type RasoiMotifId } from "./rasoi-core.js";
 import type { RasoiDebug, SessionState } from "./contracts.js";
 
-const ACTIVE_SESSION_KEY = "nindova:active-session:v2";
+const ACTIVE_SESSION_KEY = "nindova:active-session:v3";
 const PRODUCTION_CAP_SECONDS = 15 * 60;
 const PRODUCTION_WIND_DOWN_SECONDS = 12 * 60;
 const REVIEW_CAP_SECONDS = 120;
@@ -25,6 +25,7 @@ const views = {
   dismissed: element<HTMLElement>("dismissed"),
   play: element<HTMLElement>("play"),
   end: element<HTMLElement>("end"),
+  rest: element<HTMLElement>("rest"),
   dawn: element<HTMLElement>("dawn"),
 };
 const boardElement = element<HTMLDivElement>("board");
@@ -87,6 +88,7 @@ function setStatus(message: string) {
 
 function showView(next: SessionState) {
   state = next;
+  document.body.dataset.view = next;
   const visible = next === "settling" ? "play" : next;
   for (const [name, view] of Object.entries(views)) {
     const hidden = name !== visible;
@@ -114,24 +116,22 @@ function iconSvg(motif: RasoiMotifId) {
 function createBoardDom() {
   if (!board) return;
   boardElement.replaceChildren();
-  for (let row = 0; row < NindovaRasoi.ROWS; row += 1) {
-    const rack = document.createElement("div");
-    rack.className = "rack";
-    rack.setAttribute("role", "group");
-    rack.setAttribute("aria-label", `Kitchen rack ${row + 1}`);
-    for (const tile of board.tiles.filter((candidate) => candidate.row === row)) {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "tile";
-      button.dataset.tileId = tile.id;
-      button.dataset.motif = tile.motif;
-      button.style.setProperty("--slot", String(tile.slot));
-      button.style.setProperty("--depth", String(tile.depth));
-      button.innerHTML = `${iconSvg(tile.motif)}<span class="tile-label">${motifShortNames[tile.motif]}</span>`;
-      button.addEventListener("click", () => selectTile(tile.id, true));
-      rack.append(button);
-    }
-    boardElement.append(rack);
+  for (const tile of board.tiles) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "tile";
+    button.dataset.tileId = tile.id;
+    button.dataset.motif = tile.motif;
+    button.dataset.layer = String(tile.layer);
+    button.style.setProperty("--x", String(tile.x));
+    button.style.setProperty("--y", String(tile.y));
+    button.style.setProperty("--layer", String(tile.layer));
+    button.style.setProperty("--left", `${tile.x / 12 * 100}%`);
+    button.style.setProperty("--top", `${tile.y / 8 * 100}%`);
+    button.style.zIndex = String(10 + tile.layer * 10);
+    button.innerHTML = `${iconSvg(tile.motif)}<span class="tile-label">${motifShortNames[tile.motif]}</span>`;
+    button.addEventListener("click", () => selectTile(tile.id, true));
+    boardElement.append(button);
   }
   updateBoardDom();
 }
@@ -146,19 +146,28 @@ function tileButton(tileId: string) {
 
 function updateBoardDom(focusId: string | null = null) {
   if (!board) return;
-  const freeIds = new Set(NindovaRasoi.freeTiles(board, removed).map((tile) => tile.id));
   for (const tile of board.tiles) {
     const button = tileButton(tile.id);
     if (!button) continue;
-    const isRemoved = removed.has(tile.id);
-    const isFree = freeIds.has(tile.id);
+    const availability = NindovaRasoi.availabilityReason(board, removed, tile.id);
+    const isRemoved = availability === "removed";
+    const isFree = availability === "free";
     const isSelected = selectedTile === tile.id;
     const isHinted = button.classList.contains("is-hinted");
     button.disabled = !isFree || isRemoved || state !== "play";
     button.classList.toggle("is-removed", isRemoved);
+    button.classList.toggle("is-covered", availability === "covered");
+    button.classList.toggle("is-side-blocked", availability === "side-blocked");
     button.classList.toggle("is-selected", isSelected);
     button.setAttribute("aria-pressed", String(isSelected));
-    button.setAttribute("aria-label", `${motifNames[tile.motif]}, ${isRemoved ? "settled" : isFree ? "free at the rack edge" : "covered by neighboring tiles"}${isSelected ? ", selected" : ""}${isHinted ? ", suggested safe pair" : ""}`);
+    const position = availability === "covered"
+      ? "covered by a tile above"
+      : availability === "side-blocked"
+        ? "blocked on both sides"
+        : availability === "free"
+          ? "free, uncovered with an open side"
+          : "settled";
+    button.setAttribute("aria-label", `${motifNames[tile.motif]}, ${position}${isSelected ? ", selected" : ""}${isHinted ? ", suggested safe pair" : ""}`);
   }
   boardShell.style.setProperty("--warmth", String(removed.size / board.tiles.length));
   if (focusId) requestAnimationFrame(() => tileButton(focusId)?.focus());
@@ -168,7 +177,7 @@ function persistActiveSession() {
   if (!board || !currentNight || (state !== "play" && state !== "settling")) return;
   try {
     safeStorage("session")?.setItem(ACTIVE_SESSION_KEY, JSON.stringify({
-      version: 2,
+      version: 3,
       phase: state,
       endReason,
       night: currentNight,
@@ -193,7 +202,7 @@ function restoreActiveSession() {
     if (!raw) return false;
     const candidate = JSON.parse(raw);
     const restoredNight = NindovaNight.sanitizeCapture(candidate.night);
-    if (candidate.version !== 2 || !restoredNight || !Array.isArray(candidate.removed)
+    if (candidate.version !== 3 || !restoredNight || !Array.isArray(candidate.removed)
       || (candidate.phase !== "play" && candidate.phase !== "settling")
       || (candidate.endReason !== "completed" && candidate.endReason !== "production-cap")) {
       clearActiveSession();
@@ -264,7 +273,7 @@ function beginSession() {
   boardShell.classList.remove("is-settling");
   showView("play");
   createBoardDom();
-  setStatus("The edge tiles are ready.");
+  setStatus("Six free tiles sit above the quiet layers.");
   persistActiveSession();
 }
 
@@ -293,12 +302,41 @@ async function playPairSound(row: number) {
   }
 }
 
+function animatePair(firstId: string, secondId: string) {
+  const firstButton = tileButton(firstId);
+  const secondButton = tileButton(secondId);
+  if (!firstButton || !secondButton) return;
+  const firstBox = firstButton.getBoundingClientRect();
+  const secondBox = secondButton.getBoundingClientRect();
+  const boardBox = boardElement.getBoundingClientRect();
+  const midpoint = {
+    x: (firstBox.left + firstBox.width / 2 + secondBox.left + secondBox.width / 2) / 2,
+    y: (firstBox.top + firstBox.height / 2 + secondBox.top + secondBox.height / 2) / 2,
+  };
+  for (const [button, box] of [[firstButton, firstBox], [secondButton, secondBox]] as const) {
+    button.style.setProperty("--pair-dx", `${(midpoint.x - (box.left + box.width / 2)) * .18}px`);
+    button.style.setProperty("--pair-dy", `${(midpoint.y - (box.top + box.height / 2)) * .18}px`);
+    button.classList.add("is-pairing");
+  }
+  const bloom = document.createElement("span");
+  bloom.className = "pair-bloom";
+  bloom.setAttribute("aria-hidden", "true");
+  bloom.style.setProperty("--bloom-x", `${midpoint.x - boardBox.left}px`);
+  bloom.style.setProperty("--bloom-y", `${midpoint.y - boardBox.top}px`);
+  boardElement.append(bloom);
+  window.setTimeout(() => {
+    firstButton.classList.remove("is-pairing");
+    secondButton.classList.remove("is-pairing");
+    bloom.remove();
+  }, reduceMotion ? 40 : 460);
+}
+
 function selectTile(tileId: string, restoreFocus = false) {
   if (!board || state !== "play" || !NindovaRasoi.isFree(board, removed, tileId)) return false;
   const tile = tileById(tileId)!;
   if (!selectedTile) {
     selectedTile = tileId;
-    setStatus(`${motifShortNames[tile.motif]} lifted. Find its match at another edge.`);
+    setStatus(`${motifShortNames[tile.motif]} lifted. Find its matching free tile.`);
     updateBoardDom(restoreFocus ? tileId : null);
     persistActiveSession();
     return true;
@@ -319,10 +357,11 @@ function selectTile(tileId: string, restoreFocus = false) {
     persistActiveSession();
     return false;
   }
+  animatePair(selectedTile, tileId);
   removed = new Set(result.removed);
   selectedTile = null;
-  void playPairSound(tile.row);
-  setStatus(`${motifShortNames[tile.motif]} settles with its pair.`);
+  void playPairSound(tile.layer);
+  setStatus(`${motifShortNames[tile.motif]} meets its pair and settles.`);
   const nextFocus = restoreFocus ? NindovaRasoi.hintPair(board, removed)?.[0] ?? null : null;
   updateBoardDom(nextFocus);
   persistActiveSession();
@@ -378,7 +417,7 @@ function finishSession() {
   clearActiveSession();
   boardShell.classList.remove("is-settling");
   showView("end");
-  element<HTMLButtonElement>("tomorrowBtn").focus();
+  element<HTMLButtonElement>("dimRestBtn").focus();
   updateDawnButton();
 }
 
@@ -569,6 +608,11 @@ function closeDawn() {
   showView("intake");
 }
 
+function returnToIntake() {
+  showView("intake");
+  element<HTMLButtonElement>("beginBtn").focus();
+}
+
 function setLoopUnsupported(value: boolean) {
   forceLoopUnsupported = value;
   return forceLoopUnsupported;
@@ -576,11 +620,17 @@ function setLoopUnsupported(value: boolean) {
 
 element<HTMLButtonElement>("beginBtn").addEventListener("click", beginSession);
 element<HTMLButtonElement>("notNowBtn").addEventListener("click", () => showView("dismissed"));
-element<HTMLButtonElement>("returnBtn").addEventListener("click", () => showView("intake"));
+element<HTMLButtonElement>("returnBtn").addEventListener("click", returnToIntake);
 element<HTMLButtonElement>("hintBtn").addEventListener("click", hint);
 muteButton.addEventListener("click", () => { audioEnabled = !audioEnabled; updateMuteButton(); });
 dawnButton.addEventListener("click", () => void openDawn());
 element<HTMLButtonElement>("closeDawnBtn").addEventListener("click", closeDawn);
+element<HTMLButtonElement>("dimRestBtn").addEventListener("click", () => {
+  showView("rest");
+  element<HTMLButtonElement>("restBackBtn").focus();
+});
+element<HTMLButtonElement>("endBackBtn").addEventListener("click", returnToIntake);
+element<HTMLButtonElement>("restBackBtn").addEventListener("click", returnToIntake);
 element<HTMLButtonElement>("tomorrowBtn").addEventListener("click", () => {
   if (!nightState.lastCompleted) return;
   const next = NindovaNight.setTomorrowIntention(nightState, nightState.lastCompleted.nightId);
@@ -628,6 +678,7 @@ Object.defineProperties(debug, {
   board: { get: () => board },
   tiles: { get: () => board?.tiles.map((tile) => ({
     ...tile,
+    availability: NindovaRasoi.availabilityReason(board!, removed, tile.id),
     free: NindovaRasoi.isFree(board!, removed, tile.id),
     removed: removed.has(tile.id),
     selected: selectedTile === tile.id,

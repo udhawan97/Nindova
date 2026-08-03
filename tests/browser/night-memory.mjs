@@ -7,7 +7,7 @@ await import("../../apps/session/dist/night-core.js");
 const Night = globalThis.NindovaNight;
 const root = resolve(import.meta.dirname, "../..");
 const target = `${pathToFileURL(resolve(root, "apps/session/dist/nindova.html")).href}?review=1`;
-const activeSessionKey = "nindova:active-session:v2";
+const activeSessionKey = "nindova:active-session:v3";
 const browser = await chromium.launch();
 const context = await browser.newContext({ viewport: { width: 375, height: 812 } });
 const page = await context.newPage();
@@ -60,7 +60,7 @@ try {
   await page.reload();
   await page.waitForFunction(() => window.__ct.state === "play");
   const unreachableRecord = JSON.parse(validActiveRecord);
-  unreachableRecord.removed = ["r0-s5", "r0-s6"];
+  unreachableRecord.removed = ["t-1", "t-2"];
   await page.addInitScript(({ key, value }) => {
     if (!sessionStorage.getItem("nindova:test:unreachable-state-injected")) {
       sessionStorage.setItem(key, value);

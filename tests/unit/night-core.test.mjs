@@ -4,12 +4,12 @@ import test from "node:test";
 await import("../../apps/session/dist/night-core.js");
 const Night = globalThis.NindovaNight;
 
-test("night capture switches Dawn date at local noon and uses recipe two", () => {
+test("night capture switches Dawn date at local noon and uses recipe three", () => {
   assert.deepEqual(Night.captureNight(new Date("2026-08-02T16:59:00Z"), "America/Chicago"), {
-    nightId: "2026-08-02|America/Chicago|r2",
+    nightId: "2026-08-02|America/Chicago|r3",
     dawnDate: "2026-08-02",
     timeZone: "America/Chicago",
-    recipeVersion: 2,
+    recipeVersion: 3,
     startedAt: "2026-08-02T16:59:00.000Z",
   });
   assert.equal(Night.captureNight(new Date("2026-08-02T17:00:00Z"), "America/Chicago").dawnDate, "2026-08-03");
@@ -31,21 +31,21 @@ test("active-session Night captures are fully validated and normalized", () => {
 });
 
 test("the nightly Rasoi recipe is deterministic", () => {
-  const first = Night.recipeForNight("2026-08-03|America/Chicago|r2");
-  const replay = Night.recipeForNight("2026-08-03|America/Chicago|r2");
+  const first = Night.recipeForNight("2026-08-03|America/Chicago|r3");
+  const replay = Night.recipeForNight("2026-08-03|America/Chicago|r3");
   assert.deepEqual(replay, first);
   assert.equal(first.motifOrder.length, 9);
   assert.equal(new Set(first.motifOrder).size, 9);
 });
 
-function rasoiCompletion(nightId = "2026-08-03|America/Chicago|r2") {
+function rasoiCompletion(nightId = "2026-08-03|America/Chicago|r3") {
   const recipe = Night.recipeForNight(nightId);
   return {
     kind: "rasoi-pairs",
     nightId,
     dawnDate: nightId.slice(0, 10),
     timeZone: "America/Chicago",
-    recipeVersion: 2,
+    recipeVersion: 3,
     boardId: recipe.boardId,
     motifOrder: recipe.motifOrder,
   };
@@ -100,6 +100,19 @@ test("v2 Dawn data migrates into the v3 union without deleting its source", () =
   assert.equal(values.has(key), true);
   assert.equal(values.has(Night.STORAGE_KEY), true);
   assert.equal(values.get(Night.STORAGE_KEY).includes("completedAt"), false);
+});
+
+test("recipe-two Rasoi completion remains available after the layered recipe upgrade", () => {
+  const previous = rasoiCompletion("2026-08-03|America/Chicago|r2");
+  previous.recipeVersion = 2;
+  previous.boardId = "rasoi-r2-previous";
+  const decoded = Night.decodeState(JSON.stringify({
+    ...Night.emptyState(),
+    lastCompleted: previous,
+  }));
+  assert.equal(decoded.reason, "ok");
+  assert.equal(decoded.state.lastCompleted.recipeVersion, 2);
+  assert.equal(decoded.state.lastCompleted.boardId, "rasoi-r2-previous");
 });
 
 test("tomorrow intention is quiet, completion-bound, and idempotent", () => {

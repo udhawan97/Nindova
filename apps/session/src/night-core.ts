@@ -48,7 +48,8 @@ interface StorageLike {
 "use strict";
 
 const SCHEMA_VERSION = 3;
-const RECIPE_VERSION = 2;
+const RECIPE_VERSION = 3;
+const SUPPORTED_RASOI_RECIPE_VERSIONS = [2, RECIPE_VERSION] as const;
 const STORAGE_KEY = "nindova:night-state:v3";
 const LEGACY_STORAGE_KEYS = ["nindova:night-state:v2", "nindova:night-state:v1"] as const;
 const MOTIFS = ["belan", "chakla", "tawa", "chimta", "katori", "tiffin", "masala", "chai", "cooker"] as const;
@@ -170,7 +171,8 @@ function sanitizeCapture(value: any): Readonly<NightCapture> | null {
 
 function validRasoiCompletion(value: any): value is RasoiCompletion {
   return Boolean(
-    validBase(value) && value.kind === "rasoi-pairs" && value.recipeVersion === RECIPE_VERSION && isText(value.boardId)
+    validBase(value) && value.kind === "rasoi-pairs"
+      && SUPPORTED_RASOI_RECIPE_VERSIONS.includes(value.recipeVersion) && isText(value.boardId)
       && Array.isArray(value.motifOrder) && value.motifOrder.length === MOTIFS.length
       && new Set(value.motifOrder).size === MOTIFS.length && value.motifOrder.every((motif: string) => MOTIFS.includes(motif as any)),
   );
@@ -191,7 +193,7 @@ function sanitizeCompletion(value: any): NightCompletion | null {
       nightId: value.nightId,
       dawnDate: value.dawnDate,
       timeZone: value.timeZone,
-      recipeVersion: RECIPE_VERSION,
+      recipeVersion: value.recipeVersion,
       boardId: value.boardId,
       motifOrder: [...value.motifOrder],
     };

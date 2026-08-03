@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#17172a">
+  <meta name="theme-color" content="#09080d">
   <meta name="application-name" content="Nindova">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,20 +12,21 @@
   <style>
     :root {
       color-scheme: dark;
-      --night: #11101d;
-      --night-soft: #1b1b31;
-      --indigo: #202858;
-      --madder: #8c3b39;
-      --marigold: #e3a642;
-      --brass: #c99643;
-      --cream: #f3ead8;
-      --cream-deep: #ddcbaa;
+      --night: #09080d;
+      --night-soft: #141526;
+      --indigo: #171b38;
+      --madder: #78363a;
+      --marigold: #c99745;
+      --brass: #c99745;
+      --cream: #e7d6b8;
+      --cream-deep: #d5bf98;
       --wood: #4b2d25;
       --ink: #251c1a;
-      --quiet: #bfb5a5;
+      --quiet: #b6aa98;
       --focus: #ffd990;
-      --tile-w: clamp(46px, 14vw, 68px);
-      --tile-h: clamp(62px, 18vw, 82px);
+      --steel: #7894a4;
+      --tile-w: clamp(48px, 10vw, 76px);
+      --tile-h: calc(var(--tile-w) * 1.28);
     }
 
     * { box-sizing: border-box; }
@@ -37,7 +38,7 @@
       color: var(--cream);
       background:
         radial-gradient(circle at 48% -15%, rgba(118, 90, 166, .2), transparent 42%),
-        linear-gradient(180deg, #17172a, #0e0d17 74%);
+        linear-gradient(180deg, #121427, #09080d 74%);
     }
     button, input { font: inherit; }
     button { min-width: 44px; min-height: 44px; }
@@ -128,12 +129,12 @@
       min-height: calc(100dvh - 64px);
       padding: clamp(20px, 5vw, 52px) max(16px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
     }
-    .intro, .dismissed, .end {
+    .intro, .dismissed, .end, .rest {
       display: grid;
       place-items: center;
       text-align: center;
     }
-    .intro-card, .dismissed-card, .end-card {
+    .intro-card, .dismissed-card, .end-card, .rest-card {
       width: min(100%, 680px);
       padding: clamp(24px, 7vw, 54px);
       border: 1px solid rgba(227, 166, 66, .23);
@@ -142,6 +143,12 @@
         rgba(21, 19, 34, .82);
       box-shadow: 18px 18px 0 rgba(83, 38, 41, .13);
     }
+    body[data-view="rest"] { background: #09080d; }
+    body[data-view="rest"] .shell::before, body[data-view="rest"] .shell::after { opacity: .035; }
+    body[data-view="rest"] .topbar { opacity: .28; }
+    .rest-card { border-color: rgba(201,151,69,.1); background: rgba(9,8,13,.92); box-shadow: none; }
+    .rest-object { width: 62px; height: 62px; margin: 0 auto 28px; border: 1px solid rgba(201,151,69,.36); border-radius: 50%; box-shadow: 0 0 44px rgba(201,151,69,.08); }
+    .rest .lede { color: #978f84; }
     .kicker {
       margin: 0 0 16px;
       color: var(--marigold);
@@ -199,41 +206,42 @@
         linear-gradient(-45deg, transparent 44%, var(--madder) 45% 55%, transparent 56%) 19px 19px / 38px 38px;
       mask-image: linear-gradient(90deg, black, transparent 20% 80%, black);
     }
-    .rack {
+    #board {
       position: relative;
-      height: calc(var(--tile-h) + 18px);
-      margin: 0 auto 3px;
+      width: calc(var(--tile-w) * 6);
+      height: calc(var(--tile-h) * 4 + 12px);
+      max-width: 100%;
+      margin: 0 auto;
       isolation: isolate;
     }
-    .rack::after {
+    #board::after {
       position: absolute;
-      inset: auto 2% 2px;
-      z-index: -1;
-      height: 15px;
+      inset: auto 4% 0;
+      z-index: 1;
+      height: 24px;
       border-radius: 50%;
       background: rgba(9, 6, 13, .4);
-      filter: blur(8px);
+      filter: blur(11px);
       content: "";
     }
     .tile {
       --motif: var(--madder);
       position: absolute;
-      inset-block-start: 0;
-      inset-inline-start: calc((100% - var(--tile-w)) * var(--slot) / 11);
-      z-index: calc(20 - var(--depth));
+      inset-block-start: var(--top);
+      inset-inline-start: var(--left);
       display: grid;
       grid-template-rows: 1fr auto;
       place-items: center;
       width: var(--tile-w);
       height: var(--tile-h);
       padding: 7px 4px 6px;
-      border: 1px solid #b99e71;
+      border: 1px solid #aa8a5d;
       border-radius: 12px 12px 9px 9px;
       color: var(--ink);
       background:
         linear-gradient(135deg, rgba(255,255,255,.55), transparent 32%),
-        linear-gradient(180deg, #f6edda, #d9c39d);
-      box-shadow: 2px 4px 0 #8e724e, 0 8px 14px rgba(0,0,0,.23);
+        linear-gradient(180deg, #eadcbe, #cdb487);
+      box-shadow: 2px 4px 0 #806542, 0 10px 16px rgba(0,0,0,.3);
       cursor: pointer;
       transform-origin: center bottom;
       transition: transform 180ms cubic-bezier(.2,.8,.2,1), opacity 340ms ease, filter 180ms ease, box-shadow 180ms ease;
@@ -248,15 +256,52 @@
     }
     .tile svg { width: 72%; height: 62%; color: var(--motif); overflow: visible; }
     .tile-label { max-width: 100%; overflow: hidden; color: #5d4437; font-size: clamp(8px, 2.1vw, 10px); font-weight: 760; letter-spacing: .02em; text-overflow: ellipsis; white-space: nowrap; }
-    .tile:disabled { cursor: default; filter: brightness(.68) saturate(.7); }
+    .tile[data-layer="1"] { margin-top: -3px; }
+    .tile[data-layer="2"] { margin-top: -6px; }
+    .tile:disabled { cursor: default; filter: brightness(.66) saturate(.64); }
+    .tile.is-covered { filter: brightness(.48) saturate(.54); }
+    .tile.is-side-blocked { filter: brightness(.62) saturate(.62); }
     .tile:not(:disabled):hover { transform: translateY(-4px); filter: brightness(1.06); }
-    .tile.is-selected { z-index: 40; transform: translateY(-9px) scale(1.045); box-shadow: 3px 7px 0 #8e724e, 0 18px 24px rgba(0,0,0,.36), 0 0 0 3px var(--focus); }
+    .tile.is-selected { z-index: 60 !important; transform: translateY(-9px) scale(1.045); box-shadow: 3px 7px 0 #806542, 0 18px 24px rgba(0,0,0,.36), 0 0 0 3px var(--focus); }
     .tile.is-hinted { animation: hint-breathe 1.2s ease-in-out 2; }
-    .tile.is-removed { opacity: 0; pointer-events: none; transform: translateY(-18px) scale(.92); }
+    .tile.is-removed { opacity: 0; pointer-events: none; }
+    .tile.is-pairing.is-removed { z-index: 62 !important; animation: brass-settle 420ms cubic-bezier(.2,.78,.22,1) both; }
     .tile[data-motif="belan"], .tile[data-motif="chai"], .tile[data-motif="tiffin"] { --motif: #8c3b39; }
-    .tile[data-motif="chakla"], .tile[data-motif="katori"], .tile[data-motif="cooker"] { --motif: #345a75; }
+    .tile[data-motif="chakla"], .tile[data-motif="katori"], .tile[data-motif="cooker"] { --motif: var(--steel); }
     .tile[data-motif="tawa"], .tile[data-motif="chimta"], .tile[data-motif="masala"] { --motif: #9b661e; }
     @keyframes hint-breathe { 0%,100% { transform: none; } 50% { transform: translateY(-7px); box-shadow: 2px 4px 0 #8e724e, 0 0 0 3px rgba(255,217,144,.78); } }
+    @keyframes brass-settle {
+      0% { opacity: 1; transform: translateY(-3px) scale(1); filter: brightness(1.04); }
+      58% { opacity: .92; transform: translate(var(--pair-dx), var(--pair-dy)) scale(.88); filter: sepia(.18) brightness(.96); }
+      100% { opacity: 0; transform: translate(var(--pair-dx), var(--pair-dy)) scale(.62); filter: sepia(.28) brightness(.72); }
+    }
+    @keyframes pair-fade { from { opacity: 1; } to { opacity: 0; } }
+    .pair-bloom {
+      position: absolute;
+      inset: var(--bloom-y) auto auto var(--bloom-x);
+      z-index: 61;
+      width: clamp(32px, 8vw, 54px);
+      aspect-ratio: 1;
+      border: 2px solid rgba(201,151,69,.72);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 1px rgba(9,8,13,.65), inset 0 0 18px rgba(201,151,69,.14), 0 0 22px rgba(201,151,69,.1);
+      animation: bloom-settle 420ms ease-out both;
+    }
+    .pair-bloom::before, .pair-bloom::after {
+      position: absolute;
+      inset: 21%;
+      border: 1px solid rgba(120,148,164,.42);
+      transform: rotate(45deg);
+      content: "";
+    }
+    .pair-bloom::after { transform: rotate(0); }
+    @keyframes bloom-settle {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(.42); }
+      42% { opacity: .82; }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.28); }
+    }
 
     .board-status { min-height: 1.6em; margin: 16px auto 0; color: #d5c7b2; font-family: Georgia, "Iowan Old Style", serif; text-align: center; }
     .lid {
@@ -301,14 +346,13 @@
     .sr-only { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
 
     @media (max-width: 520px) {
-      :root { --tile-w: clamp(46px, 15.5vw, 58px); --tile-h: clamp(62px, 20vw, 74px); }
+      :root { --tile-w: clamp(46px, 14vw, 56px); }
       .view { padding-top: 18px; }
-      .intro-card, .dismissed-card, .end-card { padding: 24px 18px 28px; box-shadow: 10px 10px 0 rgba(83,38,41,.13); }
+      .intro-card, .dismissed-card, .end-card, .rest-card { padding: 24px 18px 28px; box-shadow: 10px 10px 0 rgba(83,38,41,.13); }
       .rule-note { grid-template-columns: 1fr; }
       .play { justify-content: flex-start; }
       .play-head { margin-bottom: 12px; }
       .board-shell { padding-inline: 7px; border-radius: 18px 18px 10px 10px; }
-      .rack { height: calc(var(--tile-h) + 12px); }
       .tile-label { max-width: calc(var(--tile-w) - 10px); }
     }
     @media (max-height: 650px) {
@@ -317,12 +361,13 @@
       .play-head h1 { font-size: 28px; }
       .play-instruction { margin-top: 4px; font-size: 13px; }
       .play-toolbar { margin-top: 7px; }
-      .rack { height: calc(var(--tile-h) + 3px); }
       .board-shell { padding-top: 10px; padding-bottom: 10px; }
       .board-status { margin-top: 7px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+      .tile.is-pairing.is-removed { animation-name: pair-fade !important; animation-duration: 80ms !important; transform: none !important; }
+      .pair-bloom { display: none; }
     }
   </style>
 </head>
@@ -339,16 +384,16 @@
       <div class="intro-card">
         <p class="kicker">Rasoi Pairs · a bounded night game</p>
         <h1 id="intakeTitle">Find the pairs.<br>Let the kitchen quiet.</h1>
-        <p class="lede">Match two kitchen tiles when they are free at the ends of their racks. The game grows lighter as the board opens, then closes itself.</p>
+        <p class="lede">Uncover a mound of familiar kitchen forms. Match two equal tiles when nothing rests above them and one side is open.</p>
         <div class="entry-actions">
           <button class="primary-button" id="beginBtn" type="button">Enter the kitchen</button>
           <button class="text-button" id="notNowBtn" type="button">Not now</button>
           <button class="quiet-button" id="dawnBtn" type="button" hidden>Open Dawn</button>
         </div>
         <div class="rule-note" aria-label="How Rasoi Pairs works">
-          <p><strong>Look at the edges</strong>Only exposed tiles can be chosen.</p>
+          <p><strong>Read the layers</strong>A free tile has nothing above it and one open side.</p>
           <p><strong>Find the same object</strong>Belan with belan. Tiffin with tiffin.</p>
-          <p><strong>Leave when it ends</strong>No score, grade, or reason to replay.</p>
+          <p><strong>Leave when it ends</strong>No score, grade, or pressure to continue.</p>
         </div>
         <p class="trust-line">Nothing to win. Nothing tracked. Nothing you can do wrong.</p>
       </div>
@@ -366,15 +411,15 @@
     <section class="view play" id="play" aria-labelledby="playTitle" hidden>
       <header class="play-head">
         <p class="kicker">Tonight's kitchen</p>
-        <h1 id="playTitle">Rasoi Pairs</h1>
-        <p class="play-instruction">Choose two matching tiles that are free at the ends of their racks.</p>
+        <h1 id="playTitle">Masala Mound</h1>
+        <p class="play-instruction">Choose two matching tiles that are uncovered and open on one side.</p>
         <div class="play-toolbar"><button class="quiet-button" id="hintBtn" type="button">Show a safe pair</button></div>
       </header>
-      <div class="board-shell" id="boardShell" aria-label="Rasoi Pairs board">
-        <div id="board"></div>
+      <div class="board-shell" id="boardShell" aria-label="Masala Mound layered pair board">
+        <div id="board" role="group" aria-label="Thirty-six kitchen tiles in three overlapping layers"></div>
         <div class="lid" aria-hidden="true"></div>
       </div>
-      <p class="board-status" id="boardStatus" role="status" aria-live="polite">The edge tiles are ready.</p>
+      <p class="board-status" id="boardStatus" role="status" aria-live="polite">Six free tiles sit above the quiet layers.</p>
     </section>
 
     <section class="view end" id="end" aria-labelledby="endTitle" hidden>
@@ -382,9 +427,24 @@
         <p class="kicker">The kitchen is quiet</p>
         <h2 id="endTitle">The session is over. That's the point.</h2>
         <p class="end-sub">No score. No streak. Nothing owed tomorrow.</p>
-        <div class="end-actions"><button class="quiet-button" id="tomorrowBtn" type="button">Same time tomorrow?</button></div>
+        <div class="end-actions">
+          <button class="primary-button" id="dimRestBtn" type="button">Dim and rest</button>
+          <button class="quiet-button" id="endBackBtn" type="button">Back to Nindova</button>
+          <button class="text-button" id="tomorrowBtn" type="button">Same time tomorrow?</button>
+        </div>
         <p class="tomorrow-status" id="tomorrowStatus" role="status" aria-live="polite"></p>
         <p class="disclaimer">Nindova is a behavioral design study about ending an unbounded loop. It is not a sleep tracker or treatment, and Rasoi Pairs has not been clinically shown to make people sleepy. Intended for ages 13 and up. Persistent sleep difficulty deserves evidence-based care such as CBT-I with a qualified clinician.</p>
+      </div>
+    </section>
+
+    <section class="view rest" id="rest" aria-labelledby="restTitle" hidden>
+      <div class="rest-card">
+        <div class="rest-object" aria-hidden="true"></div>
+        <p class="kicker">Optional screen-away handoff</p>
+        <h2 id="restTitle">Let the last object go.</h2>
+        <p class="lede">Put the phone down. Close your eyes. Picture one ordinary kitchen object, then let its edges soften and disappear.</p>
+        <div class="end-actions"><button class="text-button" id="restBackBtn" type="button">Back to Nindova</button></div>
+        <p class="disclaimer">This is a quiet product experiment, not a sleep treatment or clinically validated exercise.</p>
       </div>
     </section>
 
