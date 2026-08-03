@@ -9,5 +9,5 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["src/contracts.ts", "src/night-core.ts", "src/dawn-core.ts", "vite.config.ts"]
+  "include": ["src/contracts.ts", "src/rasoi-core.ts", "src/night-core.ts", "src/dawn-core.ts", "vite.config.ts"]
 }

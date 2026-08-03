@@ -1,6 +1,6 @@
 # Nindova Build Plan
 
-**Status:** Approved — two-round council complete; all blockers closed.
+**Status:** Historical browser-first baseline, completed. The experience-specific arc is superseded by [ADR 0010](./adr/0010-replace-the-vista-arc-with-rasoi-pairs.md) and the [Rasoi Pairs redesign plan](./REDESIGN-PLAN.md). The immutable language, privacy boundary, accessibility floor, Two-Loop Law, and fifteen-minute maximum remain active.
 
 ## Delivery boundary
 

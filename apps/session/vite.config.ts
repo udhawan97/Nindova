@@ -23,16 +23,15 @@ function emitPortableHtml(): Plugin {
     name: "nindova-portable-html",
     async closeBundle() {
       const assetDirectory = resolve("dist/assets");
-      const spriteSource = resolve("assets/focal-sprites.png");
-      const spriteOutput = resolve(assetDirectory, "focal-sprites.png");
       const nightCoreSource = resolve("src/night-core.ts");
+      const rasoiCoreSource = resolve("src/rasoi-core.ts");
       const dawnCoreSource = resolve("src/dawn-core.ts");
       const manifestSource = resolve("manifest.webmanifest");
       const workerSource = resolve("sw.js");
       const iconSource = resolve("assets/nindova-icon.svg");
       await mkdir(assetDirectory, { recursive: true });
-      await copyFile(spriteSource, spriteOutput);
       await emitTypedModule(nightCoreSource, resolve("dist/night-core.js"));
+      await emitTypedModule(rasoiCoreSource, resolve("dist/rasoi-core.js"));
       await emitTypedModule(dawnCoreSource, resolve("dist/dawn-core.js"));
       await copyFile(manifestSource, resolve("dist/manifest.webmanifest"));
       await copyFile(workerSource, resolve("dist/sw.js"));
@@ -53,14 +52,9 @@ function emitPortableHtml(): Plugin {
       if (installable === manifestNormalized) throw new Error("Compiled Session module was not inlined");
       await writeFile(indexPath, installable);
       await rm(modulePath);
-      const sprite = await readFile(spriteSource);
-      const portable = installable.replace(
-        "./assets/focal-sprites.png",
-        `data:image/png;base64,${sprite.toString("base64")}`,
-      )
+      const portable = installable
         .replace('<link rel="manifest" href="./manifest.webmanifest">', "")
         .replace(/<script data-portable-remove>[\s\S]*?<\/script>/, "");
-      if (portable === installable) throw new Error("Portable sprite reference was not inlined");
       if (portable.includes("manifest.webmanifest") || portable.includes("serviceWorker.register")) throw new Error("Portable artifact retained PWA dependencies");
       await writeFile(resolve("dist/nindova.html"), portable);
     },

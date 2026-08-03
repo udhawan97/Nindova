@@ -1,2215 +1,616 @@
-import { NindovaDawn as Dawn } from "./dawn-core.js";
-import { NindovaNight as Night, type NightCapture, type NightRecipe, type NightState, type Vista } from "./night-core.js";
-import type { ClosingTimeDebug, SessionState } from "./contracts";
+import { NindovaDawn } from "./dawn-core.js";
+import { NindovaNight, type NightCapture, type NightCompletion, type NightState, type RasoiCompletion } from "./night-core.js";
+import { NindovaRasoi, type RasoiBoard, type RasoiMotifId } from "./rasoi-core.js";
+import type { RasoiDebug, SessionState } from "./contracts.js";
 
-'use strict';
+const ACTIVE_SESSION_KEY = "nindova:active-session:v1";
+const PRODUCTION_CAP_SECONDS = 15 * 60;
+const PRODUCTION_WIND_DOWN_SECONDS = 12 * 60;
+const REVIEW_CAP_SECONDS = 120;
+const REVIEW_WIND_DOWN_SECONDS = 90;
 
-function byId<T extends HTMLElement>(id: string): T {
-  const element = document.getElementById(id);
-  if (!element) throw new Error(`Missing required element #${id}`);
-  return element as T;
+const reviewerMode = new URLSearchParams(location.search).get("review") === "1";
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const hardCapSeconds = reviewerMode ? REVIEW_CAP_SECONDS : PRODUCTION_CAP_SECONDS;
+const windDownSeconds = reviewerMode ? REVIEW_WIND_DOWN_SECONDS : PRODUCTION_WIND_DOWN_SECONDS;
+
+function element<T extends HTMLElement>(id: string) {
+  const value = document.getElementById(id);
+  if (!value) throw new Error(`Missing #${id}`);
+  return value as T;
 }
 
-function select<T extends Element>(selector: string): T {
-  const element = document.querySelector(selector);
-  if (!element) throw new Error(`Missing required element ${selector}`);
-  return element as T;
-}
-/* ============================================================
-   NINDOVA — Closing Time Session
-   A bedtime game that decays toward nothing.
-   Procedural atmosphere with illustrated focal sprites and authored accents.
-   ============================================================ */
-
-const VW = 1200, VH = 750;                 // virtual scene space
-const canvas = byId<HTMLCanvasElement>('stage');
-const ctx = canvas.getContext('2d')!;
-let scaleF = 1, offX = 0, offY = 0, dpr = 1, portraitMode=false, cameraCenterX=VW/2;
-
-function resize(){
-  dpr = Math.min(window.devicePixelRatio||1, 2);
-  canvas.width = innerWidth*dpr; canvas.height = innerHeight*dpr;
-  canvas.style.width = innerWidth+'px'; canvas.style.height = innerHeight+'px';
-  portraitMode = innerHeight > innerWidth*1.12;
-  scaleF = portraitMode
-    ? Math.max(innerWidth/540, (innerHeight/VH)*0.78)
-    : Math.min(innerWidth/VW, innerHeight/VH);
-  cameraCenterX = VW/2;
-  offX = portraitMode ? innerWidth/2-cameraCenterX*scaleF : (innerWidth-VW*scaleF)/2;
-  offY = (innerHeight - VH*scaleF)/2;
-}
-addEventListener('resize', resize); resize();
-
-const toV = (px,py)=>({ x:(px-offX)/scaleF, y:(py-offY)/scaleF });
-const lerp=(a,b,t)=>a+(b-a)*t;
-const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const easeOut=t=>1-Math.pow(1-t,3);
-const easeInOut=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
-const rnd=(a,b)=>a+Math.random()*(b-a);
-const dist=(x1,y1,x2,y2)=>Math.hypot(x2-x1,y2-y1);
-
-/* ---------------- pacing ---------------- */
-const reviewerMode = new URLSearchParams(location.search).get('review')==='1';
-const PRODUCTION_CAP_SECONDS=15*60;
-const PACING = {
-  compressed:{ label:'reviewer cut', hardCap:105, labelFade:12, decayTime:36, arriveAuto:4, autoStoreStart:7, autoStoreStep:4.5, namingGrace:5, heldGrace:3, darkHold:2, wipeAuto:4, vistaTime:28, driftTime:10, signAuto:4, endLabel:'Use production pacing' },
-  real:      { label:'production pacing', hardCap:PRODUCTION_CAP_SECONDS, labelFade:75, decayTime:360, arriveAuto:45, autoStoreStart:90, autoStoreStep:46, namingGrace:60, heldGrace:18, darkHold:18, wipeAuto:36, vistaTime:290, driftTime:126, signAuto:20, endLabel:'Use reviewer pacing' }
+const views = {
+  intake: element<HTMLElement>("intake"),
+  dismissed: element<HTMLElement>("dismissed"),
+  play: element<HTMLElement>("play"),
+  end: element<HTMLElement>("end"),
+  dawn: element<HTMLElement>("dawn"),
 };
-let paceKey: "compressed" | "real" = reviewerMode?'compressed':'real';
-const pace = ()=>PACING[paceKey];
+const boardElement = element<HTMLDivElement>("board");
+const boardShell = element<HTMLDivElement>("boardShell");
+const boardStatus = element<HTMLParagraphElement>("boardStatus");
+const srStatus = element<HTMLParagraphElement>("srStatus");
+const muteButton = element<HTMLButtonElement>("muteBtn");
+const dawnButton = element<HTMLButtonElement>("dawnBtn");
+const dawnCanvas = element<HTMLCanvasElement>("dawnCanvas");
+const dawnVideo = element<HTMLVideoElement>("dawnVideo");
+const dawnStatus = element<HTMLParagraphElement>("dawnStatus");
+const loopActions = element<HTMLDivElement>("loopActions");
 
-function assistanceEnvelope(value=decay){
-  const help=easeInOut(clamp(value,0,1));
-  return Object.freeze({
-    snapRadius:Math.round(78+142*help),
-    magnetism:Number((.08+.82*help).toFixed(3)),
-    requiredGestureDistance:Math.round(420-310*help),
-    autonomousWait:Number((pace().autoStoreStep*(1-.58*help)).toFixed(2))
-  });
+const motifNames: Record<RasoiMotifId, string> = Object.fromEntries(
+  NindovaRasoi.RASOI_MOTIFS.map((motif) => [motif.id, motif.label]),
+) as Record<RasoiMotifId, string>;
+const motifShortNames: Record<RasoiMotifId, string> = {
+  belan: "Belan",
+  chakla: "Chakla",
+  tawa: "Tawa",
+  chimta: "Chimta",
+  katori: "Katori",
+  tiffin: "Tiffin",
+  masala: "Masala",
+  chai: "Chai",
+  cooker: "Cooker",
+};
+
+let state: SessionState = "intake";
+let board: RasoiBoard | null = null;
+let currentNight: NightCapture | null = null;
+let removed = new Set<string>();
+let selectedTile: string | null = null;
+let startedAtMs = 0;
+let deadlineAtMs = 0;
+let windDownAtMs = 0;
+let virtualOffsetMs = 0;
+let audioEnabled = false;
+let audioContext: AudioContext | null = null;
+let endReason: "completed" | "production-cap" = "completed";
+let settlementTimer: number | null = null;
+let dawnNowOverride: Date | null = null;
+let forceLoopUnsupported = false;
+let nightStateResult = NindovaNight.readStorage(safeStorage("local"));
+let nightState = nightStateResult.state;
+let loopResult: null | { blob: Blob; type: string; extension: string; durationMs: number } = null;
+let loopLease: null | { url: string; revoke(): void } = null;
+
+function safeStorage(kind: "local" | "session") {
+  try {
+    return kind === "local" ? localStorage : sessionStorage;
+  } catch {
+    return null;
+  }
 }
 
-function arcClosureProgress(){
-  if(STATE==='intake'||STATE==='arrive') return 0;
-  if(STATE==='play') return .08+decay*.36;
-  if(STATE==='wipe') return .46;
-  if(STATE==='approach') return .48+clamp(approachT/2.7,0,1)*.04;
-  if(STATE==='vista') return .52+vDecay()*.25;
-  if(STATE==='drift') return .77+clamp(driftT/pace().driftTime,0,1)*.13;
-  if(STATE==='return') return .91;
-  if(STATE==='sign') return .94;
-  if(STATE==='dark') return .96+clamp(darkT/pace().darkHold,0,1)*.04;
-  return 1;
+function setStatus(message: string) {
+  boardStatus.textContent = message;
+  srStatus.textContent = message;
 }
 
-function lightEnvelope(){
-  const progress=arcClosureProgress();
-  const budget=lightBudgetAt(progress);
-  return Object.freeze({
-    ...budget,
-    focus:lampLit?Math.max(.035,.48*(1-progress)):.018,
-    veil:lampLit ? .25+.43*progress : .26
-  });
+function showView(next: SessionState) {
+  state = next;
+  const visible = next === "settling" ? "play" : next;
+  for (const [name, view] of Object.entries(views)) {
+    const hidden = name !== visible;
+    view.hidden = hidden;
+    view.setAttribute("aria-hidden", String(hidden));
+  }
 }
 
-function lightBudgetAt(value){
-  const progress=clamp(value,0,1);
-  return Object.freeze({
-    progress:Number(progress.toFixed(4)),
-    meanBudget:Number((.22*(1-.72*progress)).toFixed(4)),
-    peakBudget:Number((.78*(1-.62*progress)).toFixed(4))
-  });
-}
-
-/* ---------------- state ---------------- */
-let STATE: SessionState='intake';         // intake | play | wipe | sign | dark | end
-let playT=0;                // seconds since play began
-let decay=0;                // 0..1 master decay
-let dim=0;                  // 0..1 room dimming
-let dimTarget=0;
-let objects=[], slots=[];
-let dragObj=null, hoverSlot=null;
-let pointer={x:0,y:0,down:false};
-let wipeProg=0, lastWipe=null, motes=[];
-let signSwing=0, signHot=false, signDone=false;
-let darkT=0;
-let sessionStarted=false, sessionDeadlineAt=0, sessionElapsed=0, stateElapsed=0;
-let clockState: SessionState=STATE;
-let lastAutoStoreAt=-Infinity, capClosing=false;
-let wipePending=false, wipePendingT=0, signCloseT=0, namingOpenedAt=0;
-let endReason: "completed" | "production-cap"='completed';
-const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
-let reduceMotion = motionPreference.matches;
-const dawnNowParameter=reviewerMode?new URLSearchParams(location.search).get('dawnNow'):null;
-let dawnNowOverride=dawnNowParameter?new Date(dawnNowParameter):null;
-if(dawnNowOverride&&Number.isNaN(dawnNowOverride.getTime())) dawnNowOverride=null;
-const dawnNow=()=>dawnNowOverride??new Date();
-let activeNight: Readonly<NightCapture> | null=null;
-let nightRecipe: Readonly<NightRecipe>=Night.recipeForNight('nindova-preview|r1');
-let nightStorage: Storage | null=null;
-try{ nightStorage=globalThis.localStorage; }catch{}
-let nightRead=Night.readStorage(nightStorage);
-let nightMemory: NightState=nightRead.state;
-
-function startNight(){
-  if(!activeNight) activeNight=Night.captureNight(new Date());
-  nightRecipe=Night.recipeForNight(activeNight.nightId);
-  nightRead=Night.readStorage(nightStorage);
-  nightMemory=nightRead.state;
-  initRain();
-  if(nightRead.recovered) srStatus.textContent='Local scene memory started fresh.';
-}
-
-function recordNightCompletion(){
-  if(!activeNight) startNight();
-  const finalKind=finalEntity?.kind
-    ?? (vistaChoice==='meadow'?nightRecipe.meadowSpecies[0]:nightRecipe.harborBoats[0]);
-  const completion={
-    nightId:activeNight.nightId,
-    dawnDate:activeNight.dawnDate,
-    timeZone:activeNight.timeZone,
-    recipeVersion:activeNight.recipeVersion,
-    vista:vistaChoice,
-    finalKind
+function iconSvg(motif: RasoiMotifId) {
+  const common = 'viewBox="0 0 64 48" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"';
+  const drawings: Record<RasoiMotifId, string> = {
+    belan: '<path d="M13 24h38"/><path d="M19 17h26a7 7 0 0 1 0 14H19a7 7 0 0 1 0-14Z"/><path d="M3 24h10M51 24h10"/>',
+    chakla: '<ellipse cx="32" cy="22" rx="21" ry="13"/><path d="M16 30l-2 7M32 35v5M48 30l2 7"/><path d="M22 21c6-5 14-5 20 0"/>',
+    tawa: '<circle cx="26" cy="23" r="15"/><path d="M41 23h18M48 20v6"/><path d="M19 20c4-4 10-4 14 0"/>',
+    chimta: '<path d="M13 7c4 17 10 28 19 35M51 7c-4 17-10 28-19 35"/><path d="M13 7l7 3M51 7l-7 3"/><circle cx="32" cy="41" r="2"/>',
+    katori: '<path d="M12 17h40c-2 17-9 23-20 23S14 34 12 17Z"/><path d="M16 20c10 4 22 4 32 0"/><path d="M18 40h28"/>',
+    tiffin: '<path d="M17 15h30v26H17Z"/><path d="M15 23h34M15 32h34M22 15v-5h20v5"/><path d="M13 20v16M51 20v16"/>',
+    masala: '<circle cx="32" cy="24" r="20"/><circle cx="32" cy="24" r="5"/><circle cx="20" cy="18" r="4"/><circle cx="44" cy="18" r="4"/><circle cx="20" cy="32" r="4"/><circle cx="44" cy="32" r="4"/>',
+    chai: '<path d="M18 14h28l-3 28H21Z"/><path d="M22 23h20M23 31h18"/><path d="M25 9c-3-3 2-5 0-8M34 9c-3-3 2-5 0-8M42 9c-3-3 2-5 0-8"/>',
+    cooker: '<path d="M12 19h39v21H12Z"/><path d="M16 15h31l4 4H12Z"/><path d="M24 12h16M32 12V7M51 25h10"/><circle cx="32" cy="7" r="2"/>',
   };
-  const result=Night.completeState(nightMemory,completion);
-  nightMemory=result.state;
-  if(result.changed) Night.writeStorage(nightStorage,nightMemory);
-  refreshDawnAvailability();
-  return result.changed;
+  return `<svg ${common}>${drawings[motif]}</svg>`;
 }
 
-/* ---------------- scene geometry ---------------- */
-const WIN = {x:84, y:96, w:330, h:368};                  // window
-const DESK = {y:520, faceH:150};                          // desk surface line
-const LAMP = {x:560, bx:560, by:392, poolX:600, poolY:530}; // desk lamp
-const SHELF = {x:836, w:308, ys:[214, 330, 446]};         // shelf unit
-const SIGN = {x:497, y:118, w:104, h:56};                 // hanging sign
-
-/* slots: 5 shelf gaps + 3 drawers */
-function buildSlots(n){
-  const s=[];
-  const shelfGaps=[ {x:906,y:SHELF.ys[0]}, {x:1064,y:SHELF.ys[0]},
-                    {x:886,y:SHELF.ys[1]}, {x:1076,y:SHELF.ys[1]},
-                    {x:966,y:SHELF.ys[2]} ];
-  const drawers=[ {x:938,y:636,d:0}, {x:1076,y:636,d:1}, {x:938,y:702,d:2} ];
-  const order=[shelfGaps[0],drawers[0],shelfGaps[2],shelfGaps[1],drawers[1],shelfGaps[3],shelfGaps[4],drawers[2]];
-  for(let i=0;i<n;i++){
-    const g=order[i%order.length];
-    s.push({x:g.x, y:g.y, drawer:('d' in g)?g.d:null, open:0, occupied:false, glow:0});
-  }
-  return s;
-}
-
-/* illustrated focal sprites with procedural fallbacks */
-const FOCAL_SPRITES=new Image();
-FOCAL_SPRITES.decoding='async';
-FOCAL_SPRITES.src='./assets/focal-sprites.png';
-const SPRITE_CELLS={
-  letter:[0,0], key:[1,0], mug:[2,0], book:[3,0],
-  spool:[0,1], watch:[1,1], sheep:[2,1], goose:[3,1],
-  tortoise:[0,2], rabbit:[1,2], skiff:[2,2], tug:[3,2]
-};
-function drawFocalSprite(kind,x,y,w,h){
-  return drawFocalSpriteOn(ctx,kind,x,y,w,h);
-}
-function drawFocalSpriteOn(targetContext,kind,x,y,w,h){
-  const cell=SPRITE_CELLS[kind];
-  if(!cell||!FOCAL_SPRITES.complete||!FOCAL_SPRITES.naturalWidth) return false;
-  const sw=FOCAL_SPRITES.naturalWidth/4, sh=FOCAL_SPRITES.naturalHeight/3;
-  targetContext.drawImage(FOCAL_SPRITES,cell[0]*sw,cell[1]*sh,sw,sh,x,y,w,h);
-  return true;
-}
-
-function makeObjects(n){
-  const arr=[];
-  const spread = Math.min(660, 110*n);
-  const kindsTonight = nightRecipe.objectKinds;
-  let prevX = -999;
-  for(let i=0;i<n;i++){
-    let x = 170 + (i+0.5)*(spread/n) + rnd(-16,16);
-    if(Math.abs(x-LAMP.bx)<75) x += (x<LAMP.bx? -95: 95); // keep clear of the lamp
-    if(x - prevX < 64) x = prevX + 64;                     // never overlap a neighbour
-    if(Math.abs(x-LAMP.bx)<75) x = LAMP.bx+80;
-    x = clamp(x, 150, 806);
-    prevX = x;
-    const y = DESK.y - 12 + rnd(-6,10);
-    arr.push({
-      id:i, kind:kindsTonight[i%kindsTonight.length], label:null, labelSetT:0,
-      x, y, rot:rnd(-.12,.12), scale:1,
-      homeX:x, homeY:y,
-      state:'desk',            // desk | drag | settle | rest | stored
-      slot:null, touched:false, touchT:0,
-      settleT:0, liftT:0, sx:0, sy:0, srot:0, tilt:0,
-      labelA:0, shadow:1, labelDy:-34-(i%2)*24
-    });
-  }
-  return arr;
-}
-
-/* ---------------- palette ---------------- */
-const P = {
-  wallTop:'#101725', wallBot:'#28170f',
-  deskTop:'#4a2a18', deskLit:'#6a3d20', deskFace:'#351d12'
-};
-
-/* ============================================================
-   AUDIO — procedural rain + sfx
-   ============================================================ */
-let AC=null, rainGain=null, masterGain=null, muted=false, plinkTimer=null;
-const AUTHORED_ACCENTS={
-  lamp:[{f:98,d:.34,g:.035},{f:147,d:.52,g:.024}],
-  shelf:[{f:220,d:.18,g:.026},{f:165,d:.24,g:.018}],
-  drawer:[{f:112,d:.20,g:.05},{f:74,d:.28,g:.032}],
-  crossing:[{f:262,d:.18,g:.028},{f:196,d:.26,g:.018}],
-  mooring:[{f:659,d:.34,g:.016},{f:494,d:.48,g:.012},{f:392,d:.62,g:.009}],
-  handoff:[{f:392,d:.42,g:.018},{f:294,d:.58,g:.012}],
-  sign:[{f:523,d:.34,g:.022},{f:392,d:.46,g:.016},{f:262,d:.72,g:.010}]
-};
-function authoredAccent(name){
-  if(!AC||muted||!masterGain) return;
-  const notes=AUTHORED_ACCENTS[name];
-  if(!notes) return;
-  notes.forEach((note,index)=>{
-    const start=AC.currentTime+index*.075;
-    const o=AC.createOscillator(),g=AC.createGain();
-    o.type=index?'sine':'triangle'; o.frequency.value=note.f;
-    g.gain.setValueAtTime(.0001,start);
-    g.gain.exponentialRampToValueAtTime(note.g,start+.018);
-    g.gain.exponentialRampToValueAtTime(.0001,start+note.d);
-    o.connect(g); g.connect(masterGain); o.start(start); o.stop(start+note.d+.03);
-  });
-}
-function initAudio(){
-  if(AC) return;
-  const LegacyAudioContext=(window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-  try{ AC = new (window.AudioContext||LegacyAudioContext!)(); }catch(e){ return; }
-  masterGain = AC.createGain(); masterGain.gain.value = muted?0:0.9;
-  masterGain.connect(AC.destination);
-  // rain: two filtered noise layers
-  const len = AC.sampleRate*2;
-  const buf = AC.createBuffer(1,len,AC.sampleRate);
-  const d = buf.getChannelData(0);
-  for(let i=0;i<len;i++) d[i]=Math.random()*2-1;
-  const src = AC.createBufferSource(); src.buffer=buf; src.loop=true;
-  const hp = AC.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=380;
-  const lp = AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1500; lp.Q.value=.4;
-  rainGain = AC.createGain(); rainGain.gain.value=0.0;
-  src.connect(hp); hp.connect(lp); lp.connect(rainGain); rainGain.connect(masterGain);
-  src.start();
-  // low rumble layer
-  const src2 = AC.createBufferSource(); src2.buffer=buf; src2.loop=true;
-  const lp2 = AC.createBiquadFilter(); lp2.type='lowpass'; lp2.frequency.value=300;
-  const g2 = AC.createGain(); g2.gain.value=0.05;
-  src2.connect(lp2); lp2.connect(g2); g2.connect(masterGain);
-  src2.start();
-  rainGain.gain.linearRampToValueAtTime(0.10, AC.currentTime+3);
-  // droplet plinks
-  plinkTimer = setInterval(()=>{
-    if(!AC || muted || document.hidden) return;
-    if(Math.random()<0.55) plink();
-  }, 900);
-}
-function plink(){
-  const o=AC.createOscillator(), g=AC.createGain(), p=AC.createStereoPanner?AC.createStereoPanner():null;
-  o.type='sine'; o.frequency.value=rnd(740,1750);
-  g.gain.setValueAtTime(0.0, AC.currentTime);
-  g.gain.linearRampToValueAtTime(rnd(0.008,0.02), AC.currentTime+0.005);
-  g.gain.exponentialRampToValueAtTime(0.0005, AC.currentTime+rnd(0.08,0.2));
-  o.connect(g);
-  if(p){ p.pan.value=rnd(-0.7,0.7); g.connect(p); p.connect(masterGain);} else g.connect(masterGain);
-  o.start(); o.stop(AC.currentTime+0.25);
-}
-function sfxSettle(){
-  authoredAccent('shelf');
-}
-function sfxDrawer(){
-  authoredAccent('drawer');
-}
-function sfxSign(){
-  authoredAccent('sign');
-}
-function setMuted(m){
-  muted=m;
-  const muteButton=document.getElementById('muteBtn');
-  muteButton.textContent = m?'sound off':'sound on';
-  muteButton.setAttribute('aria-pressed',String(m));
-  if(masterGain) masterGain.gain.linearRampToValueAtTime(m?0:0.9, AC.currentTime+0.3);
-}
-
-/* ============================================================
-   RAIN + MOTES particles
-   ============================================================ */
-const drops=[]; const streaks=[];
-function weatherScale(){
-  return ({
-    'soft-monsoon':1.2,
-    'distant-rain':.78,
-    'still-haze':.34,
-    'clear-indigo':.12
-  }[nightRecipe.weather]??.78);
-}
-function initRain(){
-  drops.length=0; streaks.length=0;
-  const density=weatherScale();
-  const N = Math.round((reduceMotion?26:60)*density);
-  for(let i=0;i<N;i++) drops.push({x:rnd(WIN.x+6,WIN.x+WIN.w-6),y:rnd(WIN.y,WIN.y+WIN.h),v:rnd(160,300),l:rnd(8,18)});
-  for(let i=0;i<Math.max(2,Math.round(10*density));i++) streaks.push({x:rnd(WIN.x+8,WIN.x+WIN.w-8),y:rnd(WIN.y,WIN.y+WIN.h),v:rnd(6,16)});
-  motes.length=0;
-  for(let i=0;i<14;i++) motes.push({x:rnd(500,780),y:rnd(390,520),v:rnd(2,7),a:rnd(.05,.16),ph:rnd(0,6)});
-}
-initRain();
-motionPreference.addEventListener('change',event=>{
-  reduceMotion=event.matches;
-  initRain();
-});
-
-function portraitFocus(){
-  if(STATE==='approach') return WIN.x+WIN.w/2;
-  if(STATE==='vista'){
-    const arriving=entities.find(entity=>entity.final)
-      ?? entities.find(entity=>entity.phase==='approach'||entity.phase==='wait'||entity.phase==='linger');
-    return clamp(arriving?.x ?? FENCE_X,240,FENCE_X);
-  }
-  if(STATE==='drift'||STATE==='return'){
-    return clamp(driftLight?.x ?? finalEntity?.x ?? FENCE_X,420,840);
-  }
-  if(STATE==='sign'||STATE==='dark'||STATE==='end') return SIGN.x+SIGN.w/2;
-  if(STATE==='play'||STATE==='wipe'){
-    const active=objects.find(object=>object.state==='drag')
-      ?? objects.find(object=>object.state==='desk')
-      ?? objects.find(object=>object.state==='settle');
-    return clamp(active?.x ?? LAMP.poolX,360,760);
-  }
-  return LAMP.poolX;
-}
-
-function updatePortraitCamera(){
-  if(!portraitMode) return;
-  const target=portraitFocus();
-  cameraCenterX=reduceMotion?target:lerp(cameraCenterX,target,0.12);
-  offX=innerWidth/2-cameraCenterX*scaleF;
-}
-
-/* ============================================================
-   DRAWING
-   ============================================================ */
-function draw(t,dt){
-  updatePortraitCamera();
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  ctx.fillStyle='#0c0a08'; ctx.fillRect(0,0,innerWidth,innerHeight);
-  ctx.setTransform(dpr*scaleF,0,0,dpr*scaleF,offX*dpr,offY*dpr);
-
-  // Acts II & III draw their own world
-  if(STATE==='vista'||STATE==='drift'||STATE==='return'){ drawVista(t,dt); return; }
-
-  // camera drifts into the window during the approach
-  let zoomK=0;
-  if(STATE==='approach'){
-    zoomK=easeInOut(clamp(approachT/2.7,0,1));
-    const wc={x:WIN.x+WIN.w/2, y:WIN.y+WIN.h/2};
-    const s=1+zoomK*(portraitMode?0.75:2.2);
-    ctx.translate(wc.x,wc.y); ctx.scale(s,s); ctx.translate(-wc.x,-wc.y);
-  }
-
-  const budget=lightEnvelope();
-  const lampI = budget.focus * (1 + (reduceMotion?0:Math.sin(t*1.7)*0.012));
-  const shelfLampI = lampLit?budget.focus*.72:.012;
-
-  drawRoom(lampI, shelfLampI, t, dt);
-  drawWindow(t,dt);
-  drawSign(t,dt);
-  drawShelves(shelfLampI, t);
-  drawDesk(lampI, t, dt);
-  drawObjects(t,dt,lampI);
-  drawLampGlow(lampI, shelfLampI, t);
-  drawMotes(t,dt,lampI);
-  if(STATE==='wipe') drawWipeSheen(t);
-  // vignette + global dim
-  ctx.setTransform(dpr*scaleF,0,0,dpr*scaleF,offX*dpr,offY*dpr);
-  const vg=ctx.createRadialGradient(VW/2,VH/2,VH*0.35,VW/2,VH/2,VH*0.95);
-  vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(4,3,2,0.55)');
-  ctx.fillStyle=vg; ctx.fillRect(0,0,VW,VH);
-  ctx.fillStyle=`rgba(3,2,1,${budget.veil})`; ctx.fillRect(-4,-4,VW+8,VH+8);
-  // fog swallows the room as we pass through the glass
-  if(zoomK>0){
-    ctx.fillStyle=`rgba(30,28,26,${zoomK*0.95})`; ctx.fillRect(-4,-4,VW+8,VH+8);
-  }
-}
-
-function drawRoom(li,sli,t,_dt){
-  const g=ctx.createLinearGradient(0,0,0,VH);
-  g.addColorStop(0,P.wallTop); g.addColorStop(1,P.wallBot);
-  ctx.fillStyle=g; ctx.fillRect(-4,-4,VW+8,VH+8);
-  // warm wash from desk lamp on wall
-  const w=ctx.createRadialGradient(LAMP.poolX,430,40, LAMP.poolX,430,480);
-  w.addColorStop(0,`rgba(255,176,110,${0.10*li})`); w.addColorStop(1,'rgba(255,176,110,0)');
-  ctx.fillStyle=w; ctx.fillRect(0,0,VW,VH);
-  // floor hint
-  ctx.fillStyle='rgba(10,7,5,0.5)'; ctx.fillRect(0,DESK.y+DESK.faceH-8,VW,VH-(DESK.y+DESK.faceH-8));
-  // small phulkari textile panel — a specific Punjabi material cue, kept quiet
-  ctx.save(); ctx.translate(640,220);
-  ctx.fillStyle='rgba(70,42,24,0.94)'; ctx.fillRect(-48,-58,96,116);
-  ctx.fillStyle='#111a31'; ctx.fillRect(-40,-50,80,100);
-  ctx.strokeStyle=`rgba(216,154,54,${0.34+li*.25})`; ctx.lineWidth=2;
-  for(let row=-32;row<=32;row+=32){
-    for(let col=-24;col<=24;col+=24){
-      ctx.beginPath(); ctx.moveTo(col,row-9); ctx.lineTo(col+9,row); ctx.lineTo(col,row+9); ctx.lineTo(col-9,row); ctx.closePath(); ctx.stroke();
+function createBoardDom() {
+  if (!board) return;
+  boardElement.replaceChildren();
+  for (let row = 0; row < NindovaRasoi.ROWS; row += 1) {
+    const rack = document.createElement("div");
+    rack.className = "rack";
+    rack.setAttribute("role", "group");
+    rack.setAttribute("aria-label", `Kitchen rack ${row + 1}`);
+    for (const tile of board.tiles.filter((candidate) => candidate.row === row)) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "tile";
+      button.dataset.tileId = tile.id;
+      button.dataset.motif = tile.motif;
+      button.style.setProperty("--slot", String(tile.slot));
+      button.style.setProperty("--depth", String(tile.depth));
+      button.innerHTML = `${iconSvg(tile.motif)}<span class="tile-label">${motifShortNames[tile.motif]}</span>`;
+      button.addEventListener("click", () => selectTile(tile.id, true));
+      rack.append(button);
     }
+    boardElement.append(rack);
   }
-  ctx.strokeStyle=`rgba(166,55,42,${0.45+li*.22})`; ctx.lineWidth=1.5;
-  ctx.beginPath(); ctx.moveTo(-34,-42); ctx.lineTo(34,42); ctx.moveTo(34,-42); ctx.lineTo(-34,42); ctx.stroke();
-  ctx.restore();
+  updateBoardDom();
 }
 
-function drawWindow(t,dt){
-  ctx.save();
-  // frame
-  ctx.fillStyle='#241a12';
-  ctx.fillRect(WIN.x-16,WIN.y-16,WIN.w+32,WIN.h+32);
-  // carved jali rhythm along the lintel
-  ctx.strokeStyle='rgba(201,150,72,.28)'; ctx.lineWidth=1.4;
-  for(let x=WIN.x+12;x<WIN.x+WIN.w-10;x+=28){
-    ctx.beginPath(); ctx.moveTo(x,WIN.y-12); ctx.lineTo(x+8,WIN.y-4); ctx.lineTo(x+16,WIN.y-12); ctx.lineTo(x+8,WIN.y-20); ctx.closePath(); ctx.stroke();
+function tileById(tileId: string) {
+  return board?.tiles.find((tile) => tile.id === tileId) ?? null;
+}
+
+function tileButton(tileId: string) {
+  return boardElement.querySelector<HTMLButtonElement>(`[data-tile-id="${tileId}"]`);
+}
+
+function updateBoardDom(focusId: string | null = null) {
+  if (!board) return;
+  const freeIds = new Set(NindovaRasoi.freeTiles(board, removed).map((tile) => tile.id));
+  for (const tile of board.tiles) {
+    const button = tileButton(tile.id);
+    if (!button) continue;
+    const isRemoved = removed.has(tile.id);
+    const isFree = freeIds.has(tile.id);
+    const isSelected = selectedTile === tile.id;
+    button.disabled = !isFree || isRemoved || state !== "play";
+    button.classList.toggle("is-removed", isRemoved);
+    button.classList.toggle("is-selected", isSelected);
+    button.setAttribute("aria-pressed", String(isSelected));
+    button.setAttribute("aria-label", `${motifNames[tile.motif]}, ${isRemoved ? "settled" : isFree ? "free at the rack edge" : "covered by neighboring tiles"}${isSelected ? ", selected" : ""}`);
   }
-  // night panes
-  const g=ctx.createLinearGradient(0,WIN.y,0,WIN.y+WIN.h);
-  g.addColorStop(0,'#131b22'); g.addColorStop(0.7,'#18222b'); g.addColorStop(1,'#10161c');
-  ctx.fillStyle=g; ctx.fillRect(WIN.x,WIN.y,WIN.w,WIN.h);
-  // distant glow
-  const dg=ctx.createRadialGradient(WIN.x+WIN.w*0.72,WIN.y+WIN.h*0.78,4,WIN.x+WIN.w*0.72,WIN.y+WIN.h*0.78,90);
-  dg.addColorStop(0,'rgba(190,170,120,0.10)'); dg.addColorStop(1,'rgba(190,170,120,0)');
-  ctx.fillStyle=dg; ctx.fillRect(WIN.x,WIN.y,WIN.w,WIN.h);
-  // tonight's vista, previewed through the glass
-  ctx.save();
-  ctx.beginPath(); ctx.rect(WIN.x,WIN.y,WIN.w,WIN.h); ctx.clip();
-  // small crescent
-  ctx.globalAlpha=0.6;
-  ctx.drawImage(moonSprite(), WIN.x+WIN.w*0.7-13, WIN.y+56-13, 26, 26);
-  ctx.globalAlpha=1;
-  if(vistaChoice==='meadow'){
-    ctx.strokeStyle='rgba(120,118,96,0.35)'; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.moveTo(WIN.x,WIN.y+WIN.h*0.66);
-    ctx.quadraticCurveTo(WIN.x+WIN.w*0.4,WIN.y+WIN.h*0.58,WIN.x+WIN.w,WIN.y+WIN.h*0.68); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(WIN.x,WIN.y+WIN.h*0.8);
-    ctx.quadraticCurveTo(WIN.x+WIN.w*0.55,WIN.y+WIN.h*0.74,WIN.x+WIN.w,WIN.y+WIN.h*0.82); ctx.stroke();
-    ctx.fillStyle='rgba(218,163,48,.28)';
-    for(let i=0;i<18;i++){
-      const fx=WIN.x+rnd2(i+81,8,WIN.w-8), fy=WIN.y+rnd2(i+93,WIN.h*.67,WIN.h*.9);
-      ctx.beginPath(); ctx.arc(fx,fy,1.6,0,7); ctx.fill();
+  boardShell.style.setProperty("--warmth", String(removed.size / board.tiles.length));
+  if (focusId) requestAnimationFrame(() => tileButton(focusId)?.focus());
+}
+
+function persistActiveSession() {
+  if (!board || !currentNight || state === "end") return;
+  try {
+    safeStorage("session")?.setItem(ACTIVE_SESSION_KEY, JSON.stringify({
+      version: 1,
+      night: currentNight,
+      boardId: board.id,
+      removed: [...removed],
+      startedAtMs,
+      deadlineAtMs,
+      windDownAtMs,
+    }));
+  } catch {
+    // Ephemeral resume is optional; the game remains usable without it.
+  }
+}
+
+function clearActiveSession() {
+  try { safeStorage("session")?.removeItem(ACTIVE_SESSION_KEY); } catch { /* no-op */ }
+}
+
+function restoreActiveSession() {
+  try {
+    const raw = safeStorage("session")?.getItem(ACTIVE_SESSION_KEY);
+    if (!raw) return false;
+    const candidate = JSON.parse(raw);
+    if (candidate.version !== 1 || !candidate.night?.nightId || !Array.isArray(candidate.removed)) return false;
+    const restoredBoard = NindovaRasoi.createBoard(candidate.night.nightId);
+    if (restoredBoard.id !== candidate.boardId) return false;
+    const allowed = new Set(restoredBoard.tiles.map((tile) => tile.id));
+    if (candidate.removed.some((tileId: string) => !allowed.has(tileId))) return false;
+    currentNight = candidate.night;
+    board = restoredBoard;
+    removed = new Set(candidate.removed);
+    selectedTile = null;
+    startedAtMs = Number(candidate.startedAtMs);
+    deadlineAtMs = Number(candidate.deadlineAtMs);
+    windDownAtMs = Number(candidate.windDownAtMs);
+    if (![startedAtMs, deadlineAtMs, windDownAtMs].every(Number.isFinite)) return false;
+    showView("play");
+    createBoardDom();
+    setStatus("The same kitchen is still here.");
+    enforceBoundary();
+    return true;
+  } catch {
+    clearActiveSession();
+    return false;
+  }
+}
+
+function beginSession() {
+  currentNight = NindovaNight.captureNight();
+  board = NindovaRasoi.createBoard(currentNight.nightId);
+  const verification = NindovaRasoi.verifyBoard(board);
+  if (!verification.valid) throw new Error(`Unverified Rasoi board: ${verification.reason}`);
+  removed = new Set();
+  selectedTile = null;
+  startedAtMs = Date.now();
+  deadlineAtMs = startedAtMs + hardCapSeconds * 1000;
+  windDownAtMs = startedAtMs + windDownSeconds * 1000;
+  virtualOffsetMs = 0;
+  endReason = "completed";
+  boardShell.classList.remove("is-settling");
+  showView("play");
+  createBoardDom();
+  setStatus("The edge tiles are ready.");
+  persistActiveSession();
+}
+
+async function playPairSound(row: number) {
+  if (!audioEnabled) return;
+  try {
+    audioContext ??= new AudioContext();
+    await audioContext.resume();
+    const now = audioContext.currentTime;
+    const gain = audioContext.createGain();
+    gain.gain.setValueAtTime(.0001, now);
+    gain.gain.exponentialRampToValueAtTime(.055, now + .01);
+    gain.gain.exponentialRampToValueAtTime(.0001, now + .22);
+    gain.connect(audioContext.destination);
+    for (const [offset, ratio] of [[0, 1], [.055, 1.52]] as const) {
+      const oscillator = audioContext.createOscillator();
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime((330 + row * 34) * ratio, now + offset);
+      oscillator.connect(gain);
+      oscillator.start(now + offset);
+      oscillator.stop(now + .24);
     }
-  } else {
-    ctx.strokeStyle='rgba(140,160,170,0.28)'; ctx.lineWidth=1.6;
-    for(let i=0;i<3;i++){
-      const wy=WIN.y+WIN.h*(0.68+i*0.09);
-      ctx.beginPath();
-      for(let x=0;x<=WIN.w;x+=22) ctx.lineTo(WIN.x+x, wy+Math.sin(x*0.05+t*0.6+i)*1.5);
-      ctx.stroke();
-    }
-  }
-  ctx.restore();
-  // rain
-  ctx.strokeStyle='rgba(150,175,195,0.34)'; ctx.lineWidth=1.1; ctx.beginPath();
-  for(const d of drops){
-    d.y+=d.v*dt; d.x+=d.v*dt*0.06;
-    if(d.y>WIN.y+WIN.h){ d.y=WIN.y-10; d.x=rnd(WIN.x+4,WIN.x+WIN.w-4); }
-    ctx.moveTo(d.x,d.y); ctx.lineTo(d.x-d.l*0.06,d.y-d.l);
-  }
-  ctx.stroke();
-  // slow pane streaks
-  ctx.strokeStyle='rgba(160,185,205,0.13)'; ctx.lineWidth=1.6; ctx.beginPath();
-  for(const s of streaks){
-    s.y+=s.v*dt;
-    if(s.y>WIN.y+WIN.h){ s.y=WIN.y; s.x=rnd(WIN.x+6,WIN.x+WIN.w-6); s.v=rnd(5,15);}
-    ctx.moveTo(s.x,s.y-14); ctx.quadraticCurveTo(s.x+1.5,s.y-7,s.x,s.y);
-  }
-  ctx.stroke();
-  // mullions
-  ctx.fillStyle='#241a12';
-  ctx.fillRect(WIN.x+WIN.w/2-4,WIN.y,8,WIN.h);
-  ctx.fillRect(WIN.x,WIN.y+WIN.h/2-4,WIN.w,8);
-  // sill
-  ctx.fillStyle='#2c2015'; ctx.fillRect(WIN.x-22,WIN.y+WIN.h+16,WIN.w+44,12);
-  // small plant on sill
-  ctx.save(); ctx.translate(WIN.x+40,WIN.y+WIN.h+16);
-  ctx.fillStyle='#4a3423'; ctx.fillRect(-9,-16,18,16);
-  ctx.strokeStyle='rgba(96,116,70,0.9)'; ctx.lineWidth=2;
-  for(let i=-2;i<=2;i++){ ctx.beginPath(); ctx.moveTo(0,-16);
-    ctx.quadraticCurveTo(i*7,-30,i*9,-38+Math.abs(i)*3); ctx.stroke(); }
-  ctx.restore();
-  ctx.restore();
-}
-
-function drawSign(t,dt){
-  // hanging sign near window; interactive at 'sign' phase
-  const sway = reduceMotion?0:Math.sin(t*0.9)*0.02;
-  signSwing = lerp(signSwing,0,dt*1.4);
-  const rot = sway + (signDone? 0 : 0) + Math.sin(t*6)*signSwing;
-  ctx.save();
-  ctx.translate(SIGN.x+SIGN.w/2, SIGN.y-18);
-  // strings
-  ctx.strokeStyle='rgba(120,96,70,0.8)'; ctx.lineWidth=1.4;
-  ctx.beginPath(); ctx.moveTo(-SIGN.w/2+10,18); ctx.lineTo(-SIGN.w/2+16,-2); ctx.moveTo(SIGN.w/2-10,18); ctx.lineTo(SIGN.w/2-16,-2); ctx.stroke();
-  ctx.rotate(rot);
-  ctx.translate(0,18+SIGN.h/2);
-  const hot = STATE==='sign' && !signDone;
-  if(hot){
-    const pulse=0.5+0.5*Math.sin(t*2.2);
-    ctx.shadowColor=`rgba(255,190,120,${0.35+0.3*pulse})`; ctx.shadowBlur=26;
-  }
-  // board — flips tone when done
-  ctx.fillStyle= signDone? '#241a13' : '#43301e';
-  rrect(-SIGN.w/2,-SIGN.h/2,SIGN.w,SIGN.h,7); ctx.fill();
-  ctx.shadowBlur=0;
-  ctx.strokeStyle='rgba(20,14,9,0.8)'; ctx.lineWidth=2;
-  rrect(-SIGN.w/2,-SIGN.h/2,SIGN.w,SIGN.h,7); ctx.stroke();
-  // carved moon instead of words
-  ctx.strokeStyle= signDone? 'rgba(200,180,150,0.5)':'rgba(230,200,160,0.75)';
-  ctx.lineWidth=2.4; ctx.beginPath();
-  if(signDone){ ctx.arc(0,0,13,0.6,5.2); }        // waning arc = closed
-  else { ctx.arc(-3,0,12,0,6.4); }                // open circle = open
-  ctx.stroke();
-  ctx.restore();
-}
-
-function drawShelves(sli,t){
-  ctx.save();
-  // unit
-  ctx.fillStyle='#2a1e14'; ctx.fillRect(SHELF.x-14,150,SHELF.w+28,SHELF.ys[2]-150+38);
-  ctx.fillStyle='#221810'; ctx.fillRect(SHELF.x-6,158,SHELF.w+12,SHELF.ys[2]-158+26);
-  // shelves + books
-  const bookCols=['#6e4632','#5a6048','#7c5a3a','#4e3a4a','#75492e','#556052','#6a3f2e','#7a6444'];
-  SHELF.ys.forEach((sy,si)=>{
-    ctx.fillStyle='#3a2a1a'; ctx.fillRect(SHELF.x-10,sy,SHELF.w+20,10);
-    // books with gaps left for slots
-    let bx=SHELF.x+4; let ci=si*3;
-    while(bx<SHELF.x+SHELF.w-14){
-      const nearSlot = slots.find(s=>s.drawer===null && Math.abs(s.x-(bx+14))<40 && Math.abs(s.y-sy)<8);
-      if(nearSlot){ bx = nearSlot.x+36; continue; }
-      const bw=rnd2(ci,14,24), bh=rnd2(ci+1,52,84);
-      ctx.fillStyle=shade(bookCols[ci%bookCols.length], -18+((ci*37)%12));
-      rrect(bx,sy-bh,bw,bh,2); ctx.fill();
-      ctx.fillStyle='rgba(0,0,0,0.22)'; ctx.fillRect(bx,sy-bh,bw,5);
-      bx+=bw+3; ci++;
-    }
-  });
-  // shelf lamp on top
-  ctx.save(); ctx.translate(SHELF.x+SHELF.w-52,150);
-  ctx.fillStyle='#33261a'; ctx.fillRect(-4,-6,8,6);
-  ctx.fillStyle=`rgba(60,44,30,1)`;
-  ctx.beginPath(); ctx.moveTo(-16,-6); ctx.lineTo(16,-6); ctx.lineTo(9,-26); ctx.lineTo(-9,-26); ctx.closePath(); ctx.fill();
-  ctx.restore();
-  ctx.restore();
-}
-function rnd2(seed,a,b){ const x=Math.sin(seed*127.1)*43758.5453; const f=x-Math.floor(x); return a+f*(b-a); }
-function shade(hex,amt){
-  const n=parseInt(hex.slice(1),16);
-  let r=(n>>16)+amt,g=((n>>8)&255)+amt,b=(n&255)+amt;
-  r=clamp(r,0,255);g=clamp(g,0,255);b=clamp(b,0,255);
-  return `rgb(${r},${g},${b})`;
-}
-
-function drawDesk(li,t,dt){
-  ctx.save();
-  // surface
-  const g=ctx.createLinearGradient(0,DESK.y-6,0,DESK.y+40);
-  g.addColorStop(0,shade('#5a4028',Math.round(-24+li*26)));
-  g.addColorStop(1,'#332416');
-  ctx.fillStyle=g; ctx.fillRect(60,DESK.y,VW-120,34);
-  // lamplight pool on surface
-  const pool=ctx.createRadialGradient(LAMP.poolX,DESK.y+16,10,LAMP.poolX,DESK.y+16,330);
-  pool.addColorStop(0,`rgba(255,190,120,${0.20*li})`);
-  pool.addColorStop(1,'rgba(255,190,120,0)');
-  ctx.fillStyle=pool; ctx.fillRect(60,DESK.y,VW-120,34);
-  // desk face + drawers
-  ctx.fillStyle=P.deskFace; ctx.fillRect(60,DESK.y+34,VW-120,DESK.faceH-34);
-  ctx.fillStyle='rgba(0,0,0,0.25)'; ctx.fillRect(60,DESK.y+34,VW-120,8);
-  // legs shadow
-  ctx.fillStyle='rgba(0,0,0,0.35)';
-  ctx.fillRect(80,DESK.y+DESK.faceH-6,60,10); ctx.fillRect(VW-160,DESK.y+DESK.faceH-6,60,10);
-  // drawers (right side)
-  for(const s of slots){
-    if(s.drawer===null) continue;
-    const open=s.open;
-    const dw=118, dh=54;
-    const dx=s.x-dw/2, dy=s.y-dh/2 + open*20;
-    // cavity
-    if(open>0.02){ ctx.fillStyle='rgba(12,8,5,0.95)'; rrect(s.x-dw/2, s.y-dh/2, dw, dh,4); ctx.fill(); }
-    ctx.fillStyle=shade('#3c2b1a', open>0.02? 10:0);
-    rrect(dx,dy,dw,dh,4); ctx.fill();
-    ctx.strokeStyle='rgba(0,0,0,0.4)'; ctx.lineWidth=1.5; rrect(dx,dy,dw,dh,4); ctx.stroke();
-    // knob
-    ctx.fillStyle='#8a6a42'; ctx.beginPath(); ctx.arc(s.x,dy+dh/2,4.5,0,7); ctx.fill();
-    // slot glow
-    if(s.glow>0.01){
-      ctx.fillStyle=`rgba(255,196,130,${0.16*s.glow})`;
-      rrect(dx-4,dy-4,dw+8,dh+8,7); ctx.fill();
-    }
-  }
-  // shelf slot glows
-  for(const s of slots){
-    if(s.drawer!==null) continue;
-    if(s.glow>0.01){
-      const gg=ctx.createRadialGradient(s.x,s.y-22,4,s.x,s.y-22,44);
-      gg.addColorStop(0,`rgba(255,200,135,${0.30*s.glow})`); gg.addColorStop(1,'rgba(255,200,135,0)');
-      ctx.fillStyle=gg; ctx.fillRect(s.x-48,s.y-70,96,96);
-    }
-  }
-  ctx.restore();
-}
-
-function drawLampGlow(li,sli,t){
-  // desk lamp body
-  ctx.save();
-  ctx.translate(LAMP.bx,LAMP.by);
-  ctx.strokeStyle='#241a10'; ctx.lineWidth=7; ctx.lineCap='round';
-  ctx.beginPath(); ctx.moveTo(0,128); ctx.quadraticCurveTo(-8,60,26,26); ctx.stroke();
-  ctx.fillStyle='#241a10';
-  ctx.beginPath(); ctx.ellipse(0,130,34,9,0,0,7); ctx.fill();
-  // shade
-  ctx.save(); ctx.translate(30,22); ctx.rotate(0.5);
-  ctx.fillStyle='#2e2013';
-  ctx.beginPath(); ctx.moveTo(-26,0); ctx.lineTo(26,0); ctx.lineTo(16,-30); ctx.lineTo(-16,-30); ctx.closePath(); ctx.fill();
-  // bulb glow
-  const bg=ctx.createRadialGradient(0,6,2,0,6,46);
-  bg.addColorStop(0,`rgba(255,214,150,${0.8*li})`); bg.addColorStop(1,'rgba(255,214,150,0)');
-  ctx.fillStyle=bg; ctx.beginPath(); ctx.arc(0,6,46,0,7); ctx.fill();
-  ctx.restore();
-  // cone of light onto desk
-  ctx.globalCompositeOperation='screen';
-  const cone=ctx.createLinearGradient(0,30,0,150);
-  cone.addColorStop(0,`rgba(255,196,124,${0.13*li})`);
-  cone.addColorStop(1,`rgba(255,196,124,0)`);
-  ctx.fillStyle=cone;
-  ctx.beginPath(); ctx.moveTo(42,36); ctx.lineTo(240,150); ctx.lineTo(-40,150); ctx.lineTo(18,42); ctx.closePath(); ctx.fill();
-  ctx.restore();
-  // shelf lamp glow
-  if(sli>0.02){
-    ctx.save(); ctx.globalCompositeOperation='screen';
-    const sx=SHELF.x+SHELF.w-52, sy=128;
-    const sg=ctx.createRadialGradient(sx,sy,4,sx,sy,120);
-    sg.addColorStop(0,`rgba(255,206,150,${0.28*sli})`); sg.addColorStop(1,'rgba(255,206,150,0)');
-    ctx.fillStyle=sg; ctx.fillRect(sx-130,sy-130,260,260);
-    ctx.restore();
-  }
-}
-
-function drawMotes(t,dt,li){
-  if(li<0.05) return;
-  ctx.save();
-  for(const m of motes){
-    m.y-=m.v*dt; m.x+=Math.sin(t*0.7+m.ph)*0.12;
-    if(m.y<340){ m.y=rnd(500,540); m.x=rnd(500,780); }
-    ctx.fillStyle=`rgba(255,220,170,${m.a*li*0.8})`;
-    ctx.beginPath(); ctx.arc(m.x,m.y,1.1,0,7); ctx.fill();
-  }
-  ctx.restore();
-}
-
-function drawWipeSheen(t){
-  // faint affordance band on desk + trail
-  const pulse=0.5+0.5*Math.sin(t*1.6);
-  ctx.save();
-  ctx.fillStyle=`rgba(255,205,150,${0.045+0.03*pulse})`;
-  rrect(140,DESK.y-2,760,30,14); ctx.fill();
-  if(lastWipe){
-    const gg=ctx.createRadialGradient(lastWipe.x,lastWipe.y,4,lastWipe.x,lastWipe.y,70);
-    gg.addColorStop(0,'rgba(255,220,170,0.16)'); gg.addColorStop(1,'rgba(255,220,170,0)');
-    ctx.fillStyle=gg; ctx.fillRect(lastWipe.x-72,lastWipe.y-72,144,144);
-  }
-  ctx.restore();
-}
-
-function rrect(x,y,w,h,r){
-  ctx.beginPath();
-  ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
-  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
-}
-
-/* ============================================================
-   ACT II — THE VISTA (through the window)
-   A procession: things arrive, you let them across, they get
-   slower and rarer, and finally one settles down for the night.
-   No counting. No score. Touch always works; later, it isn't needed.
-   ============================================================ */
-let vistaChoice: Vista='meadow';
-const vistaDisplayName=()=>vistaChoice==='meadow'?'mustard meadow':'riverside harbor';
-let approachT=0, vistaT=0, driftT=0, returnT=0, vistaFade=0, vistaCloseT=0;
-let entities=[], nextSpawn=1.5, speciesBag=[], finalEntity=null, vistaDone=false;
-let fullRain=[], crickets=null, waterTimer=null;
-let driftLight=null, driftPointer=null, lastDriftTouch=0;
-
-const moonSprites=new Map();
-function moonSprite(){
-  const phase=nightRecipe.moon;
-  if(moonSprites.has(phase)) return moonSprites.get(phase);
-  const moonCv=document.createElement('canvas'); moonCv.width=64; moonCv.height=64;
-  const m=moonCv.getContext('2d');
-  m.fillStyle='#d8cba8'; m.beginPath(); m.arc(32,32,26,0,Math.PI*2); m.fill();
-  m.globalCompositeOperation='destination-out';
-  if(phase==='half') m.fillRect(32,3,31,58);
-  else {
-    m.beginPath(); m.arc(phase==='veiled'?39:43,phase==='veiled'?27:23,phase==='veiled'?21:23,0,Math.PI*2); m.fill();
-  }
-  if(phase==='veiled'){
-    m.globalCompositeOperation='source-over';
-    m.fillStyle='rgba(24,31,48,.32)'; m.fillRect(4,24,56,12);
-  }
-  moonSprites.set(phase,moonCv);
-  return moonCv;
-}
-
-const FENCE_X=740;
-
-function vDecay(){ return clamp(vistaT/pace().vistaTime,0,1); }
-
-function drawnBag(){
-  if(!speciesBag.length){
-    const src = vistaChoice==='meadow'? nightRecipe.meadowSpecies : nightRecipe.harborBoats;
-    speciesBag = [...src];
-  }
-  return speciesBag.pop();
-}
-
-function beginVista(){
-  STATE='vista'; vistaT=0; entities=[]; speciesBag=[]; finalEntity=null; vistaDone=false;
-  vistaFade=0; vistaCloseT=0; nextSpawn=1.2;
-  fullRain=[];
-  const N=Math.max(4,Math.round((reduceMotion?18:40)*weatherScale()));
-  for(let i=0;i<N;i++) fullRain.push({x:rnd(0,VW),y:rnd(0,VH),v:rnd(110,210),l:rnd(10,20)});
-  startVistaAudio();
-  hint(vistaChoice==='meadow' ? 'Let them over, whenever you\'re ready.' : 'Bring each one in to its light.', 1.2, 5);
-}
-
-function spawnEntity(final=false){
-  const kind=drawnBag();
-  const m = vistaChoice==='meadow';
-  const baseY = m ? 585+rnd(-6,10) : 560+rnd(-14,18);
-  let speed = m ? ({tortoise:22,hedgehog:30,cat:52,deer:58,rabbit:64}[kind]||44) : 34;
-  if(final) speed = Math.max(speed, 56); // the last one doesn't dawdle its entrance
-  entities.push({
-    kind, x:-70, y:baseY, v:speed*rnd(0.9,1.1),
-    phase:'approach', t:0, hopT:0, bob:rnd(0,6), waitT:0,
-    final, crossed:false, lampA:0, restY:baseY
-  });
-}
-
-function vistaTap(v){
-  // generous: nearest un-crossed entity within reach
-  let best=null,bd=150;
-  for(const e of entities){
-    if(e.crossed||e.phase==='hop'||e.phase==='settle') continue;
-    const d=dist(v.x,v.y,e.x,e.y);
-    if(d<bd){bd=d;best=e;}
-  }
-  if(best){
-    if(best.final){ beginSettleEntity(best); return; }
-    if(best.phase==='wait') beginCross(best);
-    else best.queued=true; // will cross on arrival
-    sfxAcknowledge();
-  }
-}
-
-function beginCross(e){
-  e.phase='hop'; e.hopT=0;
-  if(vistaChoice==='meadow') sfxHop(); else sfxBell();
-}
-function beginSettleEntity(e){
-  e.phase='settle'; e.t=0; sfxAcknowledge();
-}
-
-function updateVista(dt){
-  vistaT+=dt;
-  vistaFade=Math.min(1,vistaFade+dt*0.7);
-  const D=vDecay();
-  dimTarget = 0.68 + D*0.24;
-
-  // spawning — intervals stretch as the night deepens; then the last one
-  nextSpawn-=dt;
-  const wantFinal = vistaT > pace().vistaTime*0.86 && !finalEntity;
-  if(nextSpawn<=0 && !vistaDone){
-    if(wantFinal){
-      spawnEntity(true);
-      finalEntity=entities[entities.length-1];
-      nextSpawn=9999;
-    } else if(!finalEntity){
-      spawnEntity(false);
-      const scaleT = pace().vistaTime/78;
-      nextSpawn = lerp(4.5,12,D) * scaleT * rnd(0.85,1.2);
-    }
-  }
-
-  const m=vistaChoice==='meadow';
-  for(const e of entities){
-    e.t+=dt;
-    if(e.phase==='approach'){
-      e.x += e.v*dt*(m?1:0.9);
-      const stopX = e.final ? FENCE_X-95 : FENCE_X-70;
-      if(e.x>=stopX){
-        e.x=stopX;
-        if(e.final){ e.phase='linger'; e.waitT=0; }
-        else if(e.queued){ beginCross(e); }
-        else { e.phase='wait'; e.waitT=0; }
-      }
-    }
-    else if(e.phase==='wait'){
-      e.waitT+=dt;
-      // deep in the night they cross on their own — your touch becomes optional
-      const patience = lerp(20, 5.5, easeInOut(clamp((D-0.3)/0.6,0,1)));
-      if(D>0.32 && e.waitT>patience) beginCross(e);
-    }
-    else if(e.phase==='linger'){
-      e.waitT+=dt;
-      if(e.waitT>5) beginSettleEntity(e); // settles by itself if you just watch
-    }
-    else if(e.phase==='hop'){
-      e.hopT+=dt;
-      const T=m?0.9:2.4, k=clamp(e.hopT/T,0,1);
-      if(m){
-        e.x = lerp(FENCE_X-70, FENCE_X+64, k);
-        e.y = e.restY - Math.sin(k*Math.PI)*74;
-        if(k>=1){ e.phase='depart'; e.y=e.restY; e.crossed=true; }
-      } else {
-        e.x = lerp(FENCE_X-70, FENCE_X+120, easeInOut(k));
-        if(k>=1){ e.phase='moored'; e.crossed=true; e.mx=e.x; }
-      }
-    }
-    else if(e.phase==='depart'){
-      e.x += e.v*1.15*dt;
-    }
-    else if(e.phase==='moored'){
-      e.lampA=lerp(e.lampA,1,dt*1.6);
-    }
-    else if(e.phase==='settle'){
-      // the last one curls up at the fence
-      e.settled = e.t>1.6;
-      if(e.settled && !vistaDone){
-        vistaDone=true;
-        vistaCloseT=0;
-      }
-    }
-  }
-  entities=entities.filter(e=> e.x<VW+90);
-  if(vistaDone){
-    vistaCloseT+=dt;
-    if(vistaCloseT>(capClosing ? 0.6 : 2.8)) beginDrift();
-  }
-}
-
-/* ---------- drift (Act III) ---------- */
-function beginDrift(){
-  STATE='drift'; driftT=0; lastDriftTouch=0;
-  const anchor = finalEntity? {x:finalEntity.x, y:finalEntity.y-90} : {x:640,y:430};
-  driftLight={x:anchor.x,y:anchor.y,tx:anchor.x,ty:anchor.y,glow:1};
-  driftPointer=null;
-  authoredAccent('handoff');
-  hint('', 0, 0.1);
-  if(rainGain&&AC) rainGain.gain.setTargetAtTime(0.07,AC.currentTime,1.5);
-}
-function updateDrift(dt){
-  driftT+=dt;
-  const D=clamp(driftT/pace().driftTime,0,1);
-  dimTarget=0.78+D*0.16;
-  const L=driftLight;
-  if(driftPointer){
-    lastDriftTouch=driftT;
-    L.tx=driftPointer.x; L.ty=clamp(driftPointer.y,120,600);
-  }
-  // the light follows with growing lag until it stops caring
-  const follow = lerp(2.2, 0.12, easeInOut(D));
-  L.x=lerp(L.x,L.tx,dt*follow);
-  L.y=lerp(L.y,L.ty,dt*follow) + Math.sin(driftT*0.9)*0.3;
-  // long stillness or time up → light goes to rest
-  const still = driftT-lastDriftTouch;
-  if(D>=1 || (driftT>8 && still>lerp(14,7,D))){
-    STATE='return'; returnT=0;
-    if(finalEntity){ L.tx=finalEntity.x; L.ty=finalEntity.y-40; }
-  }
-}
-function updateReturn(dt){
-  returnT+=dt;
-  const L=driftLight;
-  L.x=lerp(L.x,L.tx,dt*1.2); L.y=lerp(L.y,L.ty,dt*1.2);
-  L.glow=lerp(L.glow,0,dt*0.8);
-  dimTarget=0.94;
-  if(returnT>3.2){
-    STATE='sign'; dimTarget=0.96;
-    stopVistaAudio();
-    hint('Turn the sign.',0.8,6);
-  }
-}
-
-/* ---------- vista drawing ---------- */
-function drawVista(t,dt){
-  const m=vistaChoice==='meadow';
-  const D=vDecay();
-  // night sky
-  const sky=ctx.createLinearGradient(0,0,0,VH);
-  sky.addColorStop(0,'#17213a'); sky.addColorStop(0.55,'#20253a'); sky.addColorStop(1,'#24251c');
-  ctx.fillStyle=sky; ctx.fillRect(-4,-4,VW+8,VH+8);
-  // crescent moon (offscreen sprite — the cut never touches the sky)
-  ctx.save(); ctx.globalAlpha=0.85;
-  ctx.drawImage(moonSprite(), 952-32, 128-32);
-  ctx.restore();
-  // moonlight wash
-  ctx.save(); ctx.globalCompositeOperation='screen';
-  const mg=ctx.createRadialGradient(952,128,10,952,128,320);
-  mg.addColorStop(0,'rgba(200,195,165,0.10)'); mg.addColorStop(1,'rgba(200,195,165,0)');
-  ctx.fillStyle=mg; ctx.fillRect(632,-60,640,640); ctx.restore();
-  // faint stars
-  for(let i=0;i<26;i++){
-    const sx=rnd2(i*7+1,30,VW-30), sy=rnd2(i*13+2,30,300);
-    const tw=0.5+0.5*Math.sin(t*0.8+i);
-    ctx.fillStyle=`rgba(220,215,190,${0.10+0.10*tw})`;
-    ctx.fillRect(sx,sy,1.6,1.6);
-  }
-
-  if(m) drawMeadow(t,D); else drawHarbor(t,D);
-
-  // full-frame gentle rain
-  ctx.strokeStyle=`rgba(150,175,195,${0.16-(D*0.06)})`; ctx.lineWidth=1; ctx.beginPath();
-  for(const d of fullRain){
-    d.y+=d.v*dt; d.x+=d.v*dt*0.05;
-    if(d.y>VH){ d.y=-20; d.x=rnd(0,VW); }
-    ctx.moveTo(d.x,d.y); ctx.lineTo(d.x-d.l*0.05,d.y-d.l);
-  }
-  ctx.stroke();
-
-  // drift light
-  if((STATE==='drift'||STATE==='return') && driftLight){
-    const L=driftLight;
-    ctx.save(); ctx.globalCompositeOperation='screen';
-    const g=ctx.createRadialGradient(L.x,L.y,2,L.x,L.y,60);
-    g.addColorStop(0,`rgba(255,214,150,${0.75*L.glow})`);
-    g.addColorStop(1,'rgba(255,214,150,0)');
-    ctx.fillStyle=g; ctx.fillRect(L.x-64,L.y-64,128,128);
-    ctx.restore();
-    ctx.fillStyle=`rgba(255,236,200,${0.9*L.glow})`;
-    ctx.beginPath(); ctx.arc(L.x,L.y,2.6,0,7); ctx.fill();
-  }
-
-  // fog bands rise with decay
-  for(let i=0;i<3;i++){
-    const fy=470+i*90;
-    const fg=ctx.createLinearGradient(0,fy-46,0,fy+46);
-    const a=(0.05+D*0.14)*(1-i*0.18);
-    fg.addColorStop(0,'rgba(46,42,38,0)');
-    fg.addColorStop(0.5,`rgba(52,48,44,${a})`);
-    fg.addColorStop(1,'rgba(46,42,38,0)');
-    ctx.fillStyle=fg; ctx.fillRect(0,fy-46,VW,92);
-  }
-
-  // vignette + dim
-  const vg=ctx.createRadialGradient(VW/2,VH/2,VH*0.35,VW/2,VH/2,VH*0.95);
-  vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(4,3,2,0.6)');
-  ctx.fillStyle=vg; ctx.fillRect(0,0,VW,VH);
-  ctx.fillStyle=`rgba(3,2,1,${lightEnvelope().veil})`; ctx.fillRect(-4,-4,VW+8,VH+8);
-  // arriving through the fog
-  if(vistaFade<1){
-    ctx.fillStyle=`rgba(30,28,26,${(1-vistaFade)*0.95})`; ctx.fillRect(-4,-4,VW+8,VH+8);
-  }
-}
-
-function drawMeadow(t,D){
-  // Punjab mustard meadow at night
-  ctx.fillStyle='#343b20';
-  ctx.beginPath(); ctx.moveTo(0,470);
-  ctx.quadraticCurveTo(300,420,640,462); ctx.quadraticCurveTo(950,498,VW,452);
-  ctx.lineTo(VW,VH); ctx.lineTo(0,VH); ctx.closePath(); ctx.fill();
-  ctx.fillStyle='#292417';
-  ctx.beginPath(); ctx.moveTo(0,560);
-  ctx.quadraticCurveTo(420,520,800,556); ctx.quadraticCurveTo(1040,576,VW,548);
-  ctx.lineTo(VW,VH); ctx.lineTo(0,VH); ctx.closePath(); ctx.fill();
-  // moonlit fog behind fence line (backdrop that makes silhouettes readable)
-  const bg=ctx.createLinearGradient(0,470,0,640);
-  bg.addColorStop(0,'rgba(84,79,68,0)'); bg.addColorStop(0.55,`rgba(84,79,68,${0.42+D*0.1})`); bg.addColorStop(1,'rgba(84,79,68,0)');
-  ctx.fillStyle=bg; ctx.fillRect(0,470,VW,170);
-  // fence
-  ctx.strokeStyle='#241c12'; ctx.lineWidth=7; ctx.lineCap='round';
-  ctx.beginPath();
-  ctx.moveTo(FENCE_X-16,626); ctx.lineTo(FENCE_X-6,548);
-  ctx.moveTo(FENCE_X+22,628); ctx.lineTo(FENCE_X+12,550);
-  ctx.stroke();
-  ctx.lineWidth=5;
-  ctx.beginPath();
-  ctx.moveTo(FENCE_X-60,566); ctx.lineTo(FENCE_X+64,562);
-  ctx.moveTo(FENCE_X-60,596); ctx.lineTo(FENCE_X+64,592);
-  ctx.stroke();
-  // a few grass tufts
-  ctx.strokeStyle='rgba(52,54,36,0.9)'; ctx.lineWidth=1.6;
-  for(let i=0;i<12;i++){
-    const gx=rnd2(i*3+40,40,VW-40), gy=630+rnd2(i*5+1,0,60);
-    ctx.beginPath(); ctx.moveTo(gx,gy); ctx.quadraticCurveTo(gx+2,gy-10,gx+rnd2(i,-4,4),gy-14); ctx.stroke();
-  }
-  // mustard flowers read as a field, never as collectible markers
-  const accent={marigold:'216,161,48',saffron:'202,127,38',wheat:'191,164,91'}[nightRecipe.meadowAccent]??'216,161,48';
-  ctx.lineWidth=1.2;
-  for(let i=0;i<34;i++){
-    const gx=rnd2(i*11+6,24,VW-24), gy=rnd2(i*17+9,610,718);
-    const height=rnd2(i*19+4,10,24);
-    ctx.strokeStyle='rgba(94,100,48,.55)';
-    ctx.beginPath(); ctx.moveTo(gx,gy); ctx.lineTo(gx,gy-height); ctx.stroke();
-    ctx.fillStyle=`rgba(${accent},${.22+(1-D)*.16})`;
-    ctx.beginPath(); ctx.arc(gx,gy-height,2.1,0,7); ctx.arc(gx-3,gy-height+2,1.6,0,7); ctx.fill();
-  }
-  if(nightMemory.meadowEcho){
-    ctx.save(); ctx.globalAlpha=.26;
-    drawAnimal({kind:nightMemory.meadowEcho.kind,x:FENCE_X+118,y:600,phase:'echo',t:0,bob:0},t);
-    ctx.restore();
-  }
-  // tonight's entities
-  for(const e of entities) drawAnimal(e,t);
-}
-
-function drawAnimal(e,t){
-  ctx.save();
-  ctx.translate(e.x, e.y + ((e.phase==='approach'||e.phase==='depart')? Math.sin(t*7+e.bob)*1.6:0));
-  const idle = (e.phase==='wait'||e.phase==='linger')? Math.sin(t*1.4+e.bob)*1 : 0;
-  ctx.translate(0,idle);
-  if(SPRITE_CELLS[e.kind]&&FOCAL_SPRITES.complete&&FOCAL_SPRITES.naturalWidth){
-    const settle=e.phase==='settle'?clamp(e.t/1.6,0,1):0;
-    const breathe=e.phase==='settle'&&!reduceMotion?1+Math.sin(t*1.1)*0.012:1;
-    ctx.scale(breathe*(1-settle*0.08),breathe*(1-settle*0.08));
-    drawFocalSprite(e.kind,-50,-76,100,100);
-    ctx.restore();
-    return;
-  }
-  const body='#221b13', rim='rgba(255,205,150,0.14)';
-  ctx.fillStyle=body; ctx.strokeStyle=rim; ctx.lineWidth=1.4;
-  const K=e.kind;
-  ctx.beginPath();
-  if(K==='sheep'){
-    for(let i=0;i<6;i++){ const a=i/6*Math.PI*2; ctx.moveTo(Math.cos(a)*22+6,Math.sin(a)*13-8); ctx.arc(Math.cos(a)*16+4,Math.sin(a)*9-8,11,0,7); }
-    ctx.fill(); ctx.beginPath(); ctx.arc(-24,-14,8,0,7); ctx.fill();      // head
-    ctx.fillRect(-12,2,4,14); ctx.fillRect(6,2,4,14);                     // legs
-  } else if(K==='goose'){
-    ctx.ellipse(4,-6,20,11,0,0,7); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(-12,-10); ctx.quadraticCurveTo(-22,-34,-16,-40); ctx.lineTo(-12,-38); ctx.quadraticCurveTo(-16,-30,-8,-12); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.arc(-15,-40,4.5,0,7); ctx.fill();
-    ctx.fillRect(-2,4,3,10);
-  } else if(K==='tortoise'){
-    ctx.arc(0,-6,17,Math.PI,0); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.arc(-20,-4,5,0,7); ctx.fill();
-    ctx.fillRect(-12,-2,26,5);
-  } else if(K==='rabbit'){
-    ctx.ellipse(2,-8,13,10,0,0,7); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(-10,-24,3.4,12,-0.25,0,7); ctx.ellipse(-3,-25,3.4,12,0.12,0,7); ctx.fill();
-    ctx.beginPath(); ctx.arc(-9,-13,6,0,7); ctx.fill();
-    ctx.beginPath(); ctx.arc(13,-4,4,0,7); ctx.fill();
-  } else if(K==='cat'){
-    ctx.ellipse(2,-8,16,9,0,0,7); ctx.fill();
-    ctx.beginPath(); ctx.arc(-14,-16,7,0,7); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(-19,-21); ctx.lineTo(-17,-28); ctx.lineTo(-13,-22); ctx.moveTo(-11,-22); ctx.lineTo(-8,-28); ctx.lineTo(-6,-21); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(16,-8); ctx.quadraticCurveTo(28,-14,26,-26); ctx.quadraticCurveTo(24,-14,14,-11); ctx.closePath(); ctx.fill();
-  } else if(K==='hedgehog'){
-    ctx.arc(0,-4,14,Math.PI,0); ctx.closePath(); ctx.fill();
-    for(let i=0;i<7;i++){ const a=Math.PI+(i+0.5)/7*Math.PI; ctx.beginPath();
-      ctx.moveTo(Math.cos(a)*13,-4+Math.sin(a)*13);
-      ctx.lineTo(Math.cos(a)*20,-4+Math.sin(a)*20); ctx.lineWidth=2.6; ctx.strokeStyle=body; ctx.stroke(); }
-    ctx.beginPath(); ctx.moveTo(-13,-4); ctx.lineTo(-22,0); ctx.lineTo(-13,2); ctx.closePath(); ctx.fill();
-  } else if(K==='deer'){
-    ctx.ellipse(2,-16,16,9,0,0,7); ctx.fill();
-    ctx.fillRect(-9,-10,3.4,20); ctx.fillRect(9,-10,3.4,20);
-    ctx.beginPath(); ctx.arc(-16,-28,5.5,0,7); ctx.fill();
-    ctx.strokeStyle=body; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.moveTo(-18,-32); ctx.lineTo(-22,-42); ctx.moveTo(-20,-37); ctx.lineTo(-25,-39);
-    ctx.moveTo(-14,-32); ctx.lineTo(-11,-42); ctx.stroke();
-  } else if(K==='duck'){
-    ctx.ellipse(2,-6,14,9,0,0,7); ctx.fill();
-    ctx.beginPath(); ctx.arc(-11,-16,5.5,0,7); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(-16,-16); ctx.lineTo(-23,-14); ctx.lineTo(-16,-12); ctx.closePath(); ctx.fill();
-  }
-  ctx.restore();
-  // breathing curl overlay once settled
-  if(e.phase==='settle'){
-    const k=clamp(e.t/1.6,0,1);
-    ctx.save(); ctx.translate(e.x,e.y);
-    ctx.globalAlpha=k;
-    ctx.fillStyle='#201a12';
-    const br=1+Math.sin(t*1.1)*0.02;
-    ctx.beginPath(); ctx.ellipse(0,-6,20*br,12*br,0,0,7); ctx.fill();
-    ctx.beginPath(); ctx.arc(14,-10,6,0,7); ctx.fill();
-    ctx.restore();
-  }
-}
-
-function drawHarbor(t,D){
-  // quiet Indian riverside landing, retaining the fixed harbor path
-  const paint={indigo:'74,91,132',madder:'133,62,49',marigold:'193,132,38'}[nightRecipe.harborPaint]??'74,91,132';
-  const wg=ctx.createLinearGradient(0,470,0,VH);
-  wg.addColorStop(0,'#141a1e'); wg.addColorStop(1,'#101211');
-  ctx.fillStyle=wg; ctx.fillRect(0,470,VW,VH-470);
-  ctx.strokeStyle=`rgba(${paint},0.10)`;
-  for(let i=0;i<8;i++){
-    const wy=500+i*30, ph=t*0.5+i;
-    ctx.beginPath();
-    for(let x=0;x<=VW;x+=40) ctx.lineTo(x, wy+Math.sin(x*0.01+ph)*2.4);
-    ctx.stroke();
-  }
-  // carved stone landing steps, softened into the night
-  ctx.fillStyle='rgba(86,67,50,.42)';
-  for(let i=0;i<5;i++) ctx.fillRect(0,470+i*22,230-i*24,16);
-  ctx.strokeStyle='rgba(205,142,52,.16)'; ctx.lineWidth=1;
-  for(let i=0;i<5;i++){
-    ctx.beginPath(); ctx.moveTo(0,486+i*22); ctx.lineTo(220-i*24,486+i*22); ctx.stroke();
-  }
-  nightMemory.harborEchoes.forEach((echo,index,list)=>{
-    ctx.save();
-    ctx.globalAlpha=.10+.22*((index+1)/list.length);
-    drawBoat({kind:echo.kind,x:FENCE_X+150+index*64,y:560+index*17,bob:index,phase:'moored',lampA:.18},t);
-    ctx.restore();
-  });
-  // far shore
-  ctx.fillStyle='#131410';
-  ctx.beginPath(); ctx.moveTo(0,470);
-  ctx.lineTo(VW,470); ctx.lineTo(VW,455); ctx.quadraticCurveTo(700,438,380,452); ctx.quadraticCurveTo(160,462,0,450);
-  ctx.closePath(); ctx.fill();
-  // mooring posts with lamps (right side)
-  for(let i=0;i<4;i++){
-    const px=FENCE_X+120+i*74, py=560+i*22;
-    ctx.strokeStyle='#231b10'; ctx.lineWidth=6; ctx.lineCap='round';
-    ctx.beginPath(); ctx.moveTo(px,py+26); ctx.lineTo(px,py-14); ctx.stroke();
-    const lit = entities.some(e=>e.phase==='moored'&&Math.abs(e.mx-px)<40);
-    const la = lit?0.55:0.12;
-    ctx.save(); ctx.globalCompositeOperation='screen';
-    const g=ctx.createRadialGradient(px,py-20,1,px,py-20,26);
-    g.addColorStop(0,`rgba(255,200,130,${la})`); g.addColorStop(1,'rgba(255,200,130,0)');
-    ctx.fillStyle=g; ctx.fillRect(px-28,py-48,56,56); ctx.restore();
-    ctx.fillStyle=`rgba(255,220,170,${lit?0.9:0.35})`;
-    ctx.beginPath(); ctx.arc(px,py-20,2.4,0,7); ctx.fill();
-  }
-  // boats
-  for(const e of entities) drawBoat(e,t);
-}
-
-function drawBoat(e,t){
-  const bobY = Math.sin(t*0.9+e.bob)*2.2;
-  ctx.save(); ctx.translate(e.x, e.y+bobY);
-  if(SPRITE_CELLS[e.kind]&&FOCAL_SPRITES.complete&&FOCAL_SPRITES.naturalWidth){
-    drawFocalSprite(e.kind,-58,-58,116,90);
-    ctx.restore();
-    return;
-  }
-  ctx.fillStyle='#1e1811';
-  ctx.beginPath();
-  ctx.moveTo(-30,0); ctx.quadraticCurveTo(-24,12,0,13); ctx.quadraticCurveTo(26,12,32,0); ctx.closePath(); ctx.fill();
-  ctx.strokeStyle='rgba(255,205,150,0.12)'; ctx.lineWidth=1.2;
-  ctx.beginPath(); ctx.moveTo(-30,0); ctx.lineTo(32,0); ctx.stroke();
-  if(e.kind!=='tug'){
-    ctx.strokeStyle='#1e1811'; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.moveTo(2,0); ctx.lineTo(2,-34); ctx.stroke();
-    if(e.kind==='sloop'){
-      ctx.fillStyle='rgba(210,195,165,0.14)';
-      ctx.beginPath(); ctx.moveTo(3,-32); ctx.lineTo(20,-4); ctx.lineTo(3,-4); ctx.closePath(); ctx.fill();
-    }
-  } else { ctx.fillStyle='#1e1811'; ctx.fillRect(-8,-12,16,12); }
-  // stern lantern warms as it moors
-  if(e.lampA>0.02){
-    ctx.save(); ctx.globalCompositeOperation='screen';
-    const g=ctx.createRadialGradient(-22,-6,1,-22,-6,22);
-    g.addColorStop(0,`rgba(255,200,130,${0.5*e.lampA})`); g.addColorStop(1,'rgba(255,200,130,0)');
-    ctx.fillStyle=g; ctx.fillRect(-44,-28,44,44); ctx.restore();
-  }
-  ctx.restore();
-}
-
-/* ---------- vista audio ---------- */
-function startVistaAudio(){
-  if(!AC) return;
-  if(rainGain) rainGain.gain.setTargetAtTime(0.06,AC.currentTime,1.5);
-  if(vistaChoice==='meadow'){
-    crickets=setInterval(()=>{
-      if(muted||document.hidden||!(STATE==='vista'||STATE==='drift')) return;
-      if(Math.random()<0.7) cricketChirp();
-    },600);
-  } else {
-    waterTimer=setInterval(()=>{
-      if(muted||document.hidden||!(STATE==='vista'||STATE==='drift')) return;
-      waterLap();
-    },1400);
-  }
-}
-function stopVistaAudio(){
-  if(crickets){clearInterval(crickets);crickets=null;}
-  if(waterTimer){clearInterval(waterTimer);waterTimer=null;}
-  if(rainGain&&AC) rainGain.gain.setTargetAtTime(0.09,AC.currentTime,1);
-}
-function cricketChirp(){
-  const n=2+Math.floor(Math.random()*3);
-  for(let i=0;i<n;i++){
-    const t0=AC.currentTime+i*0.07;
-    const o=AC.createOscillator(),g=AC.createGain();
-    o.type='sine'; o.frequency.value=rnd(4100,4500);
-    g.gain.setValueAtTime(0,t0);
-    g.gain.linearRampToValueAtTime(rnd(0.004,0.009),t0+0.012);
-    g.gain.exponentialRampToValueAtTime(0.0004,t0+0.05);
-    o.connect(g); g.connect(masterGain); o.start(t0); o.stop(t0+0.07);
-  }
-}
-function waterLap(){
-  const o=AC.createOscillator(),g=AC.createGain(),f=AC.createBiquadFilter();
-  o.type='sine'; o.frequency.setValueAtTime(rnd(90,140),AC.currentTime);
-  o.frequency.exponentialRampToValueAtTime(60,AC.currentTime+0.9);
-  f.type='lowpass'; f.frequency.value=200;
-  g.gain.setValueAtTime(0,AC.currentTime);
-  g.gain.linearRampToValueAtTime(rnd(0.015,0.03),AC.currentTime+0.3);
-  g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+1.1);
-  o.connect(f); f.connect(g); g.connect(masterGain); o.start(); o.stop(AC.currentTime+1.2);
-}
-function sfxHop(){
-  authoredAccent('crossing');
-}
-function sfxBell(){
-  authoredAccent('mooring');
-}
-function sfxAcknowledge(){
-  if(!AC||muted) return;
-  const o=AC.createOscillator(),g=AC.createGain();
-  o.type='sine'; o.frequency.value=rnd(430,470);
-  g.gain.setValueAtTime(0,AC.currentTime);
-  g.gain.linearRampToValueAtTime(0.02,AC.currentTime+0.01);
-  g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+0.18);
-  o.connect(g); g.connect(masterGain); o.start(); o.stop(AC.currentTime+0.2);
-}
-
-/* -------- object sketches -------- */
-function drawObjects(t,dt,li){
-  // desk objects sorted by y for painter's order
-  const list=[...objects].sort((a,b)=>a.y-b.y);
-  for(const o of list){
-    if(o.state==='stored' && o.slot && o.slot.drawer!==null && o.slot.open<0.05) continue; // hidden in closed drawer
-    ctx.save();
-    // shadow
-    if(o.state!=='stored'){
-      ctx.fillStyle=`rgba(0,0,0,${0.28*o.shadow})`;
-      ctx.beginPath(); ctx.ellipse(o.x, o.y+16, 26*o.scale, 7*o.scale, 0,0,7); ctx.fill();
-    }
-    ctx.translate(o.x,o.y);
-    ctx.rotate(o.rot + o.tilt);
-    ctx.scale(o.scale,o.scale);
-    sketch(o.kind, li, o);
-    ctx.restore();
-    // label
-    if(o.label && o.labelA>0.01 && o.state!=='stored'){
-      ctx.save();
-      ctx.globalAlpha = o.labelA*0.9;
-      ctx.font='italic 15px Georgia, serif';
-      ctx.textAlign='center';
-      ctx.fillStyle='rgba(20,14,8,0.55)';
-      ctx.fillText(o.label, o.x+1, o.y+o.labelDy+1);
-      ctx.fillStyle='#ead9bc';
-      ctx.fillText(o.label, o.x, o.y+o.labelDy);
-      ctx.restore();
-    }
-  }
-}
-
-function sketch(kind, li, o){
-  const warm = (base,amt)=>shade(base, Math.round(-16+li*20+amt));
-  if(drawFocalSprite(kind,-38,-38,76,76)) return;
-  switch(kind){
-    case 'letter':
-      ctx.fillStyle=warm('#cbb489',0);
-      rrect(-24,-15,48,30,3); ctx.fill();
-      ctx.strokeStyle='rgba(90,66,40,0.7)'; ctx.lineWidth=1.4;
-      rrect(-24,-15,48,30,3); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(-24,-15); ctx.lineTo(0,4); ctx.lineTo(24,-15); ctx.stroke();
-      break;
-    case 'key':
-      ctx.strokeStyle=warm('#a9854f',6); ctx.lineWidth=5; ctx.lineCap='round';
-      ctx.beginPath(); ctx.arc(-14,0,8,0,7); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(-6,0); ctx.lineTo(22,0); ctx.moveTo(14,0); ctx.lineTo(14,8); ctx.moveTo(21,0); ctx.lineTo(21,7); ctx.stroke();
-      break;
-    case 'mug':
-      ctx.fillStyle=warm('#8a5342',0);
-      rrect(-16,-18,32,34,5); ctx.fill();
-      ctx.strokeStyle=warm('#8a5342',-16); ctx.lineWidth=4;
-      ctx.beginPath(); ctx.arc(20,-2,9,-1.4,1.4); ctx.stroke();
-      ctx.fillStyle='rgba(30,16,10,0.75)';
-      ctx.beginPath(); ctx.ellipse(0,-18,15,4.5,0,0,7); ctx.fill();
-      break;
-    case 'book':
-      ctx.fillStyle=warm('#5d6b52',0);
-      rrect(-22,-15,44,30,3); ctx.fill();
-      ctx.fillStyle=warm('#4c5a44',-8); ctx.fillRect(-22,-15,7,30);
-      ctx.strokeStyle='rgba(235,220,190,0.5)'; ctx.lineWidth=1;
-      ctx.beginPath(); ctx.moveTo(-8,-8); ctx.lineTo(16,-8); ctx.moveTo(-8,-2); ctx.lineTo(16,-2); ctx.stroke();
-      break;
-    case 'coin':
-      ctx.fillStyle=warm('#c2a05e',6);
-      ctx.beginPath(); ctx.arc(0,0,13,0,7); ctx.fill();
-      ctx.strokeStyle='rgba(110,84,44,0.8)'; ctx.lineWidth=1.6;
-      ctx.beginPath(); ctx.arc(0,0,13,0,7); ctx.stroke();
-      ctx.beginPath(); ctx.arc(0,0,8.5,0,7); ctx.stroke();
-      break;
-    case 'spool':
-      ctx.fillStyle=warm('#9b6a4c',0);
-      rrect(-9,-16,18,32,3); ctx.fill();
-      ctx.fillStyle=warm('#7e5238',-6);
-      rrect(-13,-18,26,6,2); ctx.fill(); rrect(-13,12,26,6,2); ctx.fill();
-      ctx.strokeStyle=warm('#c9856a',10); ctx.lineWidth=1.4;
-      for(let i=-9;i<=9;i+=3){ ctx.beginPath(); ctx.moveTo(-9,i); ctx.lineTo(9,i+1.5); ctx.stroke(); }
-      break;
-    case 'watch':
-      ctx.fillStyle=warm('#b8ab8f',0);
-      ctx.beginPath(); ctx.arc(0,0,15,0,7); ctx.fill();
-      ctx.strokeStyle='rgba(70,56,36,0.9)'; ctx.lineWidth=2;
-      ctx.beginPath(); ctx.arc(0,0,15,0,7); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,-8); ctx.moveTo(0,0); ctx.lineTo(5.5,3); ctx.stroke();
-      ctx.fillStyle=warm('#b8ab8f',-10);
-      ctx.fillRect(-4,-20,8,5);
-      break;
-    case 'photo':
-      ctx.fillStyle=warm('#d3c7ab',4);
-      rrect(-19,-23,38,46,2); ctx.fill();
-      ctx.fillStyle='rgba(52,58,66,0.85)';
-      ctx.fillRect(-14,-18,28,28);
-      ctx.fillStyle='rgba(210,200,175,0.5)';
-      ctx.beginPath(); ctx.arc(-2,-6,5,0,7); ctx.fill();
-      ctx.beginPath(); ctx.moveTo(-12,8); ctx.lineTo(-2,-2); ctx.lineTo(6,6); ctx.lineTo(14,-4); ctx.lineTo(14,10) ; ctx.lineTo(-12,10); ctx.closePath(); ctx.fill();
-      break;
-    case 'leaf':
-      ctx.fillStyle=warm('#6d7a4c',0);
-      ctx.beginPath(); ctx.moveTo(0,-18);
-      ctx.quadraticCurveTo(16,-6,0,18); ctx.quadraticCurveTo(-16,-6,0,-18); ctx.fill();
-      ctx.strokeStyle='rgba(46,54,30,0.8)'; ctx.lineWidth=1.2;
-      ctx.beginPath(); ctx.moveTo(0,-16); ctx.lineTo(0,16); ctx.stroke();
-      break;
-    case 'pencil':
-      ctx.save(); ctx.rotate(-0.35);
-      ctx.fillStyle=warm('#c59a55',4); rrect(-22,-4,38,8,2); ctx.fill();
-      ctx.fillStyle='#e8d9c0';
-      ctx.beginPath(); ctx.moveTo(16,-4); ctx.lineTo(25,0); ctx.lineTo(16,4); ctx.closePath(); ctx.fill();
-      ctx.fillStyle='#2c2018';
-      ctx.beginPath(); ctx.moveTo(21.5,-1.6); ctx.lineTo(25,0); ctx.lineTo(21.5,1.6); ctx.closePath(); ctx.fill();
-      ctx.fillStyle='#a1554a'; rrect(-24,-4,5,8,2); ctx.fill();
-      ctx.restore();
-      break;
-  }
-}
-
-/* ============================================================
-   GAME LOGIC
-   ============================================================ */
-let lampLit=false, windowHintShown=false;
-function beginArrive(){
-  const n=5;
-  slots = buildSlots(n);
-  objects = makeObjects(n);
-  STATE='arrive'; playT=0; decay=0;
-  lampLit=false; windowHintShown=false;
-  dim=0.52; dimTarget=0.52;
-  initAudio();
-  hint('Light the lamp.', 1.6, 8);
-}
-function lightLamp(){
-  if(lampLit) return;
-  lampLit=true; sfxLampOn();
-  STATE='play'; playT=0; dimTarget=0.66;
-  hint('Touch a thing to name it — or just put it away.', 1.8, 6);
-  setTimeout(()=>{
-    if(STATE==='play' && !windowHintShown){
-      windowHintShown=true;
-      hint(`Outside the window: ${vistaDisplayName()}. Touch the glass to change it.`, 0, 4.5);
-    }
-  }, 10000);
-}
-function sfxLampOn(){
-  authoredAccent('lamp');
-}
-
-/* ---- naming (optional, diegetic offloading) ---- */
-const nameBox=byId<HTMLInputElement>('nameBox');
-let namingObj=null;
-function toScreen(x,y){ return {x:x*scaleF+offX, y:y*scaleF+offY}; }
-function openNameBox(o){
-  namingObj=o;
-  namingOpenedAt=sessionElapsed;
-  const p=toScreen(o.x, o.y+o.labelDy-14);
-  nameBox.style.display='block';
-  nameBox.style.left=clamp(p.x-95,12,innerWidth-202)+'px';
-  nameBox.style.top=clamp(p.y-18,12,innerHeight-68)+'px';
-  nameBox.value=o.label||'';
-  nameBox.focus();
-}
-function closeNameBox(commit){
-  if(namingObj && commit){
-    const v=nameBox.value.trim();
-    if(v){ namingObj.label=v; namingObj.labelSetT=playT; namingObj.labelA=1; }
-  }
-  namingObj=null; nameBox.style.display='none'; nameBox.value='';
-}
-nameBox.addEventListener('keydown',e=>{
-  if(e.key==='Enter') closeNameBox(true);
-  if(e.key==='Escape') closeNameBox(false);
-});
-nameBox.addEventListener('blur',()=>closeNameBox(true));
-
-let hintTimer=null, hintDelayTimer=null;
-function hint(text, delay=0, hold=5){
-  const el=document.getElementById('hint');
-  clearTimeout(hintTimer);
-  clearTimeout(hintDelayTimer);
-  hintDelayTimer=setTimeout(()=>{
-    hintDelayTimer=null;
-    el.textContent=text; el.style.color='rgba(232,217,192,0.75)';
-    hintTimer=setTimeout(()=>{ el.style.color='rgba(232,217,192,0)'; }, hold*1000);
-  }, delay*1000);
-}
-
-function storedCount(){ return objects.filter(o=>o.state==='stored').length; }
-
-const actionDock=byId<HTMLDivElement>('actionDock');
-const actName=byId<HTMLDivElement>('actName');
-const actionPrompt=byId<HTMLDivElement>('actionPrompt');
-const semanticPrimary=byId<HTMLButtonElement>('semanticPrimary');
-const nameNextBtn=byId<HTMLButtonElement>('nameNextBtn');
-const changeVistaBtn=byId<HTMLButtonElement>('changeVistaBtn');
-const semanticNameForm=byId<HTMLFormElement>('semanticNameForm');
-const semanticNameInput=byId<HTMLInputElement>('semanticNameInput');
-const srStatus=byId<HTMLDivElement>('srStatus');
-let semanticRenderKey='', semanticNamingObjectId=null;
-const dawnBtn=byId<HTMLButtonElement>('dawnBtn');
-const dawnCard=byId<HTMLDivElement>('dawnCard');
-const dawnCanvas=byId<HTMLCanvasElement>('dawnCanvas');
-const dawnContext=dawnCanvas.getContext('2d')!;
-const dawnStatus=byId<HTMLParagraphElement>('dawnStatus');
-const dawnVideo=byId<HTMLVideoElement>('dawnVideo');
-const loopActions=byId<HTMLDivElement>('loopActions');
-let dawnStillBlob=null, dawnLoop=null, dawnLoopLease=null, forceLoopUnsupported=false;
-
-function refreshDawnAvailability(){
-  const latestNightRead=Night.readStorage(nightStorage);
-  nightMemory=latestNightRead.state;
-  const result=Dawn.eligibility(nightMemory.lastCompleted,dawnNow());
-  dawnBtn.hidden=!result.available;
-  dawnBtn.setAttribute('aria-label',result.available?'Open last night’s Dawn':'Dawn is not available');
-  return result;
-}
-
-function drawDawnScene(progress=0){
-  const completion=nightMemory.lastCompleted;
-  if(!completion) return;
-  const recipe=Night.recipeForNight(completion.nightId);
-  const motion=reduceMotion?0:Math.sin(progress*Math.PI*2);
-  const d=dawnContext;
-  d.clearRect(0,0,1200,750);
-  const sky=d.createLinearGradient(0,0,0,750);
-  sky.addColorStop(0,'#4d6f91'); sky.addColorStop(.46,'#d29a5a'); sky.addColorStop(1,'#f0c46f');
-  d.fillStyle=sky; d.fillRect(0,0,1200,750);
-  const sunX=890, sunY=160-motion*3;
-  const halo=d.createRadialGradient(sunX,sunY,18,sunX,sunY,180);
-  halo.addColorStop(0,'rgba(255,238,174,.86)'); halo.addColorStop(1,'rgba(255,211,112,0)');
-  d.fillStyle=halo; d.fillRect(sunX-190,sunY-190,380,380);
-  d.fillStyle='#ffe6a0'; d.beginPath(); d.arc(sunX,sunY,42,0,7); d.fill();
-
-  if(completion.vista==='meadow'){
-    d.fillStyle='#7d803c'; d.beginPath(); d.moveTo(0,470); d.quadraticCurveTo(310,390,650,475); d.quadraticCurveTo(930,525,1200,430); d.lineTo(1200,750); d.lineTo(0,750); d.fill();
-    d.fillStyle='#5e632f'; d.beginPath(); d.moveTo(0,570); d.quadraticCurveTo(430,500,790,590); d.quadraticCurveTo(1030,625,1200,560); d.lineTo(1200,750); d.lineTo(0,750); d.fill();
-    const flower={marigold:'#d49e28',saffron:'#c97826',wheat:'#d2b56d'}[recipe.meadowAccent]??'#d49e28';
-    for(let index=0;index<92;index++){
-      const x=rnd2(index*13+7,18,1182), y=rnd2(index*19+5,545,735), h=rnd2(index*23+3,12,34);
-      d.strokeStyle='rgba(66,81,36,.72)'; d.lineWidth=2; d.beginPath(); d.moveTo(x,y); d.lineTo(x,y-h); d.stroke();
-      d.fillStyle=flower; d.beginPath(); d.arc(x,y-h,3.4,0,7); d.fill();
-    }
-    d.strokeStyle='#4d351f'; d.lineWidth=9; d.beginPath(); d.moveTo(720,650); d.lineTo(730,525); d.moveTo(770,650); d.lineTo(760,525); d.moveTo(660,555); d.lineTo(820,548); d.moveTo(660,600); d.lineTo(820,592); d.stroke();
-    drawFocalSpriteOn(d,completion.finalKind,790,485+motion*2,150,150);
-  } else {
-    const water=d.createLinearGradient(0,440,0,750); water.addColorStop(0,'#557b8b'); water.addColorStop(1,'#294e65');
-    d.fillStyle=water; d.fillRect(0,440,1200,310);
-    d.fillStyle='#8e7457';
-    for(let index=0;index<6;index++) d.fillRect(0,440+index*34,320-index*34,25);
-    d.strokeStyle='rgba(245,215,150,.25)'; d.lineWidth=3;
-    for(let index=0;index<9;index++){
-      const y=485+index*27+motion*(index%2?2:-2); d.beginPath(); d.moveTo(250,y); d.quadraticCurveTo(650,y-8,1180,y+3); d.stroke();
-    }
-    nightMemory.harborEchoes.forEach((echo,index,list)=>{
-      d.save(); d.globalAlpha=.18+.48*((index+1)/list.length);
-      drawFocalSpriteOn(d,echo.kind,570+index*92,500+index*20+motion*2,150,118);
-      d.restore();
-    });
-    if(!nightMemory.harborEchoes.length) drawFocalSpriteOn(d,completion.finalKind,770,505+motion*2,170,132);
-  }
-
-  // restrained phulkari edge, part of the picture rather than a badge
-  d.strokeStyle='rgba(111,32,37,.72)'; d.lineWidth=6; d.strokeRect(14,14,1172,722);
-  d.strokeStyle='rgba(236,177,54,.82)'; d.lineWidth=3;
-  for(let x=34;x<1170;x+=42){
-    d.beginPath(); d.moveTo(x,26); d.lineTo(x+10,36); d.lineTo(x+20,26); d.lineTo(x+10,16); d.closePath(); d.stroke();
-  }
-}
-
-function downloadDawnBlob(blob,filename){
-  const lease=Dawn.leaseUrl(blob);
-  const link=document.createElement('a');
-  link.href=lease.url; link.download=filename; link.hidden=true;
-  document.body.appendChild(link); link.click(); link.remove();
-  setTimeout(()=>lease.revoke(),0);
-}
-
-async function ensureDawnStill(){
-  if(!dawnStillBlob){ drawDawnScene(0); dawnStillBlob=await Dawn.stillBlob(dawnCanvas); }
-  return dawnStillBlob;
-}
-
-async function openDawn(){
-  if(!refreshDawnAvailability().available) return false;
-  if(!FOCAL_SPRITES.complete||!FOCAL_SPRITES.naturalWidth) await FOCAL_SPRITES.decode().catch(()=>{});
-  dawnStillBlob=null; dawnStatus.textContent='';
-  drawDawnScene(0);
-  select<HTMLElement>('.toggles').hidden=true;
-  dawnCard.classList.remove('hidden'); dawnCard.setAttribute('aria-hidden','false');
-  const intake=document.getElementById('intake');
-  intake.classList.add('hidden'); intake.setAttribute('aria-hidden','true');
-  document.getElementById('closeDawnBtn').focus({preventScroll:true});
-  return true;
-}
-
-function closeDawn(){
-  dawnLoopLease?.revoke(); dawnLoopLease=null; dawnLoop=null;
-  dawnVideo.pause(); dawnVideo.removeAttribute('src'); dawnVideo.load(); dawnVideo.hidden=true;
-  loopActions.hidden=true; dawnStatus.textContent='';
-  dawnCard.classList.add('hidden'); dawnCard.setAttribute('aria-hidden','true');
-  select<HTMLElement>('.toggles').hidden=false;
-  const intake=document.getElementById('intake');
-  intake.classList.remove('hidden'); intake.setAttribute('aria-hidden','false');
-  dawnBtn.focus({preventScroll:true});
-}
-
-dawnBtn.addEventListener('click',()=>openDawn());
-document.getElementById('closeDawnBtn').addEventListener('click',closeDawn);
-document.getElementById('saveStillBtn').addEventListener('click',async()=>{
-  try{
-    const blob=await ensureDawnStill();
-    downloadDawnBlob(blob,`nindova-dawn-${nightMemory.lastCompleted.dawnDate}.png`);
-    dawnStatus.textContent='The still was prepared for saving.';
-  }catch{ dawnStatus.textContent='The still could not be prepared. Dawn is still here.'; }
-});
-document.getElementById('shareStillBtn').addEventListener('click',async()=>{
-  try{
-    const blob=await ensureDawnStill();
-    const result=await Dawn.shareBlob(blob,`nindova-dawn-${nightMemory.lastCompleted.dawnDate}.png`,'Nindova Dawn');
-    dawnStatus.textContent=result==='shared'?'Shared.':result==='cancelled'?'Share cancelled. Dawn is still here.':'Sharing files is not available here. You can save the still instead.';
-  }catch{ dawnStatus.textContent='Sharing did not finish. Dawn is still here.'; }
-});
-document.getElementById('makeLoopBtn').addEventListener('click',async event=>{
-  const button=event.currentTarget as HTMLButtonElement; button.disabled=true; dawnStatus.textContent='Making the quiet loop…';
-  try{
-    if(forceLoopUnsupported) throw new Error('loop-export-unsupported');
-    dawnLoop=await Dawn.recordLoop(dawnCanvas,progress=>drawDawnScene(progress));
-    dawnLoopLease?.revoke(); dawnLoopLease=Dawn.leaseUrl(dawnLoop.blob);
-    dawnVideo.src=dawnLoopLease.url; dawnVideo.hidden=false; loopActions.hidden=false;
-    await dawnVideo.play().catch(()=>{});
-    dawnStatus.textContent='The silent three-second loop is ready.';
-  }catch{
-    drawDawnScene(0);
-    dawnStatus.textContent='This browser could not make the loop. The still is ready.';
-  }finally{ button.disabled=false; }
-});
-document.getElementById('saveLoopBtn').addEventListener('click',()=>{
-  if(!dawnLoop) return;
-  downloadDawnBlob(dawnLoop.blob,`nindova-dawn-${nightMemory.lastCompleted.dawnDate}.${dawnLoop.extension}`);
-  dawnStatus.textContent='The loop was prepared for saving.';
-});
-document.getElementById('shareLoopBtn').addEventListener('click',async()=>{
-  if(!dawnLoop) return;
-  try{
-    const result=await Dawn.shareBlob(dawnLoop.blob,`nindova-dawn-${nightMemory.lastCompleted.dawnDate}.${dawnLoop.extension}`,'Nindova Dawn');
-    dawnStatus.textContent=result==='shared'?'Shared.':result==='cancelled'?'Share cancelled. Dawn is still here.':'Sharing files is not available here. You can save the loop instead.';
-  }catch{ dawnStatus.textContent='Sharing did not finish. Dawn is still here.'; }
-});
-addEventListener('pagehide',()=>dawnLoopLease?.revoke());
-
-const STATE_LABELS: Record<SessionState, string>={
-  intake:'The Session has not begun.',
-  arrive:'The room is dark. The lamp is ready.',
-  play:'The desk is lit. Put away any remaining thing.',
-  wipe:'The desk is clear. Settle the dust.',
-  approach:'The window is opening.',
-  vista:'A Visitor is moving toward shelter.',
-  drift:'The last light is ready to return.',
-  return:'The light is returning on its own.',
-  sign:'The room is ready to close.',
-  dark:'The room is darkening.',
-  end:"The session is over. That's the point."
-};
-
-function helpNextVisitor(){
-  const entity=entities.find(candidate=>!candidate.crossed
-    && (candidate.phase==='wait'||candidate.phase==='approach'||candidate.phase==='linger'));
-  if(!entity) return false;
-  vistaTap({x:entity.x,y:entity.y});
-  return true;
-}
-
-function semanticConfig(){
-  if(STATE==='arrive') return {act:'Arrive',prompt:'The room is dark. Light the lamp when you are ready.',primary:'Light the lamp'};
-  if(STATE==='play'){
-    const hasDeskObject=objects.some(object=>object.state==='desk');
-    return {act:'Put away',prompt:hasDeskObject?'The desk still holds something. Name it if you want, then put it away.':'The last thing is settling.',
-      primary:hasDeskObject?'Put the next thing away':null,name:hasDeskObject,window:true};
-  }
-  if(STATE==='wipe') return {act:'Settle',prompt:'The desk is clear. One calm pass settles the dust.',primary:'Clear the dust'};
-  if(STATE==='approach') return {act:'Approach',prompt:'The window is opening. Nothing is required.'};
-  if(STATE==='vista') return {act:'Vista',prompt:'A Visitor is moving toward shelter. Your help can be one touch.',primary:'Help the next Visitor'};
-  if(STATE==='drift') return {act:'Drift',prompt:'The light will return whether or not you guide it.',primary:'Let the light return'};
-  if(STATE==='return') return {act:'Return',prompt:'The light is finding its own way home.'};
-  if(STATE==='sign') return {act:'Close',prompt:'Turn the sign. The room will go dark.',primary:'Turn the sign'};
-  return null;
-}
-
-function syncSemanticUI(force=false){
-  const config=semanticConfig();
-  const renderKey=`${STATE}:${storedCount()}:${objects.filter(object=>object.state==='desk').length}:${vistaChoice}`;
-  if(!force&&renderKey===semanticRenderKey) return;
-  semanticRenderKey=renderKey;
-  const stateText=STATE_LABELS[STATE]||'The Session is changing.';
-  select<HTMLElement>('.toggles').hidden=STATE==='end';
-  srStatus.textContent=stateText;
-  canvas.setAttribute('aria-label',stateText+' Every required action is also available in the controls below the scene.');
-  actionDock.hidden=!config;
-  if(!config){
-    semanticNameForm.hidden=true;
-    semanticNamingObjectId=null;
-    return;
-  }
-  actName.textContent=config.act;
-  actionPrompt.textContent=config.prompt;
-  semanticPrimary.hidden=!config.primary;
-  semanticPrimary.disabled=!config.primary;
-  if(config.primary) semanticPrimary.textContent=config.primary;
-  nameNextBtn.hidden=!config.name;
-  changeVistaBtn.hidden=!config.window;
-  changeVistaBtn.textContent=`Change window · ${vistaDisplayName()}`;
-  if(STATE!=='play'){
-    semanticNameForm.hidden=true;
-    semanticNamingObjectId=null;
-  }
-}
-
-semanticPrimary.addEventListener('click',()=>{
-  if(STATE==='arrive') lightLamp();
-  else if(STATE==='play') window.__ct.storeNext();
-  else if(STATE==='wipe') finishWipe();
-  else if(STATE==='vista') helpNextVisitor();
-  else if(STATE==='drift') window.__ct.finishDrift();
-  else if(STATE==='sign') tapSign();
-  syncSemanticUI(true);
-});
-
-nameNextBtn.addEventListener('click',()=>{
-  const object=objects.find(candidate=>candidate.state==='desk');
-  if(!object) return;
-  semanticNamingObjectId=object.id;
-  namingOpenedAt=sessionElapsed;
-  semanticNameInput.value=object.label||'';
-  semanticNameForm.hidden=false;
-  semanticNameInput.focus({preventScroll:true});
-});
-
-changeVistaBtn.addEventListener('click',()=>{
-  toggleVista();
-  syncSemanticUI(true);
-});
-
-semanticNameForm.addEventListener('submit',event=>{
-  event.preventDefault();
-  const object=objects.find(candidate=>candidate.id===semanticNamingObjectId);
-  const value=semanticNameInput.value.trim();
-  if(object&&value){ object.label=value; object.labelSetT=playT; object.labelA=1; }
-  semanticNameForm.hidden=true;
-  semanticNamingObjectId=null;
-  semanticPrimary.focus({preventScroll:true});
-  srStatus.textContent=value?'The name is kept.':'No name was added.';
-});
-
-document.getElementById('cancelSemanticName').addEventListener('click',()=>{
-  semanticNameForm.hidden=true;
-  semanticNamingObjectId=null;
-  semanticPrimary.focus({preventScroll:true});
-  srStatus.textContent='No name was added. You can still put the thing away.';
-});
-
-function nearestFreeSlot(x,y,r){
-  let best=null,bd=r;
-  for(const s of slots){
-    if(s.occupied) continue;
-    const sy = s.drawer!==null? s.y : s.y-22;
-    const d=dist(x,y,s.x,sy);
-    if(d<bd){bd=d;best=s;}
-  }
-  return best;
-}
-
-function beginSettle(o,s){
-  o.state='settle'; o.settleT=0;
-  o.sx=o.x; o.sy=o.y; o.srot=o.rot;
-  o.slot=s; s.occupied=true;
-}
-
-function closeOptionalNaming(){
-  closeNameBox(false);
-  semanticNameForm.hidden=true;
-  semanticNamingObjectId=null;
-}
-
-function showEnd(reason: "completed" | "production-cap"='completed'){
-  if(STATE==='end') return;
-  endReason=reason;
-  recordNightCompletion();
-  releasePointer(true);
-  closeOptionalNaming();
-  stopVistaAudio();
-  STATE='end'; dim=1; dimTarget=1;
-  const endCard=document.getElementById('endCard');
-  endCard.classList.remove('hidden');
-  endCard.setAttribute('aria-hidden','false');
-  endCard.scrollTop=0;
-  refreshTomorrowAction();
-  if(rainGain&&AC) rainGain.gain.setTargetAtTime(0.03,AC.currentTime,2);
-}
-
-const tomorrowBtn=byId<HTMLButtonElement>('tomorrowBtn');
-const tomorrowStatus=byId<HTMLDivElement>('tomorrowStatus');
-
-function refreshTomorrowAction(){
-  const held=Boolean(activeNight&&nightMemory.tomorrowIntention?.nightId===activeNight.nightId);
-  tomorrowBtn.disabled=held;
-  tomorrowBtn.textContent=held?'Tomorrow is held quietly':'Same time tomorrow?';
-  tomorrowStatus.textContent=held?'No reminder was set. Return only if you want to.':'';
-}
-
-tomorrowBtn.addEventListener('click',()=>{
-  if(!activeNight) return;
-  const result=Night.setTomorrowIntention(nightMemory,activeNight.nightId);
-  nightMemory=result.state;
-  if(result.changed) Night.writeStorage(nightStorage,nightMemory);
-  refreshTomorrowAction();
-});
-
-function settleNextAutonomously(){
-  if(dragObj) releasePointer(true);
-  const object=objects.find(candidate=>candidate.state==='desk');
-  if(!object) return false;
-  const slot=nearestFreeSlot(object.x,object.y,Infinity);
-  if(!slot) return false;
-  beginSettle(object,slot);
-  lastAutoStoreAt=stateElapsed;
-  srStatus.textContent='The room quietly helped one thing find its place.';
-  return true;
-}
-
-function forceTowardEnd(){
-  capClosing=true;
-  closeOptionalNaming();
-  if(pointer.down||dragObj) releasePointer(true);
-  if(STATE==='arrive'){ lightLamp(); return; }
-  if(STATE==='play'){
-    for(const object of objects.filter(candidate=>candidate.state==='desk')){
-      const slot=nearestFreeSlot(object.x,object.y,Infinity);
-      if(slot) beginSettle(object,slot);
-    }
-    return;
-  }
-  if(STATE==='wipe'){ finishWipe(); return; }
-  if(STATE==='approach'){ approachT=2.7; return; }
-  if(STATE==='vista'){ beginDrift(); return; }
-  if(STATE==='drift'){
-    STATE='return'; returnT=0;
-    if(finalEntity&&driftLight){ driftLight.tx=finalEntity.x; driftLight.ty=finalEntity.y-40; }
-    return;
-  }
-  if(STATE==='return'){ STATE='sign'; return; }
-  if(STATE==='sign'){ tapSign(); }
-}
-
-function update(dt,t){
-  if(STATE!==clockState){ clockState=STATE; stateElapsed=0; lastAutoStoreAt=-Infinity; }
-  else stateElapsed+=dt;
-
-  if(sessionStarted&&STATE!=='end'){
-    const remaining=reviewerMode
-      ? pace().hardCap-(sessionElapsed+=dt)
-      : (sessionDeadlineAt-Date.now())/1000;
-    if(!reviewerMode) sessionElapsed=clamp(pace().hardCap-Math.max(remaining,0),0,pace().hardCap);
-    if(remaining<=0){ showEnd('production-cap'); return; }
-    if(remaining<=26) forceTowardEnd();
-  }
-
-  if(STATE==='arrive'&&stateElapsed>=pace().arriveAuto) lightLamp();
-  if(STATE==='play'){
-    const namingOpen=namingObj||!semanticNameForm.hidden;
-    if(namingOpen&&sessionElapsed-namingOpenedAt>=pace().namingGrace) closeOptionalNaming();
-    if(pointer.down&&Math.max((performance.now()-downAt)/1000,sessionElapsed-pointerHeldAt)>=pace().heldGrace) releasePointer(true);
-    if(stateElapsed>=pace().autoStoreStart){
-      const wait=assistanceEnvelope().autonomousWait;
-      if(stateElapsed-lastAutoStoreAt>=wait) settleNextAutonomously();
-    }
-  }
-  if(STATE==='wipe'&&stateElapsed>=pace().wipeAuto) finishWipe();
-  if(STATE==='sign'){
-    if(!signDone&&stateElapsed>=pace().signAuto) tapSign();
-    if(signDone){
-      signCloseT+=dt;
-      if(signCloseT>1.4){ STATE='dark'; darkT=0; }
-    }
-  }
-
-  // Act transitions
-  if(STATE==='approach'){
-    approachT+=dt;
-    dimTarget=0.68;
-    if(approachT>2.7) beginVista();
-  }
-  else if(STATE==='vista'){ updateVista(dt); }
-  else if(STATE==='drift'){ updateDrift(dt); }
-  else if(STATE==='return'){ updateReturn(dt); }
-
-  // decay driver: max(time, progress)
-  if(STATE==='play' || STATE==='wipe'){
-    playT+=dt;
-    const tf = clamp(playT/pace().decayTime,0,1);
-    const pf = objects.length? storedCount()/objects.length : 0;
-    decay = clamp(Math.max(tf*0.85, pf*0.75 + tf*0.3),0,1);
-    dimTarget = 0.66+decay*0.30;
-  }
-  dim = lerp(dim, dimTarget, dt*0.8);
-
-  // label fade — each label fades from the moment it was written
-  const lf = pace().labelFade;
-  for(const o of objects){
-    if(o.state==='stored' || !o.label) continue;
-    o.labelA = clamp(1 - (playT-o.labelSetT)/lf, 0, 1);
-  }
-
-  // slot glows ease
-  for(const s of slots){
-    const target = (hoverSlot===s)?1:0;
-    s.glow=lerp(s.glow,target,dt*8);
-    // drawers open when their object approaches or while settling into them
-    let wantOpen=0;
-    if(dragObj && hoverSlot===s && s.drawer!==null) wantOpen=1;
-    for(const o of objects){ if(o.state==='settle'&&o.slot===s&&s.drawer!==null) wantOpen=1; }
-    s.open=lerp(s.open,wantOpen,dt*6);
-  }
-
-  // magnetism while dragging
-  const assistance=assistanceEnvelope();
-  const mag=assistance.magnetism;
-  if(dragObj){
-    dragObj.liftT=Math.min(1,dragObj.liftT+dt*6);
-    const targetX=pointer.x, targetY=pointer.y-12;
-    dragObj.x=lerp(dragObj.x,targetX,1-Math.pow(0.0001,dt));
-    dragObj.y=lerp(dragObj.y,targetY,1-Math.pow(0.0001,dt));
-    dragObj.tilt=lerp(dragObj.tilt,(targetX-dragObj.x)*0.004,dt*10);
-    dragObj.scale=lerp(dragObj.scale,1.07,dt*9);
-    dragObj.shadow=lerp(dragObj.shadow,.46,dt*8);
-    hoverSlot = nearestFreeSlot(dragObj.x,dragObj.y,assistance.snapRadius);
-    if(mag>0.05 && hoverSlot){
-      const sy=hoverSlot.drawer!==null?hoverSlot.y:hoverSlot.y-22;
-      dragObj.x=lerp(dragObj.x,hoverSlot.x,dt*2.2*mag);
-      dragObj.y=lerp(dragObj.y,sy,dt*2.2*mag);
-    }
-  } else hoverSlot=null;
-
-  // rest-back animation (missed drop → return to desk, never counts as stored)
-  for(const o of objects){
-    if(o.state!=='rest') continue;
-    o.settleT+=dt;
-    const T=0.45, k=easeOut(clamp(o.settleT/T,0,1));
-    o.x=lerp(o.sx,o.restTo.x,k);
-    o.y=lerp(o.sy,o.restTo.y,k);
-    o.rot=lerp(o.srot,rnd2(o.id+3,-0.1,0.1),k);
-    o.tilt=lerp(o.tilt,0,k);
-    if(o.settleT>=T){ o.state='desk'; o.shadow=1; o.scale=1; }
-  }
-
-  // settle animation
-  for(const o of objects){
-    if(o.state!=='settle') continue;
-    o.settleT+=dt;
-    const T=0.55, k=easeOut(clamp(o.settleT/T,0,1));
-    const sy=o.slot.drawer!==null? o.slot.y : o.slot.y-22;
-    o.x=lerp(o.sx,o.slot.x,k);
-    o.y=lerp(o.sy,sy,k)-Math.sin(k*Math.PI)*20;
-    o.rot=lerp(o.srot,(o.slot.drawer!==null?0:rnd2(o.id,-0.08,0.08)),k);
-    o.scale=lerp(1,0.92,k);
-    o.shadow=1-k; o.tilt=lerp(o.tilt,0,k);
-    if(o.settleT>=T){
-      o.state='stored';
-      if(o.slot.drawer!==null) sfxDrawer(); else sfxSettle();
-      const left=objects.length-storedCount();
-      if(left===2) hint('Nearly there.',0.4,3);
-      if(left===0){ wipePending=true; wipePendingT=0; }
-    }
-  }
-
-  if(wipePending&&STATE==='play'){
-    wipePendingT+=dt;
-    if(wipePendingT>(capClosing ? .15 : .9)){ wipePending=false; startWipe(); }
-  }
-
-  // auto-fit at deep decay: touch an object anywhere and it goes home
-  // (handled in pointerdown)
-
-  // wipe phase
-  if(STATE==='wipe' && pointer.down && lastWipe){
-    // accumulation happens in pointermove
-  }
-
-  // sign → dark sequencing
-  if(STATE==='dark'){
-    darkT+=dt;
-    dimTarget=1;
-    if(rainGain && AC) rainGain.gain.setTargetAtTime(0.055, AC.currentTime, 1.2);
-    if(darkT>(capClosing?Math.min(8,pace().darkHold):pace().darkHold)) showEnd();
-  }
-}
-
-function startWipe(){
-  if(STATE!=='play') return;
-  closeNameBox(false);
-  STATE='wipe'; wipeProg=0;
-  hint('The desk is clear. One slow pass to settle the dust.',0.4,6);
-}
-function finishWipe(){
-  if(STATE!=='wipe') return;
-  STATE='approach'; approachT=0;
-  hint('',0,0.1);
-}
-function tapSign(){
-  if(signDone) return;
-  signDone=true; signCloseT=0; signSwing=0.22; sfxSign();
-  hint('',0,0.1);
-}
-
-/* ---------------- input ---------------- */
-function pickObject(x,y){
-  let best=null,bd=64;
-  for(const o of objects){
-    if(o.state!=='desk') continue;
-    const d=dist(x,y,o.x,o.y);
-    if(d<bd){bd=d;best=o;}
-  }
-  return best;
-}
-
-const inWindow=(v)=> v.x>WIN.x-10 && v.x<WIN.x+WIN.w+10 && v.y>WIN.y-10 && v.y<WIN.y+WIN.h+10;
-function toggleVista(){
-  vistaChoice = vistaChoice==='meadow' ? 'harbor' : 'meadow';
-  sfxAcknowledge();
-  hint(`${vistaDisplayName()} tonight`, 0, 1.8);
-}
-let downV=null, downAt=0, pointerHeldAt=0, activePointerId=null;
-
-canvas.addEventListener('pointerdown',e=>{
-  if(activePointerId!==null&&activePointerId!==e.pointerId) return;
-  activePointerId=e.pointerId;
-  try{ canvas.setPointerCapture(e.pointerId); }catch{}
-  const v=toV(e.clientX,e.clientY);
-  pointer.x=v.x; pointer.y=v.y; pointer.down=true;
-  downV=v; downAt=performance.now(); pointerHeldAt=sessionElapsed;
-  if(AC && AC.state==='suspended') AC.resume();
-  if(STATE==='arrive'){
-    if(dist(v.x,v.y,LAMP.bx+20,LAMP.by+50)<150) lightLamp();
-    else if(inWindow(v)) toggleVista();
-  } else if(STATE==='play'){
-    const o=pickObject(v.x,v.y);
-    if(o){
-      o.touched=true; o.touchT=playT;
-      const autoFit = decay>0.78;
-      if(autoFit){
-        const s=nearestFreeSlot(o.x,o.y,9999);
-        if(s){ beginSettle(o,s); return; }
-      }
-      dragObj=o; o.state='drag'; canvas.style.cursor='grabbing';
-      o.liftT=0;
-    } else if(inWindow(v)) toggleVista();
-  } else if(STATE==='wipe'){
-    if(inWindow(v)){ toggleVista(); return; }
-    lastWipe={x:v.x,y:v.y};
-  } else if(STATE==='vista'){
-    vistaTap(v);
-  } else if(STATE==='drift'){
-    driftPointer={x:v.x,y:v.y};
-  } else if(STATE==='sign'){
-    if(Math.abs(v.x-(SIGN.x+SIGN.w/2))<90 && Math.abs(v.y-(SIGN.y+30))<80) tapSign();
-  }
-});
-canvas.addEventListener('pointermove',e=>{
-  const v=toV(e.clientX,e.clientY);
-  if(STATE==='wipe' && pointer.down && lastWipe){
-    wipeProg += dist(v.x,v.y,lastWipe.x,lastWipe.y);
-    lastWipe={x:v.x,y:clamp(v.y,DESK.y-30,DESK.y+40)};
-    if(wipeProg>=assistanceEnvelope().requiredGestureDistance) finishWipe();
-  }
-  if(STATE==='drift' && pointer.down) driftPointer={x:v.x,y:v.y};
-  pointer.x=v.x; pointer.y=v.y;
-});
-
-function releasePointer(cancelled=false){
-  pointer.down=false;
-  canvas.style.cursor='default';
-  if(STATE==='drift'){ driftPointer=null; }
-  if(dragObj){
-    const o=dragObj; dragObj=null;
-    if(cancelled){
-      o.state='rest'; o.settleT=0; o.sx=o.x; o.sy=o.y; o.srot=o.rot;
-      o.restTo={x:o.homeX,y:o.homeY};
-      o.tilt=0;
-      hoverSlot=null;
-      return;
-    }
-    const wasTap = downV && dist(pointer.x,pointer.y,downV.x,downV.y)<9
-                   && (performance.now()-downAt)<380;
-    if(wasTap && decay<0.7){
-      // a touch, not a move — offer to name it
-      o.state='desk'; o.tilt=0;
-      openNameBox(o);
-      return;
-    }
-    const s=nearestFreeSlot(o.x,o.y,assistanceEnvelope().snapRadius);
-    if(s) beginSettle(o,s);
-    else { // ease back to a desk resting spot
-      o.state='rest';
-      o.settleT=0; o.sx=o.x; o.sy=o.y; o.srot=o.rot;
-      const restX=clamp(o.x,170,860), restY=DESK.y-12+rnd(-4,8);
-      o.restTo={x:restX,y:restY};
-    }
-  }
-}
-
-addEventListener('pointerup',event=>{
-  if(activePointerId!==null&&event.pointerId!==activePointerId) return;
-  releasePointer(false);
-  if(activePointerId!==null&&canvas.hasPointerCapture(activePointerId)){
-    try{ canvas.releasePointerCapture(activePointerId); }catch{}
-  }
-  activePointerId=null;
-});
-canvas.addEventListener('pointercancel',event=>{
-  if(activePointerId!==null&&event.pointerId!==activePointerId) return;
-  releasePointer(true);
-  activePointerId=null;
-});
-canvas.addEventListener('lostpointercapture',()=>{
-  if(pointer.down) releasePointer(true);
-  activePointerId=null;
-});
-addEventListener('blur',()=>{
-  if(pointer.down||dragObj) releasePointer(true);
-  activePointerId=null;
-});
-document.addEventListener('visibilitychange',()=>{
-  if(document.hidden&&(pointer.down||dragObj)) releasePointer(true);
-  if(!document.hidden) refreshDawnAvailability();
-});
-
-/* ---------------- entry ---------------- */
-const beginBtn=byId<HTMLButtonElement>('beginBtn');
-beginBtn.onclick=()=>{
-  startNight();
-  initAudio(); // inside the user gesture, for autoplay policy
-  const intake=document.getElementById('intake');
-  intake.classList.add('hidden');
-  intake.setAttribute('aria-hidden','true');
-  sessionStarted=true; sessionDeadlineAt=Date.now()+pace().hardCap*1000; sessionElapsed=0;
-  beginArrive();
-};
-
-/* pacing + mute */
-function setPace(k: "compressed" | "real"){
-  paceKey=k;
-  const paceButton=document.getElementById('paceBtn');
-  paceButton.textContent=pace().label;
-  paceButton.setAttribute('aria-pressed',String(paceKey==='compressed'));
-  document.getElementById('paceBtn2').textContent=pace().endLabel;
-}
-document.getElementById('paceBtn').onclick=()=>setPace(paceKey==='compressed'?'real':'compressed');
-document.getElementById('paceBtn2').onclick=()=>{ setPace(paceKey==='compressed'?'real':'compressed'); restart(); };
-document.getElementById('muteBtn').onclick=()=>{ if(!AC) initAudio(); setMuted(!muted); };
-document.getElementById('replayBtn').onclick=()=>restart();
-document.getElementById('paceBtn').hidden=!reviewerMode;
-document.getElementById('reviewEvidence').hidden=!reviewerMode;
-document.getElementById('reviewActions').hidden=!reviewerMode;
-setPace(paceKey);
-setMuted(muted);
-refreshDawnAvailability();
-
-function restart(){
-  const endCard=document.getElementById('endCard');
-  const intake=document.getElementById('intake');
-  endCard.classList.add('hidden');
-  endCard.setAttribute('aria-hidden','true');
-  closeNameBox(false); stopVistaAudio();
-  objects=[]; slots=[]; dragObj=null; hoverSlot=null;
-  wipeProg=0; lastWipe=null; signDone=false; signSwing=0; darkT=0;
-  wipePending=false; wipePendingT=0; signCloseT=0;
-  decay=0; dim=0; dimTarget=0; playT=0;
-  lampLit=false; windowHintShown=false;
-  approachT=0; vistaT=0; driftT=0; returnT=0; vistaFade=0; vistaCloseT=0;
-  entities=[]; speciesBag=[]; finalEntity=null; vistaDone=false;
-  driftLight=null; driftPointer=null;
-  sessionStarted=false; sessionDeadlineAt=0; sessionElapsed=0; stateElapsed=0; clockState='intake';
-  lastAutoStoreAt=-Infinity; capClosing=false; endReason='completed';
-  STATE='intake';
-  intake.classList.remove('hidden');
-  intake.setAttribute('aria-hidden','false');
-  actionDock.hidden=true;
-  semanticRenderKey='';
-}
-
-/* ---------------- main loop ---------------- */
-let last=performance.now();
-function frame(now){
-  const dt=Math.min((now-last)/1000, 0.05); last=now;
-  const t=now/1000;
-  update(dt,t); syncSemanticUI(); draw(t,dt);
-  requestAnimationFrame(frame);
-}
-requestAnimationFrame(frame);
-
-/* ---------------- debug hooks (for automated testing) ---------------- */
-window.__ct = {
-  get state(){ return STATE; },
-  get decay(){ return decay; },
-  get objects(){ return objects.map(o=>({id:o.id,kind:o.kind,x:o.x,y:o.y,state:o.state,label:o.label})); },
-  get slots(){ return slots.map(s=>({x:s.x,y:s.y,drawer:s.drawer,occupied:s.occupied})); },
-  get entities(){ return entities.map(e=>({kind:e.kind,x:e.x,y:e.y,phase:e.phase,final:e.final})); },
-  get vistaT(){ return vistaT; },
-  get portraitMode(){ return portraitMode; },
-  get reduceMotion(){ return reduceMotion; },
-  get pointerDown(){ return pointer.down; },
-  get dragging(){ return Boolean(dragObj); },
-  get reviewerMode(){ return reviewerMode; },
-  get paceKey(){ return paceKey; },
-  get sessionElapsed(){ return sessionElapsed; },
-  get hardCapSeconds(){ return pace().hardCap; },
-  get capClosing(){ return capClosing; },
-  get endReason(){ return endReason; },
-  get spriteReady(){ return Boolean(FOCAL_SPRITES.complete&&FOCAL_SPRITES.naturalWidth); },
-  get authoredAccents(){ return Object.keys(AUTHORED_ACCENTS); },
-  get assistance(){ return assistanceEnvelope(); },
-  get light(){ return lightEnvelope(); },
-  get night(){ return activeNight?{...activeNight}:null; },
-  get recipe(){ return {...nightRecipe,objectKinds:[...nightRecipe.objectKinds],meadowSpecies:[...nightRecipe.meadowSpecies],harborBoats:[...nightRecipe.harborBoats]}; },
-  get memory(){ return JSON.parse(JSON.stringify(nightMemory)); },
-  get localRecovery(){ return {recovered:nightRead.recovered,reason:nightRead.reason}; },
-  get dawnEligibility(){ return Dawn.eligibility(nightMemory.lastCompleted,dawnNow()); },
-  get dawnLoopType(){ return forceLoopUnsupported?null:Dawn.chooseLoopType(); },
-  get dawnLoop(){ return dawnLoop?{type:dawnLoop.type,extension:dawnLoop.extension,durationMs:dawnLoop.durationMs,size:dawnLoop.blob.size}:null; },
-  toScreen(x,y){ return {x:x*scaleF+offX, y:y*scaleF+offY}; },
-  lightLamp(){ if(STATE==='arrive') lightLamp(); },
-  nameObject(i,text){ const o=objects[i]; if(o){ o.label=text; o.labelSetT=playT; o.labelA=1; } },
-  setVista(v){ if(v==='meadow'||v==='harbor') vistaChoice=v; },
-  storeNext(){
-    const o=objects.find(o=>o.state==='desk');
-    if(!o) return false;
-    const s=nearestFreeSlot(o.x,o.y,9999);
-    if(!s) return false;
-    beginSettle(o,s); return true;
-  },
-  setDecay(d){ playT = d*pace().decayTime; },
-  finishWipe(){ if(STATE==='wipe') finishWipe(); },
-  vistaTapNext(){ return helpNextVisitor(); },
-  setVistaT(frac){ vistaT = frac*pace().vistaTime; nextSpawn=0.05; },
-  finishDrift(){ if(STATE==='drift'){ STATE='return'; returnT=0;
-    if(finalEntity&&driftLight){ driftLight.tx=finalEntity.x; driftLight.ty=finalEntity.y-40; } } },
-  tapSign(){ if(STATE==='sign') tapSign(); },
-  sampleAssistance(value){ return assistanceEnvelope(value); },
-  sampleLightBudget(value){ return lightBudgetAt(value); },
-  recipeForNight(nightId){ return Night.recipeForNight(nightId); },
-  setDawnNow(instant){
-    if(!reviewerMode) return false;
-    const value=new Date(instant);
-    if(Number.isNaN(value.getTime())) return false;
-    dawnNowOverride=value; refreshDawnAvailability(); return true;
-  },
-  setLoopUnsupported(value){ if(reviewerMode){ forceLoopUnsupported=Boolean(value); return true; } return false; },
-  openDawn(){ return openDawn(); },
-  advanceBy(seconds){
-    if(!reviewerMode||!Number.isFinite(seconds)||seconds<0) return false;
-    const steps=Math.ceil(seconds/.05);
-    for(let index=0;index<steps&&STATE!=='end';index++) update(Math.min(.05,seconds-index*.05),performance.now()/1000);
+  } catch {
+    audioEnabled = false;
+    updateMuteButton();
+  }
+}
+
+function selectTile(tileId: string, restoreFocus = false) {
+  if (!board || state !== "play" || !NindovaRasoi.isFree(board, removed, tileId)) return false;
+  const tile = tileById(tileId)!;
+  if (!selectedTile) {
+    selectedTile = tileId;
+    setStatus(`${motifShortNames[tile.motif]} lifted. Find its match at another edge.`);
+    updateBoardDom(restoreFocus ? tileId : null);
+    persistActiveSession();
     return true;
   }
-};
+  if (selectedTile === tileId) {
+    selectedTile = null;
+    setStatus("Tile set back down.");
+    updateBoardDom(restoreFocus ? tileId : null);
+    persistActiveSession();
+    return true;
+  }
+  const first = tileById(selectedTile)!;
+  const result = NindovaRasoi.removePair(board, removed, selectedTile, tileId);
+  if (!result.changed) {
+    selectedTile = tileId;
+    setStatus(`${motifShortNames[first.motif]} and ${motifShortNames[tile.motif]} differ. The new tile is lifted.`);
+    updateBoardDom(restoreFocus ? tileId : null);
+    persistActiveSession();
+    return false;
+  }
+  removed = new Set(result.removed);
+  selectedTile = null;
+  void playPairSound(tile.row);
+  setStatus(`${motifShortNames[tile.motif]} settles with its pair.`);
+  updateBoardDom();
+  persistActiveSession();
+  if (NindovaRasoi.isComplete(board, removed)) settle("completed");
+  return true;
+}
+
+function hint() {
+  if (!board || state !== "play") return null;
+  const pair = NindovaRasoi.hintPair(board, removed);
+  boardElement.querySelectorAll(".is-hinted").forEach((tile) => tile.classList.remove("is-hinted"));
+  if (!pair) return null;
+  pair.forEach((tileId) => tileButton(tileId)?.classList.add("is-hinted"));
+  setStatus("A safe pair is breathing at the rack edges.");
+  window.setTimeout(() => pair.forEach((tileId) => tileButton(tileId)?.classList.remove("is-hinted")), reduceMotion ? 30 : 2600);
+  return pair;
+}
+
+function settle(reason: "completed" | "production-cap") {
+  if (!board || !currentNight || state === "settling" || state === "end") return;
+  endReason = reason;
+  selectedTile = null;
+  showView("settling");
+  boardShell.classList.add("is-settling");
+  updateBoardDom();
+  setStatus(reason === "completed" ? "The last pair rests. The kitchen is closing." : "The kitchen is settling under its lid.");
+  if (settlementTimer !== null) clearTimeout(settlementTimer);
+  settlementTimer = window.setTimeout(finishSession, reduceMotion || reviewerMode ? 80 : 1300);
+}
+
+function finishSession() {
+  if (!board || !currentNight) return;
+  const completion: RasoiCompletion = {
+    kind: "rasoi-pairs",
+    nightId: currentNight.nightId,
+    dawnDate: currentNight.dawnDate,
+    timeZone: currentNight.timeZone,
+    recipeVersion: currentNight.recipeVersion,
+    boardId: board.id,
+    motifOrder: board.motifOrder,
+  };
+  const completed = NindovaNight.completeState(nightState, completion);
+  nightState = completed.state;
+  NindovaNight.writeStorage(safeStorage("local"), nightState);
+  clearActiveSession();
+  boardShell.classList.remove("is-settling");
+  showView("end");
+  element<HTMLButtonElement>("tomorrowBtn").focus();
+  updateDawnButton();
+}
+
+function nowMs() {
+  return Date.now() + virtualOffsetMs;
+}
+
+function enforceBoundary() {
+  if (state !== "play") return false;
+  const current = nowMs();
+  if (current >= deadlineAtMs || current >= windDownAtMs) {
+    settle("production-cap");
+    return true;
+  }
+  return false;
+}
+
+function advanceBy(seconds: number) {
+  if (!Number.isFinite(seconds) || seconds < 0) return false;
+  virtualOffsetMs += seconds * 1000;
+  return enforceBoundary();
+}
+
+function updateMuteButton() {
+  muteButton.textContent = audioEnabled ? "sound on" : "sound off";
+  muteButton.setAttribute("aria-pressed", String(audioEnabled));
+}
+
+function currentDawnEligibility() {
+  return NindovaDawn.eligibility(nightState.lastCompleted, dawnNowOverride ?? new Date());
+}
+
+function updateDawnButton() {
+  const eligibility = currentDawnEligibility();
+  dawnButton.hidden = !eligibility.available;
+}
+
+function setDawnNow(instant: string) {
+  const value = new Date(instant);
+  if (Number.isNaN(value.getTime())) return false;
+  dawnNowOverride = value;
+  updateDawnButton();
+  return currentDawnEligibility().available;
+}
+
+function drawCanvasMotif(context: CanvasRenderingContext2D, motif: string, x: number, y: number, scale: number, progress = 0) {
+  context.save();
+  context.translate(x, y);
+  context.scale(scale, scale);
+  context.strokeStyle = "#61372b";
+  context.fillStyle = "rgba(177,112,49,.14)";
+  context.lineWidth = 4;
+  context.lineCap = "round";
+  context.lineJoin = "round";
+  const circle = (cx: number, cy: number, radius: number) => { context.beginPath(); context.arc(cx, cy, radius, 0, Math.PI * 2); context.stroke(); };
+  if (motif === "belan") {
+    context.beginPath(); context.moveTo(-38, 0); context.lineTo(38, 0); context.stroke();
+    context.strokeRect(-26, -9, 52, 18);
+  } else if (motif === "chakla") {
+    context.beginPath(); context.ellipse(0, 0, 29, 18, 0, 0, Math.PI * 2); context.fill(); context.stroke();
+    context.beginPath(); context.moveTo(-20, 14); context.lineTo(-24, 25); context.moveTo(20, 14); context.lineTo(24, 25); context.stroke();
+  } else if (motif === "tawa") {
+    circle(-7, 0, 21); context.beginPath(); context.moveTo(14, 0); context.lineTo(41, 0); context.stroke();
+  } else if (motif === "chimta") {
+    context.beginPath(); context.moveTo(-22, -23); context.quadraticCurveTo(-12, 12, 0, 25); context.moveTo(22, -23); context.quadraticCurveTo(12, 12, 0, 25); context.stroke();
+  } else if (motif === "katori") {
+    context.beginPath(); context.moveTo(-28, -10); context.quadraticCurveTo(-22, 22, 0, 23); context.quadraticCurveTo(22, 22, 28, -10); context.closePath(); context.fill(); context.stroke();
+  } else if (motif === "tiffin") {
+    context.strokeRect(-23, -24, 46, 48); context.beginPath(); context.moveTo(-23, -8); context.lineTo(23, -8); context.moveTo(-23, 9); context.lineTo(23, 9); context.moveTo(-13, -24); context.quadraticCurveTo(0, -39, 13, -24); context.stroke();
+  } else if (motif === "masala") {
+    circle(0, 0, 29); for (const [dx, dy] of [[0,0],[-14,-9],[14,-9],[-14,10],[14,10]]) circle(dx, dy, 5);
+  } else if (motif === "chai") {
+    context.beginPath(); context.moveTo(-21, -18); context.lineTo(21, -18); context.lineTo(17, 24); context.lineTo(-17, 24); context.closePath(); context.fill(); context.stroke();
+    context.beginPath(); context.moveTo(-8, -25 + progress * 4); context.quadraticCurveTo(-15, -34, -7, -40); context.moveTo(7, -26 - progress * 4); context.quadraticCurveTo(15, -36, 7, -42); context.stroke();
+  } else {
+    context.strokeRect(-28, -15, 50, 35); context.beginPath(); context.moveTo(-23, -15); context.quadraticCurveTo(0, -31, 20, -15); context.moveTo(22, 0); context.lineTo(39, 0); context.stroke(); circle(0, -27, 3);
+  }
+  context.restore();
+}
+
+function renderDawnFrame(progress = 0) {
+  const context = dawnCanvas.getContext("2d");
+  const completion = nightState.lastCompleted;
+  if (!context || !completion) return;
+  const width = dawnCanvas.width;
+  const height = dawnCanvas.height;
+  const sky = context.createLinearGradient(0, 0, 0, height);
+  sky.addColorStop(0, "#d9b678");
+  sky.addColorStop(.46, "#f0d3a0");
+  sky.addColorStop(1, "#8f513f");
+  context.fillStyle = sky;
+  context.fillRect(0, 0, width, height);
+  context.fillStyle = "rgba(255,238,185,.62)";
+  context.beginPath(); context.arc(width * .78, height * .22, 88, 0, Math.PI * 2); context.fill();
+  context.fillStyle = "#4a2b28";
+  context.fillRect(0, height * .67, width, height * .33);
+  context.fillStyle = "#674035";
+  context.fillRect(0, height * .69, width, 17);
+  context.strokeStyle = "rgba(128,65,48,.34)";
+  context.lineWidth = 2;
+  for (let x = -height; x < width + height; x += 48) {
+    context.beginPath(); context.moveTo(x, 0); context.lineTo(x + height, height); context.stroke();
+  }
+
+  if (completion.kind === "rasoi-pairs") {
+    const positions = completion.motifOrder.map((motif, index) => ({
+      motif,
+      x: 150 + (index % 5) * 225 + (index >= 5 ? 110 : 0),
+      y: index < 5 ? 500 : 625,
+    }));
+    for (const item of positions) {
+      context.fillStyle = "#dfc18a";
+      context.beginPath(); context.ellipse(item.x, item.y + 9, 76, 42, 0, 0, Math.PI * 2); context.fill();
+      context.strokeStyle = "#9b6b35"; context.lineWidth = 3; context.stroke();
+      drawCanvasMotif(context, item.motif, item.x, item.y - 4, .82, progress);
+    }
+    dawnCanvas.setAttribute("aria-label", "Last night's nine kitchen motifs resting on brass plates at first light.");
+  } else {
+    context.fillStyle = "#d9b877";
+    context.beginPath(); context.ellipse(width / 2, 545, 230, 86, 0, 0, Math.PI * 2); context.fill();
+    context.strokeStyle = "#82562d"; context.lineWidth = 5; context.stroke();
+    context.fillStyle = "#6b3a32";
+    context.font = "44px Georgia";
+    context.textAlign = "center";
+    context.fillText("An earlier Nindova night, kept safely", width / 2, 540);
+    dawnCanvas.setAttribute("aria-label", "A safely migrated Dawn from an earlier Nindova night.");
+  }
+}
+
+async function openDawn() {
+  if (!currentDawnEligibility().available || !nightState.lastCompleted) return false;
+  showView("dawn");
+  renderDawnFrame(0);
+  dawnStatus.textContent = "The still is ready on this device.";
+  return true;
+}
+
+async function dawnStillBlob() {
+  renderDawnFrame(0);
+  return NindovaDawn.stillBlob(dawnCanvas);
+}
+
+function downloadBlob(blob: Blob, filename: string) {
+  const lease = NindovaDawn.leaseUrl(blob);
+  const anchor = document.createElement("a");
+  anchor.href = lease.url;
+  anchor.download = filename;
+  anchor.click();
+  window.setTimeout(lease.revoke, 1200);
+}
+
+async function shareOrExplain(blob: Blob, filename: string) {
+  const result = await NindovaDawn.shareBlob(blob, filename, "Nindova Dawn");
+  dawnStatus.textContent = result === "shared" ? "Shared." : result === "cancelled" ? "Sharing cancelled. The still remains here." : "Sharing is unavailable here. Save the file instead.";
+}
+
+async function makeLoop() {
+  loopLease?.revoke();
+  loopLease = null;
+  loopResult = null;
+  dawnVideo.hidden = true;
+  loopActions.hidden = true;
+  dawnStatus.textContent = "Making a silent loop…";
+  try {
+    loopResult = await NindovaDawn.recordLoop(dawnCanvas, renderDawnFrame, {
+      MediaRecorderCtor: forceLoopUnsupported ? null : undefined,
+      durationMs: reviewerMode ? 240 : NindovaDawn.LOOP_DURATION_MS,
+      fps: 15,
+    });
+    loopLease = NindovaDawn.leaseUrl(loopResult.blob);
+    dawnVideo.src = loopLease.url;
+    dawnVideo.hidden = false;
+    loopActions.hidden = false;
+    await dawnVideo.play().catch(() => {});
+    dawnStatus.textContent = "The silent loop is ready.";
+  } catch {
+    dawnStatus.textContent = "A loop is unavailable in this browser. The still is still ready.";
+  }
+}
+
+function closeDawn() {
+  loopLease?.revoke();
+  loopLease = null;
+  dawnVideo.removeAttribute("src");
+  dawnVideo.load();
+  dawnVideo.hidden = true;
+  loopActions.hidden = true;
+  showView("intake");
+}
+
+function setLoopUnsupported(value: boolean) {
+  forceLoopUnsupported = value;
+  return forceLoopUnsupported;
+}
+
+element<HTMLButtonElement>("beginBtn").addEventListener("click", beginSession);
+element<HTMLButtonElement>("notNowBtn").addEventListener("click", () => showView("dismissed"));
+element<HTMLButtonElement>("returnBtn").addEventListener("click", () => showView("intake"));
+element<HTMLButtonElement>("hintBtn").addEventListener("click", hint);
+muteButton.addEventListener("click", () => { audioEnabled = !audioEnabled; updateMuteButton(); });
+dawnButton.addEventListener("click", () => void openDawn());
+element<HTMLButtonElement>("closeDawnBtn").addEventListener("click", closeDawn);
+element<HTMLButtonElement>("tomorrowBtn").addEventListener("click", () => {
+  if (!nightState.lastCompleted) return;
+  const next = NindovaNight.setTomorrowIntention(nightState, nightState.lastCompleted.nightId);
+  nightState = next.state;
+  NindovaNight.writeStorage(safeStorage("local"), nightState);
+  element<HTMLParagraphElement>("tomorrowStatus").textContent = "Held quietly on this device. No notification will be sent.";
+});
+element<HTMLButtonElement>("saveStillBtn").addEventListener("click", async () => {
+  try { downloadBlob(await dawnStillBlob(), "nindova-dawn.png"); dawnStatus.textContent = "Still saved."; }
+  catch { dawnStatus.textContent = "This browser could not save the still."; }
+});
+element<HTMLButtonElement>("shareStillBtn").addEventListener("click", async () => {
+  try { await shareOrExplain(await dawnStillBlob(), "nindova-dawn.png"); }
+  catch { dawnStatus.textContent = "Sharing did not complete. The still remains here."; }
+});
+element<HTMLButtonElement>("makeLoopBtn").addEventListener("click", () => void makeLoop());
+element<HTMLButtonElement>("saveLoopBtn").addEventListener("click", () => {
+  if (!loopResult) return;
+  downloadBlob(loopResult.blob, `nindova-dawn.${loopResult.extension}`);
+  dawnStatus.textContent = "Loop saved.";
+});
+element<HTMLButtonElement>("shareLoopBtn").addEventListener("click", async () => {
+  if (!loopResult) return;
+  try { await shareOrExplain(loopResult.blob, `nindova-dawn.${loopResult.extension}`); }
+  catch { dawnStatus.textContent = "Sharing did not complete. The loop remains here."; }
+});
+
+document.addEventListener("visibilitychange", () => { if (!document.hidden) enforceBoundary(); });
+window.addEventListener("pagehide", () => { loopLease?.revoke(); persistActiveSession(); });
+window.setInterval(enforceBoundary, 1000);
+
+const debug = {
+  version: 1 as const,
+  selectTile: (tileId: string) => selectTile(tileId),
+  hint,
+  finish: () => settle("completed"),
+  advanceBy,
+  setDawnNow,
+  setLoopUnsupported,
+  openDawn,
+} as Partial<RasoiDebug>;
+
+Object.defineProperties(debug, {
+  state: { get: () => state },
+  board: { get: () => board },
+  tiles: { get: () => board?.tiles.map((tile) => ({
+    ...tile,
+    free: NindovaRasoi.isFree(board!, removed, tile.id),
+    removed: removed.has(tile.id),
+    selected: selectedTile === tile.id,
+  })) ?? [] },
+  selectedTile: { get: () => selectedTile },
+  legalPairs: { get: () => board ? NindovaRasoi.legalPairs(board, removed) : [] },
+  removedTileCount: { get: () => removed.size },
+  reviewerMode: { get: () => reviewerMode },
+  reduceMotion: { get: () => reduceMotion },
+  audioEnabled: { get: () => audioEnabled },
+  sessionElapsed: { get: () => startedAtMs ? Math.max(0, (nowMs() - startedAtMs) / 1000) : 0 },
+  hardCapSeconds: { get: () => hardCapSeconds },
+  endReason: { get: () => endReason },
+  night: { get: () => currentNight ? {
+    nightId: currentNight.nightId,
+    dawnDate: currentNight.dawnDate,
+    timeZone: currentNight.timeZone,
+    recipeVersion: currentNight.recipeVersion,
+  } : null },
+  memory: { get: () => nightState },
+  localRecovery: { get: () => ({ recovered: nightStateResult.recovered, reason: nightStateResult.reason }) },
+  dawnEligibility: { get: currentDawnEligibility },
+});
+
+window.__rasoi = debug as RasoiDebug;
+window.__ct = window.__rasoi;
+
+updateMuteButton();
+updateDawnButton();
+if (!restoreActiveSession()) showView("intake");

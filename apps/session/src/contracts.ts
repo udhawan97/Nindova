@@ -1,118 +1,54 @@
-export type SessionState =
-  | "intake"
-  | "arrive"
-  | "play"
-  | "wipe"
-  | "approach"
-  | "vista"
-  | "drift"
-  | "return"
-  | "sign"
-  | "dark"
-  | "end";
+import type { RasoiBoard, RasoiMotifId } from "./rasoi-core.js";
 
-export interface SessionObjectSnapshot {
-  id: number;
-  kind: string;
-  x: number;
-  y: number;
-  state: string;
-  label: string | null;
+export type SessionState = "intake" | "dismissed" | "play" | "settling" | "end" | "dawn";
+
+export interface RasoiTileSnapshot {
+  readonly id: string;
+  readonly row: number;
+  readonly slot: number;
+  readonly depth: number;
+  readonly motif: RasoiMotifId;
+  readonly free: boolean;
+  readonly removed: boolean;
+  readonly selected: boolean;
 }
 
-export interface ClosingTimeDebug {
+export interface RasoiDebug {
+  readonly version: 1;
   readonly state: SessionState;
-  readonly decay: number;
-  readonly objects: SessionObjectSnapshot[];
-  readonly slots: ReadonlyArray<{
-    x: number;
-    y: number;
-    drawer: number | null;
-    occupied: boolean;
-  }>;
-  readonly entities: ReadonlyArray<{
-    kind: string;
-    x: number;
-    y: number;
-    phase: string;
-    final: boolean;
-  }>;
-  readonly vistaT: number;
-  readonly portraitMode: boolean;
-  readonly reduceMotion: boolean;
-  readonly pointerDown: boolean;
-  readonly dragging: boolean;
+  readonly board: RasoiBoard | null;
+  readonly tiles: readonly RasoiTileSnapshot[];
+  readonly selectedTile: string | null;
+  readonly legalPairs: ReadonlyArray<readonly [string, string]>;
+  readonly removedTileCount: number;
   readonly reviewerMode: boolean;
-  readonly paceKey: "compressed" | "real";
+  readonly reduceMotion: boolean;
+  readonly audioEnabled: boolean;
   readonly sessionElapsed: number;
   readonly hardCapSeconds: number;
-  readonly capClosing: boolean;
   readonly endReason: "completed" | "production-cap";
-  readonly spriteReady: boolean;
-  readonly authoredAccents: readonly string[];
-  readonly assistance: {
-    snapRadius: number;
-    magnetism: number;
-    requiredGestureDistance: number;
-    autonomousWait: number;
-  };
-  readonly light: {
-    progress: number;
-    meanBudget: number;
-    peakBudget: number;
-    focus: number;
-    veil: number;
-  };
   readonly night: null | {
     nightId: string;
     dawnDate: string;
     timeZone: string;
     recipeVersion: number;
-    startedAt: string;
   };
-  readonly recipe: {
-    version: number;
-    weather: string;
-    moon: string;
-    objectKinds: readonly string[];
-    meadowSpecies: readonly string[];
-    harborBoats: readonly string[];
-    meadowAccent: string;
-    harborPaint: string;
-  };
-  readonly memory: {
-    version: number;
-    lastCompleted: Record<string, unknown> | null;
-    meadowEcho: Record<string, unknown> | null;
-    harborEchoes: ReadonlyArray<Record<string, unknown>>;
-  };
+  readonly memory: Record<string, unknown>;
   readonly localRecovery: { recovered: boolean; reason: string };
   readonly dawnEligibility: { available: boolean; reason: string };
-  readonly dawnLoopType: string | null;
-  readonly dawnLoop: null | { type: string; extension: string; durationMs: number; size: number };
-  toScreen(x: number, y: number): { x: number; y: number };
-  lightLamp(): void;
-  nameObject(index: number, text: string): void;
-  setVista(vista: "meadow" | "harbor"): void;
-  storeNext(): boolean;
-  setDecay(decay: number): void;
-  finishWipe(): void;
-  vistaTapNext(): boolean;
-  setVistaT(fraction: number): void;
-  finishDrift(): void;
-  tapSign(): void;
-  sampleAssistance(decay: number): ClosingTimeDebug["assistance"];
-  sampleLightBudget(progress: number): Pick<ClosingTimeDebug["light"], "progress" | "meanBudget" | "peakBudget">;
-  recipeForNight(nightId: string): ClosingTimeDebug["recipe"];
+  selectTile(tileId: string): boolean;
+  hint(): readonly [string, string] | null;
+  finish(): void;
+  advanceBy(seconds: number): boolean;
   setDawnNow(instant: string): boolean;
   setLoopUnsupported(value: boolean): boolean;
   openDawn(): Promise<boolean>;
-  advanceBy(seconds: number): boolean;
 }
 
 declare global {
   interface Window {
-    __ct: ClosingTimeDebug;
+    __rasoi: RasoiDebug;
+    __ct: RasoiDebug;
   }
 }
 

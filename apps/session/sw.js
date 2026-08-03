@@ -1,12 +1,11 @@
 "use strict";
 
 const CACHE_PREFIX = "nindova-session-";
-const CACHE_NAME = `${CACHE_PREFIX}v2`;
+const CACHE_NAME = `${CACHE_PREFIX}v3`;
 const PRECACHE = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./assets/focal-sprites.png",
   "./assets/nindova-icon.svg",
 ];
 const PRECACHE_URLS = new Set(PRECACHE.map((entry) => new URL(entry, self.location.href).href));

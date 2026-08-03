@@ -2,13 +2,13 @@
   "id": "./",
   "name": "Nindova",
   "short_name": "Nindova",
-  "description": "A bounded fifteen-minute ritual that puts the day away and ends itself.",
+  "description": "A calm, bounded pair-removal game made from Indian kitchen forms.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#0d111d",
-  "theme_color": "#17263b",
+  "background_color": "#11101d",
+  "theme_color": "#17172a",
   "categories": ["lifestyle", "games"],
   "icons": [
     {

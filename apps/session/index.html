@@ -1,231 +1,421 @@
-<!DOCTYPE html>
-<!-- Nindova Session · extended from reference/nindova-demo.html SHA-256 140c0e128be8e89dcd203c503ddc619c77cc0f732954631836b09f573f7791bf -->
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#17263b">
-<meta name="application-name" content="Nindova">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="./manifest.webmanifest" data-portable-remove>
-<title>Nindova — a game that puts the day away</title>
-<style>
-  :root{
-    --ink:#f0dfbd; --ink-dim:#b5a081; --bg:#0d111d; --accent:#d9a13b;
-    --panel:rgba(18,14,10,.88); --rule:rgba(216,180,130,.28); --focus:#f3c98d;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html,body{height:100%;height:100dvh;background:var(--bg);overflow:hidden;
-    font-family:Georgia,'Iowan Old Style','Times New Roman',serif;color:var(--ink);}
-  [hidden]{display:none!important;}
-  #stage{position:fixed;inset:0;width:100%;height:100%;touch-action:none;cursor:default;}
-  .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
-    flex-direction:column;padding:max(24px,env(safe-area-inset-top)) max(24px,env(safe-area-inset-right))
-      max(24px,env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left));
-    text-align:center;overflow-y:auto;transition:opacity 1.2s cubic-bezier(.16,1,.3,1),visibility 0s linear 0s;
-    background:radial-gradient(ellipse at 50% 40%, rgba(30,24,18,.55), rgba(12,10,8,.92));}
-  .overlay.hidden{opacity:0;visibility:hidden;pointer-events:none;transition-delay:0s,1.2s;}
-  .card{max-width:560px;width:100%;margin:0 auto;}
-  #intake .card{margin:auto;}
-  #endCard{align-items:center;justify-content:flex-start;}
-  #endCard .card{padding-block:24px;}
-  #dawnCard{align-items:center;justify-content:flex-start;background:linear-gradient(180deg,#1b2941,#69462c 58%,#b77a38);}
-  #dawnCard .card{max-width:760px;padding-block:24px;}
-  h1{font-weight:normal;font-size:clamp(26px,4.5vw,40px);letter-spacing:.04em;color:var(--ink);}
-  .kicker{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:14px;}
-  .prompt{font-size:clamp(16px,2.4vw,20px);color:var(--ink);margin:26px 0 18px;font-style:italic;}
-  .inputrow{display:flex;gap:8px;justify-content:center;margin-bottom:14px;}
-  #taskInput{flex:1;max-width:340px;min-height:44px;background:rgba(255,235,205,.06);border:1px solid rgba(216,180,130,.25);
-    border-radius:6px;padding:11px 14px;color:var(--ink);font-family:inherit;font-size:16px;outline:2px solid transparent;outline-offset:2px;}
-  #taskInput:focus-visible{border-color:rgba(216,180,130,.55);outline-color:var(--focus);}
-  #taskInput::placeholder{color:rgba(200,180,150,.35);font-style:italic;}
-  button{min-height:44px;font-family:inherit;cursor:pointer;border:none;border-radius:6px;font-size:15px;}
-  button:focus-visible,input:focus-visible{outline:2px solid var(--focus);outline-offset:3px;}
-  button:active{transform:translateY(1px);}
-  button:disabled{opacity:.42;cursor:not-allowed;transform:none;}
-  .btn-add{background:rgba(216,180,130,.14);color:var(--ink);padding:11px 16px;border:1px solid rgba(216,180,130,.25);}
-  .btn-add:hover{background:rgba(216,180,130,.24);}
-  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:38px;margin-bottom:6px;}
-  .chip{background:rgba(216,164,110,.13);border:1px solid rgba(216,164,110,.28);border-radius:16px;
-    padding:6px 13px;font-size:14px;color:var(--ink);display:flex;align-items:center;gap:8px;animation:chipIn .3s ease;}
-  @keyframes chipIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
-  .chip b{cursor:pointer;color:var(--ink-dim);font-weight:normal;font-size:15px;padding:0 2px;}
-  .chip b:hover{color:var(--ink);}
-  .example{background:none;color:var(--ink-dim);font-size:13.5px;text-decoration:underline;
-    text-underline-offset:3px;padding:6px;font-style:italic;}
-  .example:hover{color:var(--ink);}
-  #nameBox{position:fixed;display:none;z-index:20;width:190px;text-align:center;
-    background:rgba(18,14,10,.66);border:none;border-bottom:1px solid rgba(216,180,130,.45);
-    border-radius:4px 4px 0 0;padding:10px;color:var(--ink);font-family:inherit;min-height:44px;
-    font-style:italic;font-size:15px;outline:none;backdrop-filter:blur(3px);}
-  #nameBox::placeholder{color:rgba(200,180,150,.4);}
-  .btn-begin{display:block;margin:22px auto 0;background:linear-gradient(180deg,#c9884e,#a96f3d);
-    color:#241708;padding:13px 34px;font-size:16.5px;letter-spacing:.03em;
-    box-shadow:0 4px 24px rgba(200,140,80,.25);transition:opacity .3s, transform .2s;}
-  .btn-begin:hover{transform:translateY(-1px);}
-  .btn-begin:disabled{opacity:.28;cursor:default;transform:none;}
-  .footnote{margin-top:26px;font-size:12.5px;color:rgba(170,150,125,.6);line-height:1.7;}
-  .toggles{position:fixed;top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));display:flex;gap:8px;z-index:30;}
-  .tg{background:rgba(20,16,12,.55);border:1px solid rgba(216,180,130,.18);color:var(--ink-dim);
-    font-size:11.5px;padding:8px 12px;border-radius:22px;letter-spacing:.05em;backdrop-filter:blur(4px);}
-  .tg:hover{color:var(--ink);border-color:rgba(216,180,130,.4);}
-  /* end card */
-  #endCard .card{max-width:600px;}
-  .end-title{font-size:clamp(22px,3.6vw,32px);margin-bottom:10px;}
-  .end-sub{color:var(--ink-dim);font-style:italic;font-size:16px;margin-bottom:30px;}
-  .principles{text-align:left;border-top:1px solid rgba(216,180,130,.18);margin-top:6px;}
-  .pr{display:flex;gap:14px;padding:13px 4px;border-bottom:1px solid rgba(216,180,130,.12);align-items:baseline;}
-  .pr .n{color:var(--accent);font-size:13px;min-width:18px;}
-  .pr .t{font-size:14.5px;line-height:1.55;color:var(--ink);}
-  .pr .t span{color:var(--ink-dim);font-size:13px;display:block;margin-top:2px;}
-  .end-actions{margin-top:26px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
-  .tomorrow-status{min-height:1.6em;margin-top:10px;color:var(--ink-dim);font-size:13px;font-style:italic;}
-  .btn-ghost{background:rgba(216,180,130,.1);border:1px solid rgba(216,180,130,.28);color:var(--ink);padding:10px 22px;}
-  .btn-ghost:hover{background:rgba(216,180,130,.2);}
-  .disclaimer{margin-top:24px;font-size:11.5px;color:rgba(160,140,115,.55);line-height:1.7;max-width:520px;margin-left:auto;margin-right:auto;}
-  #dawnCanvas{display:block;width:100%;height:auto;margin:18px auto;border:1px solid rgba(255,221,166,.3);border-radius:8px;background:#b77a38;}
-  #dawnBtn{display:block;margin:12px auto 0;}
-  .dawn-intro{max-width:46ch;margin:10px auto 0;color:#f2dfbe;line-height:1.5;}
-  .dawn-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:16px;}
-  #dawnVideo{display:block;width:min(100%,560px);margin:18px auto 0;border-radius:8px;background:#101725;}
-  #dawnStatus{min-height:1.6em;margin:12px auto 0;color:#f2dfbe;font-style:italic;}
-  /* soft hint text drawn over canvas */
-  #hint{position:fixed;left:50%;bottom:5.5%;transform:translateX(-50%);font-style:italic;
-    font-size:15px;color:rgba(232,217,192,.0);transition:color 2s ease;pointer-events:none;z-index:5;letter-spacing:.03em;}
-  .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;
-    overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important;}
-  #actionDock{position:fixed;z-index:25;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);
-    width:min(560px,calc(100% - 24px));padding:14px 16px 16px;background:var(--panel);border:1px solid var(--rule);
-    border-radius:12px;backdrop-filter:blur(10px);text-align:left;}
-  #actName{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:4px;}
-  #actionPrompt{font-size:16px;line-height:1.35;color:var(--ink);margin-bottom:12px;}
-  .semantic-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
-  .semantic-primary,.semantic-secondary{min-height:46px;padding:10px 15px;border:1px solid var(--rule);color:var(--ink);}
-  .semantic-primary{background:linear-gradient(180deg,#c9884e,#a96f3d);color:#241708;border-color:transparent;font-weight:bold;}
-  .semantic-secondary{background:rgba(216,180,130,.08);}
-  #semanticNameForm{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:12px;align-items:end;}
-  #semanticNameForm label{grid-column:1/-1;font-size:13px;color:var(--ink-dim);}
-  #semanticNameInput{min-width:0;min-height:46px;border:1px solid var(--rule);border-radius:6px;padding:10px 12px;
-    outline:2px solid transparent;outline-offset:1px;background:rgba(255,235,205,.06);color:var(--ink);font:inherit;}
-  #semanticNameInput:focus-visible{outline-color:var(--focus);}
-  @media (max-width:640px){
-    .inputrow{flex-direction:column;align-items:center;} #taskInput{max-width:100%;width:100%;}
-    .toggles{flex-direction:column;align-items:flex-end;}
-    .tg{max-width:148px;}
-    #hint{bottom:calc(170px + env(safe-area-inset-bottom));width:calc(100% - 32px);text-align:center;}
-    #actionDock{border-radius:10px;}
-    .semantic-actions>*{flex:1 1 auto;}
-    #semanticNameForm{grid-template-columns:1fr 1fr;}
-    #semanticNameInput{grid-column:1/-1;}
-  }
-  @media (max-height:620px) and (orientation:portrait){
-    #actionDock{padding:10px 12px;}
-    #actionPrompt{font-size:14px;margin-bottom:8px;}
-    .semantic-primary,.semantic-secondary{min-height:44px;padding:8px 11px;}
-  }
-  @media (prefers-reduced-motion:reduce){
-    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#17172a">
+  <meta name="application-name" content="Nindova">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="./manifest.webmanifest" data-portable-remove>
+  <title>Nindova — Rasoi Pairs</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --night: #11101d;
+      --night-soft: #1b1b31;
+      --indigo: #202858;
+      --madder: #8c3b39;
+      --marigold: #e3a642;
+      --brass: #c99643;
+      --cream: #f3ead8;
+      --cream-deep: #ddcbaa;
+      --wood: #4b2d25;
+      --ink: #251c1a;
+      --quiet: #bfb5a5;
+      --focus: #ffd990;
+      --tile-w: clamp(46px, 14vw, 68px);
+      --tile-h: clamp(62px, 18vw, 82px);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-width: 0; min-height: 100%; margin: 0; }
+    html { background: var(--night); font-family: ui-rounded, "Avenir Next", Avenir, system-ui, sans-serif; }
+    body {
+      min-height: 100dvh;
+      overflow-x: clip;
+      color: var(--cream);
+      background:
+        radial-gradient(circle at 48% -15%, rgba(118, 90, 166, .2), transparent 42%),
+        linear-gradient(180deg, #17172a, #0e0d17 74%);
+    }
+    button, input { font: inherit; }
+    button { min-width: 44px; min-height: 44px; }
+    button:focus-visible, a:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
+    [hidden] { display: none !important; }
+
+    .shell {
+      position: relative;
+      min-height: 100dvh;
+      isolation: isolate;
+      overflow: hidden;
+    }
+    .shell::before {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      opacity: .26;
+      content: "";
+      background:
+        linear-gradient(45deg, transparent 44%, rgba(227, 166, 66, .16) 45% 55%, transparent 56%) 0 0 / 42px 42px,
+        linear-gradient(-45deg, transparent 44%, rgba(140, 59, 57, .12) 45% 55%, transparent 56%) 21px 21px / 42px 42px;
+      mask-image: linear-gradient(to bottom, black, transparent 70%);
+    }
+    .shell::after {
+      position: fixed;
+      inset: auto 0 0;
+      z-index: -1;
+      height: 28vh;
+      pointer-events: none;
+      content: "";
+      background:
+        linear-gradient(90deg, rgba(227,166,66,.12) 1px, transparent 1px) 0 0 / 34px 100%,
+        linear-gradient(180deg, #221522, #110d13);
+      border-top: 1px solid rgba(227,166,66,.18);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 64px;
+      padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 10px max(16px, env(safe-area-inset-left));
+      border-bottom: 1px solid rgba(227, 166, 66, .17);
+    }
+    .wordmark {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--cream);
+      font-family: Georgia, "Iowan Old Style", serif;
+      font-size: 18px;
+      letter-spacing: .02em;
+    }
+    .wordmark-mark {
+      width: 19px;
+      height: 19px;
+      border: 2px solid var(--marigold);
+      transform: rotate(45deg);
+      box-shadow: inset 0 0 0 3px var(--night), inset 0 0 0 5px var(--madder);
+    }
+    .top-actions { display: flex; align-items: center; gap: 8px; }
+    .quiet-button, .primary-button, .text-button {
+      border: 0;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .quiet-button {
+      padding: 8px 13px;
+      border: 1px solid rgba(243, 234, 216, .22);
+      color: var(--quiet);
+      background: rgba(17, 16, 29, .58);
+    }
+    .quiet-button:hover { color: var(--cream); border-color: rgba(243, 234, 216, .42); }
+    .primary-button {
+      padding: 12px 24px;
+      color: #271a10;
+      background: linear-gradient(180deg, #f0bd61, #d89531);
+      box-shadow: 0 8px 30px rgba(202, 132, 36, .2);
+      font-weight: 750;
+    }
+    .primary-button:hover { transform: translateY(-1px); }
+    .text-button { padding: 10px 14px; color: var(--quiet); background: transparent; text-decoration: underline; text-underline-offset: 4px; }
+    .primary-button:active, .quiet-button:active, .text-button:active { transform: translateY(1px); }
+
+    .view {
+      min-height: calc(100dvh - 64px);
+      padding: clamp(20px, 5vw, 52px) max(16px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    }
+    .intro, .dismissed, .end {
+      display: grid;
+      place-items: center;
+      text-align: center;
+    }
+    .intro-card, .dismissed-card, .end-card {
+      width: min(100%, 680px);
+      padding: clamp(24px, 7vw, 54px);
+      border: 1px solid rgba(227, 166, 66, .23);
+      background:
+        linear-gradient(135deg, rgba(140, 59, 57, .12), transparent 38%),
+        rgba(21, 19, 34, .82);
+      box-shadow: 18px 18px 0 rgba(83, 38, 41, .13);
+    }
+    .kicker {
+      margin: 0 0 16px;
+      color: var(--marigold);
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: .19em;
+      text-transform: uppercase;
+    }
+    h1, h2 { margin: 0; font-family: Georgia, "Iowan Old Style", serif; font-weight: 500; }
+    h1 { font-size: clamp(35px, 8vw, 64px); line-height: 1.02; letter-spacing: -.035em; }
+    h2 { font-size: clamp(30px, 6vw, 48px); line-height: 1.08; }
+    .lede { max-width: 48ch; margin: 20px auto 0; color: #d1c5b3; font-size: clamp(16px, 2.8vw, 19px); line-height: 1.6; }
+    .entry-actions, .end-actions, .dawn-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 28px; }
+    .trust-line { margin: 28px 0 0; color: var(--quiet); font-family: Georgia, "Iowan Old Style", serif; font-size: 15px; }
+    .rule-note {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      margin-top: 32px;
+      background: rgba(227,166,66,.16);
+      border: 1px solid rgba(227,166,66,.16);
+      text-align: left;
+    }
+    .rule-note p { min-width: 0; margin: 0; padding: 14px; color: var(--quiet); background: rgba(17,16,29,.92); font-size: 13px; line-height: 1.45; }
+    .rule-note strong { display: block; margin-bottom: 4px; color: var(--cream); }
+
+    .play { display: flex; flex-direction: column; justify-content: center; }
+    .play-head { width: min(100%, 820px); margin: 0 auto 18px; text-align: center; }
+    .play-head h1 { font-size: clamp(30px, 6vw, 48px); }
+    .play-instruction { margin: 9px auto 0; color: var(--quiet); line-height: 1.45; }
+    .play-toolbar { display: flex; justify-content: center; gap: 8px; margin-top: 14px; }
+    .board-shell {
+      --warmth: 0;
+      position: relative;
+      width: min(100%, 840px);
+      margin: 0 auto;
+      padding: clamp(18px, 4vw, 34px) clamp(10px, 3vw, 28px) clamp(22px, 4vw, 38px);
+      overflow: hidden;
+      border: 1px solid rgba(227, 166, 66, .22);
+      border-radius: 26px 26px 14px 14px;
+      background:
+        radial-gradient(circle at 50% 20%, rgba(227, 166, 66, calc(.05 + var(--warmth) * .13)), transparent 44%),
+        linear-gradient(135deg, rgba(44, 54, 113, .64), rgba(26, 24, 52, .94));
+      box-shadow: inset 0 0 70px rgba(4, 3, 13, .44), 0 26px 70px rgba(0,0,0,.2);
+      transition: background 700ms ease, filter 900ms ease, opacity 900ms ease;
+    }
+    .board-shell::before {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .23;
+      content: "";
+      background:
+        linear-gradient(45deg, transparent 44%, var(--marigold) 45% 55%, transparent 56%) 0 0 / 38px 38px,
+        linear-gradient(-45deg, transparent 44%, var(--madder) 45% 55%, transparent 56%) 19px 19px / 38px 38px;
+      mask-image: linear-gradient(90deg, black, transparent 20% 80%, black);
+    }
+    .rack {
+      position: relative;
+      height: calc(var(--tile-h) + 18px);
+      margin: 0 auto 3px;
+      isolation: isolate;
+    }
+    .rack::after {
+      position: absolute;
+      inset: auto 2% 2px;
+      z-index: -1;
+      height: 15px;
+      border-radius: 50%;
+      background: rgba(9, 6, 13, .4);
+      filter: blur(8px);
+      content: "";
+    }
+    .tile {
+      --motif: var(--madder);
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline-start: calc((100% - var(--tile-w)) * var(--slot) / 11);
+      z-index: calc(20 - var(--depth));
+      display: grid;
+      grid-template-rows: 1fr auto;
+      place-items: center;
+      width: var(--tile-w);
+      height: var(--tile-h);
+      padding: 7px 4px 6px;
+      border: 1px solid #b99e71;
+      border-radius: 12px 12px 9px 9px;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.55), transparent 32%),
+        linear-gradient(180deg, #f6edda, #d9c39d);
+      box-shadow: 2px 4px 0 #8e724e, 0 8px 14px rgba(0,0,0,.23);
+      cursor: pointer;
+      transform-origin: center bottom;
+      transition: transform 180ms cubic-bezier(.2,.8,.2,1), opacity 340ms ease, filter 180ms ease, box-shadow 180ms ease;
+    }
+    .tile::before {
+      position: absolute;
+      inset: 4px;
+      border: 1px solid color-mix(in srgb, var(--motif) 38%, transparent);
+      border-radius: 8px;
+      pointer-events: none;
+      content: "";
+    }
+    .tile svg { width: 72%; height: 62%; color: var(--motif); overflow: visible; }
+    .tile-label { max-width: 100%; overflow: hidden; color: #5d4437; font-size: clamp(8px, 2.1vw, 10px); font-weight: 760; letter-spacing: .02em; text-overflow: ellipsis; white-space: nowrap; }
+    .tile:disabled { cursor: default; filter: brightness(.68) saturate(.7); }
+    .tile:not(:disabled):hover { transform: translateY(-4px); filter: brightness(1.06); }
+    .tile.is-selected { z-index: 40; transform: translateY(-9px) scale(1.045); box-shadow: 3px 7px 0 #8e724e, 0 18px 24px rgba(0,0,0,.36), 0 0 0 3px var(--focus); }
+    .tile.is-hinted { animation: hint-breathe 1.2s ease-in-out 2; }
+    .tile.is-removed { opacity: 0; pointer-events: none; transform: translateY(-18px) scale(.92); }
+    .tile[data-motif="belan"], .tile[data-motif="chai"], .tile[data-motif="tiffin"] { --motif: #8c3b39; }
+    .tile[data-motif="chakla"], .tile[data-motif="katori"], .tile[data-motif="cooker"] { --motif: #345a75; }
+    .tile[data-motif="tawa"], .tile[data-motif="chimta"], .tile[data-motif="masala"] { --motif: #9b661e; }
+    @keyframes hint-breathe { 0%,100% { transform: none; } 50% { transform: translateY(-7px); box-shadow: 2px 4px 0 #8e724e, 0 0 0 3px rgba(255,217,144,.78); } }
+
+    .board-status { min-height: 1.6em; margin: 16px auto 0; color: #d5c7b2; font-family: Georgia, "Iowan Old Style", serif; text-align: center; }
+    .lid {
+      position: absolute;
+      inset: -28% 7% auto;
+      z-index: 80;
+      height: 74%;
+      border: 2px solid #b98635;
+      border-radius: 50% 50% 16px 16px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-120%) rotate(-2deg);
+      background:
+        radial-gradient(circle at 50% 19%, #dcb05d 0 5%, #805728 6% 8%, transparent 9%),
+        linear-gradient(180deg, #d2a04c, #85602f 70%, #5b3c22);
+      box-shadow: inset 0 -16px 30px rgba(61,34,15,.35), 0 28px 50px rgba(0,0,0,.4);
+      transition: transform 1.1s cubic-bezier(.18,.8,.2,1), opacity 280ms ease;
+    }
+    .board-shell.is-settling { filter: saturate(.72) brightness(.78); }
+    .board-shell.is-settling .lid { opacity: .98; transform: translateY(38%) rotate(0); }
+
+    .end-card .end-sub { margin: 14px 0 0; color: var(--quiet); font-size: 17px; }
+    .tomorrow-status { min-height: 1.5em; margin: 14px 0 0; color: var(--quiet); }
+    .disclaimer { max-width: 58ch; margin: 28px auto 0; color: #9e958a; font-size: 12px; line-height: 1.65; }
+
+    .dawn { display: grid; place-items: center; }
+    .dawn-card { width: min(100%, 820px); text-align: center; }
+    .dawn-card .lede { margin-top: 10px; }
+    #dawnCanvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin-top: 22px;
+      border: 9px solid #d8bb7a;
+      outline: 1px solid #8c6a33;
+      background: #d6a260;
+      box-shadow: 16px 18px 0 rgba(90,45,33,.17);
+    }
+    #dawnVideo { display: block; width: min(100%, 620px); margin: 18px auto 0; background: #151321; }
+    #dawnStatus { min-height: 1.6em; color: var(--quiet); }
+
+    .sr-only { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
+
+    @media (max-width: 520px) {
+      :root { --tile-w: clamp(46px, 15.5vw, 58px); --tile-h: clamp(62px, 20vw, 74px); }
+      .view { padding-top: 18px; }
+      .intro-card, .dismissed-card, .end-card { padding: 24px 18px 28px; box-shadow: 10px 10px 0 rgba(83,38,41,.13); }
+      .rule-note { grid-template-columns: 1fr; }
+      .play { justify-content: flex-start; }
+      .play-head { margin-bottom: 12px; }
+      .board-shell { padding-inline: 7px; border-radius: 18px 18px 10px 10px; }
+      .rack { height: calc(var(--tile-h) + 12px); }
+      .tile-label { max-width: calc(var(--tile-w) - 10px); }
+    }
+    @media (max-height: 650px) {
+      .topbar { min-height: 52px; }
+      .view { min-height: calc(100dvh - 52px); padding-top: 10px; padding-bottom: 12px; }
+      .play-head h1 { font-size: 28px; }
+      .play-instruction { margin-top: 4px; font-size: 13px; }
+      .play-toolbar { margin-top: 7px; }
+      .rack { height: calc(var(--tile-h) + 3px); }
+      .board-shell { padding-top: 10px; padding-bottom: 10px; }
+      .board-status { margin-top: 7px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
 </head>
 <body>
-<canvas id="stage" role="img" aria-label="A dark room with a desk, a lamp, and a rain-lit window.">Nindova’s visual room. Use the controls below the scene to complete every action.</canvas>
-<div id="hint" aria-hidden="true"></div>
-<input id="nameBox" aria-label="Name this object" maxlength="24" autocomplete="off" spellcheck="false" placeholder="name it…">
+  <main class="shell" id="app">
+    <header class="topbar">
+      <div class="wordmark"><span class="wordmark-mark" aria-hidden="true"></span><span>Nindova</span></div>
+      <div class="top-actions">
+        <button class="quiet-button" id="muteBtn" type="button" aria-pressed="false">sound off</button>
+      </div>
+    </header>
 
-<div class="toggles">
-  <button class="tg" id="paceBtn" aria-pressed="true" hidden>reviewer cut</button>
-  <button class="tg" id="muteBtn" aria-pressed="false">sound on</button>
-</div>
+    <section class="view intro" id="intake" aria-labelledby="intakeTitle">
+      <div class="intro-card">
+        <p class="kicker">Rasoi Pairs · a bounded night game</p>
+        <h1 id="intakeTitle">Find the pairs.<br>Let the kitchen quiet.</h1>
+        <p class="lede">Match two kitchen tiles when they are free at the ends of their racks. The game grows lighter as the board opens, then closes itself.</p>
+        <div class="entry-actions">
+          <button class="primary-button" id="beginBtn" type="button">Enter the kitchen</button>
+          <button class="text-button" id="notNowBtn" type="button">Not now</button>
+          <button class="quiet-button" id="dawnBtn" type="button" hidden>Open Dawn</button>
+        </div>
+        <div class="rule-note" aria-label="How Rasoi Pairs works">
+          <p><strong>Look at the edges</strong>Only exposed tiles can be chosen.</p>
+          <p><strong>Find the same object</strong>Belan with belan. Tiffin with tiffin.</p>
+          <p><strong>Leave when it ends</strong>No score, grade, or reason to replay.</p>
+        </div>
+        <p class="trust-line">Nothing to win. Nothing tracked. Nothing you can do wrong.</p>
+      </div>
+    </section>
 
-<div id="srStatus" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
-<section id="actionDock" aria-label="Session actions" hidden>
-  <div id="actName">Arrive</div>
-  <p id="actionPrompt">The room is waiting.</p>
-  <div class="semantic-actions">
-    <button class="semantic-primary" id="semanticPrimary" type="button">Continue</button>
-    <button class="semantic-secondary" id="nameNextBtn" type="button" hidden>Name the next thing</button>
-    <button class="semantic-secondary" id="changeVistaBtn" type="button" hidden>Change window</button>
-  </div>
-  <form id="semanticNameForm" hidden>
-    <label for="semanticNameInput">A name for this thing, if you want one</label>
-    <input id="semanticNameInput" maxlength="24" autocomplete="off" spellcheck="false">
-    <button class="semantic-secondary" type="submit">Keep name</button>
-    <button class="semantic-secondary" id="cancelSemanticName" type="button">Not now</button>
-  </form>
-</section>
+    <section class="view dismissed" id="dismissed" aria-labelledby="dismissedTitle" hidden>
+      <div class="dismissed-card">
+        <p class="kicker">Not now is enough</p>
+        <h2 id="dismissedTitle">Nothing is waiting.</h2>
+        <p class="lede">Come back whenever you like tonight. Nindova stays available; it will not ask again.</p>
+        <div class="entry-actions"><button class="quiet-button" id="returnBtn" type="button">Open Nindova</button></div>
+      </div>
+    </section>
 
-<!-- INTAKE -->
-<div class="overlay" id="intake" aria-hidden="false">
-  <div class="card">
-    <div class="kicker">a bounded bedtime game</div>
-    <h1>Nindova</h1>
-    <div class="prompt">The day is still on the desk.</div>
-    <button class="btn-begin" id="beginBtn">Enter</button>
-    <button class="btn-ghost" id="dawnBtn" type="button" hidden>Open Dawn</button>
-    <div class="footnote">Nothing to win. Nothing tracked. Nothing you can do wrong.</div>
-  </div>
-</div>
+    <section class="view play" id="play" aria-labelledby="playTitle" hidden>
+      <header class="play-head">
+        <p class="kicker">Tonight's kitchen</p>
+        <h1 id="playTitle">Rasoi Pairs</h1>
+        <p class="play-instruction">Choose two matching tiles that are free at the ends of their racks.</p>
+        <div class="play-toolbar"><button class="quiet-button" id="hintBtn" type="button">Show a safe pair</button></div>
+      </header>
+      <div class="board-shell" id="boardShell" aria-label="Rasoi Pairs board">
+        <div id="board"></div>
+        <div class="lid" aria-hidden="true"></div>
+      </div>
+      <p class="board-status" id="boardStatus" role="status" aria-live="polite">The edge tiles are ready.</p>
+    </section>
 
-<!-- END CARD -->
-<div class="overlay hidden" id="endCard" aria-hidden="true">
-  <div class="card">
-    <div class="end-title">The session is over. That's the point.</div>
-    <div class="end-sub">No score. No streak. Nothing owed tomorrow.</div>
-    <div class="end-actions">
-      <button class="btn-ghost" id="tomorrowBtn" type="button">Same time tomorrow?</button>
-    </div>
-    <p class="tomorrow-status" id="tomorrowStatus" role="status" aria-live="polite"></p>
-    <div class="principles" id="reviewEvidence" hidden>
-      <div class="pr"><div class="n">01</div><div class="t">It gets easier, not harder — effort decays until the game does almost nothing.
-        <span>Boredom doesn't sedate (d ≈ −0.03 vs. neutral; 2025 meta-analysis, N=6,570). The target is effortless absorption, not under-stimulation.</span></div></div>
-      <div class="pr"><div class="n">02</div><div class="t">Naming a thing before you put it away is optional — the putting-away isn't.
-        <span>Writing specific unfinished tasks at bedtime sped sleep onset ~9 min in a polysomnography RCT (Scullin et al. 2018, d = 0.63). The more specific, the faster.</span></div></div>
-      <div class="pr"><div class="n">03</div><div class="t">It ends on its own — a bounded session, then dark.
-        <span>Night-time screen harm is mostly unbounded time (~1 h displacement), not light (0–10 min). The product sells an ending.</span></div></div>
-      <div class="pr"><div class="n">04</div><div class="t">It never mentions sleep — no scores, streaks, or tracking.
-        <span>Attention to one's own sleep performance is itself arousing (Spiegelhalder 2012, n=236, PSG; Espie's attention–intention–effort model).</span></div></div>
-      <div class="pr"><div class="n">05</div><div class="t">A visible, completable set — closure, not interruption.
-        <span>Interrupted goals get resumed (Ovsiankina, 67%); bounded sets preserve the sense of control (CHI 2021: playlists 0% control loss vs. autoplay 87%).</span></div></div>
-      <div class="pr"><div class="n">06</div><div class="t">Tonight's scene changes; the path never does. One arc, no menu.
-        <span>The procession of different animals is a stream of specific, unrelated imagery (imagery distraction beat no-instruction; vague distraction didn't — Harvey &amp; Payne 2002). A game-select menu would rebuild the "one more" loop.</span></div></div>
-    </div>
-    <div class="end-actions" id="reviewActions" hidden>
-      <button class="btn-ghost" id="replayBtn">Replay</button>
-      <button class="btn-ghost" id="paceBtn2">Switch to real pacing (~15 min)</button>
-    </div>
-    <div class="disclaimer">Nindova is a behavioral design study. The target outcome is earlier stopping and a shorter gap between getting into bed and trying to sleep — not "better sleep." This is not a treatment for insomnia; persistent sleep difficulty deserves CBT-I with a clinician. Designed simple enough for anyone, positioned 13+: evening light suppresses melatonin in young children even at the dimmest screen levels (Hartstein et al. 2022). The full iOS concept pairs this session with Screen Time interception set earlier in the day.</div>
-  </div>
-</div>
+    <section class="view end" id="end" aria-labelledby="endTitle" hidden>
+      <div class="end-card">
+        <p class="kicker">The kitchen is quiet</p>
+        <h2 id="endTitle">The session is over. That's the point.</h2>
+        <p class="end-sub">No score. No streak. Nothing owed tomorrow.</p>
+        <div class="end-actions"><button class="quiet-button" id="tomorrowBtn" type="button">Same time tomorrow?</button></div>
+        <p class="tomorrow-status" id="tomorrowStatus" role="status" aria-live="polite"></p>
+        <p class="disclaimer">Nindova is a behavioral design study about ending an unbounded loop. It is not a sleep tracker or treatment, and Rasoi Pairs has not been clinically shown to make people sleepy. Intended for ages 13 and up. Persistent sleep difficulty deserves evidence-based care such as CBT-I with a qualified clinician.</p>
+      </div>
+    </section>
 
-<!-- DAWN -->
-<div class="overlay hidden" id="dawnCard" aria-hidden="true">
-  <div class="card">
-    <div class="kicker">morning · local to this device</div>
-    <h1>Dawn</h1>
-    <p class="dawn-intro">Last night’s Vista, held at first light. Keep it only if you want to.</p>
-    <canvas id="dawnCanvas" width="1200" height="750" role="img" aria-label="Last night’s Vista rendered at first light."></canvas>
-    <div class="dawn-actions">
-      <button class="btn-ghost" id="saveStillBtn" type="button">Save still</button>
-      <button class="btn-ghost" id="shareStillBtn" type="button">Share still</button>
-      <button class="btn-ghost" id="makeLoopBtn" type="button">Make silent 3-second loop</button>
-      <button class="btn-ghost" id="closeDawnBtn" type="button">Back to the room</button>
-    </div>
-    <video id="dawnVideo" muted loop playsinline controls hidden></video>
-    <div class="dawn-actions" id="loopActions" hidden>
-      <button class="btn-ghost" id="saveLoopBtn" type="button">Save loop</button>
-      <button class="btn-ghost" id="shareLoopBtn" type="button">Share loop</button>
-    </div>
-    <p id="dawnStatus" role="status" aria-live="polite"></p>
-  </div>
-</div>
+    <section class="view dawn" id="dawn" aria-labelledby="dawnTitle" hidden>
+      <div class="dawn-card">
+        <p class="kicker">Morning · local to this device</p>
+        <h2 id="dawnTitle">First light in the kitchen.</h2>
+        <p class="lede">Last night's forms, resting after the game. Keep the still only if you want to.</p>
+        <canvas id="dawnCanvas" width="1200" height="750" role="img" aria-label="Last night's kitchen motifs arranged at first light."></canvas>
+        <div class="dawn-actions">
+          <button class="quiet-button" id="saveStillBtn" type="button">Save still</button>
+          <button class="quiet-button" id="shareStillBtn" type="button">Share still</button>
+          <button class="quiet-button" id="makeLoopBtn" type="button">Make silent loop</button>
+          <button class="text-button" id="closeDawnBtn" type="button">Back</button>
+        </div>
+        <video id="dawnVideo" muted loop playsinline controls hidden></video>
+        <div class="dawn-actions" id="loopActions" hidden>
+          <button class="quiet-button" id="saveLoopBtn" type="button">Save loop</button>
+          <button class="quiet-button" id="shareLoopBtn" type="button">Share loop</button>
+        </div>
+        <p id="dawnStatus" role="status" aria-live="polite"></p>
+      </div>
+    </section>
 
-<script type="module" src="./src/session.ts"></script>
-<script data-portable-remove>
-if(location.protocol.startsWith('http')&&'serviceWorker' in navigator){
-  addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{scope:'./',updateViaCache:'none'}).catch(()=>{}),{once:true});
-}
-</script>
+    <p class="sr-only" id="srStatus" role="status" aria-live="polite" aria-atomic="true"></p>
+  </main>
+  <script type="module" src="./src/session.ts"></script>
+  <script data-portable-remove>
+    if (location.protocol.startsWith("http") && "serviceWorker" in navigator) {
+      addEventListener("load", () => navigator.serviceWorker.register("./sw.js", { scope: "./", updateViaCache: "none" }).catch(() => {}), { once: true });
+    }
+  </script>
 </body>
 </html>

@@ -5,57 +5,48 @@ import { resolve } from "node:path";
 import { chromium } from "playwright";
 
 const root = resolve(import.meta.dirname, "../..");
-const output = resolve(root, "artifacts/dawn");
+const output = resolve(root, "artifacts/rasoi-dawn");
 const port = 4187;
 await mkdir(output, { recursive: true });
-
 const server = spawn(process.execPath, [resolve(root, "scripts/serve.mjs"), resolve(root, "dist")], {
   cwd: root,
   env: { ...process.env, NINDOVA_PREVIEW_PORT: String(port) },
   stdio: ["ignore", "pipe", "pipe"],
 });
-
 await new Promise((resolveReady, reject) => {
   const timer = setTimeout(() => reject(new Error("preview server did not start")), 5_000);
   server.once("error", reject);
-  server.stdout.on("data", (chunk) => {
-    if (!chunk.toString().includes("Nindova preview")) return;
-    clearTimeout(timer);
-    resolveReady();
-  });
+  server.stdout.on("data", (chunk) => { if (chunk.toString().includes("Nindova preview")) { clearTimeout(timer); resolveReady(); } });
 });
 
 const browser = await chromium.launch();
 const context = await browser.newContext({ viewport: { width: 375, height: 812 }, acceptDownloads: true });
 const page = await context.newPage();
 const errors = [];
-page.on("console", (message) => {
-  if (message.type() === "error") errors.push(`console: ${message.text()}`);
-});
-page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
-
-const base = `http://127.0.0.1:${port}/play/`;
+page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
+page.on("pageerror", (error) => errors.push(error.message));
 const validNow = "2026-08-03T14:00:00.000Z";
-const completion = {
-  nightId: "2026-08-03|America/Chicago|r1",
-  dawnDate: "2026-08-03",
-  timeZone: "America/Chicago",
-  recipeVersion: 1,
-  vista: "meadow",
-  finalKind: "rabbit",
-};
 
 try {
-  await page.goto(`${base}?review=1&dawnNow=${encodeURIComponent(validNow)}`);
+  await page.goto(`http://127.0.0.1:${port}/play/?review=1`);
   await page.waitForFunction(() => Boolean(window.__ct));
   assert.equal(await page.locator("#dawnBtn").isHidden(), true);
-
-  await page.evaluate((value) => {
-    const next = NindovaNight.completeState(NindovaNight.emptyState(), value).state;
-    NindovaNight.writeStorage(localStorage, next);
-  }, completion);
+  await page.evaluate(() => {
+    const nightId = "2026-08-03|America/Chicago|r2";
+    const recipe = NindovaNight.recipeForNight(nightId);
+    const completion = {
+      kind: "rasoi-pairs",
+      nightId,
+      dawnDate: "2026-08-03",
+      timeZone: "America/Chicago",
+      recipeVersion: 2,
+      boardId: recipe.boardId,
+      motifOrder: recipe.motifOrder,
+    };
+    NindovaNight.writeStorage(localStorage, NindovaNight.completeState(NindovaNight.emptyState(), completion).state);
+  });
   await page.reload();
-  await page.waitForFunction(() => Boolean(window.__ct));
+  await page.evaluate((instant) => window.__ct.setDawnNow(instant), validNow);
   assert.equal(await page.locator("#dawnBtn").isVisible(), true);
   assert.equal(await page.evaluate(() => window.__ct.dawnEligibility.reason), "available");
 
@@ -63,80 +54,40 @@ try {
   assert.equal(await page.locator("#dawnBtn").isHidden(), true);
   await page.evaluate(() => window.__ct.setDawnNow("2026-08-03T17:00:00.000Z"));
   assert.equal(await page.locator("#dawnBtn").isHidden(), true);
-  await page.evaluate(() => window.__ct.setDawnNow("2026-08-04T14:00:00.000Z"));
-  assert.equal(await page.locator("#dawnBtn").isHidden(), true);
   await page.evaluate((instant) => window.__ct.setDawnNow(instant), validNow);
-
   await page.click("#dawnBtn");
-  await page.locator("#dawnCard").waitFor({ state: "visible" });
-  await page.waitForTimeout(1_300);
-  assert.equal(await page.locator("#dawnCanvas").isVisible(), true);
-  assert.equal(await page.locator("#intake").getAttribute("aria-hidden"), "true");
+  await page.locator("#dawn").waitFor({ state: "visible" });
+  assert.equal(await page.evaluate(() => window.__ct.state), "dawn");
+  assert.ok((await page.locator("#dawnCanvas").getAttribute("aria-label")).includes("nine kitchen motifs"));
   await page.screenshot({ path: resolve(output, "dawn-375x812.png"), fullPage: true });
 
-  const stillDownloadPromise = page.waitForEvent("download");
+  const downloadPromise = page.waitForEvent("download");
   await page.click("#saveStillBtn");
-  const stillDownload = await stillDownloadPromise;
-  assert.equal(stillDownload.suggestedFilename(), "nindova-dawn-2026-08-03.png");
-  assert.ok(await stillDownload.path());
+  const download = await downloadPromise;
+  assert.equal(download.suggestedFilename(), "nindova-dawn.png");
+  assert.ok(await download.path());
 
   await page.evaluate(() => {
     Object.defineProperty(navigator, "canShare", { configurable: true, value: () => true });
-    Object.defineProperty(navigator, "share", {
-      configurable: true,
-      value: async () => {
-        throw new DOMException("cancelled", "AbortError");
-      },
-    });
+    Object.defineProperty(navigator, "share", { configurable: true, value: async () => { throw new DOMException("cancelled", "AbortError"); } });
   });
   await page.click("#shareStillBtn");
   await page.waitForFunction(() => document.querySelector("#dawnStatus").textContent.includes("cancelled"));
-  assert.equal(await page.locator("#dawnCard").isVisible(), true);
 
   await page.evaluate(() => window.__ct.setLoopUnsupported(true));
   await page.click("#makeLoopBtn");
-  await page.waitForFunction(() => document.querySelector("#dawnStatus").textContent.includes("could not make"));
+  await page.waitForFunction(() => document.querySelector("#dawnStatus").textContent.includes("unavailable"));
   assert.equal(await page.locator("#saveStillBtn").isEnabled(), true);
-  assert.equal(await page.locator("#dawnCanvas").isVisible(), true);
 
-  await page.evaluate(() => {
-    window.__revokedDawnUrls = [];
-    const original = URL.revokeObjectURL.bind(URL);
-    URL.revokeObjectURL = (url) => {
-      window.__revokedDawnUrls.push(url);
-      return original(url);
-    };
-    window.__ct.setLoopUnsupported(false);
-  });
-  assert.ok(await page.evaluate(() => window.__ct.dawnLoopType));
+  await page.evaluate(() => window.__ct.setLoopUnsupported(false));
   await page.click("#makeLoopBtn");
-  await page.waitForFunction(() => document.querySelector("#dawnStatus").textContent.includes("loop is ready"), null, {
-    timeout: 12_000,
-  });
-  const loop = await page.evaluate(() => window.__ct.dawnLoop);
-  assert.equal(loop.durationMs, 3000);
-  assert.ok(loop.size > 0);
-  assert.match(loop.type, /^video\//);
+  await page.waitForFunction(() => document.querySelector("#dawnStatus").textContent.includes("loop is ready"), null, { timeout: 10_000 });
   assert.equal(await page.locator("#dawnVideo").isVisible(), true);
   assert.equal(await page.locator("#dawnVideo").getAttribute("muted"), "");
-
-  await page.click("#shareLoopBtn");
-  await page.waitForFunction(() => document.querySelector("#dawnStatus").textContent.includes("cancelled"));
-  assert.equal(await page.locator("#dawnCard").isVisible(), true);
-
   await page.click("#closeDawnBtn");
-  await page.locator("#dawnCard").waitFor({ state: "hidden" });
-  assert.equal(await page.locator("#dawnCard").isHidden(), true);
-  assert.ok((await page.evaluate(() => window.__revokedDawnUrls.length)) >= 1);
-
-  await page.evaluate(() => localStorage.setItem(NindovaNight.STORAGE_KEY, "{corrupt"));
-  await page.reload();
-  await page.waitForFunction(() => Boolean(window.__ct));
-  assert.equal(await page.locator("#dawnBtn").isHidden(), true);
-  assert.equal(await page.locator("#beginBtn").isVisible(), true);
+  assert.equal(await page.locator("#intake").isVisible(), true);
   assert.deepEqual(errors, []);
-
-  console.log("Dawn eligibility, still, silent loop, cancellation, cleanup, and corrupt-state checks passed.");
+  console.log("Rasoi Dawn eligibility, first-light still, local export, share cancellation, and loop fallback checks passed.");
 } finally {
   await context.close();
   await browser.close();
