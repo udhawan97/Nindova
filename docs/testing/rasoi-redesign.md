@@ -37,3 +37,7 @@
 ## Honest limits
 
 Human Punjabi cultural review, real-device VoiceOver/TalkBack, installed Safari/Android proof, and facilitated human experience testing remain unverified. No sleep or dopamine outcome is claimed.
+
+## Production wall-clock receipt
+
+On 2026-08-03, `npm run test:wall-clock` exercised the council-fixed production application without reviewer acceleration. The Session reached `end` at 722.447 seconds through the `production-cap` path, remained closed through 900.001 observed seconds, and reported no console or page errors.
