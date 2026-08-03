@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "Nindova",
+  "short_name": "Nindova",
+  "description": "A bounded fifteen-minute ritual that puts the day away and ends itself.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0d111d",
+  "theme_color": "#17263b",
+  "categories": ["lifestyle", "games"],
+  "icons": [
+    {
+      "src": "./assets/nindova-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

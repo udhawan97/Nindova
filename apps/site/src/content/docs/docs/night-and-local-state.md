@@ -17,12 +17,13 @@ Published parity vectors in the unit suite pin the PRNG output and representativ
 
 ## Quiet memory
 
-Nindova writes one local key: `nindova:night-state:v1`. The schema keeps only:
+Nindova writes one local key: `nindova:night-state:v2`. The schema keeps only:
 
 - the last completed Session facts required by Dawn;
 - one meadow Echo; and
 - up to five harbor boats, with the oldest removed only when another completed harbor Session adds one.
+- one optional local “Same time tomorrow?” intention for the last completed `nightId`.
 
 Skipped nights do not age or mutate either memory. Replaying the same `nightId` is idempotent: it cannot add another Echo, boat, completion, or return marker.
 
-Missing state starts empty. Corrupt, stale, unavailable, or unsupported state fails open to a fresh local scene without blocking the Session. No count, history, collection, attendance, or missed-night language is shown.
+Version 1 migrates once and removes its old key. Missing state starts empty. Corrupt, stale, unavailable, or unsupported state fails open to a fresh local scene without blocking the Session. No count, history, collection, attendance, or missed-night language is shown. The optional return intention requests no notification and creates no scheduled prompt.

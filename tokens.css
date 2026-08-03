@@ -1,18 +1,18 @@
-/* Hallmark · tokens · genre: atmospheric · theme: Midnight · anchor hue: 65 */
+/* Hallmark · tokens · genre: atmospheric · theme: Punjabi Indigo Night · anchor hue: 75 */
 :root {
-  --color-paper: oklch(14% 0.012 60);
-  --color-paper-2: oklch(18% 0.016 60);
-  --color-paper-3: oklch(23% 0.019 60);
-  --color-rule: oklch(34% 0.025 65);
-  --color-rule-strong: oklch(46% 0.04 68);
-  --color-neutral: oklch(65% 0.024 72);
-  --color-muted: oklch(76% 0.028 76);
-  --color-ink: oklch(94% 0.024 82);
-  --color-ink-soft: oklch(87% 0.032 78);
-  --color-accent: oklch(73% 0.14 65);
-  --color-accent-soft: oklch(55% 0.09 62);
-  --color-accent-ink: oklch(18% 0.028 50);
-  --color-focus: oklch(88% 0.12 83);
+  --color-paper: oklch(15% 0.035 255);
+  --color-paper-2: oklch(20% 0.045 255);
+  --color-paper-3: oklch(27% 0.05 250);
+  --color-rule: oklch(36% 0.045 65);
+  --color-rule-strong: oklch(50% 0.075 65);
+  --color-neutral: oklch(67% 0.035 80);
+  --color-muted: oklch(77% 0.035 82);
+  --color-ink: oklch(94% 0.03 88);
+  --color-ink-soft: oklch(87% 0.04 84);
+  --color-accent: oklch(73% 0.15 75);
+  --color-accent-soft: oklch(52% 0.12 43);
+  --color-accent-ink: oklch(17% 0.035 55);
+  --color-focus: oklch(88% 0.13 86);
   --color-error: oklch(72% 0.15 27);
   --color-success: oklch(75% 0.09 145);
 

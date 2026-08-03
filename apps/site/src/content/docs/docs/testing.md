@@ -23,6 +23,8 @@ Nindova distinguishes three evidence levels:
 
 `npm run test:dawn` builds and serves the production surface, then verifies missing/before-window/valid/noon/skipped/corrupt eligibility; rendered first light; a downloaded PNG; cancelled sharing; unsupported clip encoding; an actual silent 3000 ms browser loop; and preview URL cleanup. Unit vectors pin Chicago and Kolkata zone evaluation and the 06:00–11:59 boundary.
 
+`npm run test:pwa` builds the composed artifact, verifies manifest and `/play/` worker scope, exercises v1-to-v2 state migration and corruption recovery, re-enters an unfinished night, completes an offline Session with audio unavailable, records the notification-free return intention, replays idempotently, inspects cache contents and request origins, and proves that the standalone has no PWA dependency.
+
 ## Build gates
 
 ```sh
@@ -33,6 +35,7 @@ npm run test:portrait
 npm run test:self-closing
 npm run test:night
 npm run test:dawn
+npm run test:pwa
 npm run build
 ```
 

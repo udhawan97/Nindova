@@ -17,6 +17,7 @@ Anything that makes tonight harder to leave is a bug.
 - Audio, precise dragging, animation, and sight are optional capabilities, never completion requirements.
 - State stays local. There is no analytics, advertising, telemetry, remote logging, or account.
 - Same-night voluntary replay is possible, quiet, and idempotent.
+- “Same time tomorrow?” records only a local intention, requests no notification, and creates no urgency.
 - Choosing “Not now” at the Wall dismisses it for the rest of that night without guilt; Nindova itself remains manually available later that night.
 
 ## Immutable language

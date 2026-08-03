@@ -1,9 +1,10 @@
 (function installNindovaNight(global) {
   "use strict";
 
-  const SCHEMA_VERSION = 1;
+  const SCHEMA_VERSION = 2;
   const RECIPE_VERSION = 1;
-  const STORAGE_KEY = "nindova:night-state:v1";
+  const STORAGE_KEY = "nindova:night-state:v2";
+  const LEGACY_STORAGE_KEY = "nindova:night-state:v1";
   const WEATHER = ["soft-monsoon", "still-haze", "distant-rain", "clear-indigo"];
   const MOONS = ["crescent", "half", "veiled"];
   const OBJECTS = ["letter", "key", "mug", "book", "coin", "spool", "watch", "photo", "leaf", "pencil"];
@@ -109,6 +110,7 @@
       lastCompleted: null,
       meadowEcho: null,
       harborEchoes: [],
+      tomorrowIntention: null,
     };
   }
 
@@ -135,13 +137,17 @@
   }
 
   function sanitizeState(value) {
-    if (!value || value.version !== SCHEMA_VERSION) return null;
+    if (!value || (value.version !== SCHEMA_VERSION && value.version !== 1)) return null;
     const lastCompleted = value.lastCompleted === null ? null : validCompletion(value.lastCompleted) ? { ...value.lastCompleted } : null;
     const meadowEcho = sanitizeEcho(value.meadowEcho, "kind", MEADOW_SPECIES);
     const harborEchoes = Array.isArray(value.harborEchoes)
       ? value.harborEchoes.map((echo) => sanitizeEcho(echo, "kind", HARBOR_BOATS)).filter(Boolean).slice(-5)
       : [];
-    return { version: SCHEMA_VERSION, lastCompleted, meadowEcho, harborEchoes };
+    const tomorrowIntention = value.version === SCHEMA_VERSION && value.tomorrowIntention
+      && isText(value.tomorrowIntention.nightId) && isText(value.tomorrowIntention.heldAt)
+      ? { nightId: value.tomorrowIntention.nightId, heldAt: value.tomorrowIntention.heldAt }
+      : null;
+    return { version: SCHEMA_VERSION, lastCompleted, meadowEcho, harborEchoes, tomorrowIntention };
   }
 
   function decodeState(raw) {
@@ -150,7 +156,7 @@
       const parsed = JSON.parse(raw);
       const state = sanitizeState(parsed);
       if (!state) return { state: emptyState(), recovered: true, reason: "unsupported" };
-      return { state, recovered: false, reason: "ok" };
+      return { state, recovered: false, reason: parsed.version === 1 ? "migrated" : "ok" };
     } catch {
       return { state: emptyState(), recovered: true, reason: "corrupt" };
     }
@@ -166,6 +172,7 @@
       lastCompleted: { ...completion },
       meadowEcho: state.meadowEcho,
       harborEchoes: [...state.harborEchoes],
+      tomorrowIntention: null,
     };
     if (completion.vista === "meadow") {
       next.meadowEcho = { nightId: completion.nightId, kind: completion.finalKind };
@@ -177,7 +184,16 @@
 
   function readStorage(storage) {
     try {
-      return decodeState(storage?.getItem(STORAGE_KEY) ?? null);
+      const current = storage?.getItem(STORAGE_KEY) ?? null;
+      if (current !== null) return decodeState(current);
+      const legacy = storage?.getItem(LEGACY_STORAGE_KEY) ?? null;
+      if (legacy === null) return decodeState(null);
+      const migrated = decodeState(legacy);
+      if (!migrated.recovered) {
+        storage?.setItem(STORAGE_KEY, JSON.stringify(migrated.state));
+        storage?.removeItem?.(LEGACY_STORAGE_KEY);
+      }
+      return migrated;
     } catch {
       return { state: emptyState(), recovered: true, reason: "unavailable" };
     }
@@ -194,10 +210,26 @@
     }
   }
 
+  function setTomorrowIntention(current, nightId, heldAt = new Date().toISOString()) {
+    const state = sanitizeState(current) || emptyState();
+    if (!state.lastCompleted || state.lastCompleted.nightId !== nightId || !isText(heldAt)) {
+      return { state, changed: false };
+    }
+    if (state.tomorrowIntention?.nightId === nightId) return { state, changed: false };
+    return {
+      state: {
+        ...state,
+        tomorrowIntention: { nightId, heldAt },
+      },
+      changed: true,
+    };
+  }
+
   global.NindovaNight = Object.freeze({
     SCHEMA_VERSION,
     RECIPE_VERSION,
     STORAGE_KEY,
+    LEGACY_STORAGE_KEY,
     addCivilDays,
     captureNight,
     completeState,
@@ -207,6 +239,7 @@
     readStorage,
     recipeForNight,
     seedFrom,
+    setTomorrowIntention,
     writeStorage,
   });
 })(globalThis);

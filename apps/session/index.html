@@ -4,6 +4,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#17263b">
+<meta name="application-name" content="Nindova">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="./manifest.webmanifest" data-portable-remove>
 <title>Nindova — a game that puts the day away</title>
 <style>
   :root{
@@ -75,6 +80,7 @@
   .pr .t{font-size:14.5px;line-height:1.55;color:var(--ink);}
   .pr .t span{color:var(--ink-dim);font-size:13px;display:block;margin-top:2px;}
   .end-actions{margin-top:26px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+  .tomorrow-status{min-height:1.6em;margin-top:10px;color:var(--ink-dim);font-size:13px;font-style:italic;}
   .btn-ghost{background:rgba(216,180,130,.1);border:1px solid rgba(216,180,130,.28);color:var(--ink);padding:10px 22px;}
   .btn-ghost:hover{background:rgba(216,180,130,.2);}
   .disclaimer{margin-top:24px;font-size:11.5px;color:rgba(160,140,115,.55);line-height:1.7;max-width:520px;margin-left:auto;margin-right:auto;}
@@ -167,6 +173,10 @@
   <div class="card">
     <div class="end-title">The session is over. That's the point.</div>
     <div class="end-sub">No score. No streak. Nothing owed tomorrow.</div>
+    <div class="end-actions">
+      <button class="btn-ghost" id="tomorrowBtn" type="button">Same time tomorrow?</button>
+    </div>
+    <p class="tomorrow-status" id="tomorrowStatus" role="status" aria-live="polite"></p>
     <div class="principles" id="reviewEvidence" hidden>
       <div class="pr"><div class="n">01</div><div class="t">It gets easier, not harder — effort decays until the game does almost nothing.
         <span>Boredom doesn't sedate (d ≈ −0.03 vs. neutral; 2025 meta-analysis, N=6,570). The target is effortless absorption, not under-stimulation.</span></div></div>
@@ -1657,8 +1667,8 @@ const loopActions=document.getElementById('loopActions');
 let dawnStillBlob=null, dawnLoop=null, dawnLoopLease=null, forceLoopUnsupported=false;
 
 function refreshDawnAvailability(){
-  nightRead=Night.readStorage(nightStorage);
-  nightMemory=nightRead.state;
+  const latestNightRead=Night.readStorage(nightStorage);
+  nightMemory=latestNightRead.state;
   const result=Dawn.eligibility(nightMemory.lastCompleted,dawnNow());
   dawnBtn.hidden=!result.available;
   dawnBtn.setAttribute('aria-label',result.available?'Open last night’s Dawn':'Dawn is not available');
@@ -1943,8 +1953,27 @@ function showEnd(reason='completed'){
   endCard.classList.remove('hidden');
   endCard.setAttribute('aria-hidden','false');
   endCard.scrollTop=0;
+  refreshTomorrowAction();
   if(rainGain&&AC) rainGain.gain.setTargetAtTime(0.03,AC.currentTime,2);
 }
+
+const tomorrowBtn=document.getElementById('tomorrowBtn');
+const tomorrowStatus=document.getElementById('tomorrowStatus');
+
+function refreshTomorrowAction(){
+  const held=Boolean(activeNight&&nightMemory.tomorrowIntention?.nightId===activeNight.nightId);
+  tomorrowBtn.disabled=held;
+  tomorrowBtn.textContent=held?'Tomorrow is held quietly':'Same time tomorrow?';
+  tomorrowStatus.textContent=held?'No reminder was set. Return only if you want to.':'';
+}
+
+tomorrowBtn.addEventListener('click',()=>{
+  if(!activeNight) return;
+  const result=Night.setTomorrowIntention(nightMemory,activeNight.nightId);
+  nightMemory=result.state;
+  if(result.changed) Night.writeStorage(nightStorage,nightMemory);
+  refreshTomorrowAction();
+});
 
 function settleNextAutonomously(){
   if(dragObj) releasePointer(true);
@@ -2293,6 +2322,11 @@ document.getElementById('reviewActions').hidden=!reviewerMode;
 setPace(paceKey);
 setMuted(muted);
 refreshDawnAvailability();
+
+/* The installable build is static and same-origin. The standalone file never registers a worker. */
+if(location.protocol.startsWith('http')&&'serviceWorker' in navigator){
+  addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{scope:'./',updateViaCache:'none'}).catch(()=>{}),{once:true});
+}
 
 function restart(){
   const endCard=document.getElementById('endCard');

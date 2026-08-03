@@ -1,9 +1,9 @@
-/* Hallmark · pre-emit critique: P5 H4 E4 S5 R5 V4 */
-/* Hallmark · macrostructure: Narrative Workflow · genre: atmospheric · theme: Midnight
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V4 */
+/* Hallmark · macrostructure: Narrative Workflow · genre: atmospheric · theme: Punjabi Indigo Night
  * audience: adult night owls and late coders · use: understand the bounded ritual, then play tonight
- * tone: warm-dark, atmospheric, austere · nav: N9 Edge-aligned minimal · footer: Ft5 Statement
- * enrichment: E5 Custom Illustration Centerpiece · craft: tier-B hand-built SVG
- * motion: one lamp reveal + rain drift; static under reduced motion · studied: no
+ * tone: indigo-dark, materially grounded, quiet · nav: N9 Edge-aligned minimal · footer: Ft5 Statement
+ * enrichment: real rendered Session + Dawn media · craft: Punjabi material and landscape system
+ * motion: one media settle; static under reduced motion · studied: no
  * contrast: pass (40–41) · slop: pass (42–45) · honest: pass (46)
  * chrome: pass (47) · tokens: pass (48) · responsive: pass (34, 49–57) · icons: pass (30)
  */
@@ -59,6 +59,7 @@ a {
   min-height: 4.75rem;
   padding-inline: max(var(--page-gutter), env(safe-area-inset-left));
   border-block-end: var(--rule-hair) solid var(--color-rule);
+  background-image: repeating-linear-gradient(45deg, transparent 0 13px, color-mix(in oklch, var(--color-accent) 24%, transparent) 13px 14px, transparent 14px 27px);
 }
 
 .wordmark {
@@ -200,16 +201,28 @@ h3 {
 .window-art {
   min-width: 0;
   margin: 0;
-  opacity: 0;
-  transform: translateY(8px);
-  animation: settle var(--dur-long) var(--ease-out) 120ms forwards;
+  opacity: 1;
+  transform: none;
 }
 
-.window-art svg {
+.phulkari-frame {
+  position: relative;
   display: block;
-  width: min(100%, 36rem);
-  height: auto;
+  width: min(100%, clamp(17rem, 20vw, 21rem));
+  padding: var(--space-sm);
   margin-inline: auto;
+  border: 2px solid var(--color-accent-soft);
+  background:
+    linear-gradient(45deg, transparent 42%, var(--color-accent) 43% 57%, transparent 58%) 0 0 / 1.4rem 1.4rem,
+    var(--color-accent-soft);
+  box-shadow: 1.1rem 1.1rem 0 color-mix(in oklch, var(--color-paper-3) 75%, transparent);
+}
+
+.phulkari-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: var(--rule-hair) solid var(--color-rule-strong);
 }
 
 .window-art figcaption {
@@ -219,105 +232,59 @@ h3 {
   text-align: end;
 }
 
-.window-sky > path:first-child {
-  fill: var(--color-paper-2);
-}
-
-.window-moon {
-  fill: var(--color-ink-soft);
-}
-
-.rain {
-  fill: none;
-  stroke: var(--color-rule-strong);
-  stroke-linecap: round;
-  stroke-width: 3;
-  animation: rain-drift 4s var(--ease-in-out) infinite alternate;
-}
-
-.rain-b {
-  animation-delay: -2s;
-  opacity: 0.65;
-}
-
-.hill {
-  fill: var(--color-paper-3);
-}
-
-.visitor {
-  fill: var(--color-neutral);
-}
-
-.visitor-detail {
-  fill: none;
-  stroke: var(--color-paper);
-  stroke-linecap: round;
-  stroke-width: 4;
-}
-
-.window-frame path {
-  fill: none;
-  stroke: var(--color-ink-soft);
-  stroke-width: 14;
-}
-
-.window-frame .sill {
-  fill: var(--color-paper-3);
-  stroke-width: 4;
-}
-
-.desk-top,
-.desk-face,
-.drawer {
-  stroke: var(--color-rule-strong);
-  stroke-width: 3;
-}
-
-.desk-top {
-  fill: var(--color-accent-soft);
-}
-
-.desk-face,
-.drawer {
-  fill: var(--color-paper-2);
-}
-
-.drawer-pull,
-.lamp-stem,
-.lamp-base,
-.objects path {
-  fill: none;
-  stroke: var(--color-ink-soft);
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 5;
-}
-
-.lamp-shade {
-  fill: var(--color-accent);
-  stroke: var(--color-ink-soft);
-  stroke-linejoin: round;
-  stroke-width: 5;
-}
-
-.lamp-pool {
-  fill: var(--color-accent);
-  opacity: 0.13;
-  transform-origin: center;
-  animation: lamp-arrive 420ms var(--ease-out) 220ms both;
-}
-
-.object-steam {
-  opacity: 0.7;
-}
-
 .arc,
+.material-world,
 .two-loops,
 .dawn,
 .local,
 .closing,
 .foot-stmt {
   padding-inline: var(--page-gutter);
+}
+
+.material-world {
+  display: grid;
+  gap: var(--space-xl);
+  padding-block: var(--space-3xl);
+  border-block: var(--rule-hair) solid var(--color-rule);
+  background:
+    linear-gradient(135deg, transparent 46%, color-mix(in oklch, var(--color-rule) 40%, transparent) 47% 53%, transparent 54%) 0 0 / 3rem 3rem,
+    var(--color-paper-3);
+}
+
+.material-world > p {
+  max-width: var(--measure);
+  color: var(--color-ink-soft);
+}
+
+.section-kicker {
+  margin-block-end: var(--space-sm);
+  color: var(--color-accent);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.material-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-lg);
+  padding-block-start: var(--space-md);
+  border-block-start: var(--rule-hair) solid var(--color-rule-strong);
+  color: var(--color-muted);
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+}
+
+.material-key span::before {
+  display: inline-block;
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-inline-end: var(--space-xs);
+  border: 1px solid var(--color-accent);
+  transform: rotate(45deg);
+  content: "";
 }
 
 .arc {
@@ -359,9 +326,10 @@ h3 {
   position: absolute;
   inset-block-start: -4px;
   inset-inline-start: 0;
-  width: 2.5rem;
-  height: 7px;
+  width: 1rem;
+  height: 1rem;
   background: var(--color-accent);
+  transform: rotate(45deg);
 }
 
 .two-loops {
@@ -412,71 +380,21 @@ h3 {
 }
 
 .dawn-art {
-  display: grid;
-  min-height: 22rem;
-  place-items: center;
+  margin: 0;
 }
 
-.dawn-window {
-  position: relative;
-  width: min(100%, 25rem);
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  border: 0.75rem solid var(--color-paper-2);
-  background: var(--color-accent-soft);
+.dawn-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 0.5rem solid var(--color-paper-2);
+  outline: var(--rule-hair) solid var(--color-accent);
 }
 
-.dawn-window::before,
-.dawn-window::after {
-  position: absolute;
-  z-index: var(--z-raised);
-  background: var(--color-paper-2);
-  content: "";
-}
-
-.dawn-window::before {
-  inset: 0 calc(50% - 0.3rem);
-}
-
-.dawn-window::after {
-  inset: calc(58% - 0.3rem) 0;
-}
-
-.dawn-sun {
-  position: absolute;
-  inset-block-start: 20%;
-  inset-inline-end: 18%;
-  width: 4.5rem;
-  aspect-ratio: 1;
-  border-radius: var(--radius-round);
-  background: var(--color-ink-soft);
-}
-
-.dawn-water {
-  position: absolute;
-  inset: 58% 0 0;
-  background: var(--color-rule-strong);
-}
-
-.dawn-boat {
-  position: absolute;
-  z-index: var(--z-raised);
-  inset-block-end: 19%;
-  inset-inline-start: 22%;
-  width: 7rem;
-  height: 2.25rem;
-  border-radius: 0 0 var(--radius-round) var(--radius-round);
-  background: var(--color-paper-2);
-}
-
-.dawn-boat::before {
-  position: absolute;
-  inset-block-end: 100%;
-  inset-inline-start: 48%;
-  width: var(--rule-hair);
-  height: 5rem;
-  background: var(--color-paper-2);
-  content: "";
+.dawn-art figcaption {
+  margin-block-start: var(--space-xs);
+  color: var(--color-paper-3);
+  font-size: var(--text-sm);
 }
 
 .local {
@@ -585,26 +503,6 @@ h3 {
   pointer-events: none;
 }
 
-@keyframes settle {
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes rain-drift {
-  to {
-    transform: translate3d(-5px, 8px, 0);
-  }
-}
-
-@keyframes lamp-arrive {
-  from {
-    opacity: 0;
-    transform: scaleX(0.72);
-  }
-}
-
 @media (min-width: 40rem) {
   .arc-steps {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -612,8 +510,13 @@ h3 {
   }
 
   .two-loops,
-  .local {
+  .local,
+  .material-world {
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  }
+
+  .material-key {
+    grid-column: 1 / -1;
   }
 
   .dawn {

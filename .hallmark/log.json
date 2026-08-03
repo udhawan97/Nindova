@@ -2,6 +2,15 @@
   {
     "date": "2026-08-02",
     "macrostructure": "Narrative Workflow",
+    "theme": "custom",
+    "theme_axes": "dark / roman-serif / warm",
+    "vibe": "Punjabi indigo night, marigold thread",
+    "enrichment": "real rendered Session and Dawn media",
+    "brief": "Punjabi and Indian visual system for Nindova public surfaces"
+  },
+  {
+    "date": "2026-08-02",
+    "macrostructure": "Narrative Workflow",
     "theme": "Midnight",
     "enrichment": "E5 Custom Illustration Centerpiece",
     "brief": "Warm-dark public front door for a bounded nightly ritual"

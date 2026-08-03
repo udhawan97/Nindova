@@ -21,6 +21,8 @@ The build starts from the supplied standalone Canvas demo and extracts modules o
 
 The production clock defaults to the fifteen-minute cap. Reviewer pacing is available only through an explicit `?review=1` test switch; its visible evidence and replay controls never appear in production mode. The standalone build embeds the focal sprite sheet while the multi-file build loads the same checked asset.
 
+The multi-file build registers a versioned service worker scoped to `/play/` and precaches only same-origin static shell files. The standalone removes its manifest and worker registration during composition. Updating the cache name installs a new shell; the old worker remains in control until existing tabs release it, then activation removes older Nindova caches.
+
 ## Planned boundaries
 
 - **Browser** owns standalone output, PWA shell, service worker, and install/update behavior.

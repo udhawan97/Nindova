@@ -30,7 +30,7 @@ const href = (path: string) => `${base}${path}` || "/";
     <main>
       <section class="window-hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="hero-premise">A small room after a long day.</p>
+          <p class="hero-premise">A Punjabi night room after a long day.</p>
           <h1 id="hero-title">Put the day away.</h1>
           <p class="hero-lede">
             A quiet fifteen-minute ritual: clear one desk, cross one changing Vista, follow the last
@@ -44,48 +44,31 @@ const href = (path: string) => `${base}${path}` || "/";
         </div>
 
         <figure class="window-art">
-          <svg viewBox="0 0 620 690" role="img" aria-labelledby="window-title window-desc">
-            <title id="window-title">A warm desk beneath a rain-dark window</title>
-            <desc id="window-desc">
-              A lamp lights a letter, key, mug, and book. Rain crosses the dark panes while a small
-              animal waits beyond the glass.
-            </desc>
-            <g class="window-sky">
-              <path d="M82 72H534V478H82Z" />
-              <path class="window-moon" d="M438 122a46 46 0 1 0 35 74 40 40 0 1 1-35-74Z" />
-              <path class="rain rain-a" d="m139 118-20 50m92-76-24 62m111-30-21 54m104-83-26 70m101-32-19 50" />
-              <path class="rain rain-b" d="m115 238-20 50m99-72-24 62m105-28-21 54m114-76-26 70m84-24-19 50" />
-              <path class="hill" d="M82 390c86-83 155-89 218-28 63-74 139-72 234 8v108H82Z" />
-              <path class="visitor" d="M392 376c5-24 20-38 42-38 26 0 44 21 45 54-19 13-63 12-87-1Z" />
-              <path class="visitor-detail" d="m405 347-7-22m51 18 9-23m-51 61c16 8 34 8 52 0" />
-            </g>
-            <g class="window-frame">
-              <path d="M62 52H554V498H62Z" />
-              <path d="M308 52V498M62 274H554" />
-              <path class="sill" d="M42 498H574V524H42Z" />
-            </g>
-            <g class="desk">
-              <path class="desk-top" d="M18 536H602V576H18Z" />
-              <path class="desk-face" d="M42 576H578V664H42Z" />
-              <path class="drawer" d="M400 590H548V640H400Z" />
-              <path class="drawer-pull" d="M457 606h34" />
-            </g>
-            <g class="lamp">
-              <path class="lamp-stem" d="m192 548 34-140 88-44" />
-              <path class="lamp-shade" d="m282 334 77 43-42 70-94-42Z" />
-              <ellipse class="lamp-pool" cx="315" cy="548" rx="151" ry="31" />
-              <path class="lamp-base" d="M146 548h94" />
-            </g>
-            <g class="objects">
-              <path class="object-letter" d="M275 524h86v35h-86Zm0 0 43 22 43-22" />
-              <path class="object-key" d="M396 546a14 14 0 1 1 12 13h45m-12 0v-12m12 12v-10" />
-              <path class="object-mug" d="M102 505h57v53h-57Zm57 12h13c15 0 15 26 0 26h-13" />
-              <path class="object-steam" d="M118 493c-7-10 8-17 0-29m22 29c-7-10 8-17 0-29" />
-              <path class="object-book" d="M475 529h74v29h-74Zm8-10h66v10h-66" />
-            </g>
-          </svg>
-          <figcaption>Tonight begins at the desk.</figcaption>
+          <div class="phulkari-frame">
+            <img
+              src={href("/media/session-punjabi-portrait.png")}
+              width="375"
+              height="812"
+              alt="The real Nindova Session: an indigo rain window, phulkari border, lamp-lit desk, letter, and mustard-field Vista controls."
+            />
+          </div>
+          <figcaption>Rendered Session · Punjabi night room</figcaption>
         </figure>
+      </section>
+
+      <section class="material-world" aria-labelledby="world-title">
+        <div>
+          <p class="section-kicker">The visual world</p>
+          <h2 id="world-title">Indigo night. Marigold thread. Earth after rain.</h2>
+        </div>
+        <p>
+          Nindova draws from Punjabi material craft and Indian landscapes: phulkari geometry, carved
+          jali rhythm, brass, terracotta, mustard fields, and a quiet riverside harbor. The references
+          stay specific and everyday—never religious decoration or generic “exotic” styling.
+        </p>
+        <div class="material-key" aria-label="Visual materials">
+          <span>Phulkari</span><span>Indigo</span><span>Terracotta</span><span>Brass</span>
+        </div>
       </section>
 
       <section class="arc" aria-labelledby="arc-title">
@@ -127,13 +110,15 @@ const href = (path: string) => `${base}${path}` || "/";
       </section>
 
       <section class="dawn" aria-labelledby="dawn-title">
-        <div class="dawn-art" aria-hidden="true">
-          <div class="dawn-window">
-            <span class="dawn-sun"></span>
-            <span class="dawn-water"></span>
-            <span class="dawn-boat"></span>
-          </div>
-        </div>
+        <figure class="dawn-art">
+          <img
+            src={href("/media/dawn-punjabi.png")}
+            width="712"
+            height="446"
+            alt="Nindova Dawn rendered over a Punjabi mustard meadow, with a rabbit beside a wooden fence and a phulkari border."
+          />
+          <figcaption>Rendered Dawn · first light in the mustard meadow</figcaption>
+        </figure>
         <div class="dawn-copy">
           <h2 id="dawn-title">Morning keeps one still.</h2>
           <p>

@@ -6,6 +6,8 @@ import { createServer } from "node:http";
 const root = resolve(process.argv[2] ?? "dist");
 const host = "127.0.0.1";
 const port = Number(process.env.NINDOVA_PREVIEW_PORT ?? 4173);
+const configuredBase = process.env.NINDOVA_PREVIEW_BASE?.replace(/^\/+|\/+$/g, "") ?? "";
+const mountPath = configuredBase ? `/${configuredBase}` : "";
 const mime = new Map([
   [".css", "text/css; charset=utf-8"],
   [".html", "text/html; charset=utf-8"],
@@ -17,7 +19,12 @@ const mime = new Map([
 
 createServer(async (request, response) => {
   const requestUrl = new URL(request.url ?? "/", `http://${host}:${port}`);
-  const decoded = decodeURIComponent(requestUrl.pathname);
+  const decodedPath = decodeURIComponent(requestUrl.pathname);
+  if (mountPath && decodedPath !== mountPath && !decodedPath.startsWith(`${mountPath}/`)) {
+    response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" }).end("Not found");
+    return;
+  }
+  const decoded = mountPath ? decodedPath.slice(mountPath.length) || "/" : decodedPath;
   const candidate = resolve(root, `.${decoded}`);
 
   if (candidate !== root && !candidate.startsWith(`${root}${sep}`)) {
@@ -38,5 +45,5 @@ createServer(async (request, response) => {
     response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" }).end("Not found");
   }
 }).listen(port, host, () => {
-  console.log(`Nindova preview: http://${host}:${port}`);
+  console.log(`Nindova preview: http://${host}:${port}${mountPath || "/"}`);
 });

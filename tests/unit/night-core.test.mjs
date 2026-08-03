@@ -65,7 +65,7 @@ test("representative night recipes are stable", () => {
 
 test("missing, stale, and corrupt state recover without throwing", () => {
   assert.deepEqual(Night.decodeState(null), {
-    state: { version: 1, lastCompleted: null, meadowEcho: null, harborEchoes: [] },
+    state: { version: 2, lastCompleted: null, meadowEcho: null, harborEchoes: [], tomorrowIntention: null },
     recovered: false,
     reason: "missing",
   });
@@ -95,6 +95,45 @@ test("same-night completion is idempotent and meadow keeps one Echo", () => {
   assert.deepEqual(replay.state, first.state);
   const next = Night.completeState(replay.state, completion("2026-08-04-b", "meadow", "sheep"));
   assert.deepEqual(next.state.meadowEcho, { nightId: "2026-08-04-b", kind: "sheep" });
+});
+
+test("v1 state migrates once and keeps its bounded memory", () => {
+  const legacy = {
+    version: 1,
+    lastCompleted: completion("2026-08-03-a", "meadow", "rabbit"),
+    meadowEcho: { nightId: "2026-08-03-a", kind: "rabbit" },
+    harborEchoes: [],
+  };
+  const values = new Map([[Night.LEGACY_STORAGE_KEY, JSON.stringify(legacy)]]);
+  const storage = {
+    getItem(key) { return values.get(key) ?? null; },
+    setItem(key, value) { values.set(key, value); },
+    removeItem(key) { values.delete(key); },
+  };
+  const result = Night.readStorage(storage);
+  assert.equal(result.reason, "migrated");
+  assert.equal(result.state.version, 2);
+  assert.deepEqual(result.state.meadowEcho, legacy.meadowEcho);
+  assert.equal(values.has(Night.LEGACY_STORAGE_KEY), false);
+  assert.equal(values.has(Night.STORAGE_KEY), true);
+});
+
+test("tomorrow intention is quiet, completion-bound, and idempotent", () => {
+  const completed = Night.completeState(
+    Night.emptyState(),
+    completion("2026-08-03-a", "meadow", "rabbit"),
+  ).state;
+  const rejected = Night.setTomorrowIntention(completed, "another-night", "2026-08-03T03:05:00.000Z");
+  assert.equal(rejected.changed, false);
+  const held = Night.setTomorrowIntention(completed, "2026-08-03-a", "2026-08-03T03:05:00.000Z");
+  assert.equal(held.changed, true);
+  assert.deepEqual(held.state.tomorrowIntention, {
+    nightId: "2026-08-03-a",
+    heldAt: "2026-08-03T03:05:00.000Z",
+  });
+  assert.equal(Night.setTomorrowIntention(held.state, "2026-08-03-a").changed, false);
+  const next = Night.completeState(held.state, completion("2026-08-04-b", "harbor", "skiff")).state;
+  assert.equal(next.tomorrowIntention, null);
 });
 
 test("harbor keeps five boats and skipped dates do not mutate memory", () => {
