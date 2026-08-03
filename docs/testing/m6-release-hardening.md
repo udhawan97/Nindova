@@ -12,9 +12,9 @@ The gates cover TypeScript, builds, 39+ pure unit assertions, exhaustive Rasoi r
 
 ## Production wall-clock proof
 
-The final v0.1.0 wall-clock observation is a release gate. Its exact measured wind-down and fifteen-minute ceiling timestamps are recorded here after the run completes; the release must not be published while this section remains pending.
+The final v0.1.0 wall-clock observation ran against the production timing constants and composed release build. The Session reached its quiet end at **722.527 seconds**, reported `production-cap`, and remained ended through the **900.002-second** observation. The browser reported no runtime errors.
 
-**Status:** Pending final v0.1.0 wall-clock run.
+**Status:** Passed on 2026-08-03. Observed end: 722.527 seconds. Observed ceiling: 900.002 seconds.
 
 ## Graph and repository proof
 

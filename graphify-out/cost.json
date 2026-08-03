@@ -12,6 +12,13 @@
       "input_tokens": 0,
       "output_tokens": 0,
       "files": 76
+    },
+    {
+      "date": "2026-08-03T06:13:13.309880+00:00",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 37,
+      "accounting_note": "Collaboration runtime did not expose per-agent token usage. Zeroes are placeholders, not measured usage."
     }
   ],
   "total_input_tokens": 0,
