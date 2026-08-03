@@ -1,16 +1,15 @@
 # Graph Report - Nindova  (2026-08-03)
 
 ## Corpus Check
-- 78 files · ~50,593 words
-- Verdict: corpus is large enough that graph structure adds value.
+- cluster-only mode — file stats not available
 
 ## Summary
-- 585 nodes · 739 edges · 51 communities (34 shown, 17 thin omitted)
-- Extraction: 86% EXTRACTED · 14% INFERRED · 0% AMBIGUOUS · INFERRED: 107 edges (avg confidence: 0.76)
+- 588 nodes · 738 edges · 51 communities (34 shown, 17 thin omitted)
+- Extraction: 86% EXTRACTED · 14% INFERRED · 0% AMBIGUOUS · INFERRED: 103 edges (avg confidence: 0.75)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `094d680e`
+- Built from commit: `20286152`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -18,13 +17,13 @@
 - session.ts
 - Rasoi Pairs
 - night-core.ts
-- Release Automated Gates
+- Automated Release Gates
 - scripts
 - Rasoi Pairs Session Interface
 - rasoi-core.ts
 - Nindova Master Brief
-- Calm Bounded Pair-removal Promise
 - Rasoi Pairs v0.1.0 Change Set
+- Rasoi Pairs Accessibility
 - compilerOptions
 - site/package.json
 - dawn-core.ts
@@ -66,14 +65,14 @@
 ## God Nodes (most connected - your core abstractions)
 1. `scripts` - 19 edges
 2. `Nindova Master Brief` - 11 edges
-3. `Release Automated Gates` - 11 edges
-4. `RasoiDebug` - 10 edges
-5. `restoreActiveSession()` - 10 edges
-6. `Rasoi Pairs` - 10 edges
-7. `Rasoi Pairs Redesign Evidence` - 10 edges
-8. `Rasoi Pairs v0.1.0 Change Set` - 10 edges
-9. `selectTile()` - 9 edges
-10. `settle()` - 9 edges
+3. `RasoiDebug` - 10 edges
+4. `restoreActiveSession()` - 10 edges
+5. `Rasoi Pairs` - 10 edges
+6. `Rasoi Pairs Redesign Evidence` - 10 edges
+7. `Rasoi Pairs v0.1.0 Change Set` - 10 edges
+8. `selectTile()` - 9 edges
+9. `settle()` - 9 edges
+10. `compilerOptions` - 9 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Fifteen-Minute Session Cap` --semantically_similar_to--> `Bounded Self-Ending Session`  [INFERRED] [semantically similar]
@@ -91,9 +90,9 @@
 - None detected.
 
 ## Hyperedges (group relationships)
-- **Complete Automated Release Gate** — docs_testing_m6_release_hardening_41_plus_assertions, docs_testing_m6_release_hardening_continuous_keyboard_200_zoom, docs_testing_m6_release_hardening_strict_active_record_recovery, docs_testing_m6_release_hardening_reload_during_settlement_closure [EXTRACTED 1.00]
-- **Corrected Production Wall-clock Observation** — docs_testing_m6_release_hardening_corrected_wall_clock_proof, docs_testing_m6_release_hardening_passed_722_257_end, docs_testing_m6_release_hardening_passed_900_000_ceiling, docs_testing_m6_release_hardening_production_cap_result [EXTRACTED 1.00]
-- **Rasoi v0.1.0 Release Evidence Chain** — docs_releases_v0_1_0_release_notes, docs_testing_m6_release_hardening_v0_1_0_release_hardening, docs_public_surface_evidence_public_surface_evidence_ledger, apps_site_src_content_docs_docs_testing_testing [INFERRED 0.95]
+- **Measured Production Wall-clock Result** — docs_testing_m6_release_hardening_722_330_wall_seconds, docs_testing_m6_release_hardening_722_289_internal_seconds, docs_testing_m6_release_hardening_900_000_ceiling, docs_testing_m6_release_hardening_production_cap, docs_testing_m6_release_hardening_zero_browser_errors [EXTRACTED 1.00]
+- **Release Gate Evidence** — docs_testing_m6_release_hardening_41_plus_assertions, docs_testing_m6_release_hardening_rasoi_reachability, docs_testing_m6_release_hardening_pair_removal_arc, docs_testing_m6_release_hardening_accessibility_evidence, docs_testing_m6_release_hardening_state_recovery_evidence, docs_testing_m6_release_hardening_distribution_evidence [EXTRACTED 1.00]
+- **Rasoi v0.1.0 Release Evidence Chain** — docs_releases_v0_1_0_release_notes, docs_public_surface_evidence_public_surface_evidence_ledger, apps_site_src_content_docs_docs_testing_testing [INFERRED 0.95]
 - **Bounded Rasoi Session Contract** — docs_redesign_plan_enter_pair_settle_dawn, apps_site_src_content_docs_docs_nightly_arc_fixed_session_path, apps_site_src_content_docs_docs_architecture_browser_local_state, apps_site_src_content_docs_docs_privacy_local_state_active_session_v2 [INFERRED 0.95]
 - **Local Night State to Dawn Flow** — apps_site_src_content_docs_docs_night_and_local_state_version_3_state, apps_site_src_content_docs_docs_dawn_captured_zone_eligibility, apps_site_src_content_docs_docs_dawn_local_keepsake_exports [INFERRED 0.95]
 - **Rasoi Dawn Visual Composition** — apps_site_public_media_rasoi_dawn_rasoi_dawn_image, apps_site_public_media_rasoi_dawn_first_light_kitchen, apps_site_public_media_rasoi_dawn_brass_plate_arrangement, apps_site_public_media_rasoi_dawn_warm_dawn_palette [INFERRED 0.95]
@@ -103,20 +102,20 @@
 ## Communities (51 total, 17 thin omitted)
 
 ### Community 0 - "session.ts"
-Cohesion: 0.08
-Nodes (52): NindovaDawn, NindovaNight, NindovaRasoi, advanceBy(), beginSession(), boardElement, boardShell, boardStatus (+44 more)
+Cohesion: 0.06
+Nodes (58): RasoiDebug, RasoiTileSnapshot, SessionState, Window, NindovaDawn, NindovaNight, NindovaRasoi, RasoiBoard (+50 more)
 
 ### Community 1 - "Rasoi Pairs"
-Cohesion: 0.06
-Nodes (43): Chai Tile Pair, Chimta Tile Pair, The Edge Tiles Are Ready Status, Visible Free Edge Pairs, Katori Tile Pair, Indian Kitchen Tile Motifs, Match Free Edge Tiles, Punjabi-inspired Material Direction (+35 more)
+Cohesion: 0.05
+Nodes (48): Chai Tile Pair, Chimta Tile Pair, The Edge Tiles Are Ready Status, Visible Free Edge Pairs, Katori Tile Pair, Indian Kitchen Tile Motifs, Match Free Edge Tiles, Punjabi-inspired Material Direction (+40 more)
 
 ### Community 2 - "night-core.ts"
 Cohesion: 0.10
 Nodes (37): addCivilDays(), captureNight(), CLOTHS, completeState(), createPrng(), decodeState(), emptyState(), isText() (+29 more)
 
-### Community 3 - "Release Automated Gates"
+### Community 3 - "Automated Release Gates"
 Cohesion: 0.06
-Nodes (39): Rasoi Pairs Accessibility, Accessible Alternate Presentation, Live Semantic Selection and Hint Feedback, Real-device Assistive Technology Limit, Semantic Tile Controls, Nindova Getting Started, Standalone and Composed Release Surfaces, Active-record Recovery and Reload Settlement Tests (+31 more)
+Nodes (35): Scoped PWA Bootstrap, PWA and Standalone Distribution Boundary, Nindova Getting Started, Standalone and Composed Release Surfaces, Active-record Recovery and Reload Settlement Tests, Full Keyboard Pairing at 200 Percent Zoom, Verified Source-proven and Untested Evidence Levels, Release Verification Commands (+27 more)
 
 ### Community 4 - "scripts"
 Cohesion: 0.05
@@ -124,23 +123,23 @@ Nodes (38): @astrojs/check, devDependencies, @astrojs/check, @playwright/test, @
 
 ### Community 5 - "Rasoi Pairs Session Interface"
 Cohesion: 0.06
-Nodes (38): Session Asset Provenance, First-Light Dawn Surface, Browser Dismissal Surface, Voluntary Intake Surface, Scoped PWA Bootstrap, Quiet End Card, Rasoi Pairs Session Interface, Semantic Rasoi Board (+30 more)
+Nodes (39): Session Asset Provenance, First-Light Dawn Surface, Browser Dismissal Surface, Voluntary Intake Surface, Quiet End Card, Rasoi Pairs Session Interface, Semantic Rasoi Board, Captured-Zone Dawn Eligibility (+31 more)
 
 ### Community 6 - "rasoi-core.ts"
-Cohesion: 0.10
-Nodes (25): RasoiDebug, RasoiTileSnapshot, SessionState, Window, activeTiles(), BoardVerification, createBoard(), createPrng() (+17 more)
+Cohesion: 0.19
+Nodes (19): activeTiles(), BoardVerification, createBoard(), createPrng(), freeTiles(), hintPair(), isComplete(), isFree() (+11 more)
 
 ### Community 7 - "Nindova Master Brief"
 Cohesion: 0.09
 Nodes (30): User-Chosen Unguilted Wall, Asymmetric Vista Memory, Fifteen-Minute Session Cap, Browser and PWA Before iOS Wall, Codex Kickoff Protocol, Decay-Driven Assistance, Dual Pacing Profiles, Fixed Session State Arc (+22 more)
 
-### Community 8 - "Calm Bounded Pair-removal Promise"
-Cohesion: 0.08
-Nodes (26): Universal 343-state Board Guarantee, Deliberately Deferred iOS Wall, Human and Device Hardening, Nindova v0.1.0 Roadmap, Shipped Rasoi v0.1.0 Surface, 343-state Verified Browser Arc, All Eighteen Pairs by Keyboard at 200 Percent Zoom, Production Fifteen-minute Hard Ceiling (+18 more)
+### Community 8 - "Rasoi Pairs v0.1.0 Change Set"
+Cohesion: 0.05
+Nodes (46): Rasoi Browser Architecture, Session Clock and Local State Architecture, Shared Rasoi Legality Kernel Architecture, Session Site and Composition Workspace, Universal 343-state Board Guarantee, Voluntary Pair-removal Session Path, Mahjong-solitaire Rule Inspiration, Rasoi Pairs Session Arc (+38 more)
 
-### Community 9 - "Rasoi Pairs v0.1.0 Change Set"
-Cohesion: 0.10
-Nodes (24): Rasoi Browser Architecture, Session Clock and Local State Architecture, Shared Rasoi Legality Kernel Architecture, Session Site and Composition Workspace, Voluntary Pair-removal Session Path, Semantic Safe-pair Hint, Active-session v2 Strict Validation and Reload Settlement, Bounded Version 3 Night Record (+16 more)
+### Community 9 - "Rasoi Pairs Accessibility"
+Cohesion: 0.40
+Nodes (5): Rasoi Pairs Accessibility, Accessible Alternate Presentation, Live Semantic Selection and Hint Feedback, Real-device Assistive Technology Limit, Semantic Tile Controls
 
 ### Community 10 - "compilerOptions"
 Cohesion: 0.10
@@ -223,24 +222,24 @@ Cohesion: 0.67
 Nodes (3): Cultural Visual Guardrails, Punjabi and Indian Material World, Theme and Behavior Independence
 
 ## Knowledge Gaps
-- **233 isolated node(s):** `name`, `version`, `private`, `type`, `build` (+228 more)
+- **239 isolated node(s):** `name`, `version`, `private`, `type`, `build` (+234 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **17 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Rasoi Pairs` connect `Rasoi Pairs` to `Calm Bounded Pair-removal Promise`, `Release Automated Gates`?**
+- **Why does `Rasoi Pairs` connect `Rasoi Pairs` to `Automated Release Gates`?**
+  _High betweenness centrality (0.038) - this node is a cross-community bridge._
+- **Why does `Calm Bounded Pair-removal Promise` connect `Rasoi Pairs` to `Rasoi Pairs v0.1.0 Change Set`?**
   _High betweenness centrality (0.028) - this node is a cross-community bridge._
-- **Why does `Calm Bounded Pair-removal Promise` connect `Calm Bounded Pair-removal Promise` to `Rasoi Pairs`?**
-  _High betweenness centrality (0.020) - this node is a cross-community bridge._
+- **Why does `Nindova v0.1.0 Distribution` connect `Automated Release Gates` to `Rasoi Pairs`?**
+  _High betweenness centrality (0.027) - this node is a cross-community bridge._
+- **Are the 2 inferred relationships involving `Rasoi Pairs` (e.g. with `Sound Off Control` and `Calm Bounded Pair-removal Promise`) actually correct?**
+  _`Rasoi Pairs` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `name`, `version`, `private` to the rest of the system?**
-  _233 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _239 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `session.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.08315863032844165 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.061018437225636525 - nodes in this community are weakly interconnected._
 - **Should `Rasoi Pairs` be split into smaller, more focused modules?**
-  _Cohesion score 0.05537098560354374 - nodes in this community are weakly interconnected._
-- **Should `night-core.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.10128205128205128 - nodes in this community are weakly interconnected._
-- **Should `Release Automated Gates` be split into smaller, more focused modules?**
-  _Cohesion score 0.0553306342780027 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.04964539007092199 - nodes in this community are weakly interconnected._
