@@ -40,7 +40,25 @@ try {
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 375);
   const publicCopy = await page.locator("body").innerText();
   assert.ok(publicCopy.includes("Nothing to win. Nothing tracked. Nothing you can do wrong."));
-  assert.equal(await page.locator('a.button-primary').first().getAttribute("href"), `${mountPath ? `/${mountPath}` : ""}/play/`);
+  const rootPath = mountPath ? `/${mountPath}/` : "/";
+  const landingLinks = {
+    play: await page.locator('a.button-primary').first().getAttribute("href"),
+    docs: await page.locator('nav a[href$="/docs/"]').first().getAttribute("href"),
+    standalone: await page.locator("a[download]").first().getAttribute("href"),
+    release: await page.locator('a[href*="/releases/tag/"]').first().getAttribute("href"),
+  };
+  assert.deepEqual(landingLinks, {
+    play: `${rootPath}play/`,
+    docs: `${rootPath}docs/`,
+    standalone: `${rootPath}nindova.html`,
+    release: "https://github.com/udhawan97/Nindova/releases/tag/v0.1.0",
+  });
+  for (const href of [landingLinks.docs, landingLinks.standalone]) {
+    const linkedPage = await context.newPage();
+    const response = await linkedPage.goto(new URL(href, prefix).href);
+    assert.equal(response?.ok(), true);
+    await linkedPage.close();
+  }
   const qrPng = PNG.sync.read(await page.locator(".qr-art img").screenshot());
   const decodedQr = jsQR(new Uint8ClampedArray(qrPng.data), qrPng.width, qrPng.height);
   assert.equal(decodedQr?.data, publicFacts.canonicalPlayUrl);

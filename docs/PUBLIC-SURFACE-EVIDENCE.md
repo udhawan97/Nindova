@@ -12,7 +12,7 @@
 - Dawn renders the stored kitchen motif order, downloads a local PNG, survives unsupported loop encoding, and creates a real browser loop when supported.
 - The PWA manifest and service worker are scoped to `/play/`; the v4 cache replaces a seeded v3 cache, retains local storage, and contains static same-origin shell URLs only. The Session resumes and closes offline with audio denied.
 - The end and rest surfaces do not route back into play. A page close/reopen returns to intake and can begin another separately bounded Session with the same board and cleared ephemeral state.
-- The landing page and docs build under `/` and `/Nindova/`; local links point to the matching `/play/`, `/docs/`, standalone artifact, font licenses, and v0.1.0 release history. Automation decodes the rendered QR to the single shared proposed canonical URL.
+- The landing page and docs build under `/` and `/Nindova/`; automation traverses the local `/play/`, `/docs/`, standalone artifact, and font-license paths. It also decodes the rendered QR to the single shared proposed canonical URL.
 
 ## Source-proven
 
@@ -21,6 +21,7 @@
 - Same-tab active state accepts only a complete Night capture, exact capture-bound boundary times, a reachable legal removal history, and a possible phase/reason combination. Future/corrupt records fail open, rollback cannot defeat the monotonic boundary, and reload during settlement resumes closure instead of restoring a dead board.
 - The runtime contains no analytics, account, advertising, remote-logging, or third-party request code. Browser request capture remains same-origin.
 - Production begins its automatic settle at twelve minutes and has a hard fifteen-minute ceiling; reviewer timing compresses only those boundaries.
+- The landing page's external release-history mapping targets the existing v0.1.0 GitHub release; the offline gate does not depend on traversing that external service.
 
 ## Untested risk
 

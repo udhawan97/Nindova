@@ -21,7 +21,7 @@
 
 - Same-tab reload restores the exact board and removed-tile set from ephemeral session storage. Active clocks are bound to the captured Night instant; future-corrupt and rollback cases fail safe or still close at the boundary.
 - Same-night voluntary replay selects the same Night ID, board ID, and motif order.
-- The completed Session offers a screen-away handoff with no route back into play; closing/reopening resets ephemeral board state without multiplying Dawn.
+- The completed Session offers a screen-away handoff with no route back into play; browser evidence closes the page, opens a new page in the same profile, and completes the second touch Session without multiplying Dawn.
 - Version-3 completion is idempotent and contains no interaction timestamps.
 - Version-1 legacy Dawn data copies into an explicit legacy completion variant without pretending it was Rasoi play. A literal v0.1.0 recipe-two completion passes storage restoration, Dawn eligibility, and Dawn rendering under recipe three.
 - Browser “Not now” leaves a same-page voluntary return path. No persistence, guilt language, or native-interception claim is added.

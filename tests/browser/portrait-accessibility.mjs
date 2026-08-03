@@ -29,6 +29,15 @@ async function tabToTile(page, tileId) {
   assert.fail(`Keyboard focus did not reach ${tileId}`);
 }
 
+async function assertReachable(page, selector, viewport) {
+  const reachable = await page.locator(selector).first().evaluate((action) => {
+    action.scrollIntoView({ block: "center" });
+    const box = action.getBoundingClientRect();
+    return box.width >= 44 && box.height >= 44 && box.top >= 0 && box.bottom <= innerHeight;
+  });
+  assert.equal(reachable, true, `${selector} should be reachable at ${viewport.width}x${viewport.height}`);
+}
+
 try {
   for (const viewport of [
     { width: 320, height: 568 },
@@ -41,6 +50,8 @@ try {
     const { context, page, errors } = await open(viewport);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), viewport.width);
     assert.doesNotMatch(await page.locator('meta[name="viewport"]').getAttribute("content") ?? "", /maximum-scale|user-scalable/);
+    await assertReachable(page, "#beginBtn", viewport);
+    await assertReachable(page, "#notNowBtn", viewport);
     await page.click("#beginBtn");
     await page.waitForFunction(() => window.__ct.state === "play");
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), viewport.width);
@@ -51,16 +62,15 @@ try {
     assert.equal(freeBoxes.length, 6);
     assert.ok(freeBoxes.every((box) => box.width >= 44 && box.height >= 44 && box.label?.includes("free, uncovered with an open side")));
     for (const selector of ["#muteBtn", "#hintBtn", ".tile:not(:disabled)"]) {
-      const reachable = await page.locator(selector).first().evaluate((action) => {
-        action.scrollIntoView({ block: "center" });
-        const box = action.getBoundingClientRect();
-        return box.width >= 44 && box.height >= 44 && box.top >= 0 && box.bottom <= innerHeight;
-      });
-      assert.equal(reachable, true, `${selector} should be reachable at ${viewport.width}x${viewport.height}`);
+      await assertReachable(page, selector, viewport);
     }
     if ((viewport.width === 320 && viewport.height === 568) || viewport.width === 375 || viewport.width === 1440) {
       await page.screenshot({ path: resolve(output, `board-${viewport.width}x${viewport.height}.png`), fullPage: true });
     }
+    await page.evaluate(() => window.__ct.advanceBy(window.__ct.hardCapSeconds));
+    await page.waitForFunction(() => window.__ct.state === "end");
+    await assertReachable(page, "#dimRestBtn", viewport);
+    await assertReachable(page, "#tomorrowBtn", viewport);
     assert.deepEqual(errors, []);
     await context.close();
   }

@@ -8,12 +8,16 @@ const root = resolve(import.meta.dirname, "../..");
 const target = `${pathToFileURL(resolve(root, "apps/session/dist/nindova.html")).href}?review=1`;
 const browser = await chromium.launch();
 
+function watchPage(page, errors) {
+  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
+  page.on("pageerror", (error) => errors.push(error.message));
+}
+
 async function open(options = {}) {
   const context = await browser.newContext({ viewport: { width: 375, height: 812 }, ...options });
   const page = await context.newPage();
   const errors = [];
-  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
-  page.on("pageerror", (error) => errors.push(error.message));
+  watchPage(page, errors);
   await page.goto(target);
   await page.waitForFunction(() => Boolean(window.__ct));
   await page.click("#beginBtn");
@@ -92,7 +96,10 @@ try {
   assert.equal(await normal.page.evaluate(() => window.__ct.state), "rest");
   assert.match(await normal.page.locator("#rest").innerText(), /Put the phone down/);
   assert.equal(await normal.page.locator("#rest button").count(), 0);
-  await normal.page.reload();
+  await normal.page.close();
+  normal.page = await normal.context.newPage();
+  watchPage(normal.page, normal.errors);
+  await normal.page.goto(target);
   await normal.page.waitForFunction(() => Boolean(window.__ct));
   assert.equal(await normal.page.evaluate(() => window.__ct.state), "intake");
   await normal.page.click("#beginBtn");
