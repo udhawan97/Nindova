@@ -578,3 +578,9 @@ h3 {
   font-family: var(--font-display);
   font-style: normal;
 }
+
+.content-panel > .sl-container > h1 {
+  max-width: none;
+  overflow-wrap: normal;
+  font-size: clamp(var(--text-2xl), calc(4vw + 1rem), 4.5rem);
+}
