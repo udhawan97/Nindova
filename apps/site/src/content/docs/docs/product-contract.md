@@ -26,3 +26,9 @@ The intake promise is: “Nothing to win. Nothing tracked. Nothing you can do wr
 The end card begins: “The session is over. That's the point.”
 
 Nindova is a behavioral design study for people aged 13 and up. It is not a sleep tracker, a sleep-performance tool, or a treatment for insomnia. Persistent sleep difficulty deserves evidence-based care such as CBT-I with a qualified clinician.
+
+## Visual world
+
+Nindova is grounded in Punjabi material craft and Indian night landscapes. Phulkari geometry, carved wood, brass, terracotta, indigo, marigold, mustard fields, and a quiet riverside harbor may shape the room and Vistas. These cues must remain specific and respectful, never collapse into generic “exotic” styling, religious decoration, or a change in the product’s behavioral claims.
+
+The current interface remains in English. Visual theming does not imply language localization.

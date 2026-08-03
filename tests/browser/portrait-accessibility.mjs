@@ -6,7 +6,7 @@ import { chromium } from "playwright";
 
 const root = resolve(import.meta.dirname, "../..");
 const output = resolve(root, "artifacts/portrait-accessibility");
-const target = pathToFileURL(resolve(root, "apps/session/index.html")).href;
+const target = `${pathToFileURL(resolve(root, "apps/session/index.html")).href}?review=1`;
 await mkdir(output, { recursive: true });
 
 const browser = await chromium.launch();
@@ -49,6 +49,7 @@ try {
 
     await page.click("#beginBtn");
     await waitForState(page, "arrive");
+    await page.locator("#semanticPrimary").waitFor({ state: "visible" });
     const primaryBox = await page.locator("#semanticPrimary").boundingBox();
     assert.ok(primaryBox && primaryBox.height >= 44 && primaryBox.width >= 44);
     const dockBox = await page.locator("#actionDock").boundingBox();

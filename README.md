@@ -6,13 +6,13 @@ Nindova is a bounded late-night ritual: put away a small visible set, cross one 
 
 ## Current state
 
-This repository contains the supplied playable concept extended through the first approved slice: an act-aware portrait camera, semantic controls for every required action, accessible status output, reduced-motion handling, safe-area support, and pointer-cancellation recovery. The original desktop state engine and full asserted arc remain intact. Deterministic nightly memory, Dawn, the production self-closing polish, and offline PWA behavior are planned but are not yet claimed as complete.
+This repository contains the supplied playable concept extended into a portrait-first, semantically operable, self-closing Session. The current visual world draws from Punjabi material craft and Indian night landscapes: phulkari geometry, indigo, marigold, terracotta, carved wood, a mustard meadow, and a riverside harbor. The original desktop state order and full asserted arc remain intact. Deterministic nightly memory, Dawn, and offline PWA behavior are planned but are not yet claimed as complete.
 
 There is no public deployment yet. The GitHub repository being public does not imply that Pages, a release, or an App Store build exists.
 
 ## Repository map
 
-- `apps/session/` — the playable Session. Its initial `index.html` is an exact copy of the supplied demo.
+- `apps/session/` — the playable Session, extended directly from the supplied demo with its provenance recorded.
 - `apps/site/` — the public landing page and Starlight documentation.
 - `docs/` — build plan, decision records, testing evidence, and repository-level documentation.
 - `reference/` — immutable copies of the four supplied handoff artifacts.
@@ -49,6 +49,7 @@ npm run test:unit
 npm run test:seed:observe
 npm run test:arc
 npm run test:portrait
+npm run test:self-closing
 npm run build
 ```
 
@@ -60,6 +61,7 @@ The observational test preserves the supplied script’s behavior and is deliber
 - Audio is optional; progress cannot depend on it.
 - The Session must remain completable without precision gestures, sight, or haste.
 - Anything that makes tonight harder to leave is a bug.
+- Punjabi/Indian visual cues must be specific and materially grounded, never generic “exotic” or religious decoration.
 - The browser/PWA experience comes first. The proposed iOS Wall is deferred and must not be represented as shipped.
 
 Nindova is a behavioral design study for people aged 13 and up. It is not a sleep tracker, a sleep-performance tool, or a treatment for insomnia. Persistent sleep difficulty deserves evidence-based care such as CBT-I with a qualified clinician.

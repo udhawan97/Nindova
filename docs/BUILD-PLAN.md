@@ -14,6 +14,7 @@ This build ships the browser, installable PWA, public website, documentation, an
 - Preserve `window.__ct` and the full desktop arc after every slice; new portrait and state tests add coverage rather than replace it.
 - Preserve the Two-Loop Law: satisfaction inside the Session, pull only between Sessions.
 - Keep all state local, audio optional, sharing user-initiated, and Required Actions possible without audio, precision gestures, or sight.
+- Treat Punjabi material craft and Indian night landscapes as the shared visual world: specific, contemporary, and non-religious by default. Keep localization separate from visual theming.
 - Make zero telemetry a product-wide invariant: no analytics, event metrics, advertising, remote logging, or third-party runtime requests from the Session, Dawn, PWA, site, or sharing flows.
 - Commit after every Must slice. Push the verified commit series to `main`; authorization does not include a release, tag, App Store submission, or manual deployment.
 - End every slice with an exact owner checkpoint describing what was verified, what to touch, and what should feel different. Continue automatically when the gate passes; pause only for a failed gate or genuine product decision.

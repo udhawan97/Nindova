@@ -41,6 +41,27 @@ export interface ClosingTimeDebug {
   readonly reduceMotion: boolean;
   readonly pointerDown: boolean;
   readonly dragging: boolean;
+  readonly reviewerMode: boolean;
+  readonly paceKey: "compressed" | "real";
+  readonly sessionElapsed: number;
+  readonly hardCapSeconds: number;
+  readonly capClosing: boolean;
+  readonly endReason: "completed" | "production-cap";
+  readonly spriteReady: boolean;
+  readonly authoredAccents: readonly string[];
+  readonly assistance: {
+    snapRadius: number;
+    magnetism: number;
+    requiredGestureDistance: number;
+    autonomousWait: number;
+  };
+  readonly light: {
+    progress: number;
+    meanBudget: number;
+    peakBudget: number;
+    focus: number;
+    veil: number;
+  };
   toScreen(x: number, y: number): { x: number; y: number };
   lightLamp(): void;
   nameObject(index: number, text: string): void;
@@ -52,6 +73,9 @@ export interface ClosingTimeDebug {
   setVistaT(fraction: number): void;
   finishDrift(): void;
   tapSign(): void;
+  sampleAssistance(decay: number): ClosingTimeDebug["assistance"];
+  sampleLightBudget(progress: number): Pick<ClosingTimeDebug["light"], "progress" | "meanBudget" | "peakBudget">;
+  advanceBy(seconds: number): boolean;
 }
 
 declare global {

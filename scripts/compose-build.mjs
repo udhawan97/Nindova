@@ -11,6 +11,7 @@ await mkdir(output, { recursive: true });
 await cp(siteOutput, output, { recursive: true });
 await mkdir(resolve(output, "play"), { recursive: true });
 await cp(resolve(sessionOutput, "index.html"), resolve(output, "play/index.html"));
+await cp(resolve(sessionOutput, "assets"), resolve(output, "play/assets"), { recursive: true });
 await cp(resolve(sessionOutput, "nindova.html"), resolve(output, "nindova.html"));
 
 console.log("Composed dist/: landing, docs, /play/, and nindova.html");

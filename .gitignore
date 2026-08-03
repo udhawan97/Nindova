@@ -21,3 +21,4 @@ output/playwright/
 *.png
 !apps/site/public/**/*.png
 !apps/site/public/**/*.webp
+!apps/session/assets/**/*.png

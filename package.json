@@ -19,9 +19,10 @@
     "dev:session": "npm --workspace @nindova/session run dev",
     "dev:site": "npm --workspace @nindova/site run dev",
     "preview": "node scripts/serve.mjs dist",
-    "test": "npm run test:unit && npm run test:arc && npm run test:portrait",
+    "test": "npm run test:unit && npm run test:arc && npm run test:portrait && npm run test:self-closing",
     "test:arc": "node tests/browser/seed-asserted.mjs",
     "test:portrait": "node tests/browser/portrait-accessibility.mjs",
+    "test:self-closing": "node tests/browser/self-closing.mjs",
     "test:seed:observe": "node scripts/run-seed-observational.mjs",
     "test:unit": "node --test tests/unit/*.test.mjs",
     "typecheck": "npm --workspace @nindova/session run typecheck && npm --workspace @nindova/site run typecheck"
