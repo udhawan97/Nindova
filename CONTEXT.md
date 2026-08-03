@@ -19,15 +19,20 @@ _Avoid_: Mahjong clone, challenge mode
 One kitchen form on the board. A Tile can be free, selected, covered, or settled.
 _Avoid_: Prize, collectible, card
 
-**Rack**
+**Masala Mound**
 
-One shallow line of Tiles. Only the exposed Tiles at either end are free.
-_Avoid_: Level, lane
+The fixed three-layer Rasoi board. A Tile is free when no Tile overlaps it from above and at least one horizontal side is open.
+_Avoid_: Level, rack, challenge board
 
 **Safe pair**
 
 Two matching free Tiles. Help may identify a Safe pair but cannot remove it.
 _Avoid_: Winning move, hint currency
+
+**Brass bloom**
+
+The brief, uniform visual and optional sound response when a legal pair leaves the board. It is predictable confirmation, not a prize or dopamine claim.
+_Avoid_: Kaboom, reward burst, combo
 
 **Settle**
 
