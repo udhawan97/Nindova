@@ -4,7 +4,7 @@ import { pathToFileURL } from "node:url";
 import { chromium } from "playwright";
 
 const root = resolve(import.meta.dirname, "../..");
-const source = pathToFileURL(resolve(root, "apps/session/index.html")).href;
+const source = pathToFileURL(resolve(root, "apps/session/dist/nindova.html")).href;
 const browser = await chromium.launch();
 
 async function openSession(review = true) {

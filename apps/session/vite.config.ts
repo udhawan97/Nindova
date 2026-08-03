@@ -1,6 +1,22 @@
-import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import ts from "typescript";
 import { defineConfig, type Plugin } from "vite";
+
+async function emitTypedModule(source: string, output: string) {
+  const code = await readFile(source, "utf8");
+  const result = ts.transpileModule(code, {
+    fileName: source,
+    reportDiagnostics: true,
+    compilerOptions: {
+      target: ts.ScriptTarget.ES2024,
+      module: ts.ModuleKind.ES2022,
+    },
+  });
+  const errors = result.diagnostics?.filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error) ?? [];
+  if (errors.length) throw new Error(`TypeScript emit failed for ${source}`);
+  await writeFile(output, result.outputText);
+}
 
 function emitPortableHtml(): Plugin {
   return {
@@ -9,41 +25,42 @@ function emitPortableHtml(): Plugin {
       const assetDirectory = resolve("dist/assets");
       const spriteSource = resolve("assets/focal-sprites.png");
       const spriteOutput = resolve(assetDirectory, "focal-sprites.png");
-      const nightCoreSource = resolve("night-core.js");
-      const dawnCoreSource = resolve("dawn-core.js");
+      const nightCoreSource = resolve("src/night-core.ts");
+      const dawnCoreSource = resolve("src/dawn-core.ts");
       const manifestSource = resolve("manifest.webmanifest");
       const workerSource = resolve("sw.js");
       const iconSource = resolve("assets/nindova-icon.svg");
       await mkdir(assetDirectory, { recursive: true });
       await copyFile(spriteSource, spriteOutput);
-      await copyFile(nightCoreSource, resolve("dist/night-core.js"));
-      await copyFile(dawnCoreSource, resolve("dist/dawn-core.js"));
+      await emitTypedModule(nightCoreSource, resolve("dist/night-core.js"));
+      await emitTypedModule(dawnCoreSource, resolve("dist/dawn-core.js"));
       await copyFile(manifestSource, resolve("dist/manifest.webmanifest"));
       await copyFile(workerSource, resolve("dist/sw.js"));
       await copyFile(iconSource, resolve(assetDirectory, "nindova-icon.svg"));
 
       const indexPath = resolve("dist/index.html");
       const html = await readFile(indexPath, "utf8");
-      const installable = html.replace(
+      const manifestNormalized = html.replace(
         /<link rel="manifest" href="[^"]+" data-portable-remove>/,
         '<link rel="manifest" href="./manifest.webmanifest">',
       );
-      if (installable === html) throw new Error("Installable manifest reference was not normalized");
+      if (manifestNormalized === html) throw new Error("Installable manifest reference was not normalized");
+      const moduleTag = manifestNormalized.match(/<script type="module"[^>]*src="([^"]+)"[^>]*><\/script>/);
+      if (!moduleTag) throw new Error("Compiled Session module was not found");
+      const modulePath = resolve("dist", moduleTag[1].replace(/^\.\//, ""));
+      const moduleCode = (await readFile(modulePath, "utf8")).replaceAll("</script", "<\\/script");
+      const installable = manifestNormalized.replace(moduleTag[0], `<script type="module">${moduleCode}</script>`);
+      if (installable === manifestNormalized) throw new Error("Compiled Session module was not inlined");
       await writeFile(indexPath, installable);
+      await rm(modulePath);
       const sprite = await readFile(spriteSource);
-      const nightCore = await readFile(nightCoreSource, "utf8");
-      const dawnCore = await readFile(dawnCoreSource, "utf8");
       const portable = installable.replace(
         "./assets/focal-sprites.png",
         `data:image/png;base64,${sprite.toString("base64")}`,
       )
-        .replace('<script src="./night-core.js"></script>', `<script>${nightCore}</script>`)
-        .replace('<script src="./dawn-core.js"></script>', `<script>${dawnCore}</script>`)
         .replace('<link rel="manifest" href="./manifest.webmanifest">', "")
-        .replace(/\/\* The installable build is static[\s\S]*?\nif\(location\.protocol\.startsWith\('http'\)[\s\S]*?\n}\n/, "");
+        .replace(/<script data-portable-remove>[\s\S]*?<\/script>/, "");
       if (portable === installable) throw new Error("Portable sprite reference was not inlined");
-      if (portable.includes('<script src="./night-core.js"></script>')) throw new Error("Portable night core was not inlined");
-      if (portable.includes('<script src="./dawn-core.js"></script>')) throw new Error("Portable Dawn core was not inlined");
       if (portable.includes("manifest.webmanifest") || portable.includes("serviceWorker.register")) throw new Error("Portable artifact retained PWA dependencies");
       await writeFile(resolve("dist/nindova.html"), portable);
     },

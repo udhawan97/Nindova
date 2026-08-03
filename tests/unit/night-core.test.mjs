@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-await import("../../apps/session/night-core.js");
+await import("../../apps/session/dist/night-core.js");
 const Night = globalThis.NindovaNight;
 
 const chicagoBeforeNoon = Night.captureNight(new Date("2026-08-02T16:59:00Z"), "America/Chicago");

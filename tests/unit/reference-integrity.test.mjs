@@ -19,15 +19,17 @@ for (const [name, digest] of expected) {
   });
 }
 
-test("the extended Session preserves an explicit seed provenance marker", async () => {
-  const [seed, session] = await Promise.all([
+test("the extended Session preserves seed provenance across the HTML and TypeScript runtime", async () => {
+  const [seed, session, runtime] = await Promise.all([
     readFile(resolve(root, "reference/nindova-demo.html")),
     readFile(resolve(root, "apps/session/index.html")),
+    readFile(resolve(root, "apps/session/src/session.ts"), "utf8"),
   ]);
   assert.notDeepEqual(session, seed);
   assert.match(
     session.toString("utf8"),
     /extended from reference\/nindova-demo\.html SHA-256 140c0e128be8e89dcd203c503ddc619c77cc0f732954631836b09f573f7791bf/,
   );
-  assert.match(session.toString("utf8"), /window\.__ct\s*=\s*{/);
+  assert.match(session.toString("utf8"), /<script type="module" src="\.\/src\/session\.ts"><\/script>/);
+  assert.match(runtime, /window\.__ct\s*=\s*{/);
 });

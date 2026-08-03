@@ -89,6 +89,10 @@ try {
   await page.goto(`${artifactBase}docs/research-receipts/`);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 375);
 
+  await page.evaluate(async () => {
+    await caches.open("nindova-session-obsolete");
+    await caches.open("another-project-cache");
+  });
   await page.goto(`${base}?review=1`);
   await page.waitForFunction(() => Boolean(window.__ct));
   assert.equal(await page.locator("#intake .footnote").innerText(), "Nothing to win. Nothing tracked. Nothing you can do wrong.");
@@ -113,22 +117,18 @@ try {
   const worker = await page.evaluate(async () => {
     const registration = await navigator.serviceWorker.ready;
     const keys = await caches.keys();
-    const cache = await caches.open(keys[0]);
+    const cache = await caches.open("nindova-session-v2");
     const entries = (await cache.keys()).map((request) => request.url);
     return { scope: registration.scope, keys, entries };
   });
   assert.equal(worker.scope, base);
-  assert.deepEqual(worker.keys, ["nindova-session-v1"]);
+  assert.deepEqual(worker.keys.sort(), ["another-project-cache", "nindova-session-v2"]);
   assert.ok(worker.entries.some((url) => url.endsWith("/play/index.html")));
   assert.ok(worker.entries.every((url) => url.startsWith(base)));
   assert.ok(worker.entries.every((url) => !url.startsWith("blob:") && !url.includes("night-state")));
 
   await page.evaluate(async () => {
-    const [cacheName] = await caches.keys();
-    const cache = await caches.open(cacheName);
-    await cache.put(new URL("night-core.js", location.href), new Response("globalThis.__nindovaStale = true;", {
-      headers: { "content-type": "text/javascript" },
-    }));
+    const cache = await caches.open("nindova-session-v2");
     const stalePage = new Response("<!doctype html><title>stale shell</title>", {
       headers: { "content-type": "text/html" },
     });
@@ -137,16 +137,8 @@ try {
   });
   await page.reload();
   await page.waitForFunction(() => Boolean(window.__ct));
-  assert.equal(await page.evaluate(() => globalThis.__nindovaStale), undefined);
-  const refreshedCore = await page.evaluate(async () => {
-    const [cacheName] = await caches.keys();
-    const cache = await caches.open(cacheName);
-    return cache.match(new URL("night-core.js", location.href)).then((response) => response.text());
-  });
-  assert.ok(refreshedCore.includes("NindovaNight"));
   const refreshedPages = await page.evaluate(async () => {
-    const [cacheName] = await caches.keys();
-    const cache = await caches.open(cacheName);
+    const cache = await caches.open("nindova-session-v2");
     return Promise.all([
       cache.match(new URL("./", location.href)).then((response) => response.text()),
       cache.match(new URL("index.html", location.href)).then((response) => response.text()),

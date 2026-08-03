@@ -3,10 +3,10 @@ import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { chromium } from "playwright";
 
-await import("../../apps/session/night-core.js");
+await import("../../apps/session/dist/night-core.js");
 const Night = globalThis.NindovaNight;
 const root = resolve(import.meta.dirname, "../..");
-const target = `${pathToFileURL(resolve(root, "apps/session/index.html")).href}?review=1`;
+const target = `${pathToFileURL(resolve(root, "apps/session/dist/nindova.html")).href}?review=1`;
 
 const browser = await chromium.launch();
 const context = await browser.newContext({ viewport: { width: 375, height: 812 } });

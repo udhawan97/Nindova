@@ -6,7 +6,7 @@ import { chromium } from "playwright";
 
 const root = resolve(import.meta.dirname, "../..");
 const output = resolve(root, "artifacts/portrait-accessibility");
-const target = `${pathToFileURL(resolve(root, "apps/session/index.html")).href}?review=1`;
+const target = `${pathToFileURL(resolve(root, "apps/session/dist/nindova.html")).href}?review=1`;
 await mkdir(output, { recursive: true });
 
 const browser = await chromium.launch();

@@ -21,7 +21,7 @@ There is no public deployment yet. The GitHub repository being public does not i
 
 ## Repository map
 
-- `apps/session/` — the playable Session, extended directly from the supplied demo with its provenance recorded.
+- `apps/session/` — the Vite-compiled TypeScript/Canvas Session, extended directly from the supplied demo with runtime and visual-asset provenance recorded.
 - `apps/site/` — the public landing page and Starlight documentation.
 - `docs/` — build plan, decision records, testing evidence, and repository-level documentation.
 - `graphify-out/` — generated architecture graph, interactive HTML, and audit report.

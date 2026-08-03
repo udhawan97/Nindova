@@ -2,7 +2,7 @@
 
 ## Implementation
 
-- Added a standalone classic-JavaScript night module used by the source Session, multi-file build, embedded portable HTML, and Node parity tests.
+- Added a standalone Night module, now Vite-compiled from TypeScript for the Session, multi-file build, embedded portable HTML, and Node parity tests.
 - Captured an immutable `nightId` from Dawn civil date, IANA zone, and recipe version at Session entry.
 - Seeded weather, moon, object set, featured species and boats, meadow accent, and harbor paint without changing path, effort, duration, or ending.
 - Added a versioned one-key local schema with missing, corrupt, stale, unsupported, and unavailable recovery.

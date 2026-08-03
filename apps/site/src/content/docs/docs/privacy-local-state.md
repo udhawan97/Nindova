@@ -22,6 +22,6 @@ Version 1 migrates once to version 2, preserving its bounded scene memory and re
 
 ## Offline cache
 
-The service worker is scoped to `/play/`. Its versioned precache contains the Session HTML, local engines, manifest, icon, and focal sprite sheet. It never receives or caches local storage, generated blobs, share payloads, or pages outside its scope. A newly installed worker becomes active after the previous Session tabs release the old worker; cache activation removes older Nindova shell versions deterministically.
+The service worker is scoped to `/play/`. Its versioned precache contains the Session HTML with its compiled TypeScript runtime, manifest, icon, and focal sprite sheet. It never receives or caches local storage, generated blobs, share payloads, or pages outside its scope. A newly installed worker becomes active after the previous Session tabs release the old worker; cache activation removes older `nindova-session-*` shell versions deterministically and preserves caches owned by other projects on the same origin.
 
 The standalone `nindova.html` embeds its engines and focal sprites and does not register a service worker.

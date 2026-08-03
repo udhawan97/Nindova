@@ -7,7 +7,7 @@ The build starts from the supplied standalone Canvas demo and extracts modules o
 
 ## Workspace
 
-- **Session** — Vite and TypeScript package that preserves the fixed state machine, Canvas stage, interactions, sound, and `window.__ct` evidence hook.
+- **Session** — Vite-compiled TypeScript modules for the fixed state machine, Canvas stage, interactions, sound, Night state, Dawn export, and `window.__ct` evidence hook. Night and Dawn APIs pass the strict TypeScript gate; the behavior-preserving seed migration has a separate compatibility type-check gate.
 - **Site** — Astro landing page and Starlight documentation.
 - **Composition** — one static root artifact containing the site, `/docs/`, `/play/`, and portable `nindova.html`.
 
@@ -19,12 +19,12 @@ The build starts from the supplied standalone Canvas demo and extracts modules o
 - **Night** owns the immutable `nightId`, seeded recipe, versioned local schema, safe recovery, and idempotent Echo updates.
 - **Dawn** owns captured-zone morning eligibility, first-light rendering, PNG export, silent loop recording, sharing, and temporary URL cleanup.
 
-The production clock defaults to the fifteen-minute cap. Reviewer pacing is available only through an explicit `?review=1` test switch; its visible evidence and replay controls never appear in production mode. The standalone build embeds the focal sprite sheet while the multi-file build loads the same checked asset.
+The production clock defaults to the fifteen-minute cap. Reviewer pacing is available only through an explicit `?review=1` test switch; its visible evidence and replay controls never appear in production mode. Vite compiles the shared TypeScript graph once and the build inlines that module into both browser artifacts. The standalone additionally embeds the focal sprite sheet while the multi-file build loads the same checked asset.
 
-The multi-file build registers a versioned service worker scoped to `/play/` and precaches only same-origin static shell files. The standalone removes its manifest and worker registration during composition. Updating the cache name installs a new shell; the old worker remains in control until existing tabs release it, then activation removes older Nindova caches.
+The multi-file build registers a versioned service worker scoped to `/play/` and precaches only same-origin static shell files. The standalone removes its manifest and worker registration during composition. Updating the cache name installs a new shell; the old worker remains in control until existing tabs release it, then activation removes only older `nindova-session-*` caches. Cache Storage belonging to another project on the same origin is preserved.
 
-## Planned boundaries
+## Deferred native boundary
 
-- **Browser** owns standalone output, PWA shell, service worker, and install/update behavior.
+- **iOS Wall** may eventually own the user-chosen schedule and one quiet Gate dismissal, but it is not part of this browser/PWA implementation and requires a separately entitled native proof track.
 
 The same source of truth must drive the portable HTML and the multi-file PWA. The site may explain the experience but cannot claim a capability that the shipped Session has not proved.

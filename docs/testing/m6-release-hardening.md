@@ -2,7 +2,7 @@
 
 ## Production wall-clock proof
 
-`npm run test:wall-clock` built the composed production artifact, opened `/play/` at 375×812 with reviewer mode absent, and left the Session untouched. The Session ended naturally at 648.354 wall-clock seconds with `sessionElapsed` 648.13, `endReason` `completed`, and no console or page errors. The same page remained in `end/completed` at 899.995 seconds.
+After the Session runtime moved into the compiled TypeScript graph, `npm run test:wall-clock` rebuilt the composed production artifact, opened `/play/` at 375×812 with reviewer mode absent, and left the Session untouched. The Session ended naturally at 637.062 wall-clock seconds with `sessionElapsed` 636.894, `endReason` `completed`, and no console or page errors. The same page remained in `end/completed` at 900.003 seconds.
 
 This distinguishes the product contract correctly: fifteen minutes is a ceiling, not a target duration. Reviewer-mode tests separately force 900 simulated seconds and require the `production-cap` path.
 
@@ -14,7 +14,7 @@ npm test
 npm run test:wall-clock
 ```
 
-The suites cover unit/type/build checks; the asserted arc; portrait, 200% scale, rotation, virtual-keyboard height, reduced motion, keyboard, semantic controls, pointer cancellation, and target size; autonomous closure; deterministic night and local-state recovery; Dawn still/loop export and URL cleanup; immutable product language; base-path routing; PWA installability, online cache refresh, offline completion, and same-night voluntary replay; plus standalone independence.
+The suites cover the Vite-compiled TypeScript/Canvas runtime; unit/type/build checks; the asserted arc; portrait, 200% scale, rotation, virtual-keyboard height, reduced motion, keyboard, semantic controls, pointer cancellation, and target size; autonomous closure; deterministic night and local-state recovery; Dawn still/loop export and URL cleanup; immutable product language; base-path routing; PWA installability, online cache refresh, origin-safe cache cleanup, offline completion, and same-night voluntary replay; plus standalone independence.
 
 ## Repository and architecture proof
 

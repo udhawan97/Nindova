@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-await import("../../apps/session/dawn-core.js");
+await import("../../apps/session/dist/dawn-core.js");
 const Dawn = globalThis.NindovaDawn;
 
 const chicagoCompletion = {

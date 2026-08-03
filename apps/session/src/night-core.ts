@@ -1,23 +1,63 @@
-(function installNindovaNight(global) {
+export type Vista = "meadow" | "harbor";
+
+export interface NightCapture {
+  nightId: string;
+  dawnDate: string;
+  timeZone: string;
+  recipeVersion: number;
+  startedAt: string;
+}
+
+export interface NightRecipe {
+  version: number;
+  weather: string;
+  moon: string;
+  objectKinds: readonly string[];
+  meadowSpecies: readonly string[];
+  harborBoats: readonly string[];
+  meadowAccent: string;
+  harborPaint: string;
+}
+
+export interface NightCompletion extends NightCapture {
+  vista: Vista;
+  finalKind: string;
+  completedAt: string;
+}
+
+export interface NightState {
+  version: number;
+  lastCompleted: NightCompletion | null;
+  meadowEcho: { nightId: string; kind: string } | null;
+  harborEchoes: Array<{ nightId: string; kind: string }>;
+  tomorrowIntention: { nightId: string; heldAt: string } | null;
+}
+
+interface StorageLike {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+  removeItem?(key: string): void;
+}
+
   "use strict";
 
   const SCHEMA_VERSION = 2;
   const RECIPE_VERSION = 1;
   const STORAGE_KEY = "nindova:night-state:v2";
   const LEGACY_STORAGE_KEY = "nindova:night-state:v1";
-  const WEATHER = ["soft-monsoon", "still-haze", "distant-rain", "clear-indigo"];
-  const MOONS = ["crescent", "half", "veiled"];
-  const OBJECTS = ["letter", "key", "mug", "book", "coin", "spool", "watch", "photo", "leaf", "pencil"];
-  const MEADOW_SPECIES = ["sheep", "goose", "tortoise", "rabbit"];
-  const HARBOR_BOATS = ["skiff", "tug"];
-  const MEADOW_ACCENTS = ["marigold", "saffron", "wheat"];
-  const HARBOR_PAINTS = ["indigo", "madder", "marigold"];
+  const WEATHER = ["soft-monsoon", "still-haze", "distant-rain", "clear-indigo"] as const;
+  const MOONS = ["crescent", "half", "veiled"] as const;
+  const OBJECTS = ["letter", "key", "mug", "book", "coin", "spool", "watch", "photo", "leaf", "pencil"] as const;
+  const MEADOW_SPECIES = ["sheep", "goose", "tortoise", "rabbit"] as const;
+  const HARBOR_BOATS = ["skiff", "tug"] as const;
+  const MEADOW_ACCENTS = ["marigold", "saffron", "wheat"] as const;
+  const HARBOR_PAINTS = ["indigo", "madder", "marigold"] as const;
 
-  function pad(value) {
+  function pad(value: number) {
     return String(value).padStart(2, "0");
   }
 
-  function localParts(date, timeZone) {
+  function localParts(date: Date, timeZone: string) {
     const formatter = new Intl.DateTimeFormat("en-CA", {
       timeZone,
       year: "numeric",
@@ -35,13 +75,13 @@
     };
   }
 
-  function addCivilDays(civilDate, days) {
+  function addCivilDays(civilDate: string, days: number) {
     const [year, month, day] = civilDate.split("-").map(Number);
     const next = new Date(Date.UTC(year, month - 1, day + days));
     return `${next.getUTCFullYear()}-${pad(next.getUTCMonth() + 1)}-${pad(next.getUTCDate())}`;
   }
 
-  function captureNight(now = new Date(), timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone) {
+  function captureNight(now: Date | string | number = new Date(), timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone): Readonly<NightCapture> {
     const instant = now instanceof Date ? now : new Date(now);
     if (Number.isNaN(instant.getTime())) throw new TypeError("captureNight requires a valid instant");
     if (!timeZone) throw new TypeError("captureNight requires an IANA time zone");
@@ -56,7 +96,7 @@
     });
   }
 
-  function seedFrom(text) {
+  function seedFrom(text: string) {
     let hash = 0x811c9dc5;
     for (let index = 0; index < text.length; index += 1) {
       hash ^= text.charCodeAt(index);
@@ -65,7 +105,7 @@
     return hash >>> 0;
   }
 
-  function createPrng(seedText) {
+  function createPrng(seedText: string) {
     let value = seedFrom(seedText);
     return function next() {
       value = (value + 0x6d2b79f5) >>> 0;
@@ -76,11 +116,11 @@
     };
   }
 
-  function pick(list, random) {
+  function pick<T>(list: readonly T[], random: () => number): T {
     return list[Math.floor(random() * list.length)];
   }
 
-  function shuffled(list, random) {
+  function shuffled<T>(list: readonly T[], random: () => number): T[] {
     const result = [...list];
     for (let index = result.length - 1; index > 0; index -= 1) {
       const target = Math.floor(random() * (index + 1));
@@ -89,7 +129,7 @@
     return result;
   }
 
-  function recipeForNight(nightId) {
+  function recipeForNight(nightId: string): Readonly<NightRecipe> {
     if (typeof nightId !== "string" || !nightId) throw new TypeError("recipeForNight requires a nightId");
     const random = createPrng(`${nightId}|recipe-${RECIPE_VERSION}`);
     return Object.freeze({
@@ -104,7 +144,7 @@
     });
   }
 
-  function emptyState() {
+  function emptyState(): NightState {
     return {
       version: SCHEMA_VERSION,
       lastCompleted: null,
@@ -114,11 +154,11 @@
     };
   }
 
-  function isText(value) {
+  function isText(value: unknown): value is string {
     return typeof value === "string" && value.length > 0 && value.length < 180;
   }
 
-  function validCompletion(value) {
+  function validCompletion(value: any): value is NightCompletion {
     return Boolean(
       value &&
         isText(value.nightId) &&
@@ -126,22 +166,22 @@
         isText(value.timeZone) &&
         value.recipeVersion === RECIPE_VERSION &&
         (value.vista === "meadow" || value.vista === "harbor") &&
-        (value.vista === "meadow" ? MEADOW_SPECIES : HARBOR_BOATS).includes(value.finalKind) &&
+        (value.vista === "meadow" ? MEADOW_SPECIES : HARBOR_BOATS as readonly string[]).includes(value.finalKind) &&
         isText(value.completedAt),
     );
   }
 
-  function sanitizeEcho(value, kindKey, allowed) {
+  function sanitizeEcho(value: any, kindKey: "kind", allowed: readonly string[]): { nightId: string; kind: string } | null {
     if (!value || !isText(value.nightId) || !allowed.includes(value[kindKey])) return null;
     return { nightId: value.nightId, [kindKey]: value[kindKey] };
   }
 
-  function sanitizeState(value) {
+  function sanitizeState(value: any): NightState | null {
     if (!value || (value.version !== SCHEMA_VERSION && value.version !== 1)) return null;
     const lastCompleted = value.lastCompleted === null ? null : validCompletion(value.lastCompleted) ? { ...value.lastCompleted } : null;
     const meadowEcho = sanitizeEcho(value.meadowEcho, "kind", MEADOW_SPECIES);
     const harborEchoes = Array.isArray(value.harborEchoes)
-      ? value.harborEchoes.map((echo) => sanitizeEcho(echo, "kind", HARBOR_BOATS)).filter(Boolean).slice(-5)
+      ? value.harborEchoes.map((echo: any) => sanitizeEcho(echo, "kind", HARBOR_BOATS)).filter((echo: { nightId: string; kind: string } | null): echo is { nightId: string; kind: string } => Boolean(echo)).slice(-5)
       : [];
     const tomorrowIntention = value.version === SCHEMA_VERSION && value.tomorrowIntention
       && isText(value.tomorrowIntention.nightId) && isText(value.tomorrowIntention.heldAt)
@@ -150,7 +190,7 @@
     return { version: SCHEMA_VERSION, lastCompleted, meadowEcho, harborEchoes, tomorrowIntention };
   }
 
-  function decodeState(raw) {
+  function decodeState(raw: string | null | undefined): { state: NightState; recovered: boolean; reason: string } {
     if (raw === null || raw === undefined || raw === "") return { state: emptyState(), recovered: false, reason: "missing" };
     try {
       const parsed = JSON.parse(raw);
@@ -162,7 +202,7 @@
     }
   }
 
-  function completeState(current, completion) {
+  function completeState(current: unknown, completion: NightCompletion): { state: NightState; changed: boolean } {
     if (!validCompletion(completion)) throw new TypeError("completeState requires a valid completion");
     const state = sanitizeState(current) || emptyState();
     if (state.lastCompleted?.nightId === completion.nightId) return { state, changed: false };
@@ -182,7 +222,7 @@
     return { state: next, changed: true };
   }
 
-  function readStorage(storage) {
+  function readStorage(storage: StorageLike | null | undefined) {
     try {
       const current = storage?.getItem(STORAGE_KEY) ?? null;
       if (current !== null) return decodeState(current);
@@ -199,7 +239,7 @@
     }
   }
 
-  function writeStorage(storage, state) {
+  function writeStorage(storage: StorageLike | null | undefined, state: unknown) {
     const safe = sanitizeState(state);
     if (!safe) return false;
     try {
@@ -210,7 +250,7 @@
     }
   }
 
-  function setTomorrowIntention(current, nightId, heldAt = new Date().toISOString()) {
+  function setTomorrowIntention(current: unknown, nightId: string, heldAt = new Date().toISOString()) {
     const state = sanitizeState(current) || emptyState();
     if (!state.lastCompleted || state.lastCompleted.nightId !== nightId || !isText(heldAt)) {
       return { state, changed: false };
@@ -225,7 +265,7 @@
     };
   }
 
-  global.NindovaNight = Object.freeze({
+  export const NindovaNight = Object.freeze({
     SCHEMA_VERSION,
     RECIPE_VERSION,
     STORAGE_KEY,
@@ -242,4 +282,11 @@
     setTomorrowIntention,
     writeStorage,
   });
-})(globalThis);
+
+export type NindovaNightApi = typeof NindovaNight;
+
+declare global {
+  var NindovaNight: NindovaNightApi;
+}
+
+globalThis.NindovaNight = NindovaNight;

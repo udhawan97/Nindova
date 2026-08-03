@@ -18,7 +18,7 @@ Anything that makes tonight harder to leave is a bug.
 - State stays local. There is no analytics, advertising, telemetry, remote logging, or account.
 - Same-night voluntary replay is possible, quiet, and idempotent.
 - “Same time tomorrow?” records only a local intention, requests no notification, and creates no urgency.
-- Choosing “Not now” at the Wall dismisses it for the rest of that night without guilt; Nindova itself remains manually available later that night.
+- If the deferred native Wall is built, choosing “Not now” must dismiss it for the rest of that night without guilt while leaving Nindova manually available later that night. This is a frozen future-native contract, not implemented web behavior.
 
 ## Immutable language
 
