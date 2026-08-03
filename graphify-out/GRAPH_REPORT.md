@@ -5,12 +5,12 @@
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 648 nodes · 945 edges · 49 communities (40 shown, 9 thin omitted)
+- 648 nodes · 945 edges · 50 communities (41 shown, 9 thin omitted)
 - Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 55 edges (avg confidence: 0.75)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `5a101551`
+- Built from commit: `c20167ae`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -51,10 +51,11 @@
 - Reference Integrity Tests
 - Product Contract Docs
 - Self Closing Design
-- Release Docs and Visual Guardrails
 - Night Memory to Dawn
 - Portrait Accessibility Decision
 - Browser First Delivery
+- Release Docs and Visual Guardrails
+- Two-Loop Law
 - Seed Baseline and Arc
 - Bedtime Research
 - Illustrated Focal Sprites
@@ -98,7 +99,7 @@
 - **Animal Visitors** — apps_session_assets_focal_sprites_sheep, apps_session_assets_focal_sprites_goose, apps_session_assets_focal_sprites_patterned_tortoise, apps_session_assets_focal_sprites_rabbit [INFERRED 0.95]
 - **Indigo Terracotta Brass and Madder Material Palette** — apps_session_assets_focal_sprites_brass_key, apps_session_assets_focal_sprites_terracotta_cup, apps_session_assets_focal_sprites_embroidered_book, apps_session_assets_focal_sprites_red_thread_spool, apps_session_assets_focal_sprites_brass_pocket_watch, apps_session_assets_focal_sprites_painted_rowboat [INFERRED 0.75]
 
-## Communities (49 total, 9 thin omitted)
+## Communities (50 total, 9 thin omitted)
 
 ### Community 12 - "Session Package Configuration"
 Cohesion: 0.17
@@ -121,8 +122,8 @@ Cohesion: 0.03
 Nodes (44): canvas, PACING, objects, slots, pointer, motes, motionPreference, nightRecipe (+36 more)
 
 ### Community 13 - "Night and Dawn Runtime"
-Cohesion: 0.13
-Nodes (15): select(), dawnNow(), startNight(), recordNightCompletion(), FOCAL_SPRITES, vistaDisplayName(), storedCount(), refreshDawnAvailability() (+7 more)
+Cohesion: 0.14
+Nodes (14): select(), dawnNow(), recordNightCompletion(), FOCAL_SPRITES, vistaDisplayName(), storedCount(), refreshDawnAvailability(), openDawn() (+6 more)
 
 ### Community 2 - "Session State Transitions"
 Cohesion: 0.20
@@ -133,8 +134,8 @@ Cohesion: 0.15
 Nodes (19): clamp(), easeInOut(), pace(), assistanceEnvelope(), arcClosureProgress(), lightEnvelope(), lightBudgetAt(), portraitFocus() (+11 more)
 
 ### Community 16 - "Session Audio and Visitors"
-Cohesion: 0.19
-Nodes (14): rnd(), buildSlots(), makeObjects(), initAudio(), plink(), weatherScale(), initRain(), drawnBag() (+6 more)
+Cohesion: 0.17
+Nodes (15): rnd(), startNight(), buildSlots(), makeObjects(), initAudio(), plink(), weatherScale(), initRain() (+7 more)
 
 ### Community 19 - "Pointer and Object Flow"
 Cohesion: 0.33
@@ -208,25 +209,29 @@ Nodes (66): Nindova contributor guidance, Nindova domain language, Nindova repos
 Cohesion: 0.25
 Nodes (9): Hybrid Procedural Illustration, Hybrid Procedural and Composed Audio, Fifteen-Minute Session Cap, M2 Tactile and Self-Closing Checkpoint, Autonomous Interruption Recovery, Monotonic Assistance and Light, Authored Focal and Audio Accents, Decay-Driven Assistance (+1 more)
 
-### Community 18 - "Release Docs and Visual Guardrails"
-Cohesion: 0.15
-Nodes (14): User-Chosen Unguilted Wall, Public Site and Session Separation, Punjabi and Indian Material World, Cultural Visual Guardrails, Theme and Behavior Independence, M5 Website Docs and Offline PWA Evidence, Offline PWA Boundary, PWA and Standalone Independence (+6 more)
-
 ### Community 24 - "Night Memory to Dawn"
-Cohesion: 0.21
-Nodes (12): Asymmetric Vista Memory, M3 Deterministic Nights and Quiet Memory Checkpoint, Deterministic Night Recipe, One-Key Local Memory, Idempotent Same-Night Replay, M4 Dawn Keepsake Checkpoint, Local Dawn Export, Export Failure Resilience (+4 more)
+Cohesion: 0.32
+Nodes (8): User-Chosen Unguilted Wall, Asymmetric Vista Memory, M3 Deterministic Nights and Quiet Memory Checkpoint, Deterministic Night Recipe, One-Key Local Memory, Idempotent Same-Night Replay, Notification-Free Return Intention, Between-Session Return System
 
 ### Community 39 - "Portrait Accessibility Decision"
 Cohesion: 0.50
 Nodes (4): Portrait-First Session, M1 Portrait and Accessibility Checkpoint, Semantic Portrait Operation, Pending Real-Device Assistive Technology
 
 ### Community 21 - "Browser First Delivery"
-Cohesion: 0.21
-Nodes (13): Browser and PWA Before iOS Wall, Supplied Handoff Artifacts, Handoff Provenance, Codex Kickoff Protocol, Nindova Concept Demo, Procedural Canvas and Audio, Dual Pacing Profiles, window.__ct (+5 more)
+Cohesion: 0.27
+Nodes (10): Browser and PWA Before iOS Wall, Offline PWA Boundary, Supplied Handoff Artifacts, Handoff Provenance, Codex Kickoff Protocol, Nindova Master Brief, Browser Front Door, iOS Ritual (+2 more)
+
+### Community 18 - "Release Docs and Visual Guardrails"
+Cohesion: 0.20
+Nodes (11): Public Site and Session Separation, Punjabi and Indian Material World, Cultural Visual Guardrails, Theme and Behavior Independence, M5 Website Docs and Offline PWA Evidence, PWA and Standalone Independence, Installed-Device PWA Risk, M6 Browser-First Release Hardening (+3 more)
+
+### Community 29 - "Two-Loop Law"
+Cohesion: 0.33
+Nodes (6): M4 Dawn Keepsake Checkpoint, Local Dawn Export, Export Failure Resilience, Two-Loop Law, Morning Dawn Reward, Ryan Rigby and Przybylski 2006
 
 ### Community 15 - "Seed Baseline and Arc"
-Cohesion: 0.25
-Nodes (8): Supplied Seed Baseline, Observational Evidence Limit, Asserted Arc Regression Gate, Observational Test Limitation, Fixed Session State Arc, Night Loop, Scullin et al. 2018, Harvey and Payne 2002
+Cohesion: 0.17
+Nodes (12): Supplied Seed Baseline, Observational Evidence Limit, Asserted Arc Regression Gate, Observational Test Limitation, Nindova Concept Demo, Fixed Session State Arc, Procedural Canvas and Audio, Dual Pacing Profiles (+4 more)
 
 ### Community 40 - "Bedtime Research"
 Cohesion: 0.50
@@ -262,7 +267,7 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `ClosingTimeDebug` connect `Debug Contract Types` to `Session Runtime`?**
   _High betweenness centrality (0.022) - this node is a cross-community bridge._
-- **Why does `Nindova Master Brief` connect `Browser First Delivery` to `Bedtime Research`, `Night Memory to Dawn`, `Self Closing Design`, `Seed Baseline and Arc`?**
+- **Why does `Nindova Master Brief` connect `Browser First Delivery` to `Bedtime Research`, `Seed Baseline and Arc`, `Self Closing Design`, `Night Memory to Dawn`, `Two-Loop Law`?**
   _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `private` to the rest of the system?**
   _213 weakly-connected nodes found - possible documentation gaps or missing edges._

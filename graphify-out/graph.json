@@ -1390,8 +1390,8 @@
       "source_file": "apps/session/src/session.ts",
       "source_location": "L133",
       "_origin": "ast",
-      "community": 13,
-      "community_name": "Night and Dawn Runtime",
+      "community": 16,
+      "community_name": "Session Audio and Visitors",
       "norm_label": "startnight()",
       "id": "apps_session_src_session_startnight"
     },
@@ -6237,8 +6237,8 @@
       "author": null,
       "contributor": null,
       "rationale": "Preserve meaningful precommitment without preselection, repeated nagging, punitive blocking, or delegated scheduling.",
-      "community": 18,
-      "community_name": "Release Docs and Visual Guardrails",
+      "community": 24,
+      "community_name": "Night Memory to Dawn",
       "norm_label": "user-chosen unguilted wall",
       "id": "docs_adr_0003_keep_the_wall_user_chosen_and_unguilted_user_chosen_unguilted_wall"
     },
@@ -6526,8 +6526,8 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 24,
-      "community_name": "Night Memory to Dawn",
+      "community": 29,
+      "community_name": "Two-Loop Law",
       "norm_label": "m4 dawn keepsake checkpoint",
       "id": "docs_testing_m4_dawn_keepsake_m4_dawn_keepsake_checkpoint"
     },
@@ -6540,8 +6540,8 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 24,
-      "community_name": "Night Memory to Dawn",
+      "community": 29,
+      "community_name": "Two-Loop Law",
       "norm_label": "local dawn export",
       "id": "docs_testing_m4_dawn_keepsake_local_dawn_export"
     },
@@ -6555,8 +6555,8 @@
       "author": null,
       "contributor": null,
       "rationale": "The still remains usable when loop encoding, recording, or sharing is unsupported, fails, or is cancelled, and temporary URLs are revoked.",
-      "community": 24,
-      "community_name": "Night Memory to Dawn",
+      "community": 29,
+      "community_name": "Two-Loop Law",
       "norm_label": "export failure resilience",
       "id": "docs_testing_m4_dawn_keepsake_export_failure_resilience"
     },
@@ -6583,8 +6583,8 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
-      "community_name": "Release Docs and Visual Guardrails",
+      "community": 21,
+      "community_name": "Browser First Delivery",
       "norm_label": "offline pwa boundary",
       "id": "docs_testing_m5_site_docs_offline_pwa_offline_pwa_boundary"
     },
@@ -6613,8 +6613,8 @@
       "author": null,
       "contributor": null,
       "rationale": "The local return intention is idempotent and creates neither a notification request nor a scheduled prompt.",
-      "community": 18,
-      "community_name": "Release Docs and Visual Guardrails",
+      "community": 24,
+      "community_name": "Night Memory to Dawn",
       "norm_label": "notification-free return intention",
       "id": "docs_testing_m5_site_docs_offline_pwa_notification_free_return_intention"
     },
@@ -6798,8 +6798,8 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 21,
-      "community_name": "Browser First Delivery",
+      "community": 15,
+      "community_name": "Seed Baseline and Arc",
       "norm_label": "nindova concept demo",
       "id": "reference_nindova_demo_nindova_concept_demo"
     },
@@ -6841,8 +6841,8 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 21,
-      "community_name": "Browser First Delivery",
+      "community": 15,
+      "community_name": "Seed Baseline and Arc",
       "norm_label": "procedural canvas and audio",
       "id": "reference_nindova_demo_procedural_canvas_and_audio"
     },
@@ -6855,8 +6855,8 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 21,
-      "community_name": "Browser First Delivery",
+      "community": 15,
+      "community_name": "Seed Baseline and Arc",
       "norm_label": "dual pacing profiles",
       "id": "reference_nindova_demo_dual_pacing_profiles"
     },
@@ -6869,8 +6869,8 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 21,
-      "community_name": "Browser First Delivery",
+      "community": 15,
+      "community_name": "Seed Baseline and Arc",
       "norm_label": "window.__ct",
       "id": "reference_nindova_demo_window_ct"
     },
@@ -6912,8 +6912,8 @@
       "author": "Claude",
       "contributor": null,
       "rationale": "Keep satisfaction and closure inside one Session while placing curiosity and ritual only between Sessions; anything that makes tonight harder to leave is a bug.",
-      "community": 24,
-      "community_name": "Night Memory to Dawn",
+      "community": 29,
+      "community_name": "Two-Loop Law",
       "norm_label": "two-loop law",
       "id": "reference_nindova_master_brief_two_loop_law"
     },
@@ -6970,8 +6970,8 @@
       "author": "Claude",
       "contributor": null,
       "rationale": "Put delight, sharing, and reward energy in the morning so it cannot extend the nighttime Session.",
-      "community": 24,
-      "community_name": "Night Memory to Dawn",
+      "community": 29,
+      "community_name": "Two-Loop Law",
       "norm_label": "morning dawn reward",
       "id": "reference_nindova_master_brief_morning_dawn_reward"
     },
@@ -7084,8 +7084,8 @@
       "captured_at": null,
       "author": "Claude",
       "contributor": null,
-      "community": 24,
-      "community_name": "Night Memory to Dawn",
+      "community": 29,
+      "community_name": "Two-Loop Law",
       "norm_label": "ryan rigby and przybylski 2006",
       "id": "reference_nindova_master_brief_ryan_rigby_and_przybylski_2006"
     },
@@ -16967,16 +16967,6 @@
       "target": "docs_testing_m2_self_closing_session_authored_focal_and_audio_accents"
     },
     {
-      "relation": "semantically_similar_to",
-      "confidence": "INFERRED",
-      "confidence_score": 0.95,
-      "source_file": "docs/adr/0003-keep-the-wall-user-chosen-and-unguilted.md",
-      "source_location": "line 3",
-      "weight": 1.0,
-      "source": "docs_adr_0003_keep_the_wall_user_chosen_and_unguilted_user_chosen_unguilted_wall",
-      "target": "reference_nindova_master_brief_between_session_return_system"
-    },
-    {
       "relation": "conceptually_related_to",
       "confidence": "INFERRED",
       "confidence_score": 0.85,
@@ -16990,10 +16980,10 @@
       "relation": "semantically_similar_to",
       "confidence": "INFERRED",
       "confidence_score": 0.95,
-      "source_file": "docs/adr/0004-use-asymmetric-vista-memory.md",
+      "source_file": "docs/adr/0003-keep-the-wall-user-chosen-and-unguilted.md",
       "source_location": "line 3",
       "weight": 1.0,
-      "source": "docs_adr_0004_use_asymmetric_vista_memory_asymmetric_vista_memory",
+      "source": "docs_adr_0003_keep_the_wall_user_chosen_and_unguilted_user_chosen_unguilted_wall",
       "target": "reference_nindova_master_brief_between_session_return_system"
     },
     {
@@ -17010,11 +17000,11 @@
       "relation": "semantically_similar_to",
       "confidence": "INFERRED",
       "confidence_score": 0.95,
-      "source_file": "docs/adr/0005-cap-the-real-session-at-fifteen-minutes.md",
+      "source_file": "docs/adr/0004-use-asymmetric-vista-memory.md",
       "source_location": "line 3",
       "weight": 1.0,
-      "source": "docs_adr_0005_cap_the_real_session_at_fifteen_minutes_fifteen_minute_session_cap",
-      "target": "reference_nindova_master_brief_bounded_self_ending_session"
+      "source": "docs_adr_0004_use_asymmetric_vista_memory_asymmetric_vista_memory",
+      "target": "reference_nindova_master_brief_between_session_return_system"
     },
     {
       "relation": "implements",
@@ -17037,6 +17027,16 @@
       "target": "docs_testing_m6_release_hardening_production_wall_clock_proof"
     },
     {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "docs/adr/0005-cap-the-real-session-at-fifteen-minutes.md",
+      "source_location": "line 3",
+      "weight": 1.0,
+      "source": "docs_adr_0005_cap_the_real_session_at_fifteen_minutes_fifteen_minute_session_cap",
+      "target": "reference_nindova_master_brief_bounded_self_ending_session"
+    },
+    {
       "relation": "implements",
       "confidence": "INFERRED",
       "confidence_score": 0.95,
@@ -17047,16 +17047,6 @@
       "target": "docs_testing_m1_portrait_accessibility_semantic_portrait_operation"
     },
     {
-      "relation": "semantically_similar_to",
-      "confidence": "INFERRED",
-      "confidence_score": 0.95,
-      "source_file": "docs/adr/0007-ship-browser-and-pwa-before-the-ios-wall.md",
-      "source_location": "line 3",
-      "weight": 1.0,
-      "source": "docs_adr_0007_ship_browser_and_pwa_before_the_ios_wall_browser_and_pwa_before_ios_wall",
-      "target": "reference_nindova_master_brief_browser_front_door"
-    },
-    {
       "relation": "implements",
       "confidence": "INFERRED",
       "confidence_score": 0.95,
@@ -17065,6 +17055,16 @@
       "weight": 1.0,
       "source": "docs_adr_0007_ship_browser_and_pwa_before_the_ios_wall_browser_and_pwa_before_ios_wall",
       "target": "docs_testing_m5_site_docs_offline_pwa_offline_pwa_boundary"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "docs/adr/0007-ship-browser-and-pwa-before-the-ios-wall.md",
+      "source_location": "line 3",
+      "weight": 1.0,
+      "source": "docs_adr_0007_ship_browser_and_pwa_before_the_ios_wall_browser_and_pwa_before_ios_wall",
+      "target": "reference_nindova_master_brief_browser_front_door"
     },
     {
       "relation": "implements",
@@ -17661,20 +17661,20 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "reference/nindova-master-brief.md",
-      "source_location": "line 93",
+      "source_location": "lines 40-59",
       "weight": 1.0,
       "source": "reference_nindova_master_brief_two_loop_law",
-      "target": "reference_nindova_master_brief_morning_dawn_reward"
+      "target": "reference_nindova_master_brief_bounded_self_ending_session"
     },
     {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "reference/nindova-master-brief.md",
-      "source_location": "lines 40-59",
+      "source_location": "line 93",
       "weight": 1.0,
       "source": "reference_nindova_master_brief_two_loop_law",
-      "target": "reference_nindova_master_brief_bounded_self_ending_session"
+      "target": "reference_nindova_master_brief_morning_dawn_reward"
     },
     {
       "relation": "cites",
@@ -18420,5 +18420,5 @@
       "source_file": "apps/session/assets/focal-sprites.png"
     }
   ],
-  "built_at_commit": "5a1015519b5f49638b6d7db8abfe583a524198de"
+  "built_at_commit": "c20167aef3023236783b42cd03e96f460e0ee80f"
 }
