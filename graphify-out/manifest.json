@@ -50,8 +50,8 @@
     "semantic_hash": "9da5b344274fa94c0650dcb1a257aacc"
   },
   "apps/site/src/pages/index.astro": {
-    "mtime": 1785785580.0749128,
-    "ast_hash": "187c9f74fd8e4356ebfb99dde6dc76f3",
+    "mtime": 1785786978.7575777,
+    "ast_hash": "7f01cb3f4171891e766fc1ad11ada450",
     "semantic_hash": ""
   },
   "package.json": {
@@ -145,8 +145,8 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1785786025.6487005,
-    "ast_hash": "b7de67b3fa6307f20a5c1e3e3eb49a6e",
+    "mtime": 1785786978.756908,
+    "ast_hash": "511fa9253278d585441b173780a04912",
     "semantic_hash": ""
   },
   "apps/session/index.html": {
@@ -170,8 +170,8 @@
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/getting-started.md": {
-    "mtime": 1785785580.0756829,
-    "ast_hash": "a053646f8af716a58083e9cf6912a7d3",
+    "mtime": 1785786978.7581286,
+    "ast_hash": "d8ab16f909fe8c2ab1bee94859ccdde5",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/index.md": {
@@ -210,13 +210,13 @@
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/research-receipts.md": {
-    "mtime": 1785785117.9792273,
-    "ast_hash": "2ac18230e68019e27b5b15b1d07ee32f",
+    "mtime": 1785786860.3683336,
+    "ast_hash": "d9652f2265ec6d5a346e085a592e8206",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/roadmap.md": {
-    "mtime": 1785785580.0752625,
-    "ast_hash": "bcdec85e4994ea4b1f6a214c0cfe3206",
+    "mtime": 1785786978.7586727,
+    "ast_hash": "fc95fadefe1f4af7ae466164d455b9e9",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/testing.md": {
@@ -380,8 +380,8 @@
     "semantic_hash": ""
   },
   "docs/PUBLIC-SURFACE-EVIDENCE.md": {
-    "mtime": 1785786434.506092,
-    "ast_hash": "ef53a7ed1c1bb1ca6c681af5cc81aa4f",
+    "mtime": 1785786978.7591753,
+    "ast_hash": "0c36f528d945969abc1c344d21b21141",
     "semantic_hash": ""
   },
   "docs/REDESIGN-PLAN.md": {
@@ -450,8 +450,8 @@
     "semantic_hash": ""
   },
   "docs/releases/v0.2.0.md": {
-    "mtime": 1785786025.6491137,
-    "ast_hash": "108f011254206e0c6ff8da30415bb7cd",
+    "mtime": 1785786978.7590063,
+    "ast_hash": "4735e40cb21cbf8d4ee6d1c3374783dd",
     "semantic_hash": ""
   },
   "docs/research/bedtime-game-evidence.md": {
@@ -465,7 +465,7 @@
     "semantic_hash": ""
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1785786446.1820946,
+    "mtime": 1785787005.0161998,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": ""
   },
@@ -480,8 +480,8 @@
     "semantic_hash": ""
   },
   "THIRD_PARTY_NOTICES.md": {
-    "mtime": 1785780338.9163885,
-    "ast_hash": "78fc4a834c39e655a52091edac621c2b",
+    "mtime": 1785786978.7565675,
+    "ast_hash": "fafa3c3eef1fac237af145701a2124ae",
     "semantic_hash": ""
   },
   "apps/site/public/licenses/geist-OFL-1.1.txt": {
@@ -500,13 +500,18 @@
     "semantic_hash": ""
   },
   "docs/QUIET-DEPTH-PLAN.md": {
-    "mtime": 1785784298.4331996,
-    "ast_hash": "951168922118a0502c3da911995ab675",
+    "mtime": 1785786860.3698936,
+    "ast_hash": "afdbd987f9fee77021f37af20034295f",
     "semantic_hash": ""
   },
   "docs/adr/0012-add-tonight-only-depth-and-image-drift.md": {
-    "mtime": 1785784298.4338362,
-    "ast_hash": "a89f5f67cb3657152614b69170ac916b",
+    "mtime": 1785786860.3706226,
+    "ast_hash": "b7493893f0083a589d8fc9d2131508c0",
+    "semantic_hash": ""
+  },
+  ".github/workflows/pages.yml": {
+    "mtime": 1785786983.954393,
+    "ast_hash": "30edd7fdaa58d4e1394d0c65bf9790dc",
     "semantic_hash": ""
   }
 }
