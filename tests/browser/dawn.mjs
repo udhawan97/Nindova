@@ -41,10 +41,8 @@ const completion = {
   dawnDate: "2026-08-03",
   timeZone: "America/Chicago",
   recipeVersion: 1,
-  startedAt: "2026-08-03T03:00:00.000Z",
   vista: "meadow",
   finalKind: "rabbit",
-  completedAt: "2026-08-03T03:45:00.000Z",
 };
 
 try {

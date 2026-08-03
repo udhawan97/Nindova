@@ -19,10 +19,9 @@ export interface NightRecipe {
   harborPaint: string;
 }
 
-export interface NightCompletion extends NightCapture {
+export interface NightCompletion extends Omit<NightCapture, "startedAt"> {
   vista: Vista;
   finalKind: string;
-  completedAt: string;
 }
 
 export interface NightState {
@@ -30,7 +29,7 @@ export interface NightState {
   lastCompleted: NightCompletion | null;
   meadowEcho: { nightId: string; kind: string } | null;
   harborEchoes: Array<{ nightId: string; kind: string }>;
-  tomorrowIntention: { nightId: string; heldAt: string } | null;
+  tomorrowIntention: { nightId: string } | null;
 }
 
 interface StorageLike {
@@ -166,9 +165,20 @@ interface StorageLike {
         isText(value.timeZone) &&
         value.recipeVersion === RECIPE_VERSION &&
         (value.vista === "meadow" || value.vista === "harbor") &&
-        (value.vista === "meadow" ? MEADOW_SPECIES : HARBOR_BOATS as readonly string[]).includes(value.finalKind) &&
-        isText(value.completedAt),
+        (value.vista === "meadow" ? MEADOW_SPECIES : HARBOR_BOATS as readonly string[]).includes(value.finalKind),
     );
+  }
+
+  function sanitizeCompletion(value: any): NightCompletion | null {
+    if (!validCompletion(value)) return null;
+    return {
+      nightId: value.nightId,
+      dawnDate: value.dawnDate,
+      timeZone: value.timeZone,
+      recipeVersion: value.recipeVersion,
+      vista: value.vista,
+      finalKind: value.finalKind,
+    };
   }
 
   function sanitizeEcho(value: any, kindKey: "kind", allowed: readonly string[]): { nightId: string; kind: string } | null {
@@ -178,14 +188,14 @@ interface StorageLike {
 
   function sanitizeState(value: any): NightState | null {
     if (!value || (value.version !== SCHEMA_VERSION && value.version !== 1)) return null;
-    const lastCompleted = value.lastCompleted === null ? null : validCompletion(value.lastCompleted) ? { ...value.lastCompleted } : null;
+    const lastCompleted = value.lastCompleted === null ? null : sanitizeCompletion(value.lastCompleted);
     const meadowEcho = sanitizeEcho(value.meadowEcho, "kind", MEADOW_SPECIES);
     const harborEchoes = Array.isArray(value.harborEchoes)
       ? value.harborEchoes.map((echo: any) => sanitizeEcho(echo, "kind", HARBOR_BOATS)).filter((echo: { nightId: string; kind: string } | null): echo is { nightId: string; kind: string } => Boolean(echo)).slice(-5)
       : [];
     const tomorrowIntention = value.version === SCHEMA_VERSION && value.tomorrowIntention
-      && isText(value.tomorrowIntention.nightId) && isText(value.tomorrowIntention.heldAt)
-      ? { nightId: value.tomorrowIntention.nightId, heldAt: value.tomorrowIntention.heldAt }
+      && isText(value.tomorrowIntention.nightId)
+      ? { nightId: value.tomorrowIntention.nightId }
       : null;
     return { version: SCHEMA_VERSION, lastCompleted, meadowEcho, harborEchoes, tomorrowIntention };
   }
@@ -209,7 +219,7 @@ interface StorageLike {
 
     const next = {
       version: SCHEMA_VERSION,
-      lastCompleted: { ...completion },
+      lastCompleted: sanitizeCompletion(completion)!,
       meadowEcho: state.meadowEcho,
       harborEchoes: [...state.harborEchoes],
       tomorrowIntention: null,
@@ -225,7 +235,13 @@ interface StorageLike {
   function readStorage(storage: StorageLike | null | undefined) {
     try {
       const current = storage?.getItem(STORAGE_KEY) ?? null;
-      if (current !== null) return decodeState(current);
+      if (current !== null) {
+        const decoded = decodeState(current);
+        if (!decoded.recovered && JSON.stringify(decoded.state) !== current) {
+          storage?.setItem(STORAGE_KEY, JSON.stringify(decoded.state));
+        }
+        return decoded;
+      }
       const legacy = storage?.getItem(LEGACY_STORAGE_KEY) ?? null;
       if (legacy === null) return decodeState(null);
       const migrated = decodeState(legacy);
@@ -250,16 +266,16 @@ interface StorageLike {
     }
   }
 
-  function setTomorrowIntention(current: unknown, nightId: string, heldAt = new Date().toISOString()) {
+  function setTomorrowIntention(current: unknown, nightId: string) {
     const state = sanitizeState(current) || emptyState();
-    if (!state.lastCompleted || state.lastCompleted.nightId !== nightId || !isText(heldAt)) {
+    if (!state.lastCompleted || state.lastCompleted.nightId !== nightId) {
       return { state, changed: false };
     }
     if (state.tomorrowIntention?.nightId === nightId) return { state, changed: false };
     return {
       state: {
         ...state,
-        tomorrowIntention: { nightId, heldAt },
+        tomorrowIntention: { nightId },
       },
       changed: true,
     };

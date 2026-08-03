@@ -144,10 +144,12 @@ function recordNightCompletion(){
   const finalKind=finalEntity?.kind
     ?? (vistaChoice==='meadow'?nightRecipe.meadowSpecies[0]:nightRecipe.harborBoats[0]);
   const completion={
-    ...activeNight,
+    nightId:activeNight.nightId,
+    dawnDate:activeNight.dawnDate,
+    timeZone:activeNight.timeZone,
+    recipeVersion:activeNight.recipeVersion,
     vista:vistaChoice,
-    finalKind,
-    completedAt:new Date().toISOString()
+    finalKind
   };
   const result=Night.completeState(nightMemory,completion);
   nightMemory=result.state;

@@ -145,6 +145,14 @@ try {
     ]);
   });
   assert.ok(refreshedPages.every((html) => html.includes("Nothing to win. Nothing tracked.")));
+  await page.evaluate(async () => {
+    const foreign = await caches.open("another-project-cache");
+    const collision = new Response("<!doctype html><title>foreign cache collision</title>", {
+      headers: { "content-type": "text/html" },
+    });
+    await foreign.put(new URL("./", location.href), collision.clone());
+    await foreign.put(new URL("index.html", location.href), collision);
+  });
 
   const legacyCompletion = {
     nightId: "2026-08-03|America/Chicago|r1",
@@ -169,6 +177,9 @@ try {
   await page.waitForFunction(() => Boolean(window.__ct));
   assert.deepEqual(await page.evaluate(() => window.__ct.localRecovery), { recovered: false, reason: "migrated" });
   assert.deepEqual(await page.evaluate(() => Object.keys(localStorage)), ["nindova:night-state:v2"]);
+  const migratedRaw = await page.evaluate(() => localStorage.getItem(NindovaNight.STORAGE_KEY));
+  assert.equal(migratedRaw.includes("startedAt"), false);
+  assert.equal(migratedRaw.includes("completedAt"), false);
 
   await page.evaluate(() => localStorage.setItem(NindovaNight.STORAGE_KEY, "{broken"));
   await page.reload();
@@ -199,10 +210,12 @@ try {
   assert.equal(await page.evaluate(() => window.__ct.state), "end");
   const completionMemory = await page.evaluate(() => window.__ct.memory);
   assert.ok(completionMemory.lastCompleted?.nightId);
+  assert.equal(JSON.stringify(completionMemory).includes("At"), false);
 
   await page.click("#tomorrowBtn");
   const heldMemory = await page.evaluate(() => window.__ct.memory);
   assert.equal(heldMemory.tomorrowIntention.nightId, heldMemory.lastCompleted.nightId);
+  assert.equal(await page.evaluate(() => localStorage.getItem(NindovaNight.STORAGE_KEY).includes("At")), false);
   assert.equal(await page.locator("#tomorrowBtn").isDisabled(), true);
   assert.equal(await page.evaluate(() => globalThis.__notificationRequests), 0);
 

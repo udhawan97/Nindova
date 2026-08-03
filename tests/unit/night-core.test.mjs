@@ -79,10 +79,8 @@ function completion(nightId, vista, finalKind) {
     dawnDate: nightId.slice(0, 10),
     timeZone: "America/Chicago",
     recipeVersion: 1,
-    startedAt: `${nightId.slice(0, 10)}T02:00:00.000Z`,
     vista,
     finalKind,
-    completedAt: `${nightId.slice(0, 10)}T03:00:00.000Z`,
   };
 }
 
@@ -100,7 +98,11 @@ test("same-night completion is idempotent and meadow keeps one Echo", () => {
 test("v1 state migrates once and keeps its bounded memory", () => {
   const legacy = {
     version: 1,
-    lastCompleted: completion("2026-08-03-a", "meadow", "rabbit"),
+    lastCompleted: {
+      ...completion("2026-08-03-a", "meadow", "rabbit"),
+      startedAt: "2026-08-03T02:00:00.000Z",
+      completedAt: "2026-08-03T03:00:00.000Z",
+    },
     meadowEcho: { nightId: "2026-08-03-a", kind: "rabbit" },
     harborEchoes: [],
   };
@@ -116,6 +118,33 @@ test("v1 state migrates once and keeps its bounded memory", () => {
   assert.deepEqual(result.state.meadowEcho, legacy.meadowEcho);
   assert.equal(values.has(Night.LEGACY_STORAGE_KEY), false);
   assert.equal(values.has(Night.STORAGE_KEY), true);
+  assert.equal(values.get(Night.STORAGE_KEY).includes("startedAt"), false);
+  assert.equal(values.get(Night.STORAGE_KEY).includes("completedAt"), false);
+});
+
+test("current state sanitization removes persisted interaction timestamps", () => {
+  const raw = {
+    version: 2,
+    lastCompleted: {
+      ...completion("2026-08-03-a", "meadow", "rabbit"),
+      startedAt: "2026-08-03T02:00:00.000Z",
+      completedAt: "2026-08-03T03:00:00.000Z",
+    },
+    meadowEcho: null,
+    harborEchoes: [],
+    tomorrowIntention: { nightId: "2026-08-03-a", heldAt: "2026-08-03T03:05:00.000Z" },
+  };
+  const values = new Map([[Night.STORAGE_KEY, JSON.stringify(raw)]]);
+  const storage = {
+    getItem(key) { return values.get(key) ?? null; },
+    setItem(key, value) { values.set(key, value); },
+  };
+  const result = Night.readStorage(storage);
+  assert.deepEqual(result.state.tomorrowIntention, { nightId: "2026-08-03-a" });
+  const persisted = values.get(Night.STORAGE_KEY);
+  assert.equal(persisted.includes("startedAt"), false);
+  assert.equal(persisted.includes("completedAt"), false);
+  assert.equal(persisted.includes("heldAt"), false);
 });
 
 test("tomorrow intention is quiet, completion-bound, and idempotent", () => {
@@ -123,13 +152,12 @@ test("tomorrow intention is quiet, completion-bound, and idempotent", () => {
     Night.emptyState(),
     completion("2026-08-03-a", "meadow", "rabbit"),
   ).state;
-  const rejected = Night.setTomorrowIntention(completed, "another-night", "2026-08-03T03:05:00.000Z");
+  const rejected = Night.setTomorrowIntention(completed, "another-night");
   assert.equal(rejected.changed, false);
-  const held = Night.setTomorrowIntention(completed, "2026-08-03-a", "2026-08-03T03:05:00.000Z");
+  const held = Night.setTomorrowIntention(completed, "2026-08-03-a");
   assert.equal(held.changed, true);
   assert.deepEqual(held.state.tomorrowIntention, {
     nightId: "2026-08-03-a",
-    heldAt: "2026-08-03T03:05:00.000Z",
   });
   assert.equal(Night.setTomorrowIntention(held.state, "2026-08-03-a").changed, false);
   const next = Night.completeState(held.state, completion("2026-08-04-b", "harbor", "skiff")).state;

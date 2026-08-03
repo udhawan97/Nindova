@@ -18,11 +18,17 @@ function canonicalPrecacheUrl(request) {
   return PRECACHE_URLS.has(url.href) ? url.href : null;
 }
 
+async function matchOwned(request) {
+  if (!request) return undefined;
+  const cache = await caches.open(CACHE_NAME);
+  return cache.match(request);
+}
+
 async function refreshFromNetwork(request) {
   const response = await fetch(request);
   const cacheUrl = canonicalPrecacheUrl(request);
   if (cacheUrl && !response.ok) {
-    const cached = await caches.match(cacheUrl);
+    const cached = await matchOwned(cacheUrl);
     if (cached) return cached;
   }
   if (cacheUrl && response.ok) {
@@ -60,12 +66,12 @@ self.addEventListener("fetch", (event) => {
 
   if (request.mode === "navigate") {
     event.respondWith(refreshFromNetwork(request).catch(async () => (
-      await caches.match(canonicalPrecacheUrl(request)) || caches.match("./index.html")
+      await matchOwned(canonicalPrecacheUrl(request)) || matchOwned("./index.html")
     )));
     return;
   }
 
   const cacheUrl = canonicalPrecacheUrl(request);
   if (!cacheUrl) return;
-  event.respondWith(refreshFromNetwork(request).catch(() => caches.match(cacheUrl)));
+  event.respondWith(refreshFromNetwork(request).catch(() => matchOwned(cacheUrl)));
 });
