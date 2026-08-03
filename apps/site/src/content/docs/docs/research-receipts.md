@@ -37,7 +37,7 @@ The [CDC sleep-duration table](https://www.cdc.gov/sleep/about/index.html) lists
 
 ## Rankings and retention
 
-Experiments use leaderboards to create social comparison and increase intended behavior, while streak and uncertain-reward mechanics are designed to increase persistence. The evidence review also found a small clinical case series in which sleep-tracker metrics intensified preoccupation with sleep.
+[Zhang, van Horen & Zeelenberg (2021)](https://pmc.ncbi.nlm.nih.gov/articles/PMC8046219/) used leaderboards to induce social comparison and increase intended behavior. [Mehr et al. (2025)](https://doi.org/10.1016/j.obhdp.2025.104391) studied streak incentives as a persistence mechanism, while [Shen, Fishbach & Hsee (2015)](https://doi.org/10.1086/679418) found that reward uncertainty increased invested time, effort, or money under specified conditions. A three-patient clinical case series by [Baron et al. (2017)](https://pmc.ncbi.nlm.nih.gov/articles/PMC5263088/) described sleep-tracker metrics intensifying preoccupation or unhelpful efforts to perfect sleep.
 
 **Design inference:** offer Gentle and Deeper as equal tonight-only preferences, but add no weekly ranking, performance history, streak, personal best, sleep score, or improvement claim.
 
@@ -45,7 +45,7 @@ Experiments use leaderboards to create social comparison and increase intended b
 
 ## Image Drift
 
-A small one-night experiment found favorable self-reported results from pleasant imagery distraction in people with insomnia, while a broader review found that pre-sleep cognitive manipulations can help, do nothing, or harm.
+A small one-night experiment by [Harvey & Payne (2002)](https://pubmed.ncbi.nlm.nih.gov/11863237/) found favorable self-reported results from pleasant imagery distraction in 41 people with insomnia. A broader review by [Lemyre et al. (2020)](https://doi.org/10.1016/j.smrv.2019.101253) found that pre-sleep cognitive manipulations can help, do nothing, or harm.
 
 **Design inference:** optional Rasoi Image Drift presents three familiar board forms and then moves attention away from the screen. It is response-free, skippable, and never auto-started.
 

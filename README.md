@@ -9,10 +9,10 @@ Nindova is a calm, bounded pair-removal game for the end of the day. **Masala Mo
 ## Get Nindova
 
 - [Download v0.2.0](https://github.com/udhawan97/Nindova/releases/tag/v0.2.0) for the checksummed self-contained HTML file and complete web/PWA archive, or build the same source locally.
-- The direct, non-tracking QR targets `https://udhawan97.github.io/Nindova/play/`. This source release does not configure or claim public hosting; the route and a physical-device scan remain a separate verification lane.
+- The direct, non-tracking QR targets `https://udhawan97.github.io/Nindova/play/`. The pinned GitHub Pages workflow publishes the same static build from `main`; live-route and physical-device verification remain separate evidence lanes.
 - [Open the release history](https://github.com/udhawan97/Nindova/releases) for the previous flat-rack build and its checksums.
 
-Until public hosting is separately configured and observed, `/play/` works after serving a local build and `dist/nindova.html` works as a self-contained file.
+The local `/play/` route works after serving a build, and `dist/nindova.html` works as a self-contained file even when hosting is unavailable.
 
 <img src="./apps/site/public/play-qr.svg" width="180" alt="Direct QR for the canonical Nindova play URL">
 

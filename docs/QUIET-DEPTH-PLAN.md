@@ -57,7 +57,7 @@ If a qualifying Deeper geometry cannot be authored and verified, the release blo
 
 The existing **brass bloom** remains predictable confirmation:
 
-- one fixed, low-amplitude 400 ms inward settle and dim ring;
+- one brief, fixed, low-amplitude inward settle and dim ring (420 ms presentation, 460 ms cleanup);
 - one optional, locally synthesized tone family, off by default;
 - synchronous engine removal that never waits for presentation;
 - an opacity-only reduced-motion fallback; and
@@ -117,4 +117,3 @@ The public site and documentation may include one optional, calm, paraphrased sl
 - Source, notices, citations, corresponding artifacts, and checksums come from the exact final `main` SHA.
 - Graphify is incrementally refreshed and one scoped query succeeds before publication.
 - Release version is selected from current tag/release inventory rather than presumed.
-

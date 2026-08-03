@@ -22,7 +22,7 @@
 - Same-tab active state accepts only a known profile, complete Night capture, exact capture-bound boundary times, reachable legal removal history, and possible phase/reason combination. Future/corrupt records fail open, rollback cannot defeat the monotonic boundary, and reload during settlement resumes closure instead of restoring a dead board. The profile is ephemeral and never becomes long-lived history.
 - The runtime contains no analytics, account, advertising, remote-logging, or third-party request code. Browser request capture remains same-origin.
 - Sleep education stays outside the nightly Session, paraphrases CDC and NIH/NHLBI guidance, and links directly to those public sources. It does not infer a personal need, score sleep, or claim Nindova changes sleep or memory.
-- Runtime sound, animation, imagery, icons, and board geometry are locally authored with browser primitives. No paid API, free-tier service, new package, third-party runtime asset, or remote resource was introduced; existing Apache-2.0 and OFL notices remain public.
+- Runtime sound, animation, imagery, icons, and board geometry are locally authored with browser primitives. No paid API, free-tier service, new runtime package, third-party runtime asset, or remote resource was introduced; pinned QR/PNG build-test dependencies and existing Apache-2.0/OFL materials are named in the public notice.
 
 ## Untested risk
 
@@ -30,4 +30,4 @@
 - Installed Safari and broader Android PWA behavior.
 - Human Punjabi cultural-authenticity review.
 - Human evidence that Masala Mound feels calm, legible, sleep-compatible, or improves general memory. No sleep, memory, or dopamine outcome is claimed.
-- Public deployment and real-device QR scanning. The canonical `/play/` URL returned HTTP 404 when checked on 2026-08-03; hosting is not configured by this source release.
+- Public deployment and real-device QR scanning. The canonical `/play/` URL returned HTTP 404 before the pinned GitHub Pages workflow was enabled; live-route proof must replace this note after the final `main` deployment is observed.

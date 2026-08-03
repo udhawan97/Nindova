@@ -27,7 +27,7 @@ npm run preview
 
 The root `dist/` contains the landing page, `/docs/`, `/play/`, and `nindova.html`. Open `http://127.0.0.1:4173/play/` for the installable PWA. After one online load, its static shell can reopen offline.
 
-The build also generates a direct QR for `https://udhawan97.github.io/Nindova/play/`. This source release does not configure or claim public hosting; the live URL and a physical-device scan remain separate verification lanes.
+The build also generates a direct QR for `https://udhawan97.github.io/Nindova/play/`. The pinned GitHub Pages workflow publishes the same static build from `main`; live URL and physical-device scanning remain separate verification lanes.
 
 ## Verify
 
