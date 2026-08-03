@@ -31,6 +31,7 @@ export default defineConfig({
             { label: "Getting started", slug: "docs/getting-started" },
             { label: "Product contract", slug: "docs/product-contract" },
             { label: "Night and local state", slug: "docs/night-and-local-state" },
+            { label: "Dawn", slug: "docs/dawn" },
             { label: "Accessibility", slug: "docs/accessibility" },
           ],
         },

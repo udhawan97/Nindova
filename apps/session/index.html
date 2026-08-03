@@ -25,6 +25,8 @@
   #intake .card{margin:auto;}
   #endCard{align-items:center;justify-content:flex-start;}
   #endCard .card{padding-block:24px;}
+  #dawnCard{align-items:center;justify-content:flex-start;background:linear-gradient(180deg,#1b2941,#69462c 58%,#b77a38);}
+  #dawnCard .card{max-width:760px;padding-block:24px;}
   h1{font-weight:normal;font-size:clamp(26px,4.5vw,40px);letter-spacing:.04em;color:var(--ink);}
   .kicker{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:14px;}
   .prompt{font-size:clamp(16px,2.4vw,20px);color:var(--ink);margin:26px 0 18px;font-style:italic;}
@@ -76,6 +78,12 @@
   .btn-ghost{background:rgba(216,180,130,.1);border:1px solid rgba(216,180,130,.28);color:var(--ink);padding:10px 22px;}
   .btn-ghost:hover{background:rgba(216,180,130,.2);}
   .disclaimer{margin-top:24px;font-size:11.5px;color:rgba(160,140,115,.55);line-height:1.7;max-width:520px;margin-left:auto;margin-right:auto;}
+  #dawnCanvas{display:block;width:100%;height:auto;margin:18px auto;border:1px solid rgba(255,221,166,.3);border-radius:8px;background:#b77a38;}
+  #dawnBtn{display:block;margin:12px auto 0;}
+  .dawn-intro{max-width:46ch;margin:10px auto 0;color:#f2dfbe;line-height:1.5;}
+  .dawn-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:16px;}
+  #dawnVideo{display:block;width:min(100%,560px);margin:18px auto 0;border-radius:8px;background:#101725;}
+  #dawnStatus{min-height:1.6em;margin:12px auto 0;color:#f2dfbe;font-style:italic;}
   /* soft hint text drawn over canvas */
   #hint{position:fixed;left:50%;bottom:5.5%;transform:translateX(-50%);font-style:italic;
     font-size:15px;color:rgba(232,217,192,.0);transition:color 2s ease;pointer-events:none;z-index:5;letter-spacing:.03em;}
@@ -149,6 +157,7 @@
     <h1>Nindova</h1>
     <div class="prompt">The day is still on the desk.</div>
     <button class="btn-begin" id="beginBtn">Enter</button>
+    <button class="btn-ghost" id="dawnBtn" type="button" hidden>Open Dawn</button>
     <div class="footnote">Nothing to win. Nothing tracked. Nothing you can do wrong.</div>
   </div>
 </div>
@@ -180,7 +189,30 @@
   </div>
 </div>
 
+<!-- DAWN -->
+<div class="overlay hidden" id="dawnCard" aria-hidden="true">
+  <div class="card">
+    <div class="kicker">morning · local to this device</div>
+    <h1>Dawn</h1>
+    <p class="dawn-intro">Last night’s Vista, held at first light. Keep it only if you want to.</p>
+    <canvas id="dawnCanvas" width="1200" height="750" role="img" aria-label="Last night’s Vista rendered at first light."></canvas>
+    <div class="dawn-actions">
+      <button class="btn-ghost" id="saveStillBtn" type="button">Save still</button>
+      <button class="btn-ghost" id="shareStillBtn" type="button">Share still</button>
+      <button class="btn-ghost" id="makeLoopBtn" type="button">Make silent 3-second loop</button>
+      <button class="btn-ghost" id="closeDawnBtn" type="button">Back to the room</button>
+    </div>
+    <video id="dawnVideo" muted loop playsinline controls hidden></video>
+    <div class="dawn-actions" id="loopActions" hidden>
+      <button class="btn-ghost" id="saveLoopBtn" type="button">Save loop</button>
+      <button class="btn-ghost" id="shareLoopBtn" type="button">Share loop</button>
+    </div>
+    <p id="dawnStatus" role="status" aria-live="polite"></p>
+  </div>
+</div>
+
 <script src="./night-core.js"></script>
+<script src="./dawn-core.js"></script>
 <script>
 'use strict';
 /* ============================================================
@@ -287,6 +319,12 @@ const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
 let reduceMotion = motionPreference.matches;
 const Night=globalThis.NindovaNight;
 if(!Night) throw new Error('Nindova night core did not load');
+const Dawn=globalThis.NindovaDawn;
+if(!Dawn) throw new Error('Nindova Dawn core did not load');
+const dawnNowParameter=reviewerMode?new URLSearchParams(location.search).get('dawnNow'):null;
+let dawnNowOverride=dawnNowParameter?new Date(dawnNowParameter):null;
+if(dawnNowOverride&&Number.isNaN(dawnNowOverride.getTime())) dawnNowOverride=null;
+const dawnNow=()=>dawnNowOverride??new Date();
 let activeNight=null;
 let nightRecipe=Night.recipeForNight('nindova-preview|r1');
 let nightStorage=null;
@@ -316,6 +354,7 @@ function recordNightCompletion(){
   const result=Night.completeState(nightMemory,completion);
   nightMemory=result.state;
   if(result.changed) Night.writeStorage(nightStorage,nightMemory);
+  refreshDawnAvailability();
   return result.changed;
 }
 
@@ -351,10 +390,13 @@ const SPRITE_CELLS={
   tortoise:[0,2], rabbit:[1,2], skiff:[2,2], tug:[3,2]
 };
 function drawFocalSprite(kind,x,y,w,h){
+  return drawFocalSpriteOn(ctx,kind,x,y,w,h);
+}
+function drawFocalSpriteOn(targetContext,kind,x,y,w,h){
   const cell=SPRITE_CELLS[kind];
   if(!cell||!FOCAL_SPRITES.complete||!FOCAL_SPRITES.naturalWidth) return false;
   const sw=FOCAL_SPRITES.naturalWidth/4, sh=FOCAL_SPRITES.naturalHeight/3;
-  ctx.drawImage(FOCAL_SPRITES,cell[0]*sw,cell[1]*sh,sw,sh,x,y,w,h);
+  targetContext.drawImage(FOCAL_SPRITES,cell[0]*sw,cell[1]*sh,sw,sh,x,y,w,h);
   return true;
 }
 
@@ -1605,6 +1647,156 @@ const semanticNameForm=document.getElementById('semanticNameForm');
 const semanticNameInput=document.getElementById('semanticNameInput');
 const srStatus=document.getElementById('srStatus');
 let semanticRenderKey='', semanticNamingObjectId=null;
+const dawnBtn=document.getElementById('dawnBtn');
+const dawnCard=document.getElementById('dawnCard');
+const dawnCanvas=document.getElementById('dawnCanvas');
+const dawnContext=dawnCanvas.getContext('2d');
+const dawnStatus=document.getElementById('dawnStatus');
+const dawnVideo=document.getElementById('dawnVideo');
+const loopActions=document.getElementById('loopActions');
+let dawnStillBlob=null, dawnLoop=null, dawnLoopLease=null, forceLoopUnsupported=false;
+
+function refreshDawnAvailability(){
+  nightRead=Night.readStorage(nightStorage);
+  nightMemory=nightRead.state;
+  const result=Dawn.eligibility(nightMemory.lastCompleted,dawnNow());
+  dawnBtn.hidden=!result.available;
+  dawnBtn.setAttribute('aria-label',result.available?'Open last night’s Dawn':'Dawn is not available');
+  return result;
+}
+
+function drawDawnScene(progress=0){
+  const completion=nightMemory.lastCompleted;
+  if(!completion) return;
+  const recipe=Night.recipeForNight(completion.nightId);
+  const motion=reduceMotion?0:Math.sin(progress*Math.PI*2);
+  const d=dawnContext;
+  d.clearRect(0,0,1200,750);
+  const sky=d.createLinearGradient(0,0,0,750);
+  sky.addColorStop(0,'#4d6f91'); sky.addColorStop(.46,'#d29a5a'); sky.addColorStop(1,'#f0c46f');
+  d.fillStyle=sky; d.fillRect(0,0,1200,750);
+  const sunX=890, sunY=160-motion*3;
+  const halo=d.createRadialGradient(sunX,sunY,18,sunX,sunY,180);
+  halo.addColorStop(0,'rgba(255,238,174,.86)'); halo.addColorStop(1,'rgba(255,211,112,0)');
+  d.fillStyle=halo; d.fillRect(sunX-190,sunY-190,380,380);
+  d.fillStyle='#ffe6a0'; d.beginPath(); d.arc(sunX,sunY,42,0,7); d.fill();
+
+  if(completion.vista==='meadow'){
+    d.fillStyle='#7d803c'; d.beginPath(); d.moveTo(0,470); d.quadraticCurveTo(310,390,650,475); d.quadraticCurveTo(930,525,1200,430); d.lineTo(1200,750); d.lineTo(0,750); d.fill();
+    d.fillStyle='#5e632f'; d.beginPath(); d.moveTo(0,570); d.quadraticCurveTo(430,500,790,590); d.quadraticCurveTo(1030,625,1200,560); d.lineTo(1200,750); d.lineTo(0,750); d.fill();
+    const flower={marigold:'#d49e28',saffron:'#c97826',wheat:'#d2b56d'}[recipe.meadowAccent]??'#d49e28';
+    for(let index=0;index<92;index++){
+      const x=rnd2(index*13+7,18,1182), y=rnd2(index*19+5,545,735), h=rnd2(index*23+3,12,34);
+      d.strokeStyle='rgba(66,81,36,.72)'; d.lineWidth=2; d.beginPath(); d.moveTo(x,y); d.lineTo(x,y-h); d.stroke();
+      d.fillStyle=flower; d.beginPath(); d.arc(x,y-h,3.4,0,7); d.fill();
+    }
+    d.strokeStyle='#4d351f'; d.lineWidth=9; d.beginPath(); d.moveTo(720,650); d.lineTo(730,525); d.moveTo(770,650); d.lineTo(760,525); d.moveTo(660,555); d.lineTo(820,548); d.moveTo(660,600); d.lineTo(820,592); d.stroke();
+    drawFocalSpriteOn(d,completion.finalKind,790,485+motion*2,150,150);
+  } else {
+    const water=d.createLinearGradient(0,440,0,750); water.addColorStop(0,'#557b8b'); water.addColorStop(1,'#294e65');
+    d.fillStyle=water; d.fillRect(0,440,1200,310);
+    d.fillStyle='#8e7457';
+    for(let index=0;index<6;index++) d.fillRect(0,440+index*34,320-index*34,25);
+    d.strokeStyle='rgba(245,215,150,.25)'; d.lineWidth=3;
+    for(let index=0;index<9;index++){
+      const y=485+index*27+motion*(index%2?2:-2); d.beginPath(); d.moveTo(250,y); d.quadraticCurveTo(650,y-8,1180,y+3); d.stroke();
+    }
+    nightMemory.harborEchoes.forEach((echo,index,list)=>{
+      d.save(); d.globalAlpha=.18+.48*((index+1)/list.length);
+      drawFocalSpriteOn(d,echo.kind,570+index*92,500+index*20+motion*2,150,118);
+      d.restore();
+    });
+    if(!nightMemory.harborEchoes.length) drawFocalSpriteOn(d,completion.finalKind,770,505+motion*2,170,132);
+  }
+
+  // restrained phulkari edge, part of the picture rather than a badge
+  d.strokeStyle='rgba(111,32,37,.72)'; d.lineWidth=6; d.strokeRect(14,14,1172,722);
+  d.strokeStyle='rgba(236,177,54,.82)'; d.lineWidth=3;
+  for(let x=34;x<1170;x+=42){
+    d.beginPath(); d.moveTo(x,26); d.lineTo(x+10,36); d.lineTo(x+20,26); d.lineTo(x+10,16); d.closePath(); d.stroke();
+  }
+}
+
+function downloadDawnBlob(blob,filename){
+  const lease=Dawn.leaseUrl(blob);
+  const link=document.createElement('a');
+  link.href=lease.url; link.download=filename; link.hidden=true;
+  document.body.appendChild(link); link.click(); link.remove();
+  setTimeout(()=>lease.revoke(),0);
+}
+
+async function ensureDawnStill(){
+  if(!dawnStillBlob){ drawDawnScene(0); dawnStillBlob=await Dawn.stillBlob(dawnCanvas); }
+  return dawnStillBlob;
+}
+
+async function openDawn(){
+  if(!refreshDawnAvailability().available) return false;
+  if(!FOCAL_SPRITES.complete||!FOCAL_SPRITES.naturalWidth) await FOCAL_SPRITES.decode().catch(()=>{});
+  dawnStillBlob=null; dawnStatus.textContent='';
+  drawDawnScene(0);
+  document.querySelector('.toggles').hidden=true;
+  dawnCard.classList.remove('hidden'); dawnCard.setAttribute('aria-hidden','false');
+  const intake=document.getElementById('intake');
+  intake.classList.add('hidden'); intake.setAttribute('aria-hidden','true');
+  document.getElementById('closeDawnBtn').focus({preventScroll:true});
+  return true;
+}
+
+function closeDawn(){
+  dawnLoopLease?.revoke(); dawnLoopLease=null; dawnLoop=null;
+  dawnVideo.pause(); dawnVideo.removeAttribute('src'); dawnVideo.load(); dawnVideo.hidden=true;
+  loopActions.hidden=true; dawnStatus.textContent='';
+  dawnCard.classList.add('hidden'); dawnCard.setAttribute('aria-hidden','true');
+  document.querySelector('.toggles').hidden=false;
+  const intake=document.getElementById('intake');
+  intake.classList.remove('hidden'); intake.setAttribute('aria-hidden','false');
+  dawnBtn.focus({preventScroll:true});
+}
+
+dawnBtn.addEventListener('click',()=>openDawn());
+document.getElementById('closeDawnBtn').addEventListener('click',closeDawn);
+document.getElementById('saveStillBtn').addEventListener('click',async()=>{
+  try{
+    const blob=await ensureDawnStill();
+    downloadDawnBlob(blob,`nindova-dawn-${nightMemory.lastCompleted.dawnDate}.png`);
+    dawnStatus.textContent='The still was prepared for saving.';
+  }catch{ dawnStatus.textContent='The still could not be prepared. Dawn is still here.'; }
+});
+document.getElementById('shareStillBtn').addEventListener('click',async()=>{
+  try{
+    const blob=await ensureDawnStill();
+    const result=await Dawn.shareBlob(blob,`nindova-dawn-${nightMemory.lastCompleted.dawnDate}.png`,'Nindova Dawn');
+    dawnStatus.textContent=result==='shared'?'Shared.':result==='cancelled'?'Share cancelled. Dawn is still here.':'Sharing files is not available here. You can save the still instead.';
+  }catch{ dawnStatus.textContent='Sharing did not finish. Dawn is still here.'; }
+});
+document.getElementById('makeLoopBtn').addEventListener('click',async event=>{
+  const button=event.currentTarget; button.disabled=true; dawnStatus.textContent='Making the quiet loop…';
+  try{
+    if(forceLoopUnsupported) throw new Error('loop-export-unsupported');
+    dawnLoop=await Dawn.recordLoop(dawnCanvas,progress=>drawDawnScene(progress));
+    dawnLoopLease?.revoke(); dawnLoopLease=Dawn.leaseUrl(dawnLoop.blob);
+    dawnVideo.src=dawnLoopLease.url; dawnVideo.hidden=false; loopActions.hidden=false;
+    await dawnVideo.play().catch(()=>{});
+    dawnStatus.textContent='The silent three-second loop is ready.';
+  }catch{
+    drawDawnScene(0);
+    dawnStatus.textContent='This browser could not make the loop. The still is ready.';
+  }finally{ button.disabled=false; }
+});
+document.getElementById('saveLoopBtn').addEventListener('click',()=>{
+  if(!dawnLoop) return;
+  downloadDawnBlob(dawnLoop.blob,`nindova-dawn-${nightMemory.lastCompleted.dawnDate}.${dawnLoop.extension}`);
+  dawnStatus.textContent='The loop was prepared for saving.';
+});
+document.getElementById('shareLoopBtn').addEventListener('click',async()=>{
+  if(!dawnLoop) return;
+  try{
+    const result=await Dawn.shareBlob(dawnLoop.blob,`nindova-dawn-${nightMemory.lastCompleted.dawnDate}.${dawnLoop.extension}`,'Nindova Dawn');
+    dawnStatus.textContent=result==='shared'?'Shared.':result==='cancelled'?'Share cancelled. Dawn is still here.':'Sharing files is not available here. You can save the loop instead.';
+  }catch{ dawnStatus.textContent='Sharing did not finish. Dawn is still here.'; }
+});
+addEventListener('pagehide',()=>dawnLoopLease?.revoke());
 
 const STATE_LABELS={
   intake:'The Session has not begun.',
@@ -2068,6 +2260,7 @@ addEventListener('blur',()=>{
 });
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden&&(pointer.down||dragObj)) releasePointer(true);
+  if(!document.hidden) refreshDawnAvailability();
 });
 
 /* ---------------- entry ---------------- */
@@ -2099,6 +2292,7 @@ document.getElementById('reviewEvidence').hidden=!reviewerMode;
 document.getElementById('reviewActions').hidden=!reviewerMode;
 setPace(paceKey);
 setMuted(muted);
+refreshDawnAvailability();
 
 function restart(){
   const endCard=document.getElementById('endCard');
@@ -2159,6 +2353,9 @@ window.__ct = {
   get recipe(){ return {...nightRecipe,objectKinds:[...nightRecipe.objectKinds],meadowSpecies:[...nightRecipe.meadowSpecies],harborBoats:[...nightRecipe.harborBoats]}; },
   get memory(){ return JSON.parse(JSON.stringify(nightMemory)); },
   get localRecovery(){ return {recovered:nightRead.recovered,reason:nightRead.reason}; },
+  get dawnEligibility(){ return Dawn.eligibility(nightMemory.lastCompleted,dawnNow()); },
+  get dawnLoopType(){ return forceLoopUnsupported?null:Dawn.chooseLoopType(); },
+  get dawnLoop(){ return dawnLoop?{type:dawnLoop.type,extension:dawnLoop.extension,durationMs:dawnLoop.durationMs,size:dawnLoop.blob.size}:null; },
   toScreen(x,y){ return {x:x*scaleF+offX, y:y*scaleF+offY}; },
   lightLamp(){ if(STATE==='arrive') lightLamp(); },
   nameObject(i,text){ const o=objects[i]; if(o){ o.label=text; o.labelSetT=playT; o.labelA=1; } },
@@ -2180,6 +2377,14 @@ window.__ct = {
   sampleAssistance(value){ return assistanceEnvelope(value); },
   sampleLightBudget(value){ return lightBudgetAt(value); },
   recipeForNight(nightId){ return Night.recipeForNight(nightId); },
+  setDawnNow(instant){
+    if(!reviewerMode) return false;
+    const value=new Date(instant);
+    if(Number.isNaN(value.getTime())) return false;
+    dawnNowOverride=value; refreshDawnAvailability(); return true;
+  },
+  setLoopUnsupported(value){ if(reviewerMode){ forceLoopUnsupported=Boolean(value); return true; } return false; },
+  openDawn(){ return openDawn(); },
   advanceBy(seconds){
     if(!reviewerMode||!Number.isFinite(seconds)||seconds<0) return false;
     const steps=Math.ceil(seconds/.05);

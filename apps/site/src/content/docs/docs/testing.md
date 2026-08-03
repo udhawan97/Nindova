@@ -21,6 +21,8 @@ Nindova distinguishes three evidence levels:
 
 `npm run test:night` checks browser parity with fixed PRNG recipes, corrupt local-state recovery, recipe-to-object rendering, completion persistence, one meadow Echo, and idempotent same-night replay. Unit vectors separately cover the local-noon boundary, DST fallback, two IANA zones, bounded harbor memory, and unavailable storage.
 
+`npm run test:dawn` builds and serves the production surface, then verifies missing/before-window/valid/noon/skipped/corrupt eligibility; rendered first light; a downloaded PNG; cancelled sharing; unsupported clip encoding; an actual silent 3000 ms browser loop; and preview URL cleanup. Unit vectors pin Chicago and Kolkata zone evaluation and the 06:00–11:59 boundary.
+
 ## Build gates
 
 ```sh
@@ -30,6 +32,7 @@ npm run test:arc
 npm run test:portrait
 npm run test:self-closing
 npm run test:night
+npm run test:dawn
 npm run build
 ```
 

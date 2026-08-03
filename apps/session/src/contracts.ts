@@ -87,6 +87,9 @@ export interface ClosingTimeDebug {
     harborEchoes: ReadonlyArray<Record<string, unknown>>;
   };
   readonly localRecovery: { recovered: boolean; reason: string };
+  readonly dawnEligibility: { available: boolean; reason: string };
+  readonly dawnLoopType: string | null;
+  readonly dawnLoop: null | { type: string; extension: string; durationMs: number; size: number };
   toScreen(x: number, y: number): { x: number; y: number };
   lightLamp(): void;
   nameObject(index: number, text: string): void;
@@ -101,6 +104,9 @@ export interface ClosingTimeDebug {
   sampleAssistance(decay: number): ClosingTimeDebug["assistance"];
   sampleLightBudget(progress: number): Pick<ClosingTimeDebug["light"], "progress" | "meanBudget" | "peakBudget">;
   recipeForNight(nightId: string): ClosingTimeDebug["recipe"];
+  setDawnNow(instant: string): boolean;
+  setLoopUnsupported(value: boolean): boolean;
+  openDawn(): Promise<boolean>;
   advanceBy(seconds: number): boolean;
 }
 
