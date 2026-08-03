@@ -322,7 +322,7 @@ let pointer={x:0,y:0,down:false};
 let wipeProg=0, lastWipe=null, motes=[];
 let signSwing=0, signHot=false, signDone=false;
 let darkT=0;
-let sessionStarted=false, sessionStartedAt=0, sessionElapsed=0, stateElapsed=0, clockState=STATE;
+let sessionStarted=false, sessionDeadlineAt=0, sessionElapsed=0, stateElapsed=0, clockState=STATE;
 let lastAutoStoreAt=-Infinity, capClosing=false;
 let wipePending=false, wipePendingT=0, signCloseT=0, namingOpenedAt=0, endReason='completed';
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
@@ -2016,9 +2016,10 @@ function update(dt,t){
   else stateElapsed+=dt;
 
   if(sessionStarted&&STATE!=='end'){
-    const wallElapsed=(performance.now()-sessionStartedAt)/1000;
-    sessionElapsed=Math.max(sessionElapsed+dt,wallElapsed);
-    const remaining=pace().hardCap-sessionElapsed;
+    const remaining=reviewerMode
+      ? pace().hardCap-(sessionElapsed+=dt)
+      : (sessionDeadlineAt-Date.now())/1000;
+    if(!reviewerMode) sessionElapsed=clamp(pace().hardCap-Math.max(remaining,0),0,pace().hardCap);
     if(remaining<=0){ showEnd('production-cap'); return; }
     if(remaining<=26) forceTowardEnd();
   }
@@ -2300,7 +2301,7 @@ beginBtn.onclick=()=>{
   const intake=document.getElementById('intake');
   intake.classList.add('hidden');
   intake.setAttribute('aria-hidden','true');
-  sessionStarted=true; sessionStartedAt=performance.now(); sessionElapsed=0;
+  sessionStarted=true; sessionDeadlineAt=Date.now()+pace().hardCap*1000; sessionElapsed=0;
   beginArrive();
 };
 
@@ -2342,7 +2343,7 @@ function restart(){
   approachT=0; vistaT=0; driftT=0; returnT=0; vistaFade=0; vistaCloseT=0;
   entities=[]; speciesBag=[]; finalEntity=null; vistaDone=false;
   driftLight=null; driftPointer=null;
-  sessionStarted=false; sessionStartedAt=0; sessionElapsed=0; stateElapsed=0; clockState='intake';
+  sessionStarted=false; sessionDeadlineAt=0; sessionElapsed=0; stateElapsed=0; clockState='intake';
   lastAutoStoreAt=-Infinity; capClosing=false; endReason='completed';
   STATE='intake';
   intake.classList.remove('hidden');

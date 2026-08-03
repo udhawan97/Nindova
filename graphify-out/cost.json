@@ -1,0 +1,14 @@
+{
+  "runs": [
+    {
+      "date": "2026-08-03T01:48:00.210615+00:00",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 73,
+      "accounting_note": "Collaboration runtime did not expose per-agent token usage. Zeroes are placeholders, not measured usage."
+    }
+  ],
+  "total_input_tokens": 0,
+  "total_output_tokens": 0,
+  "accounting_note": "Token totals are unavailable for this host-agent semantic extraction."
+}

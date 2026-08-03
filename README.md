@@ -24,6 +24,7 @@ There is no public deployment yet. The GitHub repository being public does not i
 - `apps/session/` — the playable Session, extended directly from the supplied demo with its provenance recorded.
 - `apps/site/` — the public landing page and Starlight documentation.
 - `docs/` — build plan, decision records, testing evidence, and repository-level documentation.
+- `graphify-out/` — generated architecture graph, interactive HTML, and audit report.
 - `reference/` — immutable copies of the four supplied handoff artifacts.
 - `tests/` — unit and browser evidence gates.
 - `tokens.css` — portable visual tokens shared by public surfaces.
@@ -64,6 +65,7 @@ npm run test:self-closing
 npm run test:night
 npm run test:dawn
 npm run test:pwa
+npm run test:wall-clock
 npm run build
 ```
 
@@ -88,7 +90,7 @@ Nindova is a behavioral design study for people aged 13 and up. It is not a slee
 
 ## Roadmap and limitations
 
-The browser Session, Dawn, standalone, offline PWA, public page, and documentation are implemented in source. Broader installed-device proof on Safari and Android, real-device VoiceOver and TalkBack acceptance, and the final uninterrupted production wall-clock run remain explicit hardening work. The iOS Wall requires a separate entitled native build and is not shipped.
+The browser Session, Dawn, standalone, offline PWA, public page, and documentation are implemented in source. The production Session has been observed through natural closure and the full fifteen-minute ceiling. Broader installed-device proof on Safari and Android plus real-device VoiceOver and TalkBack acceptance remain explicit hardening work. The iOS Wall requires a separate entitled native build and is not shipped.
 
 See the [roadmap](./apps/site/src/content/docs/docs/roadmap.md), [known limitations](./apps/site/src/content/docs/docs/known-limitations.md), and [deferred iOS Wall contract](./apps/site/src/content/docs/docs/ios-wall.md).
 

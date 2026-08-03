@@ -62,6 +62,12 @@ try {
     await page.setViewportSize(viewport);
     await page.goto(artifactBase);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), viewport.width);
+    const productLanguage = await page.locator("body").innerText();
+    assert.ok(productLanguage.includes("Nothing to win. Nothing tracked. Nothing you can do wrong."));
+    assert.ok(productLanguage.includes("Behavioral design study · 13+"));
+    assert.ok(productLanguage.includes("not a sleep tracker or treatment"));
+    assert.ok(productLanguage.includes("CBT-I"));
+    assert.equal(/improves? (your )?sleep|better sleep guaranteed|sleep performance score/i.test(productLanguage), false);
     const wrappedAffordances = await page.locator(".nav-action, .action-primary, .action-text, .foot-meta a").evaluateAll((elements) =>
       elements.filter((element) => getComputedStyle(element).whiteSpace !== "nowrap").map((element) => element.textContent?.trim()),
     );
@@ -85,6 +91,12 @@ try {
 
   await page.goto(`${base}?review=1`);
   await page.waitForFunction(() => Boolean(window.__ct));
+  assert.equal(await page.locator("#intake .footnote").innerText(), "Nothing to win. Nothing tracked. Nothing you can do wrong.");
+  assert.equal((await page.locator("#endCard .end-title").textContent())?.trim(), "The session is over. That's the point.");
+  const disclaimer = (await page.locator("#endCard .disclaimer").textContent()) ?? "";
+  assert.ok(disclaimer.includes("13+"));
+  assert.ok(disclaimer.includes("not a treatment for insomnia"));
+  assert.ok(disclaimer.includes("CBT-I"));
   assert.equal(await page.getAttribute('link[rel="manifest"]', "href"), "./manifest.webmanifest");
   const manifest = await page.evaluate(() => fetch("./manifest.webmanifest").then((response) => response.json()));
   assert.equal(manifest.start_url, "./");
@@ -110,6 +122,37 @@ try {
   assert.ok(worker.entries.some((url) => url.endsWith("/play/index.html")));
   assert.ok(worker.entries.every((url) => url.startsWith(base)));
   assert.ok(worker.entries.every((url) => !url.startsWith("blob:") && !url.includes("night-state")));
+
+  await page.evaluate(async () => {
+    const [cacheName] = await caches.keys();
+    const cache = await caches.open(cacheName);
+    await cache.put(new URL("night-core.js", location.href), new Response("globalThis.__nindovaStale = true;", {
+      headers: { "content-type": "text/javascript" },
+    }));
+    const stalePage = new Response("<!doctype html><title>stale shell</title>", {
+      headers: { "content-type": "text/html" },
+    });
+    await cache.put(new URL("./", location.href), stalePage.clone());
+    await cache.put(new URL("index.html", location.href), stalePage);
+  });
+  await page.reload();
+  await page.waitForFunction(() => Boolean(window.__ct));
+  assert.equal(await page.evaluate(() => globalThis.__nindovaStale), undefined);
+  const refreshedCore = await page.evaluate(async () => {
+    const [cacheName] = await caches.keys();
+    const cache = await caches.open(cacheName);
+    return cache.match(new URL("night-core.js", location.href)).then((response) => response.text());
+  });
+  assert.ok(refreshedCore.includes("NindovaNight"));
+  const refreshedPages = await page.evaluate(async () => {
+    const [cacheName] = await caches.keys();
+    const cache = await caches.open(cacheName);
+    return Promise.all([
+      cache.match(new URL("./", location.href)).then((response) => response.text()),
+      cache.match(new URL("index.html", location.href)).then((response) => response.text()),
+    ]);
+  });
+  assert.ok(refreshedPages.every((html) => html.includes("Nothing to win. Nothing tracked.")));
 
   const legacyCompletion = {
     nightId: "2026-08-03|America/Chicago|r1",
@@ -188,6 +231,9 @@ try {
   assert.equal(await portable.locator('link[rel="manifest"]').count(), 0);
   assert.equal(await portable.evaluate(() => navigator.serviceWorker.controller), null);
   assert.equal(await portable.evaluate(() => Boolean(window.NindovaNight && window.NindovaDawn)), true);
+  await portable.click("#beginBtn");
+  await portable.waitForFunction(() => window.__ct.state === "arrive");
+  assert.deepEqual(await portable.evaluate(() => window.__ct.recipe), firstRecipe);
   assert.deepEqual(portableErrors, []);
 
   assert.ok(requests.every((url) => new URL(url).origin === new URL(base).origin));

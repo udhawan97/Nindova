@@ -11,6 +11,9 @@ playwright-report/
 test-results/
 .playwright-cli/
 output/playwright/
+graphify-out/cache/
+graphify-out/.graphify_python
+graphify-out/.graphify_root
 
 # Local runtime state and temporary exports
 *.local

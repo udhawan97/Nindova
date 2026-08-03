@@ -28,6 +28,7 @@
     "test:dawn": "npm run build && node tests/browser/dawn.mjs",
     "test:seed:observe": "node scripts/run-seed-observational.mjs",
     "test:unit": "node --test tests/unit/*.test.mjs",
+    "test:wall-clock": "npm run build && node tests/browser/wall-clock-cap.mjs",
     "typecheck": "npm --workspace @nindova/session run typecheck && npm --workspace @nindova/site run typecheck"
   },
   "devDependencies": {

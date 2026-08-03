@@ -10,6 +10,35 @@ const PRECACHE = [
   "./assets/focal-sprites.png",
   "./assets/nindova-icon.svg",
 ];
+const PRECACHE_URLS = new Set(PRECACHE.map((entry) => new URL(entry, self.location.href).href));
+
+function canonicalPrecacheUrl(request) {
+  const url = new URL(request.url);
+  url.search = "";
+  url.hash = "";
+  return PRECACHE_URLS.has(url.href) ? url.href : null;
+}
+
+async function refreshFromNetwork(request) {
+  const response = await fetch(request);
+  const cacheUrl = canonicalPrecacheUrl(request);
+  if (cacheUrl && !response.ok) {
+    const cached = await caches.match(cacheUrl);
+    if (cached) return cached;
+  }
+  if (cacheUrl && response.ok) {
+    try {
+      const cache = await caches.open(CACHE_NAME);
+      const cacheTargets = request.mode === "navigate"
+        ? [new URL("./", self.location.href).href, new URL("./index.html", self.location.href).href]
+        : [cacheUrl];
+      await Promise.all(cacheTargets.map((target) => cache.put(target, response.clone())));
+    } catch {
+      // A full or unavailable cache must never replace a valid network response.
+    }
+  }
+  return response;
+}
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE)));
@@ -29,9 +58,13 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET" || url.origin !== self.location.origin) return;
 
   if (request.mode === "navigate") {
-    event.respondWith(fetch(request).catch(() => caches.match("./index.html")));
+    event.respondWith(refreshFromNetwork(request).catch(async () => (
+      await caches.match(canonicalPrecacheUrl(request)) || caches.match("./index.html")
+    )));
     return;
   }
 
-  event.respondWith(caches.match(request).then((cached) => cached || fetch(request)));
+  const cacheUrl = canonicalPrecacheUrl(request);
+  if (!cacheUrl) return;
+  event.respondWith(refreshFromNetwork(request).catch(() => caches.match(cacheUrl)));
 });

@@ -39,6 +39,7 @@ npm run test:self-closing
 npm run test:night
 npm run test:dawn
 npm run test:pwa
+npm run test:wall-clock
 ```
 
 The observational test is not a pass/fail gate. It preserves the supplied script’s evidence shape. The asserted arc is the regression gate.
