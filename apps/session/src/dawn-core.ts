@@ -18,7 +18,7 @@ interface RecorderConstructor {
 }
 
 interface RecordLoopOptions {
-  MediaRecorderCtor?: RecorderConstructor;
+  MediaRecorderCtor?: RecorderConstructor | null;
   durationMs?: number;
   fps?: number;
 }
@@ -90,7 +90,7 @@ interface RecordLoopOptions {
   }
 
   async function recordLoop(canvas: HTMLCanvasElement, renderFrame: (progress: number) => void, options: RecordLoopOptions = {}) {
-    const MediaRecorderCtor = options.MediaRecorderCtor ?? globalThis.MediaRecorder;
+    const MediaRecorderCtor = options.MediaRecorderCtor === undefined ? globalThis.MediaRecorder : options.MediaRecorderCtor;
     const durationMs = options.durationMs ?? LOOP_DURATION_MS;
     const fps = options.fps ?? 15;
     const type = chooseLoopType(MediaRecorderCtor);
