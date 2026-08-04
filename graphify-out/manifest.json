@@ -1,12 +1,12 @@
 {
   ".hallmark/log.json": {
-    "mtime": 1785875934.2112093,
-    "ast_hash": "d4010cb36adbc370c57d6fbb8036ac41",
+    "mtime": 1785880331.829869,
+    "ast_hash": "06f3db9d67a2d30bcb2493fa9482b662",
     "semantic_hash": ""
   },
   ".hallmark/preflight.json": {
-    "mtime": 1785876844.3019052,
-    "ast_hash": "df9eba5cb9ad87004dcdbeb49860d942",
+    "mtime": 1785880331.8291056,
+    "ast_hash": "c08b366e6dbd26101b28ede4695b9cd0",
     "semantic_hash": ""
   },
   "apps/session/package.json": {
@@ -50,7 +50,7 @@
     "semantic_hash": "9da5b344274fa94c0650dcb1a257aacc"
   },
   "apps/site/src/pages/index.astro": {
-    "mtime": 1785875934.208017,
+    "mtime": 1785878394.5412474,
     "ast_hash": "467fbac3efa9498228b865c52e99acdb",
     "semantic_hash": ""
   },
@@ -95,8 +95,8 @@
     "semantic_hash": ""
   },
   "tests/browser/pwa-offline.mjs": {
-    "mtime": 1785876029.4194648,
-    "ast_hash": "2d8fd7183e6d2f9fbf03ba5f6e189e72",
+    "mtime": 1785880290.4501605,
+    "ast_hash": "f203f7e7d820a3d1b157c810220415b3",
     "semantic_hash": ""
   },
   "tests/browser/seed-asserted.mjs": {
@@ -140,12 +140,12 @@
     "semantic_hash": "938df30602889721e037bc1f25fd53ed"
   },
   "CONTEXT.md": {
-    "mtime": 1785876844.29982,
+    "mtime": 1785878394.5384917,
     "ast_hash": "829173f6ecdae063d6f6645dcd32f56d",
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1785877594.7001874,
+    "mtime": 1785878394.5386639,
     "ast_hash": "79514fd15da44415e14a82dd6da7374b",
     "semantic_hash": ""
   },
@@ -155,12 +155,12 @@
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/accessibility.md": {
-    "mtime": 1785877594.7007139,
+    "mtime": 1785878394.5400481,
     "ast_hash": "6ef7f7539dd56791f65e5c503c49586d",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/architecture.md": {
-    "mtime": 1785877568.2082734,
+    "mtime": 1785878394.5401888,
     "ast_hash": "44b99d6c5d27ecd241c4867c7b858435",
     "semantic_hash": ""
   },
@@ -175,7 +175,7 @@
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/index.md": {
-    "mtime": 1785875934.2088037,
+    "mtime": 1785878394.540322,
     "ast_hash": "56a6e412106eec32eec10dc2bb5e5e48",
     "semantic_hash": ""
   },
@@ -185,7 +185,7 @@
     "semantic_hash": "d54f2070002b98fbf4784739a4d7191d"
   },
   "apps/site/src/content/docs/docs/known-limitations.md": {
-    "mtime": 1785875934.209501,
+    "mtime": 1785878394.5404572,
     "ast_hash": "f1a1c3f0ac97bb2ed3f49f44932b4bfd",
     "semantic_hash": ""
   },
@@ -200,12 +200,12 @@
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/privacy-local-state.md": {
-    "mtime": 1785877568.2080297,
-    "ast_hash": "4f5dcfb26e398360da6a360616f1ac52",
+    "mtime": 1785880290.4505532,
+    "ast_hash": "a8c8170220694cf92ddf5451f2f920d9",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/product-contract.md": {
-    "mtime": 1785876844.300202,
+    "mtime": 1785878394.5407875,
     "ast_hash": "1e9c631fb713c799da8bec5436e149ec",
     "semantic_hash": ""
   },
@@ -215,12 +215,12 @@
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/roadmap.md": {
-    "mtime": 1785876844.301345,
+    "mtime": 1785878394.540923,
     "ast_hash": "faaae75404ceb16bdba0abdd97a0e7d8",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/testing.md": {
-    "mtime": 1785877568.2090566,
+    "mtime": 1785878394.5410602,
     "ast_hash": "8ac6c0905aa795678212647c5ecd582b",
     "semantic_hash": ""
   },
@@ -465,7 +465,7 @@
     "semantic_hash": ""
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1785878265.22921,
+    "mtime": 1785881431.0969539,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": ""
   },
@@ -800,18 +800,18 @@
     "semantic_hash": ""
   },
   "apps/house/public/sw.js": {
-    "mtime": 1785875736.45972,
-    "ast_hash": "452c0159cc37598efe4acbf19ce4ca03",
+    "mtime": 1785880290.4499454,
+    "ast_hash": "9cd30b1bed326a0a6c748c3a9a7c2e81",
     "semantic_hash": ""
   },
   "apps/house/src/house-core.ts": {
-    "mtime": 1785875276.4640188,
+    "mtime": 1785878394.5391588,
     "ast_hash": "4d91c3e5a4d48e63a4078b7877f6dafd",
     "semantic_hash": ""
   },
   "apps/house/src/house.ts": {
-    "mtime": 1785877600.5853314,
-    "ast_hash": "3324dfe7054c1d1aedbdb7256784c666",
+    "mtime": 1785880120.0476687,
+    "ast_hash": "9266991871190c06c18575e067c43101",
     "semantic_hash": ""
   },
   "apps/house/src/vite-env.d.ts": {
@@ -825,27 +825,27 @@
     "semantic_hash": ""
   },
   "apps/house/vite.config.ts": {
-    "mtime": 1785877216.5101838,
+    "mtime": 1785878394.539862,
     "ast_hash": "cbeabf8c6a1de2d27adb35311cff4de2",
     "semantic_hash": ""
   },
   "tests/browser/house.mjs": {
-    "mtime": 1785877886.9534018,
-    "ast_hash": "05e95f4587f2a850e3ccb4cb30bfa4a4",
+    "mtime": 1785881426.6867514,
+    "ast_hash": "5bad4fbbd90ecef0ab846c3557431fba",
     "semantic_hash": ""
   },
   "tests/unit/house-core.test.mjs": {
-    "mtime": 1785875566.0271778,
+    "mtime": 1785878394.5447233,
     "ast_hash": "3a6c5c155428a3a0f58a107a9c2b63fb",
     "semantic_hash": ""
   },
   "apps/house/index.html": {
-    "mtime": 1785877216.509289,
+    "mtime": 1785878394.5388098,
     "ast_hash": "b79115e26ad096e2e2fad47e4630fb86",
     "semantic_hash": ""
   },
   "docs/adr/0013-add-the-adult-nindova-house.md": {
-    "mtime": 1785875934.2107794,
+    "mtime": 1785878394.5414023,
     "ast_hash": "78f898d73ec87f7a94565057395dd321",
     "semantic_hash": ""
   },
@@ -880,18 +880,18 @@
     "semantic_hash": ""
   },
   "apps/house/src/sector-sprint.ts": {
-    "mtime": 1785877974.6376512,
-    "ast_hash": "44f71348fa6f078c5c965f71c36dc596",
+    "mtime": 1785880138.3055835,
+    "ast_hash": "40a05ff6cdd5120a663e67270b8a3b70",
     "semantic_hash": ""
   },
   "tests/unit/sector-sprint.test.mjs": {
-    "mtime": 1785877382.4264374,
-    "ast_hash": "05ac72a4f1cb35456f1c856d297133f4",
+    "mtime": 1785880221.2287703,
+    "ast_hash": "c684b16ba38b03103996f6d9c7441097",
     "semantic_hash": ""
   },
   "docs/adr/0015-add-the-bounded-sector-sprint.md": {
-    "mtime": 1785877594.7004015,
-    "ast_hash": "9b267090fcf9976d90e1669db8f81d98",
+    "mtime": 1785880320.8043206,
+    "ast_hash": "50a2a9330d0d35e3c9c2ba26f062fcd7",
     "semantic_hash": ""
   },
   "graphify-out/memory/query_20260804_194501_build_entertainment_first_for_adults_above_18__tes.md": {
@@ -907,6 +907,11 @@
   "graphify-out/memory/query_20260804_211827_how_is_sector_sprint_registered__rendered__persist.md": {
     "mtime": 1785878307.1468043,
     "ast_hash": "6305d74c3fef975924c97a4960fd37c1",
+    "semantic_hash": ""
+  },
+  "graphify-out/memory/query_20260804_215805_how_does_the_polished_sector_sprint_connect_render.md": {
+    "mtime": 1785880685.3085365,
+    "ast_hash": "c0acc2752280f405c878310db1334abf",
     "semantic_hash": ""
   }
 }

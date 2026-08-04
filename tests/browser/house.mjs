@@ -42,6 +42,7 @@ async function openHouse(viewport, options = {}, {
   audioProbe = false,
   audioDenied = false,
   acceleratedRaf = false,
+  manualRaf = false,
   fakeClock = false,
   controllableVisibility = false,
 } = {}) {
@@ -57,6 +58,34 @@ async function openHouse(viewport, options = {}, {
           callback(authoredTimestamp);
         }),
       });
+    });
+  }
+  if (manualRaf) {
+    await context.addInitScript(() => {
+      let authoredTimestamp = 0;
+      let nextFrameId = 1;
+      const queuedFrames = new Map();
+      Object.defineProperty(globalThis, "requestAnimationFrame", {
+        configurable: true,
+        value: (callback) => {
+          const frameId = nextFrameId;
+          nextFrameId += 1;
+          queuedFrames.set(frameId, callback);
+          return frameId;
+        },
+      });
+      Object.defineProperty(globalThis, "cancelAnimationFrame", {
+        configurable: true,
+        value: (frameId) => queuedFrames.delete(frameId),
+      });
+      globalThis.__advanceHouseTestFrames = (count) => {
+        for (let frame = 0; frame < count; frame += 1) {
+          const callbacks = [...queuedFrames.values()];
+          queuedFrames.clear();
+          authoredTimestamp += 800;
+          callbacks.forEach((callback) => callback(authoredTimestamp));
+        }
+      };
     });
   }
   if (controllableVisibility) {
@@ -77,11 +106,12 @@ async function openHouse(viewport, options = {}, {
   } else if (audioProbe) {
     await context.addInitScript(() => {
       globalThis.__houseAudioContexts = 0;
+      globalThis.__houseAudioCloses = 0;
       class ProbeAudioContext {
-        constructor() { globalThis.__houseAudioContexts += 1; this.currentTime = 0; this.destination = {}; }
-        createOscillator() { return { type: "sine", frequency: { value: 0 }, connect: (destination) => destination, start() {}, stop() {} }; }
+        constructor() { globalThis.__houseAudioContexts += 1; this.currentTime = 0; this.destination = {}; this.state = "running"; }
+        createOscillator() { return { type: "sine", frequency: { value: 0 }, connect: (destination) => destination, start() {}, stop() { this.onended?.(); }, onended: null }; }
         createGain() { return { gain: { setValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect() { return this; } }; }
-        close() { return Promise.resolve(); }
+        close() { this.state = "closed"; globalThis.__houseAudioCloses += 1; return Promise.resolve(); }
       }
       Object.defineProperty(globalThis, "AudioContext", { configurable: true, value: ProbeAudioContext });
     });
@@ -308,6 +338,14 @@ try {
   const runner = await openHouse({ width: 375, height: 812 });
   await runner.page.click('[data-game="sector-sprint"]');
   await runner.page.waitForSelector("#runnerCanvas");
+  assert.deepEqual(await runner.page.locator("#runnerCanvas").evaluate((canvas) => ({
+    width: canvas.width,
+    height: canvas.height,
+    ratio: canvas.dataset.pixelRatio,
+    logicalWidth: canvas.dataset.logicalWidth,
+    logicalHeight: canvas.dataset.logicalHeight,
+  })), { width: 960, height: 432, ratio: "1", logicalWidth: "960", logicalHeight: "432" });
+  assert.ok((await runner.page.locator(".runner-stage-frame").boundingBox())?.y < 812, "the moving miniature enters the first phone viewport");
   assert.deepEqual(await runner.page.evaluate(() => {
     const saved = JSON.parse(sessionStorage.getItem("nindova:house:active:v1") ?? "{}");
     return { keys: Object.keys(saved).sort(), value: saved };
@@ -356,6 +394,57 @@ try {
     await runnerVisual.page.screenshot({ path: resolve(output, `sector-sprint-${viewport.width}x${viewport.height}.png`), fullPage: true, animations: "disabled" });
     await runnerVisual.context.close();
   }
+
+  const sharpRunner = await openHouse({ width: 414, height: 896 }, { deviceScaleFactor: 3 });
+  await sharpRunner.page.click('[data-game="sector-sprint"]');
+  assert.deepEqual(await sharpRunner.page.locator("#runnerCanvas").evaluate((canvas) => ({
+    width: canvas.width,
+    height: canvas.height,
+    ratio: canvas.dataset.pixelRatio,
+  })), { width: 1_920, height: 864, ratio: "2" }, "the Canvas honors high-density displays with a bounded DPR");
+  const sharpChapter = await sharpRunner.page.evaluate(() => window.__house.active?.chapter);
+  await sharpRunner.page.setViewportSize({ width: 768, height: 1_024 });
+  assert.equal(await sharpRunner.page.evaluate(() => window.__house.active?.chapter), sharpChapter, "a resize redraw cannot change the authored Act");
+  await sharpRunner.page.evaluate(() => { document.documentElement.style.fontSize = "200%"; });
+  assert.equal(await sharpRunner.page.evaluate(() => document.documentElement.scrollWidth), 768, "200% text scaling preserves horizontal reflow");
+  await sharpRunner.context.close();
+
+  const visualActs = await openHouse({ width: 375, height: 812 }, {}, { manualRaf: true });
+  await visualActs.page.click('[data-game="sector-sprint"]');
+  for (let act = 0; act < 5; act += 1) {
+    await visualActs.page.waitForFunction((expected) => window.__house.active?.chapter === expected && !window.__house.active?.resolving, act, { polling: 50, timeout: 8_000 });
+    await visualActs.page.locator("#celebration").waitFor({ state: "hidden" });
+    assert.deepEqual(await visualActs.page.evaluate(() => {
+      const frame = document.querySelector(".runner-stage-frame")?.getBoundingClientRect();
+      const approach = document.querySelector("#runnerApproach")?.getBoundingClientRect();
+      const live = document.querySelector("#runnerLive")?.getBoundingClientRect();
+      const controls = document.querySelector(".runner-controls")?.getBoundingClientRect();
+      const copy = document.querySelector(".runner-copy-deck")?.getBoundingClientRect();
+      const shell = document.querySelector(".runner-shell")?.getBoundingClientRect();
+      const visibleText = [...document.querySelectorAll(
+        ".runner-stage-frame figcaption span, #runnerApproach span, #runnerApproach strong, #runnerLive, .runner-controls button span, .runner-controls button small, .runner-copy-deck p",
+      )];
+      return {
+        stageBeforeStatus: Boolean(frame && approach && frame.bottom <= approach.top),
+        approachBeforeLive: Boolean(approach && live && approach.bottom <= live.top),
+        statusBeforeControls: Boolean(live && controls && live.bottom <= controls.top),
+        controlsBeforeCopy: Boolean(controls && copy && controls.bottom <= copy.top),
+        copyInsideShell: Boolean(copy && shell && copy.bottom <= shell.bottom + 1),
+        visibleTextFits: visibleText.every((label) => label.scrollWidth <= label.clientWidth + 1),
+      };
+    }), {
+      stageBeforeStatus: true,
+      approachBeforeLive: true,
+      statusBeforeControls: true,
+      controlsBeforeCopy: true,
+      copyInsideShell: true,
+      visibleTextFits: true,
+    }, `Act ${act + 1} keeps an intact stage, status deck, control bar, helper labels, caption, and copy`);
+    await visualActs.page.locator(".runner-shell").screenshot({ path: resolve(output, `sector-sprint-act-${act + 1}-375x812.png`), animations: "disabled" });
+    await visualActs.page.evaluate(() => globalThis.__advanceHouseTestFrames(44));
+  }
+  await visualActs.page.waitForSelector(".curtain-call", { timeout: 12_000 });
+  await visualActs.context.close();
 
   const autoRunner = await openHouse(
     { width: 414, height: 896 },
@@ -536,6 +625,18 @@ try {
   assert.equal(await restoredReduced.page.locator("#runnerCanvas").count(), 0);
   assert.equal(await restoredReduced.page.locator(".runner-restore-note").isVisible(), true);
   await restoredReduced.context.close();
+
+  const activeRunnerSound = await openHouse({ width: 375, height: 812 }, {}, { audioProbe: true });
+  await activeRunnerSound.page.click("#soundButton");
+  await activeRunnerSound.page.click('[data-game="sector-sprint"]');
+  await activeRunnerSound.page.click('[data-runner-action="jump"]');
+  await activeRunnerSound.page.waitForFunction(() => globalThis.__houseAudioContexts === 1);
+  await activeRunnerSound.page.click("[data-runner-pause]");
+  await activeRunnerSound.page.waitForFunction(() => globalThis.__houseAudioCloses === 1);
+  await activeRunnerSound.page.click("[data-runner-pause]");
+  await activeRunnerSound.page.waitForTimeout(250);
+  assert.equal(await activeRunnerSound.page.evaluate(() => globalThis.__houseAudioContexts), 1, "resume never queues or invents a sound");
+  await activeRunnerSound.context.close();
 
   const pausedRunnerSound = await openHouse({ width: 375, height: 812 }, { reducedMotion: "reduce" }, { audioProbe: true });
   await pausedRunnerSound.page.click("#soundButton");

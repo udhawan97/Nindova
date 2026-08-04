@@ -2,6 +2,8 @@ export const RUNNER_ACT_SECONDS = 32;
 export const RUNNER_SESSION_SECONDS = 240;
 export const RUNNER_WIDTH = 960;
 export const RUNNER_HEIGHT = 432;
+export const RUNNER_DPR_CAP = 2;
+export const RUNNER_EFFECT_PARTICLE_CAP = 24;
 
 export type RunnerLead = "son" | "mother" | "duo";
 export type RunnerTargetKind =
@@ -51,7 +53,7 @@ export type RunnerAct = {
   targets: readonly RunnerTarget[];
 };
 
-export type RunnerProjectile = { x: number; y: number };
+export type RunnerProjectile = { x: number; y: number; ageMs: number };
 
 export type RunnerState = {
   actIndex: number;
@@ -68,6 +70,9 @@ export type RunnerState = {
   message: string;
   flourishMs: number;
   lastTransformedTargetId: string | null;
+  landingMs: number;
+  impactMs: number;
+  lastEncounteredTargetId: string | null;
 };
 
 export type RunnerInput = { jump?: boolean; spark?: boolean };
@@ -86,10 +91,14 @@ export type RunnerPalette = {
   ruby: string;
   sapphire: string;
   jade: string;
+  fontDisplay: string;
+  fontBody: string;
+  fontMono: string;
 };
 
 const FLOOR_Y = 350;
-const PLAYER_HEIGHT = 58;
+const PLAYER_HEIGHT = 76;
+const PLAYER_WIDTH = 54;
 export const RUNNER_PLAYER_SCREEN_X = 176;
 const WORLD_LENGTH = 4_080;
 const GRAVITY = 2_120;
@@ -265,6 +274,9 @@ export function createRunnerState(actIndex: number): RunnerState {
     message: RUNNER_ACTS[actIndex].opening,
     flourishMs: 0,
     lastTransformedTargetId: null,
+    landingMs: 0,
+    impactMs: 0,
+    lastEncounteredTargetId: null,
   };
 }
 
@@ -282,14 +294,17 @@ export function stepRunner(previous: RunnerState, input: RunnerInput, deltaMs: n
   if (state.finished || state.paused) return state;
   const stepMs = Math.max(0, Math.min(deltaMs, 50));
   state.flourishMs = Math.max(0, state.flourishMs - stepMs);
+  state.landingMs = Math.max(0, state.landingMs - stepMs);
+  state.impactMs = Math.max(0, state.impactMs - stepMs);
   const dt = stepMs / 1_000;
+  const wasGrounded = state.grounded;
   if (input.jump && state.grounded) {
     state.velocityY = JUMP_VELOCITY;
     state.grounded = false;
     state.message = "Clean jump. The city keeps moving.";
   }
   if (input.spark && state.projectiles.length < 4) {
-    state.projectiles.push({ x: state.worldX + RUNNER_PLAYER_SCREEN_X + 46, y: state.y + 24 });
+    state.projectiles.push({ x: state.worldX + RUNNER_PLAYER_SCREEN_X + 58, y: state.y + 28, ageMs: 0 });
     state.message = `${RUNNER_ACTS[state.actIndex].sparkLabel}.`;
   }
   state.elapsedMs = Math.min(RUNNER_ACT_SECONDS * 1_000, state.elapsedMs + stepMs);
@@ -301,9 +316,10 @@ export function stepRunner(previous: RunnerState, input: RunnerInput, deltaMs: n
     state.y = restingY;
     state.velocityY = 0;
     state.grounded = true;
+    if (!wasGrounded) state.landingMs = 240;
   }
   state.projectiles = state.projectiles
-    .map((projectile) => ({ ...projectile, x: projectile.x + PROJECTILE_SPEED * dt }))
+    .map((projectile) => ({ ...projectile, x: projectile.x + PROJECTILE_SPEED * dt, ageMs: projectile.ageMs + stepMs }))
     .filter((projectile) => projectile.x < state.worldX + RUNNER_WIDTH + 100);
 
   const act = RUNNER_ACTS[state.actIndex];
@@ -322,10 +338,12 @@ export function stepRunner(previous: RunnerState, input: RunnerInput, deltaMs: n
       }
     }
     if (!state.encounteredTargetIds.includes(candidate.id) && !state.transformedTargetIds.includes(candidate.id)) {
-      const playerWorld = { x: state.worldX + RUNNER_PLAYER_SCREEN_X, y: state.y, width: 44, height: PLAYER_HEIGHT };
+      const playerWorld = { x: state.worldX + RUNNER_PLAYER_SCREEN_X, y: state.y, width: PLAYER_WIDTH, height: PLAYER_HEIGHT };
       if (overlaps(playerWorld, candidate)) {
         state.encounteredTargetIds.push(candidate.id);
         state.message = candidate.collisionQuip;
+        state.impactMs = 260;
+        state.lastEncounteredTargetId = candidate.id;
       }
     }
   }
@@ -341,6 +359,30 @@ function pixelRect(context: CanvasRenderingContext2D, x: number, y: number, widt
   context.fillRect(Math.round(x), Math.round(y), Math.round(width), Math.round(height));
 }
 
+function hashText(value: string): number {
+  let hash = 2_166_136_261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16_777_619);
+  }
+  return hash >>> 0;
+}
+
+function drawDiamond(context: CanvasRenderingContext2D, x: number, y: number, size: number, color: string, filled = true) {
+  context.save();
+  context.translate(Math.round(x), Math.round(y));
+  context.rotate(Math.PI / 4);
+  if (filled) {
+    context.fillStyle = color;
+    context.fillRect(-size / 2, -size / 2, size, size);
+  } else {
+    context.strokeStyle = color;
+    context.lineWidth = 2;
+    context.strokeRect(-size / 2, -size / 2, size, size);
+  }
+  context.restore();
+}
+
 function drawTarget(context: CanvasRenderingContext2D, candidate: RunnerTarget, screenX: number, transformed: boolean, palette: RunnerPalette) {
   const x = Math.round(screenX);
   const y = candidate.y;
@@ -349,7 +391,7 @@ function drawTarget(context: CanvasRenderingContext2D, candidate: RunnerTarget, 
   context.translate(x, y);
   context.fillStyle = transformed ? palette.paper3 : palette.paper2;
   context.strokeStyle = ink;
-  context.lineWidth = 3;
+  context.lineWidth = transformed ? 4 : 3;
 
   if (candidate.kind === "puddle-splash") {
     context.beginPath();
@@ -362,90 +404,281 @@ function drawTarget(context: CanvasRenderingContext2D, candidate: RunnerTarget, 
       context.stroke();
     }
   } else if (candidate.kind === "streamer") {
-    for (let strip = 0; strip < 4; strip += 1) pixelRect(context, strip * 22, transformed ? strip * 20 : 0, 8, candidate.height - strip * 20, ink);
-  } else if (candidate.kind === "produce-basket") {
-    pixelRect(context, 0, 18, candidate.width, candidate.height - 18, palette.accentSoft);
-    for (let item = 0; item < 4; item += 1) {
-      context.fillStyle = transformed ? palette.jade : palette.ruby;
+    for (let strip = 0; strip < 4; strip += 1) {
+      const sway = transformed ? strip * 15 : (strip % 2) * 10;
+      context.strokeStyle = strip % 2 ? palette.ruby : ink;
+      context.lineWidth = 7;
       context.beginPath();
-      context.arc(18 + item * 22, transformed ? 22 : 8 + (item % 2) * 10, 10, 0, Math.PI * 2);
+      context.moveTo(strip * 22 + 6, 0);
+      context.bezierCurveTo(strip * 22 + 24, candidate.height * 0.3, strip * 22 - 8, candidate.height * 0.66, strip * 22 + 9 + sway, candidate.height);
+      context.stroke();
+    }
+  } else if (candidate.kind === "produce-basket") {
+    context.strokeStyle = ink;
+    context.lineWidth = 4;
+    context.beginPath();
+    context.arc(candidate.width / 2, 26, candidate.width * 0.33, Math.PI, 0);
+    context.stroke();
+    pixelRect(context, 0, 20, candidate.width, candidate.height - 20, palette.accentSoft);
+    for (let rail = 1; rail < 4; rail += 1) pixelRect(context, rail * candidate.width / 4 - 2, 24, 4, candidate.height - 28, palette.rule);
+    for (let item = 0; item < 5; item += 1) {
+      context.fillStyle = item % 2 ? palette.ruby : transformed ? palette.jade : palette.accent;
+      context.beginPath();
+      context.arc(14 + item * 19, transformed ? 20 : 11 + (item % 2) * 9, 9, 0, Math.PI * 2);
       context.fill();
     }
-  } else {
+  } else if (candidate.kind === "price-tag") {
+    context.beginPath();
+    context.moveTo(0, 10);
+    context.lineTo(candidate.width * 0.72, 0);
+    context.lineTo(candidate.width, candidate.height / 2);
+    context.lineTo(candidate.width * 0.72, candidate.height);
+    context.lineTo(0, candidate.height - 10);
+    context.closePath();
+    context.fill();
+    context.stroke();
+    context.fillStyle = ink;
+    context.beginPath();
+    context.arc(candidate.width * 0.78, candidate.height / 2, 4, 0, Math.PI * 2);
+    context.fill();
+  } else if (candidate.kind === "grocery-list") {
     context.fillRect(0, 0, candidate.width, candidate.height);
     context.strokeRect(0, 0, candidate.width, candidate.height);
+    pixelRect(context, candidate.width * 0.25, -6, candidate.width * 0.5, 12, ink);
+    for (let line = 0; line < 3; line += 1) pixelRect(context, 13, 42 + line * 13, candidate.width - 26, 2, line === 2 && transformed ? palette.jade : palette.rule);
+  } else {
+    context.beginPath();
+    context.roundRect(0, 0, candidate.width, candidate.height, 12);
+    context.fill();
+    context.stroke();
+    context.beginPath();
+    context.moveTo(18, candidate.height);
+    context.lineTo(28, candidate.height);
+    context.lineTo(20, candidate.height + 11);
+    context.closePath();
+    context.fill();
+    context.stroke();
   }
 
   if (candidate.kind !== "streamer" && candidate.kind !== "puddle-splash") {
     context.fillStyle = transformed ? palette.ink : palette.inkSoft;
-    context.font = "700 13px ui-monospace, monospace";
+    context.font = `700 13px ${palette.fontMono}`;
     context.textAlign = "center";
     context.textBaseline = "middle";
     const label = transformed ? candidate.transformedLabel : candidate.label;
-    context.fillText(label, candidate.width / 2, candidate.height / 2, candidate.width - 10);
+    const labelY = candidate.kind === "grocery-list" ? 24 : candidate.height / 2;
+    context.fillText(label, candidate.width / 2, labelY, candidate.width - 12);
+  }
+  if (transformed) drawDiamond(context, candidate.width - 6, 5, 9, palette.jade);
+  context.restore();
+}
+
+function drawLeadSprite(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  role: "son" | "mother",
+  state: RunnerState,
+  palette: RunnerPalette,
+  scale = 1.22,
+) {
+  const runFrame = Math.floor(state.elapsedMs / 95) % 4;
+  const stride = state.grounded ? [-7, 0, 7, 0][runFrame] : 3;
+  const bounce = state.grounded && state.landingMs === 0 ? [0, -2, 0, -1][runFrame] : 0;
+  const squash = state.landingMs > 0 ? 1 - state.landingMs / 1_600 : 1;
+  const stretch = state.grounded ? 1 : 1.06;
+  const cloth = role === "mother" ? palette.ruby : palette.sapphire;
+  context.save();
+  context.translate(Math.round(x + PLAYER_WIDTH / 2), Math.round(y + PLAYER_HEIGHT));
+  context.scale(scale * squash, scale * stretch);
+  context.translate(-PLAYER_WIDTH / 2, -PLAYER_HEIGHT + bounce);
+
+  pixelRect(context, 17, 0, 25, 20, palette.inkSoft);
+  pixelRect(context, 13, 17, 33, 8, role === "mother" ? palette.accent : palette.ink);
+  pixelRect(context, 10, 24, 38, 32, cloth);
+  pixelRect(context, 14, 30, 30, 5, role === "mother" ? palette.accent : palette.jade);
+  pixelRect(context, 7, 29, 8, 27, role === "mother" ? palette.accent : cloth);
+  pixelRect(context, 46, 29, 9, 25, palette.inkSoft);
+  pixelRect(context, 12, 55, 11, 20 + Math.min(0, stride), palette.accent);
+  pixelRect(context, 35, 55, 11, 20 - Math.max(0, stride), palette.accent);
+  pixelRect(context, 8 + Math.max(0, stride), 71, 18, 5, palette.ink);
+  pixelRect(context, 32 + Math.min(0, stride), 71, 18, 5, palette.ink);
+
+  if (role === "mother") {
+    pixelRect(context, 6, 5, 8, 45, palette.accent);
+    pixelRect(context, 3, 42, 13, 8, palette.ruby);
+    context.strokeStyle = palette.accent;
+    context.lineWidth = 3;
+    context.strokeRect(46, 43, 13, 19);
+  } else {
+    pixelRect(context, 22, 3, 21, 5, palette.ink);
+    pixelRect(context, 14, 39, 7, 17, palette.jade);
   }
   context.restore();
 }
 
 function drawPerson(context: CanvasRenderingContext2D, state: RunnerState, lead: RunnerLead, palette: RunnerPalette) {
   const x = RUNNER_PLAYER_SCREEN_X;
-  const y = state.y;
-  const cloth = lead === "mother" ? palette.ruby : lead === "duo" ? palette.jade : palette.sapphire;
-  const stride = Math.floor(state.elapsedMs / 130) % 2 === 0 ? 0 : 5;
-  pixelRect(context, x + 12, y, 22, 18, palette.inkSoft);
-  pixelRect(context, x + 8, y + 18, 30, 25, cloth);
-  pixelRect(context, x + 8, y + 43, 9, 15 - stride, palette.accent);
-  pixelRect(context, x + 29, y + 43, 9, 10 + stride, palette.accent);
-  pixelRect(context, x + 38, y + 23, 11, 7, palette.inkSoft);
-  if (lead === "mother") pixelRect(context, x + 4, y + 6, 7, 30, palette.accent);
-  if (lead === "duo") {
-    pixelRect(context, x - 22, y + 12, 17, 14, palette.inkSoft);
-    pixelRect(context, x - 26, y + 26, 25, 28, palette.sapphire);
+  if (lead === "duo") drawLeadSprite(context, x - 48, state.y + 9, "mother", state, palette, 1.02);
+  drawLeadSprite(context, x, state.y, lead === "mother" ? "mother" : "son", state, palette);
+}
+
+function drawSky(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette, reducedMotion: boolean) {
+  const gradient = context.createLinearGradient(0, 0, 0, FLOOR_Y);
+  gradient.addColorStop(0, state.actIndex === 1 ? palette.paper3 : palette.paper);
+  gradient.addColorStop(1, state.actIndex === 3 ? palette.sapphire : palette.paper2);
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, RUNNER_WIDTH, FLOOR_Y);
+
+  if ([0, 2, 4].includes(state.actIndex)) {
+    context.globalAlpha = 0.68;
+    for (let star = 0; star < 24; star += 1) {
+      const seed = hashText(`${state.actIndex}-star-${star}`);
+      const drift = reducedMotion ? 0 : (state.worldX * (0.018 + (star % 3) * 0.006)) % RUNNER_WIDTH;
+      const starX = (seed % RUNNER_WIDTH - drift + RUNNER_WIDTH) % RUNNER_WIDTH;
+      const starY = 28 + ((seed >>> 9) % 116);
+      drawDiamond(context, starX, starY, star % 5 === 0 ? 4 : 2, star % 4 === 0 ? palette.accent : palette.inkSoft);
+    }
+    context.globalAlpha = 1;
+  }
+
+  if (state.actIndex === 0 || state.actIndex === 4) {
+    context.globalAlpha = 0.76;
+    context.fillStyle = palette.accentSoft;
+    context.beginPath();
+    context.arc(820, 72, state.actIndex === 4 ? 38 : 28, 0, Math.PI * 2);
+    context.fill();
+    context.globalAlpha = 1;
+  }
+
+  const hillDrift = reducedMotion ? 0 : (state.worldX * 0.12) % 180;
+  context.fillStyle = palette.sapphire;
+  context.globalAlpha = state.actIndex === 1 ? 0.32 : 0.58;
+  context.beginPath();
+  context.moveTo(0, 190);
+  for (let x = -180; x <= RUNNER_WIDTH + 180; x += 180) {
+    const peak = x - hillDrift;
+    context.lineTo(peak + 90, 74 + ((x / 180 + state.actIndex) % 3) * 24);
+    context.lineTo(peak + 180, 190);
+  }
+  context.lineTo(RUNNER_WIDTH, 250);
+  context.lineTo(0, 250);
+  context.closePath();
+  context.fill();
+  context.globalAlpha = 1;
+}
+
+function drawCityLayers(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette, reducedMotion: boolean) {
+  const layers = [
+    { speed: 0.2, spacing: 142, y: 176, color: palette.paper3, alpha: 0.62 },
+    { speed: 0.38, spacing: 188, y: 205, color: palette.paper2, alpha: 0.9 },
+  ];
+  layers.forEach((layer, layerIndex) => {
+    const offset = reducedMotion ? 0 : (state.worldX * layer.speed) % layer.spacing;
+    context.globalAlpha = layer.alpha;
+    for (let index = -1; index < Math.ceil(RUNNER_WIDTH / layer.spacing) + 2; index += 1) {
+      const x = index * layer.spacing - offset;
+      const seed = hashText(`${state.actIndex}-${layerIndex}-${index}`);
+      const height = 74 + (seed % 68);
+      pixelRect(context, x, layer.y - height, layer.spacing - 24, height + FLOOR_Y - layer.y, layer.color);
+      for (let windowIndex = 0; windowIndex < 4; windowIndex += 1) {
+        const lit = (windowIndex + index + state.actIndex) % 3 === 0;
+        pixelRect(context, x + 16 + windowIndex * 25, layer.y - height + 25, 9, Math.max(24, height - 42), lit ? palette.accentSoft : palette.rule);
+      }
+    }
+    context.globalAlpha = 1;
+  });
+}
+
+function drawActSetting(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette, reducedMotion: boolean) {
+  const drift = reducedMotion ? 0 : (state.worldX * 0.56) % 248;
+  if (state.actIndex === 0) {
+    for (let x = -160; x < RUNNER_WIDTH + 160; x += 210) {
+      const lampX = x - ((reducedMotion ? 0 : state.worldX * 0.62) % 210);
+      pixelRect(context, lampX, 180, 6, 170, palette.rule);
+      pixelRect(context, lampX - 12, 180, 30, 7, palette.accent);
+      context.globalAlpha = 0.45;
+      pixelRect(context, lampX - 20, 190, 46, 7, palette.accentSoft);
+      context.globalAlpha = 1;
+    }
+  } else if (state.actIndex === 1) {
+    for (let x = -248; x < RUNNER_WIDTH + 248; x += 248) {
+      const stallX = x - drift;
+      pixelRect(context, stallX, 236, 190, 14, palette.ruby);
+      for (let awning = 0; awning < 6; awning += 1) pixelRect(context, stallX + awning * 32, 250, 22, 12, awning % 2 ? palette.accent : palette.inkSoft);
+      pixelRect(context, stallX + 12, 262, 166, 54, palette.paper3);
+      for (let basket = 0; basket < 5; basket += 1) pixelRect(context, stallX + 18 + basket * 31, 286, 24, 22, basket % 2 ? palette.jade : palette.ruby);
+    }
+  } else if (state.actIndex === 2) {
+    context.globalAlpha = 0.86;
+    for (let x = -80; x < RUNNER_WIDTH + 80; x += 100) {
+      const ribbonX = x - ((reducedMotion ? 0 : state.worldX * 0.44) % 100);
+      context.strokeStyle = x % 200 === 0 ? palette.ruby : palette.accent;
+      context.lineWidth = 5;
+      context.beginPath();
+      context.moveTo(ribbonX, 138);
+      context.quadraticCurveTo(ribbonX + 26, 190, ribbonX + 54, 148);
+      context.stroke();
+      drawDiamond(context, ribbonX + 26, 174, 7, palette.inkSoft);
+    }
+    context.globalAlpha = 1;
+    pixelRect(context, 760, 250, 92, 45, palette.ruby);
+    context.strokeStyle = palette.accent;
+    context.lineWidth = 5;
+    context.beginPath();
+    context.arc(806, 272, 30, 0, Math.PI * 2);
+    context.stroke();
+  } else if (state.actIndex === 3) {
+    context.globalAlpha = 0.7;
+    context.fillStyle = palette.paper3;
+    for (let cloud = 0; cloud < 5; cloud += 1) {
+      const cloudX = 70 + cloud * 210 - ((reducedMotion ? 0 : state.worldX * 0.08) % 210);
+      context.beginPath();
+      context.arc(cloudX, 82 + (cloud % 2) * 26, 44, 0, Math.PI * 2);
+      context.arc(cloudX + 44, 88 + (cloud % 2) * 26, 54, 0, Math.PI * 2);
+      context.fill();
+    }
+    context.strokeStyle = palette.inkSoft;
+    context.lineWidth = 2;
+    for (let rain = 0; rain < 44; rain += 1) {
+      const rainX = (rain * 37 - (reducedMotion ? 0 : (state.worldX * 1.25) % 37) + RUNNER_WIDTH) % RUNNER_WIDTH;
+      const rainY = 108 + (rain % 8) * 29;
+      context.beginPath();
+      context.moveTo(rainX, rainY);
+      context.lineTo(rainX - 12, rainY + 22);
+      context.stroke();
+    }
+    context.globalAlpha = 1;
+  } else {
+    pixelRect(context, 708, 198, 220, 152, palette.paper3);
+    pixelRect(context, 742, 238, 38, 48, palette.accentSoft);
+    pixelRect(context, 850, 238, 38, 48, palette.accentSoft);
+    pixelRect(context, 796, 296, 42, 54, palette.accent);
+    context.strokeStyle = palette.accent;
+    context.lineWidth = 6;
+    context.beginPath();
+    context.moveTo(684, 198);
+    context.lineTo(818, 126);
+    context.lineTo(948, 198);
+    context.stroke();
+    for (let lamp = 0; lamp < 5; lamp += 1) drawDiamond(context, 724 + lamp * 42, 184, 8, palette.accent);
   }
 }
 
-function drawActSetting(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette) {
-  const drift = (state.worldX * 0.5) % 240;
-  if (state.actIndex === 1) {
-    for (let x = -240; x < RUNNER_WIDTH + 240; x += 240) {
-      const stallX = x - drift;
-      pixelRect(context, stallX, 250, 168, 12, palette.ruby);
-      pixelRect(context, stallX + 12, 262, 144, 42, palette.paper2);
-      for (let basket = 0; basket < 4; basket += 1) pixelRect(context, stallX + 20 + basket * 32, 282, 22, 16, basket % 2 ? palette.jade : palette.accent);
-    }
-  } else if (state.actIndex === 2) {
-    for (let x = -80; x < RUNNER_WIDTH + 80; x += 110) {
-      const ribbonX = x - ((state.worldX * 0.42) % 110);
-      context.strokeStyle = x % 220 === 0 ? palette.ruby : palette.accent;
-      context.lineWidth = 5;
-      context.beginPath();
-      context.moveTo(ribbonX, 158);
-      context.quadraticCurveTo(ribbonX + 28, 210, ribbonX + 56, 166);
-      context.stroke();
-    }
-  } else if (state.actIndex === 3) {
-    context.strokeStyle = palette.sapphire;
-    context.lineWidth = 2;
-    for (let rain = 0; rain < 38; rain += 1) {
-      const rainX = (rain * 43 - (state.worldX * 1.2) % 43 + RUNNER_WIDTH) % RUNNER_WIDTH;
-      context.beginPath();
-      context.moveTo(rainX, 112 + (rain % 7) * 28);
-      context.lineTo(rainX - 14, 138 + (rain % 7) * 28);
-      context.stroke();
-    }
-  } else if (state.actIndex === 4) {
-    pixelRect(context, 748, 214, 164, 136, palette.paper3);
-    pixelRect(context, 780, 246, 30, 42, palette.accentSoft);
-    pixelRect(context, 848, 246, 30, 42, palette.accentSoft);
-    pixelRect(context, 816, 300, 34, 50, palette.accent);
-    context.strokeStyle = palette.accent;
-    context.lineWidth = 4;
-    context.beginPath();
-    context.moveTo(730, 214);
-    context.lineTo(830, 154);
-    context.lineTo(930, 214);
-    context.stroke();
+function drawForeground(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette, reducedMotion: boolean) {
+  pixelRect(context, 0, FLOOR_Y, RUNNER_WIDTH, RUNNER_HEIGHT - FLOOR_Y, palette.paper2);
+  pixelRect(context, 0, FLOOR_Y, RUNNER_WIDTH, 5, palette.accent);
+  for (let road = -80; road < RUNNER_WIDTH + 80; road += 150) {
+    const roadOffset = reducedMotion ? 0 : (state.worldX * 0.92) % 150;
+    pixelRect(context, road - roadOffset, FLOOR_Y + 45, 72, 5, palette.rule);
   }
+  context.globalAlpha = 0.34;
+  const nearOffset = reducedMotion ? 0 : (state.worldX * 1.04) % 260;
+  for (let x = -260; x < RUNNER_WIDTH + 260; x += 260) {
+    pixelRect(context, x - nearOffset, FLOOR_Y + 10, 5, 52, palette.ink);
+    pixelRect(context, x - nearOffset - 20, FLOOR_Y + 9, 45, 4, palette.rule);
+  }
+  context.globalAlpha = 1;
 }
 
 function drawFlourish(context: CanvasRenderingContext2D, state: RunnerState, act: RunnerAct, palette: RunnerPalette) {
@@ -454,16 +687,79 @@ function drawFlourish(context: CanvasRenderingContext2D, state: RunnerState, act
   if (!candidate) return;
   const centerX = runnerWorldToScreen(candidate.x, state.worldX) + candidate.width / 2;
   const centerY = candidate.y + candidate.height / 2;
-  const reach = 28 + (720 - state.flourishMs) * 0.035;
+  const progress = (720 - state.flourishMs) / 720;
+  const reach = 34 + progress * 72;
   context.save();
   context.translate(centerX, centerY);
-  context.rotate(Math.PI / 4);
+  context.globalAlpha = 1 - progress * 0.6;
+  context.rotate(Math.PI / 4 + progress * 0.45);
   context.strokeStyle = palette.accent;
   context.lineWidth = 3;
   context.strokeRect(-reach / 2, -reach / 2, reach, reach);
   context.strokeStyle = palette.jade;
   context.strokeRect(-reach / 3, -reach / 3, reach * 0.66, reach * 0.66);
   context.restore();
+
+  const particleCount = Math.min(RUNNER_EFFECT_PARTICLE_CAP, 18);
+  for (let index = 0; index < particleCount; index += 1) {
+    const seed = hashText(`${candidate.id}-${index}`);
+    const angle = ((seed % 628) / 100) + progress * 0.4;
+    const distance = 18 + progress * (24 + (seed % 52));
+    context.globalAlpha = Math.max(0, 1 - progress);
+    drawDiamond(
+      context,
+      centerX + Math.cos(angle) * distance,
+      centerY + Math.sin(angle) * distance,
+      index % 4 === 0 ? 7 : 4,
+      index % 3 === 0 ? palette.jade : palette.accent,
+    );
+  }
+  context.globalAlpha = 1;
+}
+
+function drawImpact(context: CanvasRenderingContext2D, state: RunnerState, act: RunnerAct, palette: RunnerPalette) {
+  if (state.impactMs <= 0 || !state.lastEncounteredTargetId) return;
+  const candidate = act.targets.find((target) => target.id === state.lastEncounteredTargetId);
+  if (!candidate) return;
+  const progress = (260 - state.impactMs) / 260;
+  const centerX = runnerWorldToScreen(candidate.x, state.worldX) + candidate.width / 2;
+  const centerY = candidate.y + candidate.height / 2;
+  context.globalAlpha = 1 - progress;
+  for (let index = 0; index < 8; index += 1) {
+    const angle = index * Math.PI / 4;
+    const distance = 14 + progress * 38;
+    pixelRect(context, centerX + Math.cos(angle) * distance, centerY + Math.sin(angle) * distance, 6, 6, index % 2 ? palette.ruby : palette.accent);
+  }
+  context.globalAlpha = 1;
+}
+
+function drawLandingDust(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette) {
+  if (state.landingMs <= 0) return;
+  const progress = (240 - state.landingMs) / 240;
+  context.globalAlpha = 1 - progress;
+  for (let index = 0; index < 8; index += 1) {
+    const direction = index < 4 ? -1 : 1;
+    const local = index % 4;
+    pixelRect(
+      context,
+      RUNNER_PLAYER_SCREEN_X + PLAYER_WIDTH / 2 + direction * (18 + local * 9 + progress * 26),
+      FLOOR_Y - 5 - local * 3 - progress * 9,
+      8 - local,
+      4,
+      local % 2 ? palette.rule : palette.accentSoft,
+    );
+  }
+  context.globalAlpha = 1;
+}
+
+function drawSpark(context: CanvasRenderingContext2D, projectile: RunnerProjectile, state: RunnerState, palette: RunnerPalette) {
+  const screenX = runnerWorldToScreen(projectile.x, state.worldX);
+  const pulse = Math.floor(projectile.ageMs / 70) % 2;
+  context.globalAlpha = 0.36;
+  for (let trail = 3; trail > 0; trail -= 1) drawDiamond(context, screenX - trail * 10, projectile.y + 5, 4, palette.accentSoft);
+  context.globalAlpha = 1;
+  drawDiamond(context, screenX, projectile.y + 5, pulse ? 13 : 11, palette.accent);
+  drawDiamond(context, screenX, projectile.y + 5, 5, palette.ink);
 }
 
 export function drawRunnerFrame(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette, reducedMotion = false) {
@@ -473,46 +769,22 @@ export function drawRunnerFrame(context: CanvasRenderingContext2D, state: Runner
   context.clearRect(0, 0, RUNNER_WIDTH, RUNNER_HEIGHT);
   context.fillStyle = palette.paper;
   context.fillRect(0, 0, RUNNER_WIDTH, RUNNER_HEIGHT);
+  const cameraKick = !reducedMotion && state.impactMs > 0 ? Math.round(Math.sin(state.impactMs * 0.09) * 2) : 0;
+  context.translate(cameraKick, 0);
+  drawSky(context, state, palette, reducedMotion);
+  drawCityLayers(context, state, palette, reducedMotion);
+  drawActSetting(context, state, palette, reducedMotion);
+  drawForeground(context, state, palette, reducedMotion);
 
-  const parallax = state.worldX * 0.16;
-  context.fillStyle = palette.sapphire;
-  context.beginPath();
-  context.moveTo(0, 152);
-  for (let x = -120; x <= RUNNER_WIDTH + 120; x += 120) {
-    const peak = x - (parallax % 120);
-    context.lineTo(peak + 60, 80 + ((x / 120) % 2) * 24);
-    context.lineTo(peak + 120, 152);
-  }
-  context.lineTo(RUNNER_WIDTH, 220);
-  context.lineTo(0, 220);
-  context.closePath();
-  context.fill();
-
-  const buildingOffset = (state.worldX * 0.34) % 190;
-  for (let x = -190; x < RUNNER_WIDTH + 190; x += 190) {
-    const bx = x - buildingOffset;
-    pixelRect(context, bx, 158, 148, 142, palette.paper3);
-    for (let windowIndex = 0; windowIndex < 5; windowIndex += 1) {
-      pixelRect(context, bx + 18 + windowIndex * 24, 182, 9, 82, windowIndex % 2 === 0 ? palette.rule : palette.paper2);
-    }
-  }
-
-  pixelRect(context, 0, FLOOR_Y, RUNNER_WIDTH, 82, palette.paper2);
-  pixelRect(context, 0, FLOOR_Y, RUNNER_WIDTH, 4, palette.accent);
-  for (let road = -80; road < RUNNER_WIDTH + 80; road += 150) {
-    pixelRect(context, road - ((state.worldX * 0.9) % 150), FLOOR_Y + 40, 72, 5, palette.rule);
-  }
-
-  pixelRect(context, 34, 30, 138, 54, palette.paper2);
+  pixelRect(context, 28, 24, 158, 58, palette.paper2);
   context.strokeStyle = palette.accent;
-  context.lineWidth = 2;
-  context.strokeRect(34, 30, 138, 54);
+  context.lineWidth = 3;
+  context.strokeRect(28, 24, 158, 58);
+  drawDiamond(context, 48, 53, 8, palette.accent);
   context.fillStyle = palette.ink;
-  context.font = "700 14px ui-monospace, monospace";
-  context.textAlign = "center";
-  context.fillText(act.sign, 103, 63);
-
-  drawActSetting(context, state, palette);
+  context.font = `700 15px ${palette.fontMono}`;
+  context.textAlign = "start";
+  context.fillText(act.sign, 68, 58);
 
   for (const candidate of act.targets) {
     const screenX = runnerWorldToScreen(candidate.x, state.worldX);
@@ -521,18 +793,22 @@ export function drawRunnerFrame(context: CanvasRenderingContext2D, state: Runner
     }
   }
   for (const projectile of state.projectiles) {
-    const screenX = runnerWorldToScreen(projectile.x, state.worldX);
-    pixelRect(context, screenX, projectile.y, 18, 10, palette.accent);
-    pixelRect(context, screenX + 4, projectile.y + 3, 10, 4, palette.ink);
+    drawSpark(context, projectile, state, palette);
   }
-  if (!reducedMotion) drawFlourish(context, state, act, palette);
+  if (!reducedMotion) {
+    drawFlourish(context, state, act, palette);
+    drawImpact(context, state, act, palette);
+    drawLandingDust(context, state, palette);
+  }
   drawPerson(context, state, act.lead, palette);
 
   if (state.paused) {
-    context.globalAlpha = 0.72;
+    context.globalAlpha = 0.66;
     context.fillStyle = palette.paper2;
     context.fillRect(0, 0, RUNNER_WIDTH, RUNNER_HEIGHT);
     context.globalAlpha = 1;
+    pixelRect(context, 440, 170, 18, 88, palette.accent);
+    pixelRect(context, 476, 170, 18, 88, palette.accent);
   }
   context.restore();
 }

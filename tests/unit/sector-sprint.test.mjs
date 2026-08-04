@@ -21,11 +21,17 @@ test("Sector Sprint has five fixed original Acts and only allowlisted comic-obje
   assert.ok(Runner.RUNNER_ACTS.length * Runner.RUNNER_ACT_SECONDS < Runner.RUNNER_SESSION_SECONDS, "the authored action route closes before its absolute backstop");
   assert.deepEqual(Runner.RUNNER_ACTS.map((act) => act.sign), ["SECTOR 22", "SECTOR 26", "SECTOR 17", "MADHYA MARG", "GHAR THIS WAY"]);
   const allowlist = new Set(Runner.RUNNER_TARGET_KINDS);
+  const targetIds = [];
   for (const [actIndex, act] of Runner.RUNNER_ACTS.entries()) {
     assert.equal(act.storyBeats.length, 3, `${act.id} narrated beats`);
     assert.equal(act.targets.length, 5 + actIndex, `${act.id} authored target density`);
     assert.ok(act.targets.every((target) => allowlist.has(target.kind)), `${act.id} target allowlist`);
+    targetIds.push(...act.targets.map((target) => target.id));
   }
+  assert.equal(new Set(targetIds).size, targetIds.length, "every authored target id is globally unique");
+  assert.equal(Runner.RUNNER_DPR_CAP, 2);
+  assert.ok(Runner.RUNNER_EFFECT_PARTICLE_CAP <= 24, "effect work stays explicitly bounded");
+  assert.doesNotMatch(source, /Math\.random/, "scene choreography remains deterministic");
   const shippedCopy = JSON.stringify(Runner.RUNNER_ACTS).toLowerCase();
   assert.doesNotMatch(shippedCopy, /contra|subway surfers|flappy bird|chrome dino/);
   assert.doesNotMatch(shippedCopy, /\bleaderboard\b|\bhigh score\b|\bbest score\b|\bkill\b|\benemy\b|\bgun\b|\bbullet\b/);
@@ -67,6 +73,7 @@ test("jump and spark change choreography while forward progress never becomes fa
   assert.match(sparked.message, /delivered/i);
   assert.equal(sparked.lastTransformedTargetId, "gw-call-1");
   assert.equal(sparked.flourishMs, 720);
+  assert.equal(sparked.projectiles.length, 0, "the transforming spark is consumed");
 
   const collisionSetup = {
     ...Runner.createRunnerState(0),
@@ -75,8 +82,21 @@ test("jump and spark change choreography while forward progress never becomes fa
   };
   const collided = Runner.stepRunner(collisionSetup, {}, 50);
   assert.ok(collided.encounteredTargetIds.includes("gw-puddle-1"));
+  assert.equal(collided.lastEncounteredTargetId, "gw-puddle-1");
+  assert.equal(collided.impactMs, 260);
   assert.equal(collided.finished, false);
   assert.ok(collided.worldX > collisionSetup.worldX, "collision never resets forward motion");
+});
+
+test("tactile effects and optional spark objects stay bounded", () => {
+  let state = Runner.createRunnerState(0);
+  for (let attempt = 0; attempt < 12; attempt += 1) state = Runner.stepRunner(state, { spark: true }, 0);
+  assert.equal(state.projectiles.length, 4, "queued spark objects have a hard cap");
+
+  state = Runner.stepRunner(Runner.createRunnerState(0), { jump: true }, 50);
+  for (let frame = 0; frame < 60 && !state.grounded; frame += 1) state = Runner.stepRunner(state, {}, 50);
+  assert.equal(state.grounded, true);
+  assert.ok(state.landingMs > 0 && state.landingMs <= 240, "landing feedback is brief and bounded");
 });
 
 test("pause freezes the engine without changing its deterministic state", () => {

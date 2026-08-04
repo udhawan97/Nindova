@@ -21,6 +21,7 @@ import {
 import {
   RUNNER_ACTS,
   RUNNER_ACT_SECONDS,
+  RUNNER_DPR_CAP,
   RUNNER_HEIGHT,
   RUNNER_PLAYER_SCREEN_X,
   RUNNER_SESSION_SECONDS,
@@ -93,6 +94,8 @@ let runnerTransitionTimer = 0;
 let runnerTransitionRemainingMs = 0;
 let runnerTransitionStartedAt: number | null = null;
 let runnerTransitionCallback: (() => void) | null = null;
+let houseAudioContext: AudioContext | null = null;
+const houseAudioVoices = new Set<OscillatorNode>();
 
 if (active) view = "game";
 
@@ -144,6 +147,7 @@ function saveActiveGame() {
 
 function route(next: View) {
   stopRunnerLoop();
+  closeHouseAudio();
   if (next !== "game") clearRunnerTransition();
   view = next;
   if (next !== "game") {
@@ -158,6 +162,7 @@ function route(next: View) {
 function startGame(gameId: GameId) {
   const game = getGame(gameId);
   stopRunnerLoop();
+  closeHouseAudio();
   clearRunnerTransition();
   runnerState = null;
   runnerSessionElapsedMs = 0;
@@ -291,7 +296,7 @@ function renderGame() {
         <button class="back-link" type="button" data-route="home"><span aria-hidden="true">←</span> Grand Salon</button>
         <div class="chapter-mark"><span>${game.kind === "runner" ? "Act" : "Chapter"} ${active.chapter + 1}</span><i aria-hidden="true"></i><span>of 5</span></div>
       </header>
-      <div class="game-title-block">
+      <div class="game-title-block ${game.kind === "runner" ? "game-title-block-runner" : ""}">
         <p class="kicker">Table ${game.number} · ${escape(chapterTitle ?? (game.kind === "runner" ? "Act" : "Chapter"))}</p>
         <h1 id="gameTitle">${escape(game.title)}</h1>
         <p>${escape(game.description)}</p>
@@ -333,22 +338,26 @@ function renderRunner(): string {
   return `
     <section class="runner-shell" aria-labelledby="runnerActTitle">
       <header class="runner-brief">
-        <div><span>${escape(act.location)}</span><h2 id="runnerActTitle">${escape(act.title)}</h2></div>
-        <div><p>${escape(act.opening)}</p><p>${escape(act.houseCall)}</p></div>
+        <div><span>Act ${active.chapter + 1} scene · ${escape(act.location)}</span><h2 id="runnerActTitle">${escape(act.title)}</h2></div>
       </header>
       <figure class="runner-stage-frame">
         <div class="runner-canvas-window"><canvas id="runnerCanvas" width="${RUNNER_WIDTH}" height="${RUNNER_HEIGHT}" aria-label="${escape(act.title)}. An original auto-running Chandigarh city scene. Use Jump or ${escape(act.sparkLabel)} for optional comic interactions." aria-describedby="runnerInstructions runnerApproach runnerLive"></canvas></div>
-        <figcaption>${escape(act.location)} · original code-drawn miniature · fixed authored city route</figcaption>
+        <figcaption><span>${escape(act.sign)}</span><span>Original code-drawn miniature · fixed authored city route</span></figcaption>
       </figure>
-      <p id="runnerApproach" class="runner-approach"><span>Approaching</span><strong>${escape(act.targets[0]?.label ?? act.closing)}</strong></p>
-      <div class="runner-controls" aria-label="Sector Sprint controls">
-        <button type="button" data-runner-action="jump"><span>Jump</span><small>↑ · W · Space</small></button>
-        <button type="button" data-runner-action="spark"><span>${escape(act.sparkLabel)}</span><small>J · K · X</small></button>
-        <button type="button" data-runner-pause aria-pressed="${runnerPaused}"><span>${runnerPaused ? "Resume city" : "Pause city"}</span><small>Movement and sound</small></button>
-        <button type="button" data-runner-story><span>Narrated route</span><small>No precision needed</small></button>
+      <div class="runner-status-deck">
+        <p id="runnerApproach" class="runner-approach"><span>Approaching</span><strong>${escape(act.targets[0]?.label ?? act.closing)}</strong></p>
+        <p id="runnerLive" class="runner-live" role="status" aria-live="polite">${escape(runnerState?.message ?? act.opening)}</p>
       </div>
-      <p id="runnerInstructions" class="runner-instructions">The street moves forward on its own and closes this Act automatically. Jump and sparks change the comic choreography; collisions never stop or reset the run.</p>
-      <p id="runnerLive" class="runner-live" role="status" aria-live="polite">${escape(runnerState?.message ?? act.opening)}</p>
+      <div class="runner-controls" aria-label="Sector Sprint controls">
+        <button class="runner-control-primary" type="button" data-runner-action="jump"><i class="runner-control-mark runner-control-mark-jump" aria-hidden="true"></i><span>Jump</span><small>↑ · W · Space</small></button>
+        <button class="runner-control-primary" type="button" data-runner-action="spark"><i class="runner-control-mark runner-control-mark-spark" aria-hidden="true"></i><span>${escape(act.sparkLabel)}</span><small>J · K · X</small></button>
+        <button class="runner-control-quiet" type="button" data-runner-pause aria-pressed="${runnerPaused}"><i class="runner-control-mark runner-control-mark-pause" aria-hidden="true"></i><span>${runnerPaused ? "Resume city" : "Pause city"}</span><small>Movement and sound</small></button>
+        <button class="runner-control-quiet" type="button" data-runner-story><i class="runner-control-mark runner-control-mark-story" aria-hidden="true"></i><span>Narrated route</span><small>No precision needed</small></button>
+      </div>
+      <div class="runner-copy-deck">
+        <p>${escape(act.houseCall)}</p>
+        <p id="runnerInstructions" class="runner-instructions">The street moves forward on its own and closes this Act automatically. Jump and sparks change the comic choreography; collisions never stop or reset the run.</p>
+      </div>
     </section>
   `;
 }
@@ -421,6 +430,9 @@ function runnerPalette(): RunnerPalette {
     ruby: token("--color-jewel-ruby"),
     sapphire: token("--color-jewel-sapphire"),
     jade: token("--color-jewel-jade"),
+    fontDisplay: token("--font-display"),
+    fontBody: token("--font-body"),
+    fontMono: token("--font-mono"),
   };
   return runnerPaletteCache;
 }
@@ -502,9 +514,25 @@ function startRunnerStoryBoundary() {
   }, remaining);
 }
 
+function prepareRunnerCanvas(canvas: HTMLCanvasElement): CanvasRenderingContext2D | null {
+  const ratio = Math.min(RUNNER_DPR_CAP, Math.max(1, window.devicePixelRatio || 1));
+  const pixelWidth = Math.round(RUNNER_WIDTH * ratio);
+  const pixelHeight = Math.round(RUNNER_HEIGHT * ratio);
+  if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+    canvas.width = pixelWidth;
+    canvas.height = pixelHeight;
+  }
+  canvas.dataset.logicalWidth = String(RUNNER_WIDTH);
+  canvas.dataset.logicalHeight = String(RUNNER_HEIGHT);
+  canvas.dataset.pixelRatio = String(ratio);
+  const context = canvas.getContext("2d");
+  context?.setTransform(ratio, 0, 0, ratio, 0, 0);
+  return context;
+}
+
 function drawCurrentRunnerFrame() {
   const canvas = document.querySelector<HTMLCanvasElement>("#runnerCanvas");
-  const context = canvas?.getContext("2d");
+  const context = canvas ? prepareRunnerCanvas(canvas) : null;
   if (!context || !runnerState) return;
   drawRunnerFrame(
     context,
@@ -550,6 +578,8 @@ function runRunnerFrame(timestamp: number) {
   }
 
   if (active.storyBeat === null && runnerState) {
+    const previousState = runnerState;
+    const frameInput = runnerInput;
     let remaining = activeDelta;
     let firstStep = true;
     while (remaining > 0) {
@@ -559,6 +589,7 @@ function runRunnerFrame(timestamp: number) {
       firstStep = false;
       remaining -= step;
     }
+    playRunnerStateCue(previousState, runnerState, frameInput);
     drawCurrentRunnerFrame();
     updateRunnerApproach();
     updateRunnerLive(runnerState.message);
@@ -596,7 +627,10 @@ function queueRunnerAction(action: "jump" | "spark") {
 
 function setRunnerPaused(paused: boolean) {
   if (!active || getGame(active.gameId).kind !== "runner") return;
-  if (paused) stopRunnerLoop();
+  if (paused) {
+    stopRunnerLoop();
+    closeHouseAudio();
+  }
   runnerPaused = paused;
   runnerLastTimestamp = 0;
   if (runnerState) runnerState = { ...runnerState, paused };
@@ -613,6 +647,7 @@ function setRunnerPaused(paused: boolean) {
 
 function chooseNarratedRoute() {
   if (!active || getGame(active.gameId).kind !== "runner") return;
+  closeHouseAudio();
   active.storyBeat = 0;
   runnerState = null;
   runnerPaused = false;
@@ -699,6 +734,7 @@ function advanceChapter() {
 function finishGame() {
   if (!active) return;
   stopRunnerLoop();
+  closeHouseAudio();
   clearRunnerTransition();
   runnerState = null;
   runnerPaused = false;
@@ -728,6 +764,7 @@ function finishGame() {
 function closeRunnerAtBoundary() {
   if (!active || getGame(active.gameId).kind !== "runner") return;
   stopRunnerLoop();
+  closeHouseAudio();
   clearRunnerTransition();
   runnerState = null;
   runnerPaused = false;
@@ -791,34 +828,63 @@ function showCelebration(message: string) {
   celebrationTimer = window.setTimeout(() => { celebration.hidden = true; }, 980);
 }
 
-function playChime(chapter: number) {
+function closeHouseAudio() {
+  for (const voice of houseAudioVoices) {
+    try { voice.stop(); } catch { /* An ended optional voice needs no further work. */ }
+  }
+  houseAudioVoices.clear();
+  const context = houseAudioContext;
+  houseAudioContext = null;
+  if (!context) return;
+  try { void context.close().catch(() => {}); } catch { /* Audio is always optional. */ }
+}
+
+function playToneSequence(notes: readonly number[], type: OscillatorType, volume: number, spacing = 0.055) {
   if (!soundOn) return;
   const AudioContextClass = window.AudioContext;
   if (!AudioContextClass) return;
-  let context: AudioContext | null = null;
-  const closeContext = () => {
-    if (!context) return;
-    try { void context.close().catch(() => {}); } catch { /* Audio is always optional. */ }
-  };
   try {
-    context = new AudioContextClass();
+    if (!houseAudioContext || houseAudioContext.state === "closed") houseAudioContext = new AudioContextClass();
+    const context = houseAudioContext;
+    if (context.state !== "running") return;
     const now = context.currentTime;
-    [0, 4, 7].forEach((offset, index) => {
-      const oscillator = context!.createOscillator();
-      const gain = context!.createGain();
-      oscillator.type = "sine";
-      oscillator.frequency.value = 220 * 2 ** ((chapter + offset) / 12);
-      gain.gain.setValueAtTime(0.0001, now + index * 0.07);
-      gain.gain.exponentialRampToValueAtTime(0.045, now + index * 0.07 + 0.015);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + index * 0.07 + 0.22);
-      oscillator.connect(gain).connect(context!.destination);
-      oscillator.start(now + index * 0.07);
-      oscillator.stop(now + index * 0.07 + 0.24);
+    notes.slice(0, Math.max(0, 8 - houseAudioVoices.size)).forEach((frequency, index) => {
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      const startAt = now + index * spacing;
+      oscillator.type = type;
+      oscillator.frequency.value = frequency;
+      gain.gain.setValueAtTime(0.0001, startAt);
+      gain.gain.exponentialRampToValueAtTime(volume, startAt + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.16);
+      oscillator.connect(gain).connect(context.destination);
+      oscillator.onended = () => houseAudioVoices.delete(oscillator);
+      houseAudioVoices.add(oscillator);
+      oscillator.start(startAt);
+      oscillator.stop(startAt + 0.18);
     });
-    window.setTimeout(closeContext, 600);
   } catch {
-    closeContext();
+    closeHouseAudio();
   }
+}
+
+function playRunnerStateCue(previous: RunnerState, next: RunnerState, input: RunnerInput) {
+  if (!active || active.storyBeat !== null || runnerIsSuspended()) return;
+  if (next.transformedTargetIds.length > previous.transformedTargetIds.length) {
+    playToneSequence([392, 523, 659], "sine", 0.032);
+  } else if (next.impactMs > previous.impactMs) {
+    playToneSequence([147, 131], "triangle", 0.025, 0.035);
+  } else if (next.landingMs > previous.landingMs) {
+    playToneSequence([196], "triangle", 0.018);
+  } else if (input.jump && !next.grounded) {
+    playToneSequence([262, 330], "sine", 0.018, 0.045);
+  } else if (input.spark) {
+    playToneSequence([440, 587], "sine", 0.02, 0.04);
+  }
+}
+
+function playChime(chapter: number) {
+  playToneSequence([0, 4, 7].map((offset) => 220 * 2 ** ((chapter + offset) / 12)), "sine", 0.045, 0.07);
 }
 
 document.addEventListener("click", (event) => {
@@ -902,7 +968,10 @@ document.addEventListener("keydown", (event) => {
 });
 
 document.addEventListener("visibilitychange", () => {
-  if (document.hidden) stopRunnerLoop();
+  if (document.hidden) {
+    stopRunnerLoop();
+    closeHouseAudio();
+  }
   else mountRunner();
   drawCurrentRunnerFrame();
 });
@@ -910,6 +979,7 @@ document.addEventListener("visibilitychange", () => {
 window.addEventListener("blur", () => {
   runnerInterrupted = true;
   stopRunnerLoop();
+  closeHouseAudio();
   document.querySelectorAll<HTMLElement>('[data-runner-action][data-pressed="true"]').forEach((control) => {
     delete control.dataset.pressed;
   });
@@ -922,12 +992,15 @@ window.addEventListener("focus", () => {
   drawCurrentRunnerFrame();
 });
 
+window.addEventListener("resize", () => drawCurrentRunnerFrame());
+
 matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", (event) => {
   if (event.matches && active && getGame(active.gameId).kind === "runner" && active.storyBeat === null) chooseNarratedRoute();
 });
 
 soundButton.addEventListener("click", () => {
   soundOn = !soundOn;
+  if (!soundOn) closeHouseAudio();
   soundButton.ariaPressed = String(soundOn);
   soundButton.textContent = soundOn ? "Sound on" : "Sound off";
 });
