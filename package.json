@@ -9,11 +9,13 @@
     "node": ">=24"
   },
   "workspaces": [
+    "apps/house",
     "apps/session",
     "apps/site"
   ],
   "scripts": {
-    "build": "npm run build:qr && npm run build:session && npm run build:site && node scripts/compose-build.mjs",
+    "build": "npm run build:qr && npm run build:session && npm run build:house && npm run build:site && node scripts/compose-build.mjs",
+    "build:house": "npm --workspace @nindova/house run build",
     "build:qr": "node scripts/generate-play-qr.mjs",
     "build:session": "npm --workspace @nindova/session run build",
     "build:site": "npm --workspace @nindova/site run build",
@@ -21,9 +23,11 @@
     "capture:public-media": "npm run build:session && node scripts/capture-public-media.mjs",
     "check": "npm run typecheck && npm run test:unit && npm run build",
     "dev:session": "npm --workspace @nindova/session run dev",
+    "dev:house": "npm --workspace @nindova/house run dev",
     "dev:site": "npm --workspace @nindova/site run dev",
     "preview": "node scripts/serve.mjs dist",
-    "test": "npm run test:unit && npm run test:public && npm run test:arc && npm run test:portrait && npm run test:latency && npm run test:layered && npm run test:self-closing && npm run test:night && npm run test:dawn && npm run test:pwa",
+    "test": "npm run test:unit && npm run test:public && npm run test:house && npm run test:arc && npm run test:portrait && npm run test:latency && npm run test:layered && npm run test:self-closing && npm run test:night && npm run test:dawn && npm run test:pwa",
+    "test:house": "npm run build && node tests/browser/house.mjs",
     "test:arc": "npm run build:session && node tests/browser/seed-asserted.mjs",
     "test:portrait": "npm run build:session && node tests/browser/portrait-accessibility.mjs",
     "test:latency": "npm run build && node tests/browser/tile-latency.mjs",
@@ -34,9 +38,9 @@
     "test:public": "npm run build && node tests/browser/public-surface.mjs",
     "test:dawn": "npm run build && node tests/browser/dawn.mjs",
     "test:seed:observe": "node scripts/run-seed-observational.mjs",
-    "test:unit": "npm run build:session && node --test tests/unit/*.test.mjs",
+    "test:unit": "npm run build:session && npm run build:house && node --test tests/unit/*.test.mjs",
     "test:wall-clock": "npm run build && node tests/browser/wall-clock-cap.mjs",
-    "typecheck": "npm --workspace @nindova/session run typecheck && npm --workspace @nindova/site run typecheck"
+    "typecheck": "npm --workspace @nindova/session run typecheck && npm --workspace @nindova/house run typecheck && npm --workspace @nindova/site run typecheck"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.9",

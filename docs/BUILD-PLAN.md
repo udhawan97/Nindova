@@ -1,6 +1,6 @@
 # Nindova Build Plan
 
-**Status:** Historical browser-first baseline, completed. The experience-specific arc is superseded by [ADR 0010](./adr/0010-replace-the-vista-arc-with-rasoi-pairs.md) and the [Rasoi Pairs redesign plan](./REDESIGN-PLAN.md). The immutable language, privacy boundary, accessibility floor, Two-Loop Law, and fifteen-minute maximum remain active.
+**Status:** Historical browser-first baseline, completed. The experience-specific arc is superseded by [ADR 0010](./adr/0010-replace-the-vista-arc-with-rasoi-pairs.md) and the [Rasoi Pairs redesign plan](./REDESIGN-PLAN.md). [ADR 0013](./adr/0013-add-the-adult-nindova-house.md) adds the adult entertainment House while preserving and regression-testing the Night Room's two immutable core lines, privacy boundary, accessibility floor, Two-Loop Law, and fifteen-minute maximum; adult-audience framing is appended. [ADR 0014](./adr/0014-add-a-fail-closed-assessment-readiness-contract.md) adds source-only validation gates without authorizing data collection or a public assessment result.
 
 ## Delivery boundary
 
@@ -109,7 +109,7 @@ This build ships the browser, installable PWA, public website, documentation, an
 ### M6 — Final hardening, knowledge graph, and public proof
 
 - Run unit/type/build gates, deterministic cap tests, one wall-clock 15-minute Session, desktop and portrait arcs, keyboard/focus/status checks, real-device screen-reader checks, 200% zoom, reduced motion, offline/PWA tests, local-state recovery, and Dawn export tests.
-- Assert the immutable language in production surfaces: “Nothing to win. Nothing tracked. Nothing you can do wrong.”; “The session is over. That's the point.” as the end-card first line; behavioral-only/13+/not-treatment/CBT-I language; and the absence of prohibited sleep-performance claims.
+- Assert the immutable Night Room language in production surfaces: “Nothing to win. Nothing tracked. Nothing you can do wrong.”; “The session is over. That's the point.” as the end-card first line; behavioral-only/18+/not-treatment/CBT-I language; and the absence of prohibited sleep-performance claims.
 - Inspect the rendered 1440px desktop, 375×812, 375×667, 320×568 Session, 320px website, standalone HTML, and installed PWA rather than treating source/tests as shipped-surface proof.
 - Build the first Graphify graph after modular code exists, run a scoped architecture query, and update it before the final build and push.
 - Confirm every Must slice has one focused commit, no unrelated files, and a recorded owner checkpoint. Re-review the staged/final tracked inventory and scan for credentials, personal paths, browser profiles, build outputs, and unintended evidence. Push the verified series to the public `origin/main`; do not claim a live deployment unless its public URL is separately observed.

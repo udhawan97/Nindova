@@ -1,9 +1,11 @@
 ---
 title: Accessibility
-description: Native tile controls, text labels, keyboard completion, and alternate presentation in Rasoi Pairs.
+description: Native Salon and Night controls, text labels, focus-preserving keyboard play, and alternate presentation.
 ---
 
-Rasoi Pairs uses native HTML buttons for every tile. The drawing, visible name, accessible name, free/covered state, selected state, and settled state come from the same motif registry and board kernel.
+Grand Salon and Rasoi Pairs use native HTML controls for every required action. Salon rerenders deliberately restore logical focus after an answer, Lantern cover, Stack move, chapter transition, and curtain call. Stack plinths announce the ordered discs and current top disc; visible geometry is not the only state source.
+
+The Salon's visual Pattern and Mirror tasks are entertainment, not equivalent cognitive measurements. Text alternatives preserve operation and state, but no claim is made that an altered presentation measures the same construct.
 
 ## Operable rule
 
@@ -20,6 +22,6 @@ Audio is off by default and optional. The brass bloom and board-to-dabba transit
 
 ## Alternate presentation
 
-The release is browser-verified at 320×568, 375×812, 414×896, 768×1024, and 1440×900. It covers 200% page scale, reduced motion, keyboard pairing, target size, visible focus, and horizontal-overflow checks.
+The House and Night surfaces are browser-verified at 320×568, 375×812, 414×896, 768×1024, and 1440×900. Coverage includes House keyboard game paths and focus restoration, Night keyboard pairing, 200% page scale, reduced motion, target size, visible focus, and horizontal overflow.
 
 Real-device VoiceOver and TalkBack acceptance remains an untested release limitation. Automated semantic checks are not a substitute for that human proof.

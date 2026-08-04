@@ -1,20 +1,26 @@
 {
-  "date": "2026-08-02",
-  "framework": "empty repository with a supplied standalone Canvas demo",
-  "font_stack": "seed uses Georgia and Iowan Old Style",
-  "palette": "seed uses warm near-black, parchment ink, and amber accent",
-  "motion": "seed uses Canvas animation and CSS transitions; no motion library",
-  "spacing": "no shared scale existed",
+  "date": "2026-08-04",
+  "framework": "Vite TypeScript House and isolated Session/PWA plus Astro/Starlight public site",
+  "font_stack": "House and site bundle Newsreader and Geist; Session uses local Iowan Old Style and Avenir Next system stacks",
+  "palette": "Shahi Raat royal-night palette with blackened indigo, ivory, aged brass, and restrained jewel accents",
+  "motion": "CSS and Canvas motion only; no runtime motion library",
+  "spacing": "shared four-point token scale at the project root and in the standalone Session",
   "preserve": [
-    "warm-dark palette direction",
-    "literary type voice",
+    "Phulkari lattice brand mark",
+    "Shahi Raat cultural and material direction",
     "quiet restrained motion",
-    "supplied Session behavior"
+    "standalone and PWA behavior",
+    "Session copy and accessibility contracts",
+    "House and Night route, storage, and service-worker isolation"
   ],
   "introduce": [
-    "portable OKLCH tokens",
-    "atmospheric narrative macrostructure",
-    "semantic interaction states",
-    "responsive and slop-test gates"
+    "architectural House map composition",
+    "authored five-chapter thinking games for adults 18+",
+    "deterministic, restrained action celebrations",
+    "blackened-indigo lacquer surfaces",
+    "double brass inlay framing",
+    "neutral ivory tile faces with jewel motif inks",
+    "complete tokenized control states",
+    "light Shahi Raat Dawn variant with an indigo-and-brass gallery composition"
   ]
 }

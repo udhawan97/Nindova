@@ -1,8 +1,28 @@
 # Nindova
 
-Nindova is a bounded nightly game that replaces an unbounded late-night loop with a simple mental exercise and an ending it cannot bargain away.
+Nindova is an adults-only house of authored entertainment games. Its separate Night Room remains a bounded nightly game that replaces an unbounded late-night loop with a simple mental exercise and an ending it cannot bargain away.
 
 ## Language
+
+**Nindova House**
+
+The product-wide entry and spatial home for adults 18 and over. It contains the Grand Salon, the Gallery, and a door to the separately bounded Night Room.
+_Avoid_: casino, arcade, assessment platform
+
+**Grand Salon**
+
+The entertainment room containing four authored games of five chapters each. Progress is local to the current chosen game and never becomes a population comparison, intelligence claim, streak, or randomized reward.
+_Avoid_: test center, leaderboard, daily challenge
+
+**Gallery**
+
+A local ledger that may show only the most recent completed reading per Salon game. An entry is descriptive provenance, not a score, rank, collection, or longitudinal profile.
+_Avoid_: trophy room, achievements, performance history
+
+**Night Room**
+
+The existing bounded Session surface at `/play/`. Every Two-Loop, copy, duration, privacy, and ending constraint below remains scoped to it.
+_Avoid_: bonus mode, unlock
 
 **Session**
 

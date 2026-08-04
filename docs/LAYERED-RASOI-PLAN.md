@@ -6,7 +6,7 @@
 
 Replace the three flat racks with **Masala Mound**, a 36-tile, three-layer pair-removal board. The board should ask for visual search and spatial planning while preserving Nindova's promise that a legal choice cannot produce failure. Add one authored match response that feels clear and satisfying, then hand the person toward rest. Make another same-night Session possible only through a deliberate return to the intake.
 
-Nindova remains a bounded wind-down game for people aged 13 and up, not a treatment or a performance tool. The evidence review in [bedtime-game-evidence.md](./research/bedtime-game-evidence.md) does not support claims that this exact game makes people sleepy, improves sleep, improves general memory, or produces a beneficial dopamine response at any age.
+At the time of this historical plan, Nindova used a 13+ audience boundary. [ADR 0013](./adr/0013-add-the-adult-nindova-house.md) supersedes that boundary: the current House and Night Room are intended for adults 18 and over. The Night Room remains a bounded wind-down game, not a treatment or performance tool. The evidence review in [bedtime-game-evidence.md](./research/bedtime-game-evidence.md) does not support claims that this exact game makes people sleepy, improves sleep, improves general memory, or produces a beneficial dopamine response at any age.
 
 ## Experience sequence
 

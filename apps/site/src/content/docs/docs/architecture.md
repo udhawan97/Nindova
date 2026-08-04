@@ -1,13 +1,22 @@
 ---
 title: Architecture
-description: Browser-first boundaries for Rasoi legality, Night state, Dawn, PWA, and the public site.
+description: Browser-first boundaries for the House registry, Salon games, Rasoi legality, Night state, PWAs, Dawn, and the public site.
 ---
 
 ## Workspace
 
+- **House** — Vite-compiled TypeScript for the typed entertainment registry, four game renderers, same-tab active state, replaceable result provenance, adult acknowledgement, and its scoped worker.
 - **Session** — Vite-compiled TypeScript for the pure Rasoi kernel, native tile interface, boundary clock, optional audio, Night state, and Dawn export.
 - **Site** — Astro landing page and Starlight documentation built from verified product facts and rendered release media.
-- **Composition** — one static root artifact containing the landing page, `/docs/`, `/play/`, and portable `nindova.html`.
+- **Composition** — one static root artifact containing the landing page, `/docs/`, `/house/`, `/play/`, and portable `nindova.html`.
+
+## House boundary
+
+`house-core.ts` owns the compile-time game registry, five authored chapters per game, Stack legality, entertainment-result schema, and strict local-state validation. `house.ts` owns spatial navigation, semantic controls, deterministic celebration, optional sound, focus restoration, same-tab recovery, and the Gallery. Every completion is permanently labeled `mode: "entertainment"`; no assessment scoring or population comparison is present.
+
+`assessment-readiness.ts` is a source-only, fail-closed evidence contract. It is not imported by the House runtime and introduces no route, UI, storage, request, or scoring path. It rejects entertainment results as assessment inputs and keeps research collection and public cognitive output disabled.
+
+The House links to but does not import the Night runtime. `/house/` and `/play/` have separate storage namespaces, manifests, service workers, and browser evidence contracts (`window.__house` and `window.__ct`).
 
 ## Legality kernel
 
@@ -23,6 +32,6 @@ The authored Gentle geometry has 24 base, 8 middle, and 4 top Tiles. Deeper has 
 
 ## Distribution boundary
 
-The `/play/` build registers a versioned service worker scoped to its own static shell. The standalone removes its manifest and worker registration during composition. Both artifacts inline the same compiled Session runtime; neither requires an account or third-party runtime service. A build-time QR generator encodes the canonical Pages `/play/` URL and adds no runtime request.
+The `/house/` and `/play/` builds register separately scoped versioned workers. The House precaches its full hashed static asset graph; the Night standalone removes its manifest and worker registration during composition. None requires an account or third-party runtime service. A build-time QR generator still encodes the canonical direct `/play/` route and adds no runtime request.
 
 The deferred iOS Wall is a separate native boundary and is not implemented by the browser dismissal surface.

@@ -15,6 +15,9 @@
   --color-focus: oklch(88% 0.13 86);
   --color-error: oklch(72% 0.15 27);
   --color-success: oklch(75% 0.09 145);
+  --color-jewel-ruby: oklch(43% 0.11 8);
+  --color-jewel-sapphire: oklch(39% 0.1 264);
+  --color-jewel-jade: oklch(45% 0.075 160);
 
   --font-display: "Newsreader Variable", "Iowan Old Style", serif;
   --font-body: "Geist Variable", "Avenir Next", sans-serif;
@@ -44,7 +47,7 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --dur-micro: 110ms;
+  --dur-micro: 100ms;
   --dur-short: 200ms;
   --dur-long: 380ms;
 
@@ -57,4 +60,5 @@
   --z-base: 1;
   --z-raised: 10;
   --z-sticky: 200;
+  --shadow-brass: 0 1.8rem 5rem color-mix(in oklch, var(--color-paper) 72%, transparent), 0 0 0 1px color-mix(in oklch, var(--color-accent) 28%, transparent);
 }

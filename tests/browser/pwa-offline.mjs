@@ -39,16 +39,16 @@ try {
   await page.goto(prefix);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 375);
   const publicCopy = await page.locator("body").innerText();
-  assert.ok(publicCopy.includes("Nothing to win. Nothing tracked. Nothing you can do wrong."));
+  assert.ok(publicCopy.includes("Four authored tables. No account. No comparison."));
   const rootPath = mountPath ? `/${mountPath}/` : "/";
   const landingLinks = {
-    play: await page.locator('a.button-primary').first().getAttribute("href"),
+    house: await page.locator('a.button-primary').first().getAttribute("href"),
     docs: await page.locator('nav a[href$="/docs/"]').first().getAttribute("href"),
     standalone: await page.locator("a[download]").first().getAttribute("href"),
     release: await page.locator('a[href*="/releases"]').first().getAttribute("href"),
   };
   assert.deepEqual(landingLinks, {
-    play: `${rootPath}play/`,
+    house: `${rootPath}house/`,
     docs: `${rootPath}docs/`,
     standalone: `${rootPath}nindova.html`,
     release: "https://github.com/udhawan97/Nindova/releases",
@@ -58,7 +58,7 @@ try {
   assert.equal(await page.locator(".brand-lockup").count(), 2);
   assert.equal(await page.locator(".motif-line img").count(), 9);
   assert.match(await page.locator('meta[property="og:image"]').getAttribute("content") ?? "", /\/Nindova\/brand\/nindova-og\.png$/);
-  for (const href of [landingLinks.docs, landingLinks.standalone]) {
+  for (const href of [landingLinks.house, landingLinks.docs, landingLinks.standalone]) {
     const linkedPage = await context.newPage();
     const response = await linkedPage.goto(new URL(href, prefix).href);
     assert.equal(response?.ok(), true);
@@ -72,6 +72,53 @@ try {
     assert.equal(license.ok, true);
     assert.match(license.text, /SIL OPEN FONT LICENSE Version 1\.1/);
   }
+
+  const houseBase = `${prefix}house/`;
+  const houseContext = await browser.newContext({ viewport: { width: 375, height: 812 } });
+  const housePage = await houseContext.newPage();
+  const houseErrors = [];
+  const houseRequests = [];
+  housePage.on("pageerror", (error) => houseErrors.push(error.message));
+  housePage.on("console", (message) => { if (message.type() === "error") houseErrors.push(message.text()); });
+  housePage.on("request", (request) => houseRequests.push(request.url()));
+  await housePage.goto(prefix);
+  await housePage.evaluate(async () => {
+    const legacy = await caches.open("nindova-house-v2");
+    await legacy.put(new Request(`${location.origin}/legacy-house-shell`), new Response("old"));
+  });
+  await housePage.goto(houseBase);
+  await housePage.waitForFunction(() => Boolean(window.__house));
+  await housePage.click("#enterHouseButton");
+  await housePage.waitForFunction(async () => Boolean(await navigator.serviceWorker.ready));
+  await housePage.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
+  const houseRegistration = await housePage.evaluate(async () => {
+    const ready = await navigator.serviceWorker.ready;
+    const keys = await caches.keys();
+    const cache = await caches.open("nindova-house-v3");
+    return { scope: ready.scope, keys, entries: (await cache.keys()).map((request) => request.url) };
+  });
+  assert.equal(houseRegistration.scope, houseBase);
+  assert.ok(houseRegistration.keys.includes("nindova-house-v3"));
+  assert.equal(houseRegistration.keys.includes("nindova-house-v2"), false);
+  assert.ok(houseRegistration.entries.length > 0);
+  assert.ok(houseRegistration.entries.every((url) => url.startsWith(houseBase) && !url.includes("assessment-readiness")));
+  assert.equal((await houseContext.request.get(`${houseBase}assessment-readiness.js`)).status(), 404);
+  assert.doesNotMatch(await (await houseContext.request.get(`${houseBase}sw.js`)).text(), /assessment-readiness/);
+  const houseCdp = await houseContext.newCDPSession(housePage);
+  await houseCdp.send("Network.enable");
+  await houseCdp.send("Network.clearBrowserCache");
+  await housePage.close();
+  await houseContext.setOffline(true);
+  const coldHouse = await houseContext.newPage();
+  const coldHouseResponse = await coldHouse.goto(houseBase);
+  assert.equal(coldHouseResponse?.ok(), true);
+  await coldHouse.waitForFunction(() => Boolean(window.__house));
+  assert.equal(await coldHouse.locator(".game-door").count(), 4);
+  assert.ok(houseRequests.every((url) => new URL(url).origin === new URL(houseBase).origin));
+  assert.deepEqual(houseErrors, []);
+  await houseContext.setOffline(false);
+  await houseContext.close();
+
   await page.evaluate(async () => {
     const legacy = await caches.open("nindova-session-v3");
     await legacy.put(new Request(`${location.origin}/legacy-shell`), new Response("old"));
@@ -80,6 +127,7 @@ try {
 
   await page.goto(`${base}?review=1`);
   await page.waitForFunction(() => Boolean(window.__ct));
+  assert.match(await page.locator("body").innerText(), /Nothing to win\. Nothing tracked\. Nothing you can do wrong\./);
   assert.equal(await page.getAttribute('link[rel="manifest"]', "href"), "./manifest.webmanifest");
   const manifest = await page.evaluate(() => fetch("./manifest.webmanifest").then((response) => response.json()));
   assert.deepEqual({ start_url: manifest.start_url, scope: manifest.scope, display: manifest.display }, { start_url: "./", scope: "./", display: "standalone" });
@@ -141,7 +189,7 @@ try {
   assert.deepEqual(portableErrors, []);
   assert.ok(requests.every((url) => new URL(url).origin === new URL(base).origin));
   assert.deepEqual(errors, []);
-  console.log("Rasoi PWA update, QR decode, license, same-tab resume, denied audio, offline closure, privacy, and standalone checks passed.");
+  console.log("House base-path cache migration/cold offline plus Rasoi PWA update, QR, license, resume, denied audio, offline closure, privacy, and standalone checks passed.");
 } finally {
   await context.setOffline(false).catch(() => {});
   await context.close();

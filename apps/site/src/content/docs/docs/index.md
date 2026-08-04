@@ -1,22 +1,22 @@
 ---
 title: Nindova documentation
-description: Product contract and implementation notes for Rasoi Pairs and its browser-first release.
+description: Product contract and implementation notes for Nindova House, the Grand Salon, and the bounded Night Room.
 ---
 
-Nindova is a bounded late-night game. **Masala Mound** presents 36 Indian kitchen tiles in a Gentle three-layer or Deeper four-layer profile. Match two identical tiles when nothing covers them and one side is open; the board grows lighter and then the Session closes.
+Nindova House is private, offline-ready authored entertainment for adults 18 and over. The **Grand Salon** contains Pattern Court, Mirror Forge, Stack Architect, and Lantern Ledger, each arranged in five fixed chapters. The separate **Night Room** preserves Masala Mound: match two identical kitchen tiles when nothing covers them and one side is open; the board grows lighter and then the bounded Session closes.
 
 > Nothing to win. Nothing tracked. Nothing you can do wrong.
 
 ## Start here
 
-- [Getting started](./getting-started/) covers the standalone file, local workspace, and composed PWA build.
+- [Getting started](./getting-started/) covers the House, Night standalone file, local workspace, and composed PWA build.
 - [Product contract](./product-contract/) records the promises every implementation must keep.
 - [Rasoi Pairs Session](./nightly-arc/) defines free tiles, pairing, help, settlement, and closure.
 - [Night and local state](./night-and-local-state/) explains deterministic boards and safe v1/v2 migration.
 - [Privacy and local state](./privacy-local-state/) inventories long-lived, ephemeral, and cached data.
 - [Dawn](./dawn/) describes the first-light kitchen composition and local exports.
-- [Accessibility](./accessibility/) explains the native tile controls and alternate presentation.
-- [Architecture](./architecture/) maps the legality kernel, browser shell, PWA, site, and Dawn.
+- [Accessibility](./accessibility/) explains Salon and Night native controls, keyboard focus, nonvisual state, and alternate presentation.
+- [Architecture](./architecture/) maps the House registry, Night legality kernel, browser shells, PWAs, site, and Dawn.
 - [Visual identity and assets](./visual-identity/) documents the paired-diamond mark, palette, silhouettes, accessible usage, and CC0-1.0 provenance.
 - [Testing](./testing/) separates rendered evidence, source proof, and untested risk.
 - [Research receipts](./research-receipts/) states the behavioral evidence and its limits.

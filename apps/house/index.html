@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; base-uri 'self'; object-src 'none'; connect-src 'self'; img-src 'self' data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    />
+    <meta name="theme-color" content="#150d20" />
+    <meta name="description" content="Nindova House is a private, offline-ready collection of authored thinking games for adults." />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <title>Nindova House — The Grand Salon</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#houseMain">Skip to the House</a>
+    <header class="house-header">
+      <button class="wordmark" type="button" data-route="home" aria-label="Nindova House home">
+        <span class="wordmark-mark" aria-hidden="true">N</span>
+        <span><strong>Nindova</strong><small>The House</small></span>
+      </button>
+      <div class="house-header-actions">
+        <span class="audience-mark">For adults 18+</span>
+        <button id="soundButton" class="text-control" type="button" aria-pressed="false">Sound off</button>
+      </div>
+    </header>
+
+    <main id="houseMain" tabindex="-1"></main>
+
+    <footer class="house-footer">
+      <p>Nindova House · authored entertainment · private by design</p>
+      <nav aria-label="House footer">
+        <a href="../play/">Night Session</a>
+        <a href="../docs/">Documentation</a>
+      </nav>
+      <p>Adults 18+ · No account · No telemetry</p>
+    </footer>
+
+    <dialog id="audienceDialog" class="audience-dialog" aria-labelledby="audienceTitle">
+      <div class="dialog-inlay" aria-hidden="true"></div>
+      <p class="kicker">Before you enter</p>
+      <h1 id="audienceTitle">The House is designed for adults 18 and over.</h1>
+      <p>These are authored entertainment games. They do not produce an assessment result.</p>
+      <form method="dialog">
+        <button id="enterHouseButton" class="primary-action" value="enter">I am 18 or older</button>
+        <a class="quiet-link" href="../">Leave the House</a>
+      </form>
+    </dialog>
+
+    <div id="celebration" class="celebration" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+    <script type="module" src="/src/house.ts"></script>
+  </body>
+</html>

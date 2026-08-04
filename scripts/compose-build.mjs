@@ -5,6 +5,7 @@ const root = resolve(import.meta.dirname, "..");
 const output = resolve(root, "dist");
 const siteOutput = resolve(root, "apps/site/dist");
 const sessionOutput = resolve(root, "apps/session/dist");
+const houseOutput = resolve(root, "apps/house/dist");
 
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
@@ -15,5 +16,7 @@ await cp(resolve(sessionOutput, "assets"), resolve(output, "play/assets"), { rec
 await cp(resolve(sessionOutput, "manifest.webmanifest"), resolve(output, "play/manifest.webmanifest"));
 await cp(resolve(sessionOutput, "sw.js"), resolve(output, "play/sw.js"));
 await cp(resolve(sessionOutput, "nindova.html"), resolve(output, "nindova.html"));
+await mkdir(resolve(output, "house"), { recursive: true });
+await cp(houseOutput, resolve(output, "house"), { recursive: true });
 
-console.log("Composed dist/: landing, docs, /play/, and nindova.html");
+console.log("Composed dist/: landing, docs, /house/, /play/, and nindova.html");
