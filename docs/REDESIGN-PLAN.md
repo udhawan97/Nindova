@@ -17,7 +17,7 @@ Nindova offers one simple mental exercise with a familiar rule: find two matchin
 
 - One legality kernel serves rendering, input, help, and exhaustive board verification.
 - Every reachable nonterminal state exposes at least one legal pair; every legal choice remains solvable.
-- Same-night voluntary replay uses the identical board and cannot multiply Dawn or return state.
+- Same-night voluntary replay through intake uses the identical board after the same profile is reselected and cannot multiply Dawn or return state.
 - No score, timer, streak, grade, achievement, collection, missed-night language, or randomized reward.
 - Keyboard, switch, screen-reader, 200% zoom, reduced motion, muted audio, and denied audio all preserve completion.
 - The long-lived local schema stores only the facts needed for Night ID, Dawn, and the quiet tomorrow intention. Interaction timing remains ephemeral.

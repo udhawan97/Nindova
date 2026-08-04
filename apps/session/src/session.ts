@@ -36,6 +36,8 @@ const boardElement = element<HTMLDivElement>("board");
 const boardShell = element<HTMLDivElement>("boardShell");
 const boardStatus = element<HTMLParagraphElement>("boardStatus");
 const profileBadge = element<HTMLParagraphElement>("profileBadge");
+const pathNoteTitle = element<HTMLElement>("pathNoteTitle");
+const pathNoteText = element<HTMLElement>("pathNoteText");
 const driftObjects = element<HTMLDivElement>("driftObjects");
 const muteButton = element<HTMLButtonElement>("muteBtn");
 const dawnButton = element<HTMLButtonElement>("dawnBtn");
@@ -108,17 +110,17 @@ function showView(next: SessionState) {
 }
 
 function iconSvg(motif: RasoiMotifId) {
-  const common = 'viewBox="0 0 64 48" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"';
+  const common = 'viewBox="0 0 48 48" aria-hidden="true" fill="currentColor"';
   const drawings: Record<RasoiMotifId, string> = {
-    belan: '<path d="M13 24h38"/><path d="M19 17h26a7 7 0 0 1 0 14H19a7 7 0 0 1 0-14Z"/><path d="M3 24h10M51 24h10"/>',
-    chakla: '<ellipse cx="32" cy="22" rx="21" ry="13"/><path d="M16 30l-2 7M32 35v5M48 30l2 7"/><path d="M22 21c6-5 14-5 20 0"/>',
-    tawa: '<circle cx="26" cy="23" r="15"/><path d="M41 23h18M48 20v6"/><path d="M19 20c4-4 10-4 14 0"/>',
-    chimta: '<path d="M13 7c4 17 10 28 19 35M51 7c-4 17-10 28-19 35"/><path d="M13 7l7 3M51 7l-7 3"/><circle cx="32" cy="41" r="2"/>',
-    katori: '<path d="M12 17h40c-2 17-9 23-20 23S14 34 12 17Z"/><path d="M16 20c10 4 22 4 32 0"/><path d="M18 40h28"/>',
-    tiffin: '<path d="M17 15h30v26H17Z"/><path d="M15 23h34M15 32h34M22 15v-5h20v5"/><path d="M13 20v16M51 20v16"/>',
-    masala: '<circle cx="32" cy="24" r="20"/><circle cx="32" cy="24" r="5"/><circle cx="20" cy="18" r="4"/><circle cx="44" cy="18" r="4"/><circle cx="20" cy="32" r="4"/><circle cx="44" cy="32" r="4"/>',
-    chai: '<path d="M18 14h28l-3 28H21Z"/><path d="M22 23h20M23 31h18"/><path d="M25 9c-3-3 2-5 0-8M34 9c-3-3 2-5 0-8M42 9c-3-3 2-5 0-8"/>',
-    cooker: '<path d="M12 19h39v21H12Z"/><path d="M16 15h31l4 4H12Z"/><path d="M24 12h16M32 12V7M51 25h10"/><circle cx="32" cy="7" r="2"/>',
+    belan: '<rect x="9" y="20" width="30" height="8" rx="4"/><rect x="2" y="22" width="8" height="4" rx="2"/><rect x="38" y="22" width="8" height="4" rx="2"/>',
+    chakla: '<path fill-rule="evenodd" d="M24 8a16 16 0 1 0 .01 0Z M24 13.5a10.5 10.5 0 1 0 .01 0Z M24 15a9 9 0 1 0 .01 0Z"/>',
+    tawa: '<circle cx="20" cy="24" r="14"/><rect x="32" y="21" width="14" height="6" rx="3"/>',
+    chimta: '<g stroke="currentColor" stroke-width="3.5" stroke-linecap="round" fill="none"><path d="M24 9 16 39"/><path d="M24 9 32 39"/></g><circle cx="24" cy="8" r="4"/>',
+    katori: '<rect x="8" y="17.5" width="32" height="3" rx="1.5"/><path d="M10 22a14 10 0 0 0 28 0Z"/><rect x="20" y="31.5" width="8" height="4" rx="1.5"/>',
+    tiffin: '<path d="M19 15v-4q0-3 3-3h4q3 0 3 3v4" stroke="currentColor" stroke-width="3" fill="none"/><rect x="12" y="15" width="24" height="7" rx="3"/><rect x="12" y="24" width="24" height="7" rx="3"/><rect x="12" y="33" width="24" height="7" rx="3"/>',
+    masala: '<path fill-rule="evenodd" d="M24 8a16 16 0 1 0 .01 0ZM33.5 20a4 4 0 1 0 .01 0ZM19.25 11.8a4 4 0 1 0 .01 0ZM28.75 11.8a4 4 0 1 0 .01 0ZM14.5 20a4 4 0 1 0 .01 0ZM24 20a4 4 0 1 0 .01 0ZM19.25 28.2a4 4 0 1 0 .01 0ZM28.75 28.2a4 4 0 1 0 .01 0Z"/>',
+    chai: '<path fill-rule="evenodd" d="M15 9h18l-2.5 30q-.2 2-2.2 2h-8.6q-2 0-2.2-2Zm1.5 4.5v2.5h15v-2.5Z"/>',
+    cooker: '<rect x="8" y="14" width="32" height="5" rx="2.5"/><rect x="20.5" y="7" width="7" height="6" rx="2"/><rect x="38" y="20" width="8" height="5" rx="2.5"/><path d="M10 21h28v11q0 8-8 8H18q-8 0-8-8Z"/>',
   };
   return `<svg ${common}>${drawings[motif]}</svg>`;
 }
@@ -129,7 +131,9 @@ function createBoardDom() {
   const profile = NindovaRasoi.profileDefinition(board.profile);
   boardElement.setAttribute("aria-label", `Thirty-six kitchen tiles in ${profile.layers} overlapping layers, ${profile.label}`);
   boardShell.dataset.profile = board.profile;
-  profileBadge.textContent = `${profile.label} · ${profile.layers} authored layers`;
+  profileBadge.textContent = board.profile === "deeper"
+    ? `${profile.label} · triple crown · ${profile.layers} tight layers`
+    : `${profile.label} · ${profile.layers} woven layers`;
   for (const tile of board.tiles) {
     const button = document.createElement("button");
     button.type = "button";
@@ -314,29 +318,33 @@ function beginSession(profile: RasoiProfileId = chosenProfile()) {
   boardShell.classList.remove("is-settling");
   showView("play");
   createBoardDom();
-  const freeCount = NindovaRasoi.freeTiles(board, removed).length;
-  setStatus(`${freeCount} free tiles sit above the quiet layers.`);
+  setStatus("Open-side tiles sit above the quiet layers.");
   persistActiveSession();
 }
 
-async function playPairSound(row: number) {
+async function playPairSound(layer: number) {
   if (!audioEnabled) return;
   try {
     audioContext ??= new AudioContext();
     await audioContext.resume();
     const now = audioContext.currentTime;
-    const gain = audioContext.createGain();
-    gain.gain.setValueAtTime(.0001, now);
-    gain.gain.exponentialRampToValueAtTime(.055, now + .01);
-    gain.gain.exponentialRampToValueAtTime(.0001, now + .22);
-    gain.connect(audioContext.destination);
-    for (const [offset, ratio] of [[0, 1], [.055, 1.52]] as const) {
+    const master = audioContext.createGain();
+    master.gain.setValueAtTime(.0001, now);
+    master.gain.exponentialRampToValueAtTime(.045, now + .012);
+    master.gain.exponentialRampToValueAtTime(.0001, now + .34);
+    master.connect(audioContext.destination);
+    const toneFilter = audioContext.createBiquadFilter();
+    toneFilter.type = "lowpass";
+    toneFilter.frequency.setValueAtTime(2200, now);
+    toneFilter.Q.setValueAtTime(.8, now);
+    toneFilter.connect(master);
+    for (const [offset, ratio, type] of [[0, 1, "sine"], [.052, 1.5, "triangle"], [.11, 2.01, "sine"]] as const) {
       const oscillator = audioContext.createOscillator();
-      oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime((330 + row * 34) * ratio, now + offset);
-      oscillator.connect(gain);
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime((294 + layer * 26) * ratio, now + offset);
+      oscillator.connect(toneFilter);
       oscillator.start(now + offset);
-      oscillator.stop(now + .24);
+      oscillator.stop(now + .34);
     }
   } catch {
     audioEnabled = false;
@@ -402,7 +410,7 @@ function selectTile(tileId: string, restoreFocus = false) {
   animatePair(selectedTile, tileId);
   removed = new Set(result.removed);
   selectedTile = null;
-  void playPairSound(tile.layer);
+  void playPairSound(Math.max(first.layer, tile.layer));
   setStatus(`${motifShortNames[tile.motif]} meets its pair and settles.`);
   const nextFocus = restoreFocus ? NindovaRasoi.hintPair(board, removed)?.[0] ?? null : null;
   updateBoardDom(nextFocus);
@@ -420,7 +428,7 @@ function hint() {
   pair.forEach((tileId) => tileButton(tileId)?.classList.add("is-hinted"));
   updateBoardDom();
   const motif = tileById(pair[0])?.motif;
-  setStatus(`Hint: the two free ${motif ? motifShortNames[motif] : "matching"} tiles are a safe pair.`);
+  setStatus(`Hint: a free ${motif ? motifShortNames[motif] : "matching"} pair is ready.`);
   hintTimer = window.setTimeout(() => {
     pair.forEach((tileId) => tileButton(tileId)?.classList.remove("is-hinted"));
     updateBoardDom();
@@ -458,10 +466,27 @@ function finishSession() {
   NindovaNight.writeStorage(safeStorage("local"), nightState);
   clearActiveSession();
   boardShell.classList.remove("is-settling");
+  renderPathNote();
   showView("end");
   element<HTMLButtonElement>("dimRestBtn").focus();
   updateDawnButton();
   scheduleRest(END_AUTO_REST_MS, "end");
+}
+
+function renderPathNote() {
+  if (!board) return;
+  if (endReason === "production-cap") {
+    pathNoteTitle.textContent = "The lid kept the boundary";
+    pathNoteText.textContent = "The mound closed without a grade or penalty. Leaving it unfinished is part of the design.";
+    return;
+  }
+  if (board.profile === "deeper") {
+    pathNoteTitle.textContent = "You opened the triple crown";
+    pathNoteText.textContent = "One match hid among the opening tiles; settling it revealed the next crown match, then the next.";
+    return;
+  }
+  pathNoteTitle.textContent = "You read the woven layers";
+  pathNoteText.textContent = "Open sides gave the woven mound more than one way in; each settled pair made the next part legible.";
 }
 
 function nowMs() {

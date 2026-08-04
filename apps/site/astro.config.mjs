@@ -40,6 +40,7 @@ export default defineConfig({
           label: "Build",
           items: [
             { label: "Architecture", slug: "docs/architecture" },
+            { label: "Visual identity", slug: "docs/visual-identity" },
             { label: "Testing", slug: "docs/testing" },
             { label: "Research receipts", slug: "docs/research-receipts" },
             { label: "Roadmap", slug: "docs/roadmap" },

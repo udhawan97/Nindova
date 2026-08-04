@@ -18,7 +18,7 @@ Anything that makes tonight harder to leave is a bug.
 - Help identifies a safe pair but does not remove it.
 - Audio, animation, precision movement, and sight are optional; native controls and visible text names carry the rule.
 - State stays local. There is no account, analytics, advertising, app telemetry, app-controlled remote logging, or third-party runtime request. Static-host operational logs are outside the app boundary.
-- Same-night voluntary return is quiet, identical, idempotent, and starts from intake rather than a promoted replay button.
+- Same-night voluntary return is quiet and idempotent, and starts from intake rather than a promoted replay button. Reselecting the same profile yields its identical deterministic board.
 - “Not now” never prevents a voluntary return later that night.
 - “Same time tomorrow?” stores a local intention, sends no notification, and creates no urgency.
 - Match feedback is deterministic and bounded; no flash, screen shake, particle shower, combo, or randomized effect may turn it into a reward schedule.

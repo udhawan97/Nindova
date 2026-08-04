@@ -1,0 +1,40 @@
+# NINDOVA — Asset Manifest
+All assets original to this project. License: [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/). Source: this repository (see docs/brand/BRAND-GUIDE.md).
+
+## apps/site/public/brand/
+| File | Dimensions | Purpose |
+|---|---|---|
+| nindova-logo-horizontal.svg | 202×64 vb | Primary lockup, dark backgrounds |
+| nindova-logo-horizontal-light.svg | 202×64 vb | Primary lockup, light backgrounds |
+| nindova-logo-stacked.svg | 150×100 vb | Stacked lockup, dark bg |
+| nindova-logo-stacked-light.svg | 150×100 vb | Stacked lockup, light bg |
+| nindova-mark.svg | 48×48 vb | Icon-only mark, dark bg |
+| nindova-mark-light.svg | 48×48 vb | Icon-only mark, light bg |
+| nindova-mark-monochrome.svg | 48×48 vb | One-color mark (currentColor) |
+| favicon.svg | 48×48 vb | Quincunx reduced mark, any bg |
+| favicon-16.png / favicon-32.png | 16 / 32 px | Raster favicons, transparent |
+| apple-touch-icon.png | 180×180 | iOS icon, Raat ground (iOS rounds) |
+| pwa-192.png / pwa-512.png | 192 / 512 | PWA icons, rounded Raat tile, transparent corners |
+| pwa-maskable-512.png | 512×512 | Maskable, full-bleed Raat, mark in 60% safe zone |
+| nindova-mark-512.png | 512×512 | Transparent mark render (dark surfaces) |
+| nindova-og.png | 1200×630 | Open Graph / social card |
+| quiet-pattern.svg | 96×96 tile | Hero background pattern (6% cream on transparent) |
+| section-divider.svg | 240×24 vb | Section divider (lines follow currentColor) |
+| corner-ornament.svg | 64×64 vb | Corner treatment (lines follow currentColor) |
+| qr-frame.svg | 280×340 vb | QR frame; 240×240 white quiet field, ornament outside |
+| nindova-tokens.css | — | CSS custom properties, dark + light |
+| src/*.src.svg | — | Editable commented sources (mark, wordmark, favicon) |
+
+## apps/session/assets/motifs/
+| File | Dimensions | Purpose |
+|---|---|---|
+| belan.svg, chakla.svg, tawa.svg, chimta.svg, katori.svg, tiffin.svg, masala-dabba.svg, chai.svg, pressure-cooker.svg | 48×48 vb | Tile-face icon family, currentColor |
+| tile-back.svg | 96×128 vb | Masala Mound tile back |
+| src/motifs-master.src.svg | 528×48 vb | Editable master sheet, labeled groups |
+
+## docs/brand/
+| File | Dimensions | Purpose |
+|---|---|---|
+| BRAND-GUIDE.md | — | Identity, palette, usage, rationale, comparison |
+| ASSET-MANIFEST.md | — | This file |
+| concept-comparison.png | 1240×780 | Concept scoring chart |

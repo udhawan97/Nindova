@@ -1,11 +1,11 @@
 ---
 title: Getting started
-description: Run, build, and verify the Nindova v0.2.0 source release.
+description: Run, build, and verify the Nindova v0.3.0 source release.
 ---
 
 ## Fastest path
 
-Build the current source, then open `dist/nindova.html` in a current browser. The file is self-contained and does not install a service worker. The [v0.1.0 GitHub release](https://github.com/udhawan97/Nindova/releases/tag/v0.1.0) remains available as the previous flat-rack build.
+Build the current source, then open `dist/nindova.html` in a current browser. The file is self-contained and does not install a service worker. Earlier checksummed builds remain available in the [GitHub release history](https://github.com/udhawan97/Nindova/releases).
 
 ## Run from source
 

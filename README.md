@@ -1,4 +1,11 @@
-# Nindova
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="./apps/site/public/brand/nindova-logo-horizontal-light.svg">
+    <img src="./apps/site/public/brand/nindova-logo-horizontal.svg" width="303" alt="Nindova">
+  </picture>
+</p>
+
+<p align="center"><strong>One Session, then goodnight.</strong></p>
 
 Nindova is a calm, bounded pair-removal game for the end of the day. **Masala Mound** uses the uncovered-and-open-side rule of Mahjong solitaire and fills authored overlapping layers with everyday Indian kitchen forms: belan, chakla, tawa, chimta, steel katori, tiffin, masala dabba, chai glass, and pressure cooker.
 
@@ -8,9 +15,13 @@ Nindova is a calm, bounded pair-removal game for the end of the day. **Masala Mo
 
 ## Get Nindova
 
-- [Download v0.2.0](https://github.com/udhawan97/Nindova/releases/tag/v0.2.0) for the checksummed self-contained HTML file and complete web/PWA archive, or build the same source locally.
-- [Play the live PWA](https://udhawan97.github.io/Nindova/play/) or scan the direct, non-tracking QR below. The pinned GitHub Pages workflow publishes the same static build from `main`; the live route is browser-verified and a physical-device scan remains a separate evidence lane.
-- [Open the release history](https://github.com/udhawan97/Nindova/releases) for the previous flat-rack build and its checksums.
+|  | Start here | What you get |
+|---|---|---|
+| <img src="./apps/site/public/brand/favicon.svg" width="28" alt=""> | [Play the live PWA](https://udhawan97.github.io/Nindova/play/) | Installable, offline-ready Session from `main` |
+| <img src="./apps/site/public/brand/nindova-mark-monochrome.svg" width="28" alt=""> | [Download v0.3.0](https://github.com/udhawan97/Nindova/releases/tag/v0.3.0) | Checksummed standalone HTML and complete web/PWA archive |
+| <img src="./apps/site/public/brand/motifs/tiffin.svg" width="28" alt=""> | [Read the documentation](https://udhawan97.github.io/Nindova/docs/) | Product contract, architecture, privacy, testing, and limits |
+
+The pinned GitHub Pages workflow publishes the same static build from `main`. The live route is browser-verified; a physical-device QR scan remains a separate evidence lane. [Release history](https://github.com/udhawan97/Nindova/releases) preserves previous checksummed builds.
 
 The local `/play/` route works after serving a build, and `dist/nindova.html` works as a self-contained file even when hosting is unavailable.
 
@@ -21,18 +32,18 @@ The QR artifact encodes the full canonical URL with no shortener or tracking par
 ## The experience
 
 - **A spatial rule.** Choose two matching tiles only when nothing overlaps them from above and at least one horizontal side is open.
-- **A tonight-only choice.** Gentle stack has three more-open layers. Deeper stack uses four layers and more look-ahead. They are equal preferences, not levels or ability labels.
-- **Guaranteed closure.** Gentle is exhaustively verified across 382 reachable states; Deeper across 517. Each has one terminal state, zero dead states, and no losing legal choice.
-- **Clear match feedback.** Each legal pair folds inward through one brief, deterministic brass bloom; reduced motion uses opacity only and sound stays off by default.
+- **A tonight-only choice.** Gentle has three more-open layers. Deeper begins with unmatched open-side decoys and one cross-layer match, then reveals two more crown matches in sequence. They are equal preferences, not levels or ability labels.
+- **Guaranteed closure.** Gentle is exhaustively verified across 382 reachable states; Deeper across 510. Each has one terminal state, zero dead states, and no losing legal choice.
+- **Clear match feedback.** Each legal pair folds inward through one brief, deterministic brass-and-peacock bloom; reduced motion uses opacity only, and an optional three-note chime stays off by default.
 - **Quiet help.** “Show a safe pair” identifies a pair but never removes it.
 - **No performance layer.** No score, weekly rank, history, count, timer, streak, achievement, grade, collection, missed-night state, or randomized reward.
 - **A real ending.** Clearing the board closes the Session. If left unfinished, it settles itself before the hidden fifteen-minute ceiling. Rest is primary; optional Rasoi Image Drift carries three familiar forms away from the screen and never routes back into play.
 - **Dawn, by choice.** From 06:00 through 11:59 in the captured Night ID zone, the previous night’s kitchen forms return as a first-light still and optional silent loop.
-- **Voluntary return.** “Not now” leaves Nindova available later that same night. After completion, closing and deliberately reopening Nindova starts another separately bounded Session on the identical board without multiplying Dawn.
+- **Voluntary return.** “Not now” leaves Nindova available later that same night. After completion, closing and deliberately reopening Nindova returns to intake; reselecting the same profile starts another separately bounded Session on its identical deterministic board without multiplying Dawn.
 
 ## Punjabi and Indian direction
 
-The interface uses indigo, madder, marigold, brass, sheesham-toned wood, and restrained phulkari-inspired geometry. The kitchen motifs are code-native SVG forms with visible English names, so the accessible label and drawing remain the same source of truth.
+The interface uses the Shahi Raat palette—royal night, sapphire, madder, silk pink, saffron, and cream—with restrained phulkari-inspired geometry. The nine-diamond mark encodes four matched pairs and a quiet center. Original CC0-1.0 kitchen silhouettes remain backed by visible English names, so recognition never depends on drawing or color alone.
 
 The art direction is Punjabi-inspired. It deliberately excludes flags, sacred symbols, festival collage, and generic “exotic” ornament. A completed human Punjabi cultural-authenticity review is **not** claimed and remains a known release limitation.
 
@@ -75,7 +86,7 @@ npm test
 npm run test:wall-clock
 ```
 
-The main gates prove the 382-state Gentle and 517-state Deeper invariants, deterministic Night ID, recipe-two Dawn preservation, v1/v2-to-v3 local migration, profile-bound same-tab recovery, idempotent same-night return, layered rendering, brass-bloom/Image-Drift/reduced-motion behavior, Dawn eligibility/export fallback, 320–1440px rendered layouts, keyboard operation, 200% zoom, 44px targets, offline PWA closure, standalone independence, same-origin runtime requests, and the real production ceiling.
+The main gates prove the 382-state Gentle and 510-state Deeper invariants, the staged crown-search proxy, deterministic Night ID, recipe-two Dawn preservation, v1/v2-to-v3 local migration, profile-bound same-tab recovery, idempotent same-night return, layered rendering, pair-bloom/Image-Drift/reduced-motion behavior, brand-asset integrity, Dawn eligibility/export fallback, 320–1440px rendered app and public-site layouts, keyboard operation, 200% zoom, 44px targets, offline PWA closure, standalone independence, same-origin runtime requests, and the real production ceiling.
 
 See [Testing](./apps/site/src/content/docs/docs/testing.md) and the [public-surface evidence ledger](./docs/PUBLIC-SURFACE-EVIDENCE.md) for evidence levels and remaining risk.
 
@@ -89,7 +100,7 @@ Long-lived local storage contains one version-3 record with only the latest comp
 
 Nindova is a behavioral design study for people aged 13 and up. It is not a sleep tracker, sleep-performance tool, memory intervention, or treatment. Masala Mound uses recognition, visual search, and spatial planning, but has not been clinically shown to make people sleepy, produce a useful dopamine response, improve general memory, or improve sleep at any age. Persistent sleep difficulty deserves evidence-based care such as CBT-I with a qualified clinician.
 
-The browser and standalone surfaces are implemented. The iOS Wall is deferred and is not represented as shipped. Chromium automation covers the release surfaces; broader installed Safari/Android proof, real-device VoiceOver/TalkBack acceptance, and human Punjabi cultural review remain open limitations.
+The browser and standalone surfaces are implemented. The iOS Wall is deferred and is not represented as shipped. Chromium automation covers the release surfaces; broader installed Safari/Android proof, real-device VoiceOver/TalkBack acceptance, human Punjabi cultural review, and human evidence about perceived challenge or typical completion time remain open limitations.
 
 ## Contributing
 
@@ -99,4 +110,4 @@ Read [CONTEXT.md](./CONTEXT.md), the [Quiet Depth plan](./docs/QUIET-DEPTH-PLAN.
 
 Nindova is licensed under the [Apache License 2.0](./LICENSE). It is free to use, modify, and distribute under that license and its notice requirements.
 
-Redistributed font licenses are listed in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md) and shipped with the composed site.
+Redistributed font licenses and the original CC0-1.0 brand asset provenance are listed in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md). The visual rules and complete asset ledger live in [the brand guide](./docs/brand/BRAND-GUIDE.md) and [asset manifest](./docs/brand/ASSET-MANIFEST.md).

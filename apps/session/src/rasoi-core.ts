@@ -1,4 +1,4 @@
-export const RASOI_RECIPE_VERSION = 4;
+export const RASOI_RECIPE_VERSION = 5;
 
 export const RASOI_MOTIFS = Object.freeze([
   Object.freeze({ id: "belan", label: "belan rolling pin" }),
@@ -19,13 +19,13 @@ export const RASOI_PROFILES = Object.freeze([
   Object.freeze({
     id: "gentle" as const,
     label: "Gentle stack",
-    description: "Broader openings and a quieter search.",
+    description: "Broader openings across three woven layers.",
     layers: 3,
   }),
   Object.freeze({
     id: "deeper" as const,
     label: "Deeper stack",
-    description: "More overlap and a little more looking ahead.",
+    description: "A triple-crown mound with four tight layers and fewer openings.",
     layers: 4,
   }),
 ] as const);
@@ -141,12 +141,12 @@ const DEEPER_LAYOUT: readonly LayoutTile[] = Object.freeze([
   { id: "m1-2", x: 5, y: 5, layer: 1, motifIndex: 4 },
   { id: "m1-3", x: 7, y: 5, layer: 1, motifIndex: 8 },
   { id: "m1-4", x: 9, y: 5, layer: 1, motifIndex: 2 },
-  { id: "u-0", x: 2, y: 3, layer: 2, motifIndex: 1 },
-  { id: "u-1", x: 4, y: 3, layer: 2, motifIndex: 0 },
+  { id: "u-0", x: 2, y: 3, layer: 2, motifIndex: 3 },
+  { id: "u-1", x: 4, y: 3, layer: 2, motifIndex: 1 },
   { id: "u-2", x: 6, y: 3, layer: 2, motifIndex: 0 },
-  { id: "u-3", x: 8, y: 3, layer: 2, motifIndex: 1 },
+  { id: "u-3", x: 8, y: 3, layer: 2, motifIndex: 0 },
   { id: "c-0", x: 4, y: 3, layer: 3, motifIndex: 3 },
-  { id: "c-1", x: 6, y: 3, layer: 3, motifIndex: 3 },
+  { id: "c-1", x: 6, y: 3, layer: 3, motifIndex: 1 },
 ].map((tile) => Object.freeze(tile)));
 
 const LAYOUTS: Readonly<Record<RasoiProfileId, readonly LayoutTile[]>> = Object.freeze({

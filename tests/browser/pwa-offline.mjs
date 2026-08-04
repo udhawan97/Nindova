@@ -53,6 +53,11 @@ try {
     standalone: `${rootPath}nindova.html`,
     release: "https://github.com/udhawan97/Nindova/releases",
   });
+  await page.waitForFunction(() => [...document.querySelectorAll(".brand-lockup, .motif-line img")]
+    .every((image) => image.complete && image.naturalWidth > 0));
+  assert.equal(await page.locator(".brand-lockup").count(), 2);
+  assert.equal(await page.locator(".motif-line img").count(), 9);
+  assert.match(await page.locator('meta[property="og:image"]').getAttribute("content") ?? "", /\/Nindova\/brand\/nindova-og\.png$/);
   for (const href of [landingLinks.docs, landingLinks.standalone]) {
     const linkedPage = await context.newPage();
     const response = await linkedPage.goto(new URL(href, prefix).href);
@@ -78,16 +83,20 @@ try {
   assert.equal(await page.getAttribute('link[rel="manifest"]', "href"), "./manifest.webmanifest");
   const manifest = await page.evaluate(() => fetch("./manifest.webmanifest").then((response) => response.json()));
   assert.deepEqual({ start_url: manifest.start_url, scope: manifest.scope, display: manifest.display }, { start_url: "./", scope: "./", display: "standalone" });
+  assert.deepEqual(manifest.icons.map((icon) => icon.purpose), ["any", "any", "any", "maskable"]);
+  assert.equal(await page.evaluate(async (icons) => (
+    await Promise.all(icons.map((icon) => fetch(icon.src)))
+  ).every((response) => response.ok), manifest.icons), true);
   await page.waitForFunction(async () => Boolean(await navigator.serviceWorker.ready));
   await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
   const registration = await page.evaluate(async () => {
     const ready = await navigator.serviceWorker.ready;
     const keys = await caches.keys();
-    const cache = await caches.open("nindova-session-v4");
+    const cache = await caches.open("nindova-session-v5");
     return { scope: ready.scope, keys, entries: (await cache.keys()).map((request) => request.url) };
   });
   assert.equal(registration.scope, base);
-  assert.ok(registration.keys.includes("nindova-session-v4"));
+  assert.ok(registration.keys.includes("nindova-session-v5"));
   assert.equal(registration.keys.includes("nindova-session-v3"), false);
   assert.ok(registration.entries.every((url) => url.startsWith(base) && !url.includes("night-state") && !url.startsWith("blob:")));
   assert.equal(await page.evaluate(() => localStorage.getItem("nindova:test:update-sentinel")), "kept");

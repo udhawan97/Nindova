@@ -22,22 +22,33 @@ test("both authored profiles have thirty-six tiles and four of every kitchen mot
   );
 });
 
-test("Deeper adds structural occlusion and look-ahead without adding a dead state", () => {
+test("Deeper opens with unmatched decoys and a staged triple-crown search", () => {
   const gentle = Rasoi.createBoard("2026-08-04|America/Chicago|r3", "gentle");
   const deeper = Rasoi.createBoard("2026-08-04|America/Chicago|r3", "deeper");
   const deeperAvailability = Object.groupBy(deeper.tiles, (tile) => Rasoi.availabilityReason(deeper, new Set(), tile.id));
   assert.equal(gentle.tiles.filter((tile) => tile.layer > 0).length, 12);
   assert.equal(deeper.tiles.filter((tile) => tile.layer > 0).length, 16);
   assert.equal(deeperAvailability.covered.length, 32);
+  assert.equal(deeperAvailability["side-blocked"], undefined);
   assert.equal(deeperAvailability.free.length, 4);
-  assert.equal(Rasoi.legalPairs(deeper, new Set()).length, 2);
+  assert.equal(Rasoi.legalPairs(deeper, new Set()).length, 1);
   assert.deepEqual(Rasoi.verifyBoard(deeper), {
     valid: true,
-    reachableStates: 517,
+    reachableStates: 510,
     terminalStates: 1,
     deadStates: 0,
     reason: "verified",
   });
+
+  let removed = new Set();
+  for (const minimumFreeCandidates of [4, 5, 4]) {
+    const free = Rasoi.freeTiles(deeper, removed);
+    const pairs = Rasoi.legalPairs(deeper, removed);
+    assert.equal(free.length, minimumFreeCandidates);
+    assert.equal(pairs.length, 1);
+    assert.ok(free.length - new Set(pairs[0]).size >= 2, "each crown step should include unmatched free decoys");
+    removed = Rasoi.removePair(deeper, removed, pairs[0][0], pairs[0][1]).removed;
+  }
 });
 
 test("only uncovered tiles with an open side are free and they form three readable pairs", () => {
@@ -88,7 +99,7 @@ test("an exhaustive reachability check finds no dead state after any legal choic
       assert.equal(verification.valid, true);
       assert.equal(verification.deadStates, 0);
       assert.equal(verification.terminalStates, 1);
-      assert.equal(verification.reachableStates, profile.id === "gentle" ? 382 : 517);
+      assert.equal(verification.reachableStates, profile.id === "gentle" ? 382 : 510);
     }
   }
 });

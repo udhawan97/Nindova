@@ -7,7 +7,10 @@ import { recipeTwoCompletion } from "../fixtures/recipe-two.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const output = resolve(root, "artifacts/rasoi-dawn");
-const port = 4187;
+const port = Number.parseInt(process.env.NINDOVA_DAWN_TEST_PORT ?? "4187", 10);
+if (!Number.isSafeInteger(port) || port < 1024 || port > 65535) {
+  throw new Error("NINDOVA_DAWN_TEST_PORT must be a valid unprivileged TCP port");
+}
 await mkdir(output, { recursive: true });
 const server = spawn(process.execPath, [resolve(root, "scripts/serve.mjs"), resolve(root, "dist")], {
   cwd: root,

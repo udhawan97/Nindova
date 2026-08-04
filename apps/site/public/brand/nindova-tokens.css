@@ -1,0 +1,22 @@
+/* Nindova palette - Shahi Raat (royal night). CC0-1.0 */
+:root{
+  --nv-raat:#150D20;   /* night background */
+  --nv-surface:#211A33;/* raised night surface */
+  --nv-neelam:#3A4A9E; /* sapphire - decorative/large only on Raat */
+  --nv-kesari:#E0A64B; /* saffron - primary accent, AA on Raat */
+  --nv-majith:#9A3A42; /* madder - secondary, decorative on Raat */
+  --nv-gulabi:#C4638A; /* silk pink - highlight, AA on Raat */
+  --nv-malai:#EFE1C4;  /* cream - text neutral, AAA on Raat */
+  --nv-bg:var(--nv-raat); --nv-text:var(--nv-malai);
+  --nv-text-dim:rgba(239,225,196,.68);
+  --nv-accent:var(--nv-kesari); --nv-accent-2:var(--nv-gulabi);
+  --nv-focus:0 0 0 2px var(--nv-raat),0 0 0 4px var(--nv-kesari);
+}
+[data-theme=light]{
+  --nv-bg:var(--nv-malai); --nv-surface:#E6D5B4; --nv-text:var(--nv-raat);
+  --nv-text-dim:rgba(21,13,32,.66);
+  --nv-accent:#8A6420; /* kesari darkened for AA on Malai */
+  --nv-accent-2:var(--nv-majith);
+  --nv-focus:0 0 0 2px var(--nv-malai),0 0 0 4px #8A6420;
+}
+@media (prefers-reduced-motion:reduce){:root{--nv-anim:none}}

@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.3.0 — 2026-08-03
+
+### Added
+
+- A complete original CC0-1.0 Nindova identity: the paired-diamond Phulkari lattice, drawn wordmark, Shahi Raat palette, utensil silhouettes, PWA icons, social card, and documented asset provenance.
+- A qualitative end reflection that names the chosen path without measuring ability, speed, or performance.
+- A restrained deterministic three-note chime and paired brass-and-peacock match bloom, both optional and reduced-motion safe.
+
+### Changed
+
+- Re-authored Deeper as a staged triple-crown search: each opening step includes unmatched free decoys but only one legal pair, across 510 exhaustively verified reachable states.
+- Reworked the Session cards, layers, frame, and public surfaces with richer color and Punjabi-inspired material detail while preserving text labels and native controls.
+- Refreshed the README, website, screenshots, public documentation, manifest, offline cache, and release evidence for the same source tree.
+
+### Not added
+
+- No IQ estimate, brain-speed judgment, score, rank, timer, personal best, history, streak, achievement, grade, collection, or randomized reward.
+- No claim that the match feedback produces dopamine, ASMR, better cognition, or better sleep.
+
 ## 0.2.0 — 2026-08-03
 
 ### Added

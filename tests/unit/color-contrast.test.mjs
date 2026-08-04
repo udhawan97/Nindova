@@ -5,6 +5,7 @@ import test from "node:test";
 
 const root = resolve(import.meta.dirname, "../..");
 const css = await readFile(resolve(root, "tokens.css"), "utf8");
+const session = await readFile(resolve(root, "apps/session/index.html"), "utf8");
 
 function token(name) {
   const match = css.match(new RegExp(`--${name}:\\s*oklch\\(([^)]+)\\)`));
@@ -70,4 +71,48 @@ for (const [foreground, background] of bodyPairs) {
 
 test("the focus token clears 3:1 on the page", () => {
   assert.ok(ratio("color-focus", "color-paper") >= 3);
+});
+
+function rgb(hex) {
+  const value = hex.replace("#", "");
+  return [0, 2, 4].map((offset) => Number.parseInt(value.slice(offset, offset + 2), 16));
+}
+
+function relativeLuminance(channels) {
+  const linear = channels.map((channel) => {
+    const normalized = channel / 255;
+    return normalized <= .04045 ? normalized / 12.92 : ((normalized + .055) / 1.055) ** 2.4;
+  });
+  return .2126 * linear[0] + .7152 * linear[1] + .0722 * linear[2];
+}
+
+function rgbRatio(foreground, background) {
+  const light = Math.max(relativeLuminance(foreground), relativeLuminance(background));
+  const dark = Math.min(relativeLuminance(foreground), relativeLuminance(background));
+  return (light + .05) / (dark + .05);
+}
+
+const label = rgb("#25171b");
+const labelBacking = rgb("#fff6de");
+const labelBackingAlpha = .58;
+const motifRules = [...session.matchAll(/\.tile\[data-motif="([^"]+)"\]\s*\{([^}]+)\}/g)];
+assert.equal(motifRules.length, 9, "all nine motif palettes should be present");
+for (const [, motif, declarations] of motifRules) {
+  const endpoint = declarations.match(/--tile-face-2:\s*(#[0-9a-f]{6})/i)?.[1];
+  assert.ok(endpoint, `${motif} should define a lower face color`);
+  const face = rgb(endpoint);
+  const compositedBacking = labelBacking.map((channel, index) => (
+    channel * labelBackingAlpha + face[index] * (1 - labelBackingAlpha)
+  ));
+  test(`${motif} tile label clears 4.5:1 on its darkest face`, () => {
+    assert.ok(rgbRatio(label, compositedBacking) >= 4.5);
+  });
+}
+
+test("the royal-night feedback copy clears 4.5:1", () => {
+  const background = rgb("#150d20");
+  const cream = rgb("#efe1c4");
+  const alpha = .76;
+  const composited = cream.map((channel, index) => channel * alpha + background[index] * (1 - alpha));
+  assert.ok(rgbRatio(composited, background) >= 4.5);
 });

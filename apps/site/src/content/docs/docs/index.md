@@ -17,6 +17,7 @@ Nindova is a bounded late-night game. **Masala Mound** presents 36 Indian kitche
 - [Dawn](./dawn/) describes the first-light kitchen composition and local exports.
 - [Accessibility](./accessibility/) explains the native tile controls and alternate presentation.
 - [Architecture](./architecture/) maps the legality kernel, browser shell, PWA, site, and Dawn.
+- [Visual identity and assets](./visual-identity/) documents the paired-diamond mark, palette, silhouettes, accessible usage, and CC0-1.0 provenance.
 - [Testing](./testing/) separates rendered evidence, source proof, and untested risk.
 - [Research receipts](./research-receipts/) states the behavioral evidence and its limits.
 - [Roadmap](./roadmap/), [Known limitations](./known-limitations/), and [Deferred iOS Wall](./ios-wall/) distinguish the release from future work.

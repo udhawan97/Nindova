@@ -15,7 +15,7 @@ Before 06:00, from noon onward, on another date, without a completion, or after 
 
 For a Rasoi completion, Dawn uses the exact stored motif order and lays the nine kitchen forms on brass plates in a warm first-light kitchen. It shows no score, count, grade, attendance mark, or completion badge.
 
-Version 1 and version 2 Vista completions migrate to a labeled legacy Dawn composition during their original eligibility window. Recipe-two Rasoi completions remain Rasoi Dawn data after the layered recipe-three upgrade. The migration does not pretend an old Vista was a Rasoi board.
+Version 1 and version 2 Vista completions migrate to a labeled legacy Dawn composition during their original eligibility window. Recipe-two Rasoi completions remain Rasoi Dawn data after the layered board's recipe-five upgrade; the Night/Dawn record itself remains recipe three. The migration does not pretend an old Vista was a Rasoi board.
 
 ## Keepsakes
 

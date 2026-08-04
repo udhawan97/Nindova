@@ -29,6 +29,7 @@ function emitPortableHtml(): Plugin {
       const manifestSource = resolve("manifest.webmanifest");
       const workerSource = resolve("sw.js");
       const iconSource = resolve("assets/nindova-icon.svg");
+      const brandAssetDirectory = resolve("../site/public/brand");
       await mkdir(assetDirectory, { recursive: true });
       await emitTypedModule(nightCoreSource, resolve("dist/night-core.js"));
       await emitTypedModule(rasoiCoreSource, resolve("dist/rasoi-core.js"));
@@ -36,6 +37,9 @@ function emitPortableHtml(): Plugin {
       await copyFile(manifestSource, resolve("dist/manifest.webmanifest"));
       await copyFile(workerSource, resolve("dist/sw.js"));
       await copyFile(iconSource, resolve(assetDirectory, "nindova-icon.svg"));
+      await Promise.all(["pwa-192.png", "pwa-512.png", "pwa-maskable-512.png"].map((name) => (
+        copyFile(resolve(brandAssetDirectory, name), resolve(assetDirectory, name))
+      )));
 
       const indexPath = resolve("dist/index.html");
       const html = await readFile(indexPath, "utf8");

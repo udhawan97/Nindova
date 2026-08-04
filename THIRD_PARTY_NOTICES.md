@@ -7,7 +7,9 @@ The composed Nindova website and documentation include these redistributed font 
 
 Build and development dependencies retain their own licenses in the npm dependency tree and are not part of the standalone Session runtime.
 
-The v0.2.0 build and verification workflow also uses these pinned open-source packages without shipping their code in the standalone Session runtime:
+The Nindova mark, utensil silhouettes, ornaments, and derived interface assets in `apps/site/public/brand` and `apps/session/assets/motifs` are original project artwork dedicated to the public domain under [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/). Their manifest and design guidance are preserved in `docs/brand/`.
+
+The build and verification workflow also uses these pinned open-source packages without shipping their code in the standalone Session runtime:
 
 - **qrcode 1.5.4** — direct QR generation. [MIT-licensed source](https://github.com/soldair/node-qrcode).
 - **pngjs 5.0.0** — PNG inspection in browser tests. [MIT-licensed source](https://github.com/lukeapage/pngjs).

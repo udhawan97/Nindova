@@ -7,6 +7,12 @@ const href = (path: string) => `${base}${path}` || "/";
 const releaseUrl = "https://github.com/udhawan97/Nindova/releases";
 const standaloneUrl = href("/nindova.html");
 const { canonicalPlayUrl } = publicFacts;
+const socialImageUrl = new URL("../brand/nindova-og.png", canonicalPlayUrl).href;
+const motifs = [
+  ["Belan", "belan"], ["Chakla", "chakla"], ["Tawa", "tawa"],
+  ["Chimta", "chimta"], ["Katori", "katori"], ["Tiffin", "tiffin"],
+  ["Masala dabba", "masala-dabba"], ["Chai", "chai"], ["Cooker", "pressure-cooker"],
+];
 ---
 
 <!doctype html>
@@ -22,15 +28,19 @@ const { canonicalPlayUrl } = publicFacts;
     <meta property="og:title" content="Nindova — Masala Mound" />
     <meta property="og:description" content="Read the layers. Find matching kitchen tiles. Leave when it closes." />
     <meta property="og:type" content="website" />
+    <meta property="og:image" content={socialImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
-    <link rel="icon" href={href("/favicon.svg")} type="image/svg+xml" />
+    <link rel="icon" href={href("/brand/favicon.svg")} type="image/svg+xml" />
+    <link rel="icon" href={href("/brand/favicon-32.png")} sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href={href("/brand/apple-touch-icon.png")} />
     <title>Nindova — Masala Mound</title>
   </head>
   <body class="landing">
     <header class="site-nav" aria-label="Primary navigation">
       <a class="brand" href={href("/")} aria-label="Nindova home">
-        <span class="brand-mark" aria-hidden="true"></span>
-        <span>Nindova</span>
+        <img class="brand-lockup" src={href("/brand/nindova-logo-horizontal.svg")} alt="" width="202" height="64" />
       </a>
       <nav>
         <a href={href("/docs/")}>Docs</a>
@@ -61,14 +71,16 @@ const { canonicalPlayUrl } = publicFacts;
               src={href("/media/rasoi-board.png")}
               width="840"
               height="476"
-              alt="The real Deeper Masala Mound board with four overlapping layers; four uncovered open-side tiles are bright."
+              alt="The real Deeper Masala Mound board with four overlapping layers and four bright open-side crown tiles."
             />
           </div>
-          <figcaption>Rendered from the v0.2.0 source · no concept mockup</figcaption>
+          <figcaption>Rendered from the v0.3.0 source · no concept mockup</figcaption>
         </figure>
 
         <div class="motif-line" aria-label="Kitchen motifs in Rasoi Pairs">
-          <span>Belan</span><span>Chakla</span><span>Tawa</span><span>Chimta</span><span>Katori</span><span>Tiffin</span><span>Masala dabba</span><span>Chai</span><span>Cooker</span>
+          {motifs.map(([label, slug]) => (
+            <span><img src={href(`/brand/motifs/${slug}.svg`)} alt="" width="48" height="48" />{label}</span>
+          ))}
         </div>
       </section>
 
@@ -78,7 +90,8 @@ const { canonicalPlayUrl } = publicFacts;
           <h2 id="rule-title">Easy to understand.<br />Impossible to spoil.</h2>
           <p>
             A tile is free when nothing overlaps it from above and either its left or right side is open.
-            Gentle gives the mound broader openings; Deeper adds a fourth layer and more look-ahead.
+            Gentle gives the mound broader openings; Deeper begins with unmatched open-side decoys and
+            one cross-layer pair, then reveals two more crown matches in sequence.
             Every legal choice on either authored board keeps a path to the ending.
           </p>
         </div>
@@ -86,7 +99,7 @@ const { canonicalPlayUrl } = publicFacts;
           <li><span aria-hidden="true">01</span><div><h3>Choose tonight</h3><p>Gentle or Deeper. A preference, not a test.</p></div></li>
           <li><span aria-hidden="true">02</span><div><h3>Look</h3><p>Read the overlaps. The brighter open-side tiles are free.</p></div></li>
           <li><span aria-hidden="true">03</span><div><h3>Pair</h3><p>Belan with belan. Chai with chai.</p></div></li>
-          <li><span aria-hidden="true">04</span><div><h3>Settle</h3><p>The pair folds inward through one dim brass bloom and leaves.</p></div></li>
+          <li><span aria-hidden="true">04</span><div><h3>Settle</h3><p>The pair folds inward through one brief brass-and-peacock bloom and leaves.</p></div></li>
         </ol>
       </section>
 
@@ -100,7 +113,7 @@ const { canonicalPlayUrl } = publicFacts;
               alt="The real Masala Mound phone layout, with labeled overlapping kitchen tiles and a safe-pair help control."
             />
           </div>
-          <figcaption>375px v0.2.0 source surface</figcaption>
+          <figcaption>375px v0.3.0 source surface</figcaption>
         </figure>
         <div class="material-copy">
           <p class="eyebrow">Punjabi material, everyday kitchen</p>
@@ -127,7 +140,7 @@ const { canonicalPlayUrl } = publicFacts;
         <div class="boundary-grid">
           <div>
             <h3>While you play</h3>
-            <p>Predictable lift, one restrained brass bloom, and optional sound. Help points; it never plays.</p>
+            <p>Predictable lift, a paired brass-and-peacock bloom, and an optional three-note chime. Help points; it never plays.</p>
           </div>
           <div>
             <h3>When it ends</h3>
@@ -143,7 +156,7 @@ const { canonicalPlayUrl } = publicFacts;
       <section class="sleep-section" aria-labelledby="sleep-title">
         <div>
           <p class="eyebrow">Why sleep matters</p>
-          <h2 id="sleep-title">Your brain is brilliant.<br />It is also allowed to clock out.</h2>
+          <h2 id="sleep-title">Your brain has done enough.<br />It is allowed to clock out.</h2>
         </div>
         <div class="sleep-fact">
           <p>
@@ -209,7 +222,7 @@ const { canonicalPlayUrl } = publicFacts;
       </section>
 
       <section class="closing-section" aria-labelledby="closing-title">
-        <p class="eyebrow">v0.2.0 · Quiet Depth</p>
+        <p class="eyebrow">v0.3.0 · Shahi Mound</p>
         <h2 id="closing-title">Two profiles. One ending.</h2>
         <p>
           Nindova is a behavioral design study, not a sleep tracker or treatment. Masala Mound uses
@@ -224,7 +237,7 @@ const { canonicalPlayUrl } = publicFacts;
     </main>
 
     <footer class="site-footer">
-      <a class="brand" href={href("/")}><span class="brand-mark" aria-hidden="true"></span><span>Nindova</span></a>
+      <a class="brand" href={href("/")} aria-label="Nindova home"><img class="brand-lockup" src={href("/brand/nindova-logo-horizontal.svg")} alt="" width="202" height="64" /></a>
       <nav aria-label="Footer navigation">
         <a href={href("/docs/")}>Documentation</a>
         <a href="https://github.com/udhawan97/Nindova">GitHub</a>

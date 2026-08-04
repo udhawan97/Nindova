@@ -42,7 +42,50 @@ function meanLuminance(buffer) {
   return total / (png.width * png.height);
 }
 
+async function recordedOpeningChime(reverse) {
+  const context = await browser.newContext({ viewport: { width: 375, height: 812 } });
+  await context.addInitScript(() => {
+    globalThis.__toneFrequencies = [];
+    class FakeParam {
+      setValueAtTime() {}
+      exponentialRampToValueAtTime() {}
+    }
+    class FakeAudioContext {
+      currentTime = 0;
+      resume() { return Promise.resolve(); }
+      createGain() { return { gain: new FakeParam(), connect() {} }; }
+      createBiquadFilter() { return { type: "lowpass", frequency: new FakeParam(), Q: new FakeParam(), connect() {} }; }
+      createOscillator() {
+        return {
+          type: "sine",
+          frequency: { setValueAtTime(value) { globalThis.__toneFrequencies.push(value); } },
+          connect() {},
+          start() {},
+          stop() {},
+        };
+      }
+    }
+    Object.defineProperty(globalThis, "AudioContext", { configurable: true, value: FakeAudioContext });
+  });
+  const page = await context.newPage();
+  await page.goto(target);
+  await page.waitForFunction(() => Boolean(window.__ct));
+  await page.check('input[name="rasoi-profile"][value="deeper"]');
+  await page.click("#muteBtn");
+  await page.click("#beginBtn");
+  const pair = await page.evaluate(() => window.__ct.legalPairs[0]);
+  const order = reverse ? [...pair].reverse() : pair;
+  await page.click(`[data-tile-id="${order[0]}"]`);
+  await page.click(`[data-tile-id="${order[1]}"]`);
+  await page.waitForFunction(() => globalThis.__toneFrequencies.length === 3);
+  const frequencies = await page.evaluate(() => globalThis.__toneFrequencies);
+  await context.close();
+  return frequencies;
+}
+
 try {
+  assert.deepEqual(await recordedOpeningChime(false), await recordedOpeningChime(true), "pair chime should not depend on selection order");
+
   const normal = await open({ hasTouch: true });
   assert.deepEqual(await normal.page.evaluate(() => [0, 1, 2].map(
     (layer) => window.__ct.tiles.filter((tile) => tile.layer === layer).length,
@@ -92,6 +135,8 @@ try {
   }
   await normal.page.waitForFunction(() => window.__ct.state === "end");
   assert.equal((await normal.page.locator("#endTitle").textContent())?.trim(), "The session is over. That's the point.");
+  assert.match(await normal.page.locator("#pathNoteTitle").innerText(), /read the woven layers/i);
+  assert.match(await normal.page.locator("#pathNoteText").innerText(), /more than one way in/i);
   const firstMemory = await normal.page.evaluate(() => window.__ct.memory);
   const completedBoard = await normal.page.evaluate(() => window.__ct.board.id);
   assert.equal(await normal.page.evaluate(() => document.activeElement?.id), "dimRestBtn");
@@ -130,12 +175,43 @@ try {
     (layer) => window.__ct.tiles.filter((tile) => tile.layer === layer).length,
   )), [20, 10, 4, 2]);
   assert.equal(await deeper.page.evaluate(() => window.__ct.tiles.filter((tile) => tile.availability === "covered").length), 32);
-  assert.equal(await deeper.page.evaluate(() => window.__ct.legalPairs.length), 2);
-  assert.match(await deeper.page.locator("#profileBadge").innerText(), /Deeper stack · 4 authored layers/);
+  assert.equal(await deeper.page.evaluate(() => window.__ct.tiles.filter((tile) => tile.availability === "side-blocked").length), 0);
+  assert.equal(await deeper.page.evaluate(() => window.__ct.tiles.filter((tile) => tile.availability === "free").length), 4);
+  assert.equal(await deeper.page.evaluate(() => window.__ct.legalPairs.length), 1);
+  assert.match(await deeper.page.locator("#profileBadge").innerText(), /Deeper stack · triple crown · 4 tight layers/);
   assert.match(await deeper.page.locator("#board").getAttribute("aria-label") ?? "", /four overlapping layers|4 overlapping layers/i);
   assert.match(await deeper.page.locator('[data-layer="3"]').first().getAttribute("aria-label") ?? "", /layer 4/);
+  for (const minimumFreeCandidates of [4, 5, 4]) {
+    const opening = await deeper.page.evaluate(() => ({
+      free: window.__ct.tiles.filter((tile) => tile.availability === "free").length,
+      pairs: window.__ct.legalPairs.length,
+    }));
+    assert.equal(opening.free, minimumFreeCandidates);
+    assert.equal(opening.pairs, 1);
+    const pair = await deeper.page.evaluate(() => window.__ct.legalPairs[0]);
+    await deeper.page.click(`[data-tile-id="${pair[0]}"]`);
+    await deeper.page.click(`[data-tile-id="${pair[1]}"]`);
+    await deeper.page.waitForFunction(() => !document.querySelector(".pair-bloom"));
+  }
+  while (await deeper.page.evaluate(() => window.__ct.state === "play")) {
+    const pair = await deeper.page.evaluate(() => window.__ct.legalPairs[0]);
+    await deeper.page.click(`[data-tile-id="${pair[0]}"]`);
+    await deeper.page.click(`[data-tile-id="${pair[1]}"]`);
+    await deeper.page.waitForFunction(() => !document.querySelector(".pair-bloom"));
+  }
+  await deeper.page.waitForFunction(() => window.__ct.state === "end");
+  assert.match(await deeper.page.locator("#pathNoteTitle").innerText(), /opened the triple crown/i);
+  assert.match(await deeper.page.locator("#pathNoteText").innerText(), /hid among the opening tiles/i);
   assert.deepEqual(deeper.errors, []);
   await deeper.context.close();
+
+  const boundaryNote = await open();
+  await boundaryNote.page.evaluate(() => window.__ct.advanceBy(90));
+  await boundaryNote.page.waitForFunction(() => window.__ct.state === "end");
+  assert.match(await boundaryNote.page.locator("#pathNoteTitle").innerText(), /lid kept the boundary/i);
+  assert.match(await boundaryNote.page.locator("#pathNoteText").innerText(), /without a grade or penalty/i);
+  assert.deepEqual(boundaryNote.errors, []);
+  await boundaryNote.context.close();
 
   const autoRest = await open();
   await autoRest.page.evaluate(() => window.__ct.finish());

@@ -15,7 +15,7 @@ Nindova remains a bounded wind-down game for people aged 13 and up, not a treatm
 3. **Pair:** select two matching free Tiles. Covered and side-blocked Tiles remain visible but quiet.
 4. **Brass bloom:** the matched pair moves slightly inward and compresses into one dim brass ring before settling. The response is deterministic, local, brief, and optional through reduced motion and sound controls.
 5. **Close:** completion or the production cap reaches the same end card. “Dim and rest” is the only continuation from the end surface.
-6. **Return deliberately:** closing and reopening Nindova returns to intake, which can start another identical board for the same Night ID. Each open begins a new bounded Session; the end and rest surfaces never route back into play.
+6. **Return deliberately:** closing and reopening Nindova returns to intake. Reselecting the same profile can start another identical deterministic board for the same Night ID. Each open begins a new bounded Session; the end and rest surfaces never route back into play.
 
 ## Board contract
 
