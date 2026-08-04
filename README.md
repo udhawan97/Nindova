@@ -7,7 +7,7 @@
 
 <p align="center"><strong>A house of authored games. A separate room for goodnight.</strong></p>
 
-Nindova House is private, offline-ready entertainment for adults 18 and over. The Grand Salon contains four authored thinking games with five chapters each. The separate Night Room preserves **Masala Mound**, the calm bounded pair-removal Session made from everyday Indian kitchen forms.
+Nindova House is private, offline-ready entertainment for adults 18 and over. The Grand Salon contains five authored thinking games with five chapters or Acts each. The separate Night Room preserves **Masala Mound**, the calm bounded pair-removal Session made from everyday Indian kitchen forms.
 
 > Nothing to win. Nothing tracked. Nothing you can do wrong.
 
@@ -17,7 +17,7 @@ Nindova House is private, offline-ready entertainment for adults 18 and over. Th
 
 |  | Start here | What you get |
 |---|---|---|
-| <img src="./apps/site/public/brand/favicon.svg" width="28" alt=""> | [Build Nindova House locally](#run-locally) | Four offline-ready entertainment games in this workspace |
+| <img src="./apps/site/public/brand/favicon.svg" width="28" alt=""> | [Build Nindova House locally](#run-locally) | Five offline-ready entertainment games in this workspace |
 | <img src="./apps/site/public/brand/motifs/chai.svg" width="28" alt=""> | [Enter the Night Room](https://udhawan97.github.io/Nindova/play/) | The installable, self-closing Masala Mound Session |
 | <img src="./apps/site/public/brand/nindova-mark-monochrome.svg" width="28" alt=""> | [Download v0.3.0](https://github.com/udhawan97/Nindova/releases/tag/v0.3.0) | Checksummed standalone HTML and complete web/PWA archive |
 | <img src="./apps/site/public/brand/motifs/tiffin.svg" width="28" alt=""> | [Read the documentation](https://udhawan97.github.io/Nindova/docs/) | Product contract, architecture, privacy, testing, and limits |
@@ -34,8 +34,9 @@ The QR artifact encodes the full canonical URL with no shortener or tracking par
 
 ### Grand Salon
 
-- **Four distinct tables.** Pattern Court reads visual order, Mirror Forge turns spatial forms, Stack Architect moves lawful towers, and Lantern Ledger holds ordered sequences.
+- **Five distinct tables.** Pattern Court reads visual order, Mirror Forge turns spatial forms, Stack Architect moves lawful towers, Lantern Ledger holds ordered sequences, and Sector Sprint follows an original five-Act Chandigarh route with optional jumps and harmless message sparks.
 - **Five authored chapters each.** Challenge deepens inside the chosen game, without unlocks, randomized prizes, a leaderboard, or a streak.
+- **A clean runner boundary.** Sector Sprint moves forward automatically and closes by design. It has no score, high score, lives, failure, endless route, or sleep claim; reduced motion starts with the complete narrated route. If the absolute boundary arrives before all five Acts close—or the document reloads without a persisted clock—the Gallery records no completion.
 - **Royal restraint.** Deterministic brass-and-jewel inlay and action-specific praise mark a solved chapter; sound is optional and off by default.
 - **A narrow local ledger.** The Gallery keeps only the most recent completion per game, labeled as entertainment provenance rather than a population comparison.
 
@@ -118,7 +119,7 @@ The browser and standalone surfaces are implemented. The iOS Wall is deferred an
 
 ## Contributing
 
-Read [CONTEXT.md](./CONTEXT.md), [ADR 0013](./docs/adr/0013-add-the-adult-nindova-house.md), [ADR 0014](./docs/adr/0014-add-a-fail-closed-assessment-readiness-contract.md), the [Quiet Depth plan](./docs/QUIET-DEPTH-PLAN.md), and [ADR 0012](./docs/adr/0012-add-tonight-only-depth-and-image-drift.md) before changing a product boundary. Preserve House/Night isolation, the Night Two-Loop Law and two immutable core lines, zero telemetry, deterministic solvability, and rendered phone/desktop evidence; describe audience framing and other presentation changes precisely.
+Read [CONTEXT.md](./CONTEXT.md), [ADR 0013](./docs/adr/0013-add-the-adult-nindova-house.md), [ADR 0014](./docs/adr/0014-add-a-fail-closed-assessment-readiness-contract.md), [ADR 0015](./docs/adr/0015-add-the-bounded-sector-sprint.md), the [Quiet Depth plan](./docs/QUIET-DEPTH-PLAN.md), and [ADR 0012](./docs/adr/0012-add-tonight-only-depth-and-image-drift.md) before changing a product boundary. Preserve House/Night isolation, the Night Two-Loop Law and two immutable core lines, zero telemetry, deterministic solvability, and rendered phone/desktop evidence; describe audience framing and other presentation changes precisely.
 
 ## License
 

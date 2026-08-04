@@ -39,7 +39,7 @@ try {
   await page.goto(prefix);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 375);
   const publicCopy = await page.locator("body").innerText();
-  assert.ok(publicCopy.includes("Four authored tables. No account. No comparison."));
+  assert.ok(publicCopy.includes("Five authored tables. No account. No comparison."));
   const rootPath = mountPath ? `/${mountPath}/` : "/";
   const landingLinks = {
     house: await page.locator('a.button-primary').first().getAttribute("href"),
@@ -83,7 +83,7 @@ try {
   housePage.on("request", (request) => houseRequests.push(request.url()));
   await housePage.goto(prefix);
   await housePage.evaluate(async () => {
-    const legacy = await caches.open("nindova-house-v2");
+    const legacy = await caches.open("nindova-house-v3");
     await legacy.put(new Request(`${location.origin}/legacy-house-shell`), new Response("old"));
   });
   await housePage.goto(houseBase);
@@ -94,12 +94,12 @@ try {
   const houseRegistration = await housePage.evaluate(async () => {
     const ready = await navigator.serviceWorker.ready;
     const keys = await caches.keys();
-    const cache = await caches.open("nindova-house-v3");
+    const cache = await caches.open("nindova-house-v4");
     return { scope: ready.scope, keys, entries: (await cache.keys()).map((request) => request.url) };
   });
   assert.equal(houseRegistration.scope, houseBase);
-  assert.ok(houseRegistration.keys.includes("nindova-house-v3"));
-  assert.equal(houseRegistration.keys.includes("nindova-house-v2"), false);
+  assert.ok(houseRegistration.keys.includes("nindova-house-v4"));
+  assert.equal(houseRegistration.keys.includes("nindova-house-v3"), false);
   assert.ok(houseRegistration.entries.length > 0);
   assert.ok(houseRegistration.entries.every((url) => url.startsWith(houseBase) && !url.includes("assessment-readiness")));
   assert.equal((await houseContext.request.get(`${houseBase}assessment-readiness.js`)).status(), 404);
@@ -113,7 +113,7 @@ try {
   const coldHouseResponse = await coldHouse.goto(houseBase);
   assert.equal(coldHouseResponse?.ok(), true);
   await coldHouse.waitForFunction(() => Boolean(window.__house));
-  assert.equal(await coldHouse.locator(".game-door").count(), 4);
+  assert.equal(await coldHouse.locator(".game-door").count(), 5);
   assert.ok(houseRequests.every((url) => new URL(url).origin === new URL(houseBase).origin));
   assert.deepEqual(houseErrors, []);
   await houseContext.setOffline(false);

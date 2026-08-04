@@ -1,5 +1,5 @@
-/* Hallmark · genre: atmospheric · macrostructure: Map / Diagram · theme: custom Shahi Raat House · tone: restrained luxury · anchor hue: aged brass · audience: adults 18+ · use: choose an authored thinking game · nav: N3 spatial rail · footer: Ft2 · contrast: pass (40–41) · slop: pass (42–49) · mobile: pass (34, 49, 50–57) */
-/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 */
+/* Hallmark · genre: atmospheric · macrostructure: Map / Diagram (House) + Narrative Workflow (Sector Sprint) · theme: custom Shahi Raat House · tone: restrained luxury · anchor hue: aged brass · audience: adults 18+ · use: choose an authored entertainment game · enrichment: code-drawn Canvas miniature · nav: N3 spatial rail · footer: Ft2 · contrast: pass (40–41) · slop: pass (1–58) · honest: pass (46) · chrome: pass (47) · tokens: pass (48) · responsive: pass (49) · icons: pass (30) · mobile: pass (34, 49, 50–57) */
+/* Hallmark · pre-emit critique: P5 H5 E4 S5 R5 V4 */
 
 * { box-sizing: border-box; }
 
@@ -56,6 +56,7 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
 .house-intro h1 { max-width: 15ch; }
 .kicker { margin-block-end: var(--space-sm); color: var(--color-accent); font-size: var(--text-xs); font-weight: 760; letter-spacing: .2em; text-transform: uppercase; }
 .house-lede { max-width: 62ch; color: var(--color-ink-soft); font-family: var(--font-display); font-size: clamp(1.15rem, 2.2vw, 1.6rem); }
+.runner-restore-note { max-width: 62ch; margin-block: var(--space-lg) 0; padding-inline-start: var(--space-md); border-inline-start: 2px solid var(--color-accent); color: var(--color-muted); }
 
 .floor-plan {
   display: grid;
@@ -82,7 +83,7 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
 .salon-heading { display: block; padding: clamp(1.5rem, 3vw, 3rem); border-block-end: 1px solid var(--color-rule-strong); }
 .salon-heading h2 { margin: 0; }
 .salon-heading p { max-width: 48ch; margin: var(--space-sm) 0 0; color: var(--color-muted); }
-.salon-plan { display: grid; position: relative; min-height: 43rem; grid-template-areas: "pattern . mirror" ". compass ." "stack . lantern"; grid-template-columns: 1fr .38fr 1fr; grid-template-rows: 1fr .35fr 1fr; gap: var(--space-sm); padding: clamp(1.1rem, 2.7vw, 2.5rem); background: radial-gradient(circle at center, color-mix(in oklch, var(--color-accent) 7%, transparent), transparent 20rem); }
+.salon-plan { display: grid; position: relative; min-height: 43rem; grid-template-areas: "pattern sector mirror" "stack sector lantern"; grid-template-columns: minmax(0, 1fr) minmax(12rem, .82fr) minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: var(--space-sm); padding: clamp(1.1rem, 2.7vw, 2.5rem); background: radial-gradient(circle at center, color-mix(in oklch, var(--color-accent) 7%, transparent), transparent 20rem); }
 .game-door { display: flex; position: relative; min-width: 0; flex-direction: column; align-items: flex-start; justify-content: flex-end; padding: var(--space-lg); border: 1px solid var(--color-rule-strong); background: color-mix(in oklch, var(--color-paper-3) 82%, transparent); cursor: pointer; text-align: start; transition: border-color var(--dur-short) var(--ease-out), transform var(--dur-short) var(--ease-out), background var(--dur-short) var(--ease-out); }
 .game-door::before { position: absolute; inset: var(--space-sm); border: 1px solid color-mix(in oklch, var(--color-accent) 20%, transparent); content: ""; pointer-events: none; }
 .game-door:hover { border-color: var(--color-accent); background: color-mix(in oklch, var(--color-paper-3) 76%, var(--color-jewel-ruby)); transform: translateY(-3px); }
@@ -90,11 +91,13 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
 .game-door-mirror-forge { grid-area: mirror; }
 .game-door-stack-architect { grid-area: stack; }
 .game-door-lantern-ledger { grid-area: lantern; }
+.game-door-sector-sprint { grid-area: sector; justify-content: center; background: color-mix(in oklch, var(--color-paper-3) 88%, var(--color-jewel-sapphire)); }
+.game-door-sector-sprint::after { position: absolute; inset: auto var(--space-lg) var(--space-lg); height: 1px; background: var(--color-accent); content: ""; }
 .game-number { color: var(--color-accent); font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: .12em; }
 .game-title { margin-block: var(--space-xs); font-family: var(--font-display); font-size: clamp(1.5rem, 2.2vw, 2.4rem); line-height: 1; }
 .game-line { max-width: 28ch; color: var(--color-muted); font-size: var(--text-sm); }
 .game-enter { margin-block-start: var(--space-md); border-block-end: 1px solid var(--color-accent); color: var(--color-accent); font-size: var(--text-sm); font-weight: 720; }
-.salon-compass { display: grid; grid-area: compass; position: relative; place-items: center; color: var(--color-accent); font-family: var(--font-display); }
+.salon-compass { display: none; grid-area: compass; position: relative; place-items: center; color: var(--color-accent); font-family: var(--font-display); }
 .salon-compass i { position: absolute; width: 4.5rem; aspect-ratio: 1; border: 1px solid var(--color-rule-strong); transform: rotate(45deg); }
 
 .house-boundary { padding-block: var(--space-4xl); }
@@ -139,6 +142,7 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
 .game-status { min-height: 1.7rem; max-width: 80rem; margin: var(--space-md) auto 0; color: var(--color-accent); }
 
 .game-chamber:has(.stack-board) { display: block; padding: clamp(1.2rem, 4vw, 4rem); }
+.game-chamber:has(.runner-shell), .game-chamber:has(.runner-story) { display: block; min-height: 0; border: 0; background: transparent; }
 .stack-instruction { display: flex; justify-content: space-between; gap: var(--space-xl); }
 .stack-instruction p { max-width: 45ch; color: var(--color-muted); }
 .stack-board { display: grid; min-height: 22rem; grid-template-columns: repeat(3, 1fr); align-items: end; gap: var(--space-sm); margin-block-start: var(--space-xl); }
@@ -148,6 +152,44 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
 .discs { display: flex; z-index: var(--z-raised); width: 100%; flex-direction: column; justify-content: end; align-items: center; }
 .disc { display: block; width: calc(18% + var(--disc) * 11%); height: clamp(1.15rem, 3vw, 2rem); border: 1px solid var(--color-accent); background: linear-gradient(90deg, var(--color-accent-soft), var(--color-accent), var(--color-accent-soft)); box-shadow: inset 0 1px 0 color-mix(in oklch, var(--color-ink) 28%, transparent); }
 .peg-label { z-index: var(--z-raised); margin-block-start: var(--space-sm); color: var(--color-muted); font-size: var(--text-xs); }
+
+.runner-shell { min-width: 0; }
+.runner-brief { display: grid; grid-template-columns: minmax(14rem, .72fr) minmax(0, 1.28fr); gap: var(--space-2xl); align-items: end; margin-block-end: var(--space-lg); }
+.runner-brief > div { min-width: 0; }
+.runner-brief span, .runner-story-heading > span, .runner-story-beat > span { color: var(--color-accent); font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: .1em; text-transform: uppercase; }
+.runner-brief h2, .runner-story-heading h2 { margin: var(--space-xs) 0 0; font-size: clamp(2rem, 5vw, 4.2rem); }
+.runner-brief p { margin: 0; color: var(--color-muted); }
+.runner-brief p + p { margin-block-start: var(--space-sm); color: var(--color-ink-soft); font-family: var(--font-display); font-size: var(--text-md); }
+.runner-stage-frame { position: relative; margin: 0; padding: var(--space-sm); border: 1px solid var(--color-accent); background: var(--color-paper-2); }
+.runner-stage-frame::before, .runner-stage-frame::after { position: absolute; z-index: var(--z-raised); width: 1.1rem; height: 1.1rem; border-color: var(--color-accent); content: ""; pointer-events: none; }
+.runner-stage-frame::before { inset: var(--space-xs) auto auto var(--space-xs); border-block-start: 2px solid; border-inline-start: 2px solid; }
+.runner-stage-frame::after { inset: auto var(--space-xs) var(--space-xs) auto; border-inline-end: 2px solid; border-block-end: 2px solid; }
+.runner-canvas-window { overflow: clip; background: var(--color-paper); }
+#runnerCanvas { display: block; width: 100%; height: auto; aspect-ratio: 20 / 9; background: var(--color-paper); image-rendering: pixelated; }
+.runner-stage-frame figcaption { padding: var(--space-sm) var(--space-xs) 0; color: var(--color-neutral); font-family: var(--font-mono); font-size: var(--text-xs); }
+.runner-approach { display: flex; min-width: 0; align-items: center; gap: var(--space-md); margin: var(--space-sm) 0 0; padding: var(--space-sm) var(--space-md); border-inline-start: 2px solid var(--color-accent); background: var(--color-paper-2); }
+.runner-approach span { flex: none; color: var(--color-neutral); font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: .1em; text-transform: uppercase; }
+.runner-approach strong { min-width: 0; overflow-wrap: anywhere; color: var(--color-ink-soft); font-family: var(--font-display); font-size: var(--text-lg); font-weight: 520; }
+.runner-controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-block-start: var(--space-sm); border-block-start: 1px solid var(--color-rule-strong); border-inline-start: 1px solid var(--color-rule-strong); }
+.runner-controls button { display: flex; min-width: 0; min-height: 68px; flex-direction: column; align-items: flex-start; justify-content: center; padding: var(--space-sm) var(--space-md); border: 0; border-inline-end: 1px solid var(--color-rule-strong); border-block-end: 1px solid var(--color-rule-strong); background: var(--color-paper-2); cursor: pointer; text-align: start; transition: background var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out); }
+.runner-controls button span { overflow: hidden; max-width: 100%; font-family: var(--font-display); font-size: var(--text-md); text-overflow: ellipsis; white-space: nowrap; }
+.runner-controls button small { color: var(--color-neutral); font-family: var(--font-mono); font-size: var(--text-xs); white-space: nowrap; }
+.runner-controls button[data-pressed="true"], .runner-controls button:active { transform: translateY(1px); }
+.runner-controls button[aria-pressed="true"] { background: var(--color-paper-3); color: var(--color-accent); }
+.runner-controls button:disabled { cursor: not-allowed; opacity: .55; }
+@media (hover: hover) and (pointer: fine) { .runner-controls button:hover:not(:disabled) { background: color-mix(in oklch, var(--color-paper-3) 86%, var(--color-jewel-sapphire)); } }
+.runner-instructions, .runner-live, .runner-route-note { max-width: 70ch; }
+.runner-instructions { margin: var(--space-md) 0 0; color: var(--color-muted); }
+.runner-live { min-height: 1.7rem; margin: var(--space-xs) 0 0; color: var(--color-accent); font-family: var(--font-display); font-size: var(--text-md); }
+
+.runner-story { display: grid; min-height: 32rem; grid-template-columns: minmax(15rem, .75fr) minmax(0, 1.25fr); grid-template-areas: "heading beat" "actions beat" "note beat"; gap: var(--space-xl) var(--space-3xl); align-content: center; padding: clamp(1.5rem, 5vw, 5rem); border: 1px solid var(--color-rule-strong); background: var(--color-paper-2); }
+.runner-story-heading { grid-area: heading; }
+.runner-story-heading > p { max-width: 44ch; margin: var(--space-lg) 0 0; color: var(--color-muted); }
+.runner-story-beat { display: flex; grid-area: beat; min-width: 0; flex-direction: column; justify-content: center; padding: clamp(1.5rem, 5vw, 4rem); border-inline-start: 1px solid var(--color-accent); }
+.runner-story-beat p { margin: var(--space-lg) 0 0; color: var(--color-ink); font-family: var(--font-display); font-size: clamp(1.7rem, 4vw, 3.2rem); line-height: 1.08; }
+.runner-story-actions { display: flex; grid-area: actions; flex-wrap: wrap; gap: var(--space-sm); align-items: start; }
+.runner-story-actions button { white-space: nowrap; }
+.runner-route-note { grid-area: note; margin: 0; color: var(--color-neutral); font-size: var(--text-sm); }
 
 .curtain-call { display: grid; min-height: calc(100dvh - 5.2rem); place-content: center; justify-items: center; padding-block: var(--space-4xl); text-align: center; }
 .curtain-call h1 { max-width: 13ch; }
@@ -184,7 +226,7 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
   .room-night, .room-gallery { border-inline-end: 0; border-block-start: 1px solid var(--color-rule-strong); }
   .salon-heading { display: block; }
   .salon-heading p { margin-block-start: var(--space-sm); }
-  .salon-plan { min-height: auto; grid-template-areas: "pattern mirror" "stack lantern"; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(13rem, auto)); }
+  .salon-plan { min-height: auto; grid-template-areas: "sector sector" "pattern mirror" "stack lantern"; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: minmax(12rem, auto) repeat(2, minmax(13rem, auto)); }
   .salon-compass { display: none; }
   .game-chamber { grid-template-columns: 1fr; }
   .prompt-column { min-height: 19rem; border-inline-end: 0; border-block-end: 1px solid var(--color-rule-strong); }
@@ -195,13 +237,17 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
   .stack-instruction { display: block; }
   .stack-board { min-height: 18rem; }
   .peg { min-height: 16rem; }
+  .runner-brief { grid-template-columns: minmax(0, 1fr); gap: var(--space-lg); }
+  .runner-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .runner-story { min-height: 0; grid-template-columns: minmax(0, 1fr); grid-template-areas: "heading" "beat" "actions" "note"; gap: var(--space-lg); }
+  .runner-story-beat { min-height: 17rem; border-inline-start: 0; border-block-start: 1px solid var(--color-accent); }
   .house-footer { align-items: flex-start; flex-direction: column; }
 }
 
 @media (max-width: 430px) {
   h1 { font-size: clamp(2.8rem, 16vw, 4.3rem); }
   .house-intro { padding-block-start: var(--space-3xl); }
-  .salon-plan { grid-template-areas: "pattern" "mirror" "stack" "lantern"; grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(4, minmax(11rem, auto)); }
+  .salon-plan { grid-template-areas: "sector" "pattern" "mirror" "stack" "lantern"; grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(5, minmax(11rem, auto)); }
   .game-door { min-height: 11rem; }
   .game-masthead { align-items: flex-start; flex-direction: column; }
   .chapter-mark { width: 100%; }
@@ -212,6 +258,12 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
   .peg { padding-inline: 1px; }
   .peg-label { max-width: 6ch; }
   .disc { height: 1.25rem; }
+  .runner-controls { grid-template-columns: minmax(0, 1fr); }
+  .runner-controls button { min-height: 58px; }
+  #runnerCanvas { width: 260%; max-width: none; }
+  .runner-approach { align-items: flex-start; flex-direction: column; gap: var(--space-3xs); }
+  .runner-story { padding: var(--space-lg); }
+  .runner-story-beat { min-height: 14rem; padding: var(--space-lg) 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

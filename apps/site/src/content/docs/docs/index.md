@@ -3,7 +3,7 @@ title: Nindova documentation
 description: Product contract and implementation notes for Nindova House, the Grand Salon, and the bounded Night Room.
 ---
 
-Nindova House is private, offline-ready authored entertainment for adults 18 and over. The **Grand Salon** contains Pattern Court, Mirror Forge, Stack Architect, and Lantern Ledger, each arranged in five fixed chapters. The separate **Night Room** preserves Masala Mound: match two identical kitchen tiles when nothing covers them and one side is open; the board grows lighter and then the bounded Session closes.
+Nindova House is private, offline-ready authored entertainment for adults 18 and over. The **Grand Salon** contains Pattern Court, Mirror Forge, Stack Architect, Lantern Ledger, and Sector Sprint, each arranged in five fixed chapters or Acts. The separate **Night Room** preserves Masala Mound: match two identical kitchen tiles when nothing covers them and one side is open; the board grows lighter and then the bounded Session closes.
 
 > Nothing to win. Nothing tracked. Nothing you can do wrong.
 

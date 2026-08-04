@@ -29,6 +29,7 @@ function emitHouseArtifacts(): Plugin {
       await Promise.all(["pwa-192.png", "pwa-512.png", "pwa-maskable-512.png"].map((name) => (
         copyFile(resolve(brandAssetDirectory, name), resolve(assetDirectory, name))
       )));
+      await copyFile(resolve(brandAssetDirectory, "favicon.svg"), resolve("dist/favicon.svg"));
       const files = (await readdir(resolve("dist"), { recursive: true, withFileTypes: true }))
         .filter((entry) => entry.isFile())
         .map((entry) => relative(resolve("dist"), resolve(entry.parentPath, entry.name)).replaceAll("\\", "/"))
