@@ -380,8 +380,8 @@
     "semantic_hash": ""
   },
   "docs/PUBLIC-SURFACE-EVIDENCE.md": {
-    "mtime": 1785815166.3043091,
-    "ast_hash": "ce90563efdac3001450fc4b09cb43da0",
+    "mtime": 1785815802.3827949,
+    "ast_hash": "8ac50e16c6fc75fa94d34791936cda7f",
     "semantic_hash": ""
   },
   "docs/REDESIGN-PLAN.md": {
@@ -465,7 +465,7 @@
     "semantic_hash": ""
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1785815247.9400415,
+    "mtime": 1785815805.2347572,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": ""
   },
@@ -590,8 +590,8 @@
     "semantic_hash": ""
   },
   "apps/session/assets/motifs/src/motifs-master.src.svg": {
-    "mtime": 1785811970.732042,
-    "ast_hash": "d6b58b74a576224d43c15e0d2553a340",
+    "mtime": 1785815625.3554394,
+    "ast_hash": "8c0803b343183c34984623754d952517",
     "semantic_hash": ""
   },
   "apps/session/assets/motifs/tawa.svg": {
@@ -760,18 +760,18 @@
     "semantic_hash": ""
   },
   "apps/site/public/brand/src/favicon.src.svg": {
-    "mtime": 1785811970.726487,
-    "ast_hash": "fe158289849b6a0e23eeb83a0a03b685",
+    "mtime": 1785815625.3556616,
+    "ast_hash": "66d9030774a7c1f055a4cb8de8be5ace",
     "semantic_hash": ""
   },
   "apps/site/public/brand/src/mark.src.svg": {
-    "mtime": 1785811970.7261462,
-    "ast_hash": "6adb5a293d28a0079625a0f3c6318d2e",
+    "mtime": 1785815625.3558424,
+    "ast_hash": "7fe8c8ebbfd8eecf8e6fd36dd833d163",
     "semantic_hash": ""
   },
   "apps/site/public/brand/src/wordmark.src.svg": {
-    "mtime": 1785811970.726323,
-    "ast_hash": "4a83389c5cb9595d0fe6216cd4c743ce",
+    "mtime": 1785815625.3560088,
+    "ast_hash": "975594524ce5b5dfcf0d442dadff9153",
     "semantic_hash": ""
   }
 }
