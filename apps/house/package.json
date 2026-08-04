@@ -1,0 +1,19 @@
+{
+  "name": "@nindova/house",
+  "version": "0.4.0",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite --host 127.0.0.1",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fontsource-variable/geist": "5.2.8",
+    "@fontsource-variable/newsreader": "5.2.8"
+  },
+  "devDependencies": {
+    "vite": "8.1.5"
+  }
+}

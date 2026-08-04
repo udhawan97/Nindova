@@ -5,9 +5,9 @@
   </picture>
 </p>
 
-<p align="center"><strong>One Session, then goodnight.</strong></p>
+<p align="center"><strong>A house of authored games. A separate room for goodnight.</strong></p>
 
-Nindova is a calm, bounded pair-removal game for the end of the day. **Masala Mound** uses the uncovered-and-open-side rule of Mahjong solitaire and fills authored overlapping layers with everyday Indian kitchen forms: belan, chakla, tawa, chimta, steel katori, tiffin, masala dabba, chai glass, and pressure cooker.
+Nindova House is private, offline-ready entertainment for adults 18 and over. The Grand Salon contains four authored thinking games with five chapters each. The separate Night Room preserves **Masala Mound**, the calm bounded pair-removal Session made from everyday Indian kitchen forms.
 
 > Nothing to win. Nothing tracked. Nothing you can do wrong.
 
@@ -17,19 +17,29 @@ Nindova is a calm, bounded pair-removal game for the end of the day. **Masala Mo
 
 |  | Start here | What you get |
 |---|---|---|
-| <img src="./apps/site/public/brand/favicon.svg" width="28" alt=""> | [Play the live PWA](https://udhawan97.github.io/Nindova/play/) | Installable, offline-ready Session from `main` |
+| <img src="./apps/site/public/brand/favicon.svg" width="28" alt=""> | [Build Nindova House locally](#run-locally) | Four offline-ready entertainment games in this workspace |
+| <img src="./apps/site/public/brand/motifs/chai.svg" width="28" alt=""> | [Enter the Night Room](https://udhawan97.github.io/Nindova/play/) | The installable, self-closing Masala Mound Session |
 | <img src="./apps/site/public/brand/nindova-mark-monochrome.svg" width="28" alt=""> | [Download v0.3.0](https://github.com/udhawan97/Nindova/releases/tag/v0.3.0) | Checksummed standalone HTML and complete web/PWA archive |
 | <img src="./apps/site/public/brand/motifs/tiffin.svg" width="28" alt=""> | [Read the documentation](https://udhawan97.github.io/Nindova/docs/) | Product contract, architecture, privacy, testing, and limits |
 
-The pinned GitHub Pages workflow publishes the same static build from `main`. The live route is browser-verified; a physical-device QR scan remains a separate evidence lane. [Release history](https://github.com/udhawan97/Nindova/releases) preserves previous checksummed builds.
+The pinned GitHub Pages workflow can publish the static build from `main`, but this House build was not deployed or externally verified in this task. The existing Night Room and documentation links above refer to the previous public surface. A physical-device QR scan remains a separate evidence lane. [Release history](https://github.com/udhawan97/Nindova/releases) preserves previous checksummed builds.
 
-The local `/play/` route works after serving a build, and `dist/nindova.html` works as a self-contained file even when hosting is unavailable.
+The local `/house/` and `/play/` routes work after serving a build, and `dist/nindova.html` keeps the Night Session available as a self-contained file when hosting is unavailable.
 
 <img src="./apps/site/public/play-qr.svg" width="180" alt="Direct QR for the canonical Nindova play URL">
 
 The QR artifact encodes the full canonical URL with no shortener or tracking parameter. Keep the printed URL with the code so people can verify its destination when hosting is available.
 
 ## The experience
+
+### Grand Salon
+
+- **Four distinct tables.** Pattern Court reads visual order, Mirror Forge turns spatial forms, Stack Architect moves lawful towers, and Lantern Ledger holds ordered sequences.
+- **Five authored chapters each.** Challenge deepens inside the chosen game, without unlocks, randomized prizes, a leaderboard, or a streak.
+- **Royal restraint.** Deterministic brass-and-jewel inlay and action-specific praise mark a solved chapter; sound is optional and off by default.
+- **A narrow local ledger.** The Gallery keeps only the most recent completion per game, labeled as entertainment provenance rather than a population comparison.
+
+### Night Room
 
 - **A spatial rule.** Choose two matching tiles only when nothing overlaps them from above and at least one horizontal side is open.
 - **A tonight-only choice.** Gentle has three more-open layers. Deeper begins with unmatched open-side decoys and one cross-layer match, then reveals two more crown matches in sequence. They are equal preferences, not levels or ability labels.
@@ -56,7 +66,7 @@ npm install --ignore-scripts
 npm run dev:session
 ```
 
-For the complete landing page, docs, `/play/` PWA, and standalone file:
+For the complete landing page, docs, `/house/` hub, `/play/` PWA, and standalone file:
 
 ```sh
 npm run build
@@ -65,12 +75,14 @@ npm run preview
 
 Then open:
 
+- `http://127.0.0.1:4173/house/` — Nindova House and the Grand Salon
 - `http://127.0.0.1:4173/play/` — installable Session
 - `http://127.0.0.1:4173/docs/` — product and implementation docs
 - `dist/nindova.html` — standalone artifact
 
 ## Repository map
 
+- `apps/house/` — Vite + TypeScript adult entertainment hub, typed game registry, local result provenance, manifest, and worker.
 - `apps/session/` — Vite + TypeScript Rasoi engine, semantic tile interface, Night/Dawn state, export, manifest, and worker.
 - `apps/site/` — Astro landing page and Starlight documentation.
 - `docs/` — approved redesign, ADRs, evidence ledger, and release/testing records.
@@ -94,17 +106,19 @@ See [Testing](./apps/site/src/content/docs/docs/testing.md) and the [public-surf
 
 Nindova has no account, analytics, app telemetry, ads, app-controlled remote logging, or third-party runtime request. The production Session is static and same-origin. A static host may keep its own operational access logs outside the app's control.
 
-Long-lived local storage contains one version-3 record with only the latest completion facts needed by Dawn, a safely migrated legacy Dawn variant when present, and the optional local “Same time tomorrow?” intention. The selected board profile and interaction timing exist only in version-4 same-tab session storage to enforce deterministic resume and closure; neither becomes history. Generated images and loops remain local blobs unless the person explicitly saves or shares them.
+House local storage contains an adult-audience acknowledgement and at most one replaceable entertainment result per Salon game. Night Room local storage contains one version-3 record with only the latest completion facts needed by Dawn, a safely migrated legacy Dawn variant when present, and the optional local “Same time tomorrow?” intention. Active game state stays in same-tab session storage. Generated images and loops remain local blobs unless the person explicitly saves or shares them.
 
 ## Product and evidence boundary
 
-Nindova is a behavioral design study for people aged 13 and up. It is not a sleep tracker, sleep-performance tool, memory intervention, or treatment. Masala Mound uses recognition, visual search, and spatial planning, but has not been clinically shown to make people sleepy, produce a useful dopamine response, improve general memory, or improve sleep at any age. Persistent sleep difficulty deserves evidence-based care such as CBT-I with a qualified clinician.
+Nindova House is authored entertainment for adults 18 and over. It does not produce an assessment result. The Night Room remains a behavioral design study, not a sleep tracker, sleep-performance tool, memory intervention, or treatment. Masala Mound uses recognition, visual search, and spatial planning, but has not been clinically shown to make people sleepy, produce a useful dopamine response, improve general memory, or improve sleep at any age. Persistent sleep difficulty deserves evidence-based care such as CBT-I with a qualified clinician.
+
+A source-only [assessment-readiness contract](./docs/ASSESSMENT-READINESS.md) now makes the future evidence threshold executable: entertainment results are ineligible, every validation gate requires review metadata, and both research collection and public cognitive output remain hard-disabled. It is infrastructure for honest future research, not an assessment feature.
 
 The browser and standalone surfaces are implemented. The iOS Wall is deferred and is not represented as shipped. Chromium automation covers the release surfaces; broader installed Safari/Android proof, real-device VoiceOver/TalkBack acceptance, human Punjabi cultural review, and human evidence about perceived challenge or typical completion time remain open limitations.
 
 ## Contributing
 
-Read [CONTEXT.md](./CONTEXT.md), the [Quiet Depth plan](./docs/QUIET-DEPTH-PLAN.md), and [ADR 0012](./docs/adr/0012-add-tonight-only-depth-and-image-drift.md) before changing a product boundary. Preserve the Two-Loop Law, the immutable language, zero telemetry, deterministic solvability, and rendered phone/desktop evidence.
+Read [CONTEXT.md](./CONTEXT.md), [ADR 0013](./docs/adr/0013-add-the-adult-nindova-house.md), [ADR 0014](./docs/adr/0014-add-a-fail-closed-assessment-readiness-contract.md), the [Quiet Depth plan](./docs/QUIET-DEPTH-PLAN.md), and [ADR 0012](./docs/adr/0012-add-tonight-only-depth-and-image-drift.md) before changing a product boundary. Preserve House/Night isolation, the Night Two-Loop Law and two immutable core lines, zero telemetry, deterministic solvability, and rendered phone/desktop evidence; describe audience framing and other presentation changes precisely.
 
 ## License
 

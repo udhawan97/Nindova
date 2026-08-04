@@ -1,6 +1,6 @@
 ---
 title: Known limitations
-description: Honest evidence and product limits for the v0.3.0 source release.
+description: Honest evidence and product limits for the current Nindova House and Night Room source.
 ---
 
 - Masala Mound is a product hypothesis. No human study in this repository proves that it makes people sleepy, creates a particular dopamine effect, improves general memory, or improves sleep.
@@ -12,3 +12,6 @@ description: Honest evidence and product limits for the v0.3.0 source release.
 - The iOS Wall is deferred. No Family Controls entitlement, native interception, notification, or App Store capability is claimed.
 
 These are visible limits, not shipped claims hidden in a backlog.
+- Grand Salon games are authored entertainment. They have not been normed on a representative adult sample and do not produce a validated population-normed, percentile, diagnostic, or cognitive-trait result.
+- The assessment-readiness module is a fail-closed evidence inventory, not validation evidence. It authorizes neither research collection nor public output.
+- Automated browser coverage completes all four games and verifies keyboard focus and semantic Stack state. It does not establish equivalent task meaning for alternative sensory presentations or replace real-device assistive-technology testing.

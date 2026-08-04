@@ -1,5 +1,32 @@
 [
   {
+    "date": "2026-08-04",
+    "macrostructure": "Map / Diagram",
+    "theme": "custom",
+    "theme_axes": "dark / classical-serif / warm",
+    "vibe": "blackened indigo house plan, aged brass, quiet ivory",
+    "enrichment": "hand-built floor plan and deterministic royal inlay",
+    "brief": "Adult Nindova House mini-game hub with an isolated Night Room"
+  },
+  {
+    "date": "2026-08-04",
+    "macrostructure": "Workbench Dawn Gallery",
+    "theme": "custom",
+    "theme_axes": "light / classical-serif / warm",
+    "vibe": "first-light limewash, indigo lacquer, aged brass",
+    "enrichment": "real deterministic Rasoi Dawn canvas",
+    "brief": "Refine Rasoi Dawn into a sophisticated morning keepsake"
+  },
+  {
+    "date": "2026-08-04",
+    "macrostructure": "Workbench",
+    "theme": "custom",
+    "theme_axes": "dark / classical-serif / warm",
+    "vibe": "blackened indigo lacquer, aged brass, ivory inlay",
+    "enrichment": "none; the Masala Mound is the focal artifact",
+    "brief": "Royal and sophisticated Session/PWA theme without behavioral changes"
+  },
+  {
     "date": "2026-08-02",
     "macrostructure": "Narrative Workflow",
     "theme": "custom",

@@ -92,22 +92,47 @@ function rgbRatio(foreground, background) {
   return (light + .05) / (dark + .05);
 }
 
-const label = rgb("#25171b");
-const labelBacking = rgb("#fff6de");
-const labelBackingAlpha = .58;
 const motifRules = [...session.matchAll(/\.tile\[data-motif="([^"]+)"\]\s*\{([^}]+)\}/g)];
 assert.equal(motifRules.length, 9, "all nine motif palettes should be present");
 for (const [, motif, declarations] of motifRules) {
-  const endpoint = declarations.match(/--tile-face-2:\s*(#[0-9a-f]{6})/i)?.[1];
-  assert.ok(endpoint, `${motif} should define a lower face color`);
-  const face = rgb(endpoint);
-  const compositedBacking = labelBacking.map((channel, index) => (
-    channel * labelBackingAlpha + face[index] * (1 - labelBackingAlpha)
-  ));
-  test(`${motif} tile label clears 4.5:1 on its darkest face`, () => {
-    assert.ok(rgbRatio(label, compositedBacking) >= 4.5);
-  });
+  assert.match(declarations, /--motif:\s*var\(--color-[a-z-]+\)/, `${motif} should define a tokenized motif ink`);
 }
+
+function sessionToken(name) {
+  const match = session.match(new RegExp(`--${name}:\\s*oklch\\(([^)]+)\\)`));
+  assert.ok(match, `Missing Session OKLCH token --${name}`);
+  const parts = match[1].trim().split(/\s+/);
+  return {
+    lightness: Number(parts[0].replace("%", "")) / 100,
+    chroma: Number(parts[1]),
+    hue: (Number(parts[2]) * Math.PI) / 180,
+  };
+}
+
+function sessionRatio(foreground, background) {
+  const light = Math.max(luminance(sessionToken(foreground)), luminance(sessionToken(background)));
+  const dark = Math.min(luminance(sessionToken(foreground)), luminance(sessionToken(background)));
+  return (light + .05) / (dark + .05);
+}
+
+test("the neutral ivory tile label clears 4.5:1", () => {
+  const label = luminance(sessionToken("color-ink"));
+  const face = luminance(sessionToken("color-tile"));
+  const contrast = (Math.max(label, face) + .05) / (Math.min(label, face) + .05);
+  assert.ok(contrast >= 4.5, `tile label contrast is ${contrast.toFixed(2)}:1`);
+});
+
+test("the Dawn light theme keeps text and focus contrast", () => {
+  for (const [foreground, background] of [
+    ["color-dawn-ink", "color-dawn-paper-soft"],
+    ["color-dawn-ink-soft", "color-dawn-paper-soft"],
+    ["color-dawn-brass", "color-dawn-paper-soft"],
+  ]) {
+    const contrast = sessionRatio(foreground, background);
+    assert.ok(contrast >= 4.5, `${foreground} on ${background} is ${contrast.toFixed(2)}:1`);
+  }
+  assert.ok(sessionRatio("color-dawn-ink", "color-dawn-paper") >= 3);
+});
 
 test("the royal-night feedback copy clears 4.5:1", () => {
   const background = rgb("#150d20");

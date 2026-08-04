@@ -1,9 +1,14 @@
 ---
 title: Roadmap
-description: What exists in the v0.3.0 source release and what remains deliberately unclaimed.
+description: What exists in the current source and what remains deliberately unclaimed.
 ---
 
-## In the v0.3.0 source release
+## In the current source
+
+- Nindova House for adults 18 and over, with a spatial Grand Salon and separate Night Room.
+- Pattern Court, Mirror Forge, Stack Architect, and Lantern Ledger, each with five authored entertainment chapters and deterministic celebration.
+- Versioned `mode: "entertainment"` completion provenance, one replaceable local result per game, strict active-state recovery, and a visible Gallery clear action.
+- Independently scoped House and Night PWAs with cold-offline and base-path browser evidence.
 
 - Masala Mound pure legality kernel and two equal 36-Tile board profiles: three-layer Gentle and four-layer Deeper.
 - Deterministic recipe version 5 with exhaustive 382-state Gentle and 510-state Deeper verification, one ending each, and zero dead states. Deeper opens through three staged crown matches, each hidden among unmatched free decoys.
@@ -26,5 +31,7 @@ The pinned GitHub Pages workflow publishes the static build from `main`. The liv
 - Performance profiling on low-power phones without adding visual stimulation.
 
 ## Deliberately deferred
+
+A source-only assessment-readiness contract now inventories the required evidence and rejects entertainment results as research inputs. Public population-normed, percentile, diagnostic, or cognitive-trait results remain unimplemented. Any measurement claim remains blocked until representative adult norming, reliability, validity, fairness, uncertainty, informed consent, independent ethics review, and data governance exist—and a later explicit release decision authorizes output.
 
 The iOS Wall remains a product direction, not a shipped capability. Family Controls entitlement, Screen Time routing, and version-specific Gate behavior require a separate native implementation and proof track. See [Deferred iOS Wall](../ios-wall/).

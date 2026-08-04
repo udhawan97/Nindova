@@ -583,12 +583,44 @@ function setDawnNow(instant: string) {
   return currentDawnEligibility().available;
 }
 
-function drawCanvasMotif(context: CanvasRenderingContext2D, motif: string, x: number, y: number, scale: number, progress = 0) {
+const DAWN_PALETTE = Object.freeze({
+  paperLight: "#f3ead7",
+  paper: "#ead9bf",
+  sunrise: "#c98e73",
+  lightWash: "rgba(255,244,213,.54)",
+  lightClear: "rgba(255,244,213,0)",
+  clear: "transparent",
+  lattice: "rgba(83,57,70,.11)",
+  indigo: "#21192d",
+  indigoRaised: "#302239",
+  runner: "#53323d",
+  runnerPattern: "rgba(222,185,112,.17)",
+  brass: "#b77a32",
+  brassLight: "#dfc486",
+  brassShadow: "#7f542a",
+  plate: "#f0e3c7",
+  plateWash: "rgba(183,122,50,.12)",
+  shadow: "rgba(24,15,27,.28)",
+  inkIndigo: "#35243b",
+  inkMadder: "#713b45",
+  inkPeacock: "#285b5a",
+  inkBronze: "#72502f",
+});
+
+function drawCanvasMotif(
+  context: CanvasRenderingContext2D,
+  motif: string,
+  x: number,
+  y: number,
+  scale: number,
+  progress = 0,
+  ink: string = DAWN_PALETTE.inkIndigo,
+) {
   context.save();
   context.translate(x, y);
   context.scale(scale, scale);
-  context.strokeStyle = "#61372b";
-  context.fillStyle = "rgba(177,112,49,.14)";
+  context.strokeStyle = ink;
+  context.fillStyle = DAWN_PALETTE.plateWash;
   context.lineWidth = 4;
   context.lineCap = "round";
   context.lineJoin = "round";
@@ -618,6 +650,59 @@ function drawCanvasMotif(context: CanvasRenderingContext2D, motif: string, x: nu
   context.restore();
 }
 
+function drawDawnLattice(context: CanvasRenderingContext2D, width: number) {
+  context.save();
+  context.beginPath();
+  context.rect(width * .52, 48, width * .39, 318);
+  context.clip();
+  context.strokeStyle = DAWN_PALETTE.lattice;
+  context.lineWidth = 2;
+  for (let offset = -520; offset < width + 520; offset += 112) {
+    context.beginPath();
+    context.moveTo(offset, 34);
+    context.lineTo(offset + 430, 464);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(offset, 382);
+    context.lineTo(offset + 430, 34);
+    context.stroke();
+  }
+  context.restore();
+}
+
+function drawDawnPlate(context: CanvasRenderingContext2D, x: number, y: number, ink: string) {
+  context.save();
+  context.shadowColor = DAWN_PALETTE.shadow;
+  context.shadowBlur = 18;
+  context.shadowOffsetY = 12;
+  context.fillStyle = DAWN_PALETTE.brassShadow;
+  context.beginPath();
+  context.ellipse(x, y + 8, 83, 44, 0, 0, Math.PI * 2);
+  context.fill();
+  context.shadowColor = DAWN_PALETTE.clear;
+  context.fillStyle = DAWN_PALETTE.brassLight;
+  context.beginPath();
+  context.ellipse(x, y, 80, 42, 0, 0, Math.PI * 2);
+  context.fill();
+  context.strokeStyle = DAWN_PALETTE.brass;
+  context.lineWidth = 4;
+  context.stroke();
+  context.fillStyle = DAWN_PALETTE.plate;
+  context.beginPath();
+  context.ellipse(x, y - 2, 68, 33, 0, 0, Math.PI * 2);
+  context.fill();
+  context.strokeStyle = DAWN_PALETTE.brassShadow;
+  context.lineWidth = 2;
+  context.stroke();
+  context.strokeStyle = ink;
+  context.beginPath();
+  context.moveTo(x - 23, y + 29);
+  context.lineTo(x, y + 34);
+  context.lineTo(x + 23, y + 29);
+  context.stroke();
+  context.restore();
+}
+
 function renderDawnFrame(progress = 0) {
   const context = dawnCanvas.getContext("2d");
   const completion = nightState.lastCompleted;
@@ -625,44 +710,93 @@ function renderDawnFrame(progress = 0) {
   const width = dawnCanvas.width;
   const height = dawnCanvas.height;
   const sky = context.createLinearGradient(0, 0, 0, height);
-  sky.addColorStop(0, "#d9b678");
-  sky.addColorStop(.46, "#f0d3a0");
-  sky.addColorStop(1, "#8f513f");
+  sky.addColorStop(0, DAWN_PALETTE.paperLight);
+  sky.addColorStop(1, DAWN_PALETTE.sunrise);
   context.fillStyle = sky;
   context.fillRect(0, 0, width, height);
-  context.fillStyle = "rgba(255,238,185,.62)";
-  context.beginPath(); context.arc(width * .78, height * .22, 88, 0, Math.PI * 2); context.fill();
-  context.fillStyle = "#4a2b28";
-  context.fillRect(0, height * .67, width, height * .33);
-  context.fillStyle = "#674035";
-  context.fillRect(0, height * .69, width, 17);
-  context.strokeStyle = "rgba(128,65,48,.34)";
+
+  const wall = context.createLinearGradient(108, 48, width - 108, 366);
+  wall.addColorStop(0, DAWN_PALETTE.paperLight);
+  wall.addColorStop(1, DAWN_PALETTE.paper);
+  context.fillStyle = wall;
+  context.fillRect(108, 48, width - 216, 318);
+  context.strokeStyle = DAWN_PALETTE.brass;
+  context.lineWidth = 3;
+  context.strokeRect(108, 48, width - 216, 318);
+  context.strokeStyle = DAWN_PALETTE.brassLight;
+  context.lineWidth = 1;
+  context.strokeRect(118, 58, width - 236, 298);
+  const firstLight = context.createRadialGradient(width * .84, height * .08, 12, width * .84, height * .08, 430);
+  firstLight.addColorStop(0, DAWN_PALETTE.lightWash);
+  firstLight.addColorStop(1, DAWN_PALETTE.lightClear);
+  context.fillStyle = firstLight;
+  context.fillRect(108, 48, width - 216, 318);
+  context.fillStyle = DAWN_PALETTE.lightWash;
+  context.beginPath();
+  context.moveTo(width * .56, 48);
+  context.lineTo(width - 108, 48);
+  context.lineTo(width * .78, 366);
+  context.lineTo(width * .39, 366);
+  context.closePath();
+  context.fill();
+  drawDawnLattice(context, width);
+
+  const table = context.createLinearGradient(0, 390, 0, height);
+  table.addColorStop(0, DAWN_PALETTE.indigoRaised);
+  table.addColorStop(1, DAWN_PALETTE.indigo);
+  context.fillStyle = table;
+  context.fillRect(0, 390, width, height - 390);
+  context.fillStyle = DAWN_PALETTE.brass;
+  context.fillRect(0, 390, width, 7);
+  context.fillStyle = DAWN_PALETTE.runner;
+  context.fillRect(74, 420, width - 148, 297);
+  context.strokeStyle = DAWN_PALETTE.brassShadow;
   context.lineWidth = 2;
-  for (let x = -height; x < width + height; x += 48) {
-    context.beginPath(); context.moveTo(x, 0); context.lineTo(x + height, height); context.stroke();
+  context.strokeRect(74, 420, width - 148, 297);
+  context.strokeStyle = DAWN_PALETTE.runnerPattern;
+  context.lineWidth = 1;
+  context.save();
+  context.beginPath();
+  context.rect(74, 420, width - 148, 297);
+  context.clip();
+  for (let x = 74; x <= width - 74; x += 76) {
+    context.beginPath();
+    context.moveTo(x, 420);
+    context.lineTo(x + 118, 717);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(x, 717);
+    context.lineTo(x + 118, 420);
+    context.stroke();
   }
+  context.restore();
 
   if (completion.kind === "rasoi-pairs") {
+    const motifInks = [
+      DAWN_PALETTE.inkMadder,
+      DAWN_PALETTE.inkIndigo,
+      DAWN_PALETTE.inkBronze,
+      DAWN_PALETTE.inkPeacock,
+    ];
     const positions = completion.motifOrder.map((motif, index) => ({
       motif,
       x: 150 + (index % 5) * 225 + (index >= 5 ? 110 : 0),
-      y: index < 5 ? 500 : 625,
+      y: index < 5 ? 490 : 632,
+      ink: motifInks[index % motifInks.length],
     }));
     for (const item of positions) {
-      context.fillStyle = "#dfc18a";
-      context.beginPath(); context.ellipse(item.x, item.y + 9, 76, 42, 0, 0, Math.PI * 2); context.fill();
-      context.strokeStyle = "#9b6b35"; context.lineWidth = 3; context.stroke();
-      drawCanvasMotif(context, item.motif, item.x, item.y - 4, .82, progress);
+      drawDawnPlate(context, item.x, item.y, item.ink);
+      drawCanvasMotif(context, item.motif, item.x, item.y - 5, .82, progress, item.ink);
     }
     dawnCanvas.setAttribute("aria-label", "Last night's nine kitchen motifs resting on brass plates at first light.");
   } else {
-    context.fillStyle = "#d9b877";
-    context.beginPath(); context.ellipse(width / 2, 545, 230, 86, 0, 0, Math.PI * 2); context.fill();
-    context.strokeStyle = "#82562d"; context.lineWidth = 5; context.stroke();
-    context.fillStyle = "#6b3a32";
-    context.font = "44px Georgia";
+    context.fillStyle = DAWN_PALETTE.brassLight;
+    context.beginPath(); context.ellipse(width / 2, 584, 270, 92, 0, 0, Math.PI * 2); context.fill();
+    context.strokeStyle = DAWN_PALETTE.brassShadow; context.lineWidth = 5; context.stroke();
+    context.fillStyle = DAWN_PALETTE.inkIndigo;
+    context.font = "44px Iowan Old Style, Palatino, serif";
     context.textAlign = "center";
-    context.fillText("An earlier Nindova night, kept safely", width / 2, 540);
+    context.fillText("An earlier Nindova night, kept safely", width / 2, 592);
     dawnCanvas.setAttribute("aria-label", "A safely migrated Dawn from an earlier Nindova night.");
   }
 }
@@ -672,6 +806,7 @@ async function openDawn() {
   showView("dawn");
   renderDawnFrame(0);
   dawnStatus.textContent = "The still is ready on this device.";
+  element<HTMLElement>("dawnTitle").focus({ preventScroll: true });
   return true;
 }
 
@@ -725,7 +860,7 @@ function closeDawn() {
   dawnVideo.load();
   dawnVideo.hidden = true;
   loopActions.hidden = true;
-  showView("intake");
+  returnToIntake();
 }
 
 function returnToIntake() {

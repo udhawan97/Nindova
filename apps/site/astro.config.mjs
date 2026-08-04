@@ -13,7 +13,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "Nindova",
-      description: "Product and implementation notes for Masala Mound, Nindova's bounded nightly game.",
+      description: "Product and implementation notes for Nindova House, its Grand Salon games, and the bounded Night Room.",
       customCss: ["./src/styles/global.css"],
       social: [
         {

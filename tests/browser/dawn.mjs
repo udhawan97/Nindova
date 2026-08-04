@@ -51,6 +51,7 @@ try {
   await page.click("#dawnBtn");
   await page.locator("#dawn").waitFor({ state: "visible" });
   assert.equal(await page.evaluate(() => window.__ct.state), "dawn");
+  assert.equal(await page.evaluate(() => document.activeElement?.id), "dawnTitle");
   assert.ok((await page.locator("#dawnCanvas").getAttribute("aria-label")).includes("nine kitchen motifs"));
   await page.screenshot({ path: resolve(output, "dawn-375x812.png"), fullPage: true });
 
@@ -79,8 +80,40 @@ try {
   assert.equal(await page.locator("#dawnVideo").getAttribute("muted"), "");
   await page.click("#closeDawnBtn");
   assert.equal(await page.locator("#intake").isVisible(), true);
+  assert.equal(await page.evaluate(() => document.activeElement?.id), "beginBtn");
+
+  await page.evaluate(() => {
+    localStorage.clear();
+    localStorage.setItem(NindovaNight.LEGACY_STORAGE_KEYS[0], JSON.stringify({
+      version: 2,
+      lastCompleted: {
+        nightId: "2026-08-03|America/Chicago|r1",
+        dawnDate: "2026-08-03",
+        timeZone: "America/Chicago",
+        recipeVersion: 1,
+        vista: "meadow",
+        finalKind: "rabbit",
+        completedAt: "2026-08-03T03:00:00.000Z",
+      },
+      meadowEcho: { nightId: "2026-08-03|America/Chicago|r1", kind: "rabbit" },
+      harborEchoes: [],
+      tomorrowIntention: null,
+    }));
+  });
+  await page.reload();
+  await page.waitForFunction(() => Boolean(window.__ct));
+  await page.evaluate((instant) => window.__ct.setDawnNow(instant), validNow);
+  await page.click("#dawnBtn");
+  await page.locator("#dawn").waitFor({ state: "visible" });
+  assert.ok((await page.locator("#dawnCanvas").getAttribute("aria-label")).includes("earlier Nindova night"));
+
+  const legacyDownloadPromise = page.waitForEvent("download");
+  await page.click("#saveStillBtn");
+  const legacyDownload = await legacyDownloadPromise;
+  assert.equal(legacyDownload.suggestedFilename(), "nindova-dawn.png");
+  assert.ok(await legacyDownload.path());
   assert.deepEqual(errors, []);
-  console.log("Rasoi Dawn eligibility, first-light still, local export, share cancellation, and loop fallback checks passed.");
+  console.log("Rasoi Dawn eligibility, Rasoi and legacy stills, local export, share cancellation, and loop fallback checks passed.");
 } finally {
   await context.close();
   await browser.close();

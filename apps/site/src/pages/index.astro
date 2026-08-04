@@ -24,9 +24,9 @@ const motifs = [
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; base-uri 'self'; object-src 'none'; connect-src 'self'; img-src 'self' data:; media-src 'self' blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
     />
-    <meta name="description" content="Masala Mound is Nindova's calm, bounded layered pair-removal game made from Indian kitchen forms." />
-    <meta property="og:title" content="Nindova — Masala Mound" />
-    <meta property="og:description" content="Read the layers. Find matching kitchen tiles. Leave when it closes." />
+    <meta name="description" content="Nindova House is a private collection of authored thinking games for adults, with a separate quiet Night Session." />
+    <meta property="og:title" content="Nindova House — The Grand Salon" />
+    <meta property="og:description" content="Choose a room. Stay for the pleasure of solving. Nothing is tracked or compared." />
     <meta property="og:type" content="website" />
     <meta property="og:image" content={socialImageUrl} />
     <meta property="og:image:width" content="1200" />
@@ -35,7 +35,7 @@ const motifs = [
     <link rel="icon" href={href("/brand/favicon.svg")} type="image/svg+xml" />
     <link rel="icon" href={href("/brand/favicon-32.png")} sizes="32x32" type="image/png" />
     <link rel="apple-touch-icon" href={href("/brand/apple-touch-icon.png")} />
-    <title>Nindova — Masala Mound</title>
+    <title>Nindova House — The Grand Salon</title>
   </head>
   <body class="landing">
     <header class="site-nav" aria-label="Primary navigation">
@@ -48,24 +48,24 @@ const motifs = [
       <nav>
         <a href={href("/docs/")}>Docs</a>
         <a href={releaseUrl}>Release history</a>
-        <a class="nav-play" href={href("/play/")}>Play this build</a>
+        <a class="nav-play" href={href("/house/")}>Enter the House</a>
       </nav>
     </header>
 
     <main>
       <section class="rasoi-hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow">A small kitchen for the end of the day</p>
-          <h1 id="hero-title">Find the pairs.<br />Let the kitchen quiet.</h1>
+          <p class="eyebrow">A private house of authored games · adults 18+</p>
+          <h1 id="hero-title">Enter the House.<br />Choose your table.</h1>
           <p class="hero-lede">
-            Masala Mound is a calm 36-tile game inspired by Mahjong solitaire. Choose a Gentle or
-            Deeper stack, read the overlaps, and let the Session reach a real ending.
+            Pattern Court, Mirror Forge, Stack Architect, and Lantern Ledger each unfold across five
+            deliberate chapters. The original Masala Mound remains in its own quiet Night Room.
           </p>
           <div class="hero-actions">
-            <a class="button-primary" href={href("/play/")}>Play Masala Mound</a>
-            <a class="button-secondary" href={standaloneUrl} download>Download standalone</a>
+            <a class="button-primary" href={href("/house/")}>Enter Nindova House</a>
+            <a class="button-secondary" href={href("/play/")}>Visit the Night Room</a>
           </div>
-          <p class="trust-line">Nothing to win. Nothing tracked. Nothing you can do wrong.</p>
+          <p class="trust-line">Four authored tables. No account. No comparison.</p>
         </div>
 
         <figure class="hero-board">
@@ -77,7 +77,7 @@ const motifs = [
               alt="The real Deeper Masala Mound board with four overlapping layers and four bright open-side crown tiles."
             />
           </div>
-          <figcaption>Rendered from the v0.3.0 source · no concept mockup</figcaption>
+          <figcaption>Night Room · rendered from source · no concept mockup</figcaption>
         </figure>
 
         <div class="motif-line" aria-label="Kitchen motifs in Rasoi Pairs">
@@ -164,8 +164,7 @@ const motifs = [
         <div class="sleep-fact">
           <p>
             Sleep supports attention, learning, decision-making, mood, reaction time, and physical
-            health. The CDC lists 8–10 hours for ages 13–17 and at least 7 hours for adults 18–60;
-            needs vary, and Nindova does not measure yours.
+            health. The CDC lists at least 7 hours for adults 18–60; needs vary, and Nindova does not measure yours.
           </p>
           <p class="source-line">
             Sources: <a href="https://www.cdc.gov/sleep/about/index.html">CDC sleep guidance</a>
@@ -225,16 +224,15 @@ const motifs = [
       </section>
 
       <section class="closing-section" aria-labelledby="closing-title">
-        <p class="eyebrow">v0.3.0 · Shahi Mound</p>
-        <h2 id="closing-title">Two profiles. One ending.</h2>
+        <p class="eyebrow">Nindova House · The Grand Salon</p>
+        <h2 id="closing-title">Four tables. Five chapters each.</h2>
         <p>
-          Nindova is a behavioral design study, not a sleep tracker or treatment. Masala Mound uses
-          recognition, visual search, and spatial planning, but has not been clinically shown to make
-          people sleepy or improve general memory or sleep.
+          The Grand Salon is authored entertainment for adults. It does not produce an assessment result.
+          The separate Night Room remains a behavioral design study, not a sleep tracker or treatment.
         </p>
         <div class="hero-actions">
-          <a class="button-primary" href={href("/play/")}>Play this build</a>
-          <a class="button-secondary" href={releaseUrl}>Release history and checksums</a>
+          <a class="button-primary" href={href("/house/")}>Enter the House</a>
+          <a class="button-secondary" href={standaloneUrl} download>Download the Night Session</a>
         </div>
       </section>
     </main>
@@ -247,7 +245,7 @@ const motifs = [
         <a href={href("/licenses/geist-OFL-1.1.txt")}>Third-party notices</a>
         <a href={releaseUrl}>Release history</a>
       </nav>
-      <p>Behavioral design study · 13+ · Apache-2.0</p>
+      <p>Authored entertainment and behavioral design study · 18+ · Apache-2.0</p>
     </footer>
   </body>
 </html>
