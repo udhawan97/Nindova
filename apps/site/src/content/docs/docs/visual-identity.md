@@ -9,6 +9,8 @@ Nindova's mark is a nine-diamond lattice: four mirrored color pairs around one s
 
 The drawn wordmark has no font dependency. Do not retype, stretch, rotate, outline, or rearrange it. The cream pair swaps to night ink on light backgrounds so all nine shapes remain legible.
 
+The landing-page and README lockups use one authored seven-second stitch loop: mirrored diamonds arrive in four pairs, saffron closes the center, and a soft glow breathes behind a long completed-mark rest before the sequence repeats. Static lockups remain the default for footers, favicons, product controls, and any context where motion would distract.
+
 ## Shahi Raat palette
 
 - **Raat** `#150D20` — night ground
@@ -26,7 +28,7 @@ The nine 48×48 silhouettes cover belan, chakla, tawa, chimta, katori, tiffin, m
 
 ## Motion and provenance
 
-The match bloom is fixed and pair-local. The optional chime is deterministic. Reduced motion removes translation and scale; neither response awards, measures, or compares anything.
+The logo entrance and match bloom are fixed and deterministic. The optional chime is deterministic. Reduced motion shows the completed logo immediately and removes match translation and scale; none of these responses awards, measures, or compares anything.
 
 All identity, ornament, and utensil artwork is original Nindova project work dedicated under [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/). The application code remains Apache-2.0. The repository preserves the editable sources, brand guide, asset manifest, and reproducible social-card capture script.
 

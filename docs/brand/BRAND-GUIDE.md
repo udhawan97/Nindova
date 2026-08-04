@@ -35,7 +35,7 @@ Neelam/Majith never carry meaningful text on Raat — decorative shapes and ≥2
 - Minimum sizes: full 9-diamond mark 24 px; quincunx below that (16 px OK); horizontal lockup 96 px wide; stacked 64 px; wordmark cap-height 12 px.
 
 ## Motion
-Stepped frames only (steps(1,end) / discrete) — a handmade stop-motion cadence, ≤9 frames, always ending at rest. Pair-match sequence: pairs light in twos, saffron closes. Under `prefers-reduced-motion`, translation, scale, and decorative stepping are disabled; a brief opacity-only state change may remain. Motion never signals score, streak, or reward. The distributed identity marks are static; app-level motion must preserve that reduced-motion boundary.
+Stepped frames only (`steps(1,end)` / discrete) — a handmade stop-motion cadence, ≤9 frames, always returning to a long rest. The animated landing-page and README lockups follow the supplied seven-second icon study: mirrored diamonds arrive in four pairs, saffron closes the center, and a soft radial glow breathes behind the completed lattice before the sequence repeats. The in-Session header uses a shorter one-shot stitch entrance so gameplay never carries a continuous decorative loop. Static lockups remain the default for the footer, favicons, and product controls. Under `prefers-reduced-motion`, the completed logo appears immediately and the glow is removed; a brief opacity-only match state change may remain. Motion never signals score, streak, or reward.
 
 ## Icon family (Masala Mound motifs)
 48×48, flat `currentColor` fills, no strokes thinner than 3, silhouette-first, one knockout detail max. Objects: belan, chakla, tawa, chimta, katori, tiffin, masala dabba, chai glass, pressure cooker. Icons are distinguished by shape, never color alone.

@@ -31,7 +31,8 @@ h3 { margin-block-end: var(--space-xs); font-size: var(--text-lg); line-height: 
     #150d20;
 }
 .brand { display: inline-flex; min-height: 44px; align-items: center; text-decoration: none; }
-.brand-lockup { display: block; width: clamp(7.6rem, 12vw, 9.5rem); height: auto; }
+.brand-lockup-picture, .brand-lockup { display: block; }
+.brand-lockup { width: clamp(7.6rem, 12vw, 9.5rem); height: auto; }
 .site-nav nav, .site-footer nav { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs) var(--space-lg); }
 .site-nav nav a, .site-footer nav a { display: inline-flex; min-height: 44px; align-items: center; font-size: var(--text-sm); font-weight: 650; white-space: nowrap; }
 .nav-play { padding-inline: var(--space-md); border: 1px solid var(--color-accent); color: var(--color-accent); text-decoration: none; }

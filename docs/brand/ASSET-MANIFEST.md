@@ -5,6 +5,8 @@ All assets original to this project. License: [CC0 1.0 Universal](https://creati
 | File | Dimensions | Purpose |
 |---|---|---|
 | nindova-logo-horizontal.svg | 202×64 vb | Primary lockup, dark backgrounds |
+| nindova-logo-horizontal-animated.svg | 202×64 vb | Seven-second paired-stitch loop with long rest, dark backgrounds; reduced-motion safe |
+| nindova-logo-horizontal-animated-light.svg | 202×64 vb | Seven-second paired-stitch loop with long rest, light backgrounds; reduced-motion safe |
 | nindova-logo-horizontal-light.svg | 202×64 vb | Primary lockup, light backgrounds |
 | nindova-logo-stacked.svg | 150×100 vb | Stacked lockup, dark bg |
 | nindova-logo-stacked-light.svg | 150×100 vb | Stacked lockup, light bg |

@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: light)" srcset="./apps/site/public/brand/nindova-logo-horizontal-light.svg">
-    <img src="./apps/site/public/brand/nindova-logo-horizontal.svg" width="303" alt="Nindova">
+    <source media="(prefers-color-scheme: light)" srcset="./apps/site/public/brand/nindova-logo-horizontal-animated-light.svg">
+    <img src="./apps/site/public/brand/nindova-logo-horizontal-animated.svg" width="303" alt="Nindova">
   </picture>
 </p>
 

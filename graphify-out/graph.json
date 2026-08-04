@@ -3165,10 +3165,21 @@
       "norm_label": "test:portrait"
     },
     {
-      "label": "test:layered",
+      "label": "test:latency",
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L29",
+      "_origin": "ast",
+      "id": "package_scripts_test_latency",
+      "community": 4,
+      "community_name": "scripts",
+      "norm_label": "test:latency"
+    },
+    {
+      "label": "test:layered",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L30",
       "_origin": "ast",
       "id": "package_scripts_test_layered",
       "community": 4,
@@ -3179,7 +3190,7 @@
       "label": "test:self-closing",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L30",
+      "source_location": "L31",
       "_origin": "ast",
       "id": "package_scripts_test_self_closing",
       "community": 4,
@@ -3190,7 +3201,7 @@
       "label": "test:night",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L31",
+      "source_location": "L32",
       "_origin": "ast",
       "id": "package_scripts_test_night",
       "community": 4,
@@ -3201,7 +3212,7 @@
       "label": "test:pwa",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L32",
+      "source_location": "L33",
       "_origin": "ast",
       "id": "package_scripts_test_pwa",
       "community": 4,
@@ -3212,7 +3223,7 @@
       "label": "test:public",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L33",
+      "source_location": "L34",
       "_origin": "ast",
       "id": "package_scripts_test_public",
       "community": 4,
@@ -3223,7 +3234,7 @@
       "label": "test:dawn",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L34",
+      "source_location": "L35",
       "_origin": "ast",
       "id": "package_scripts_test_dawn",
       "community": 4,
@@ -3234,7 +3245,7 @@
       "label": "test:seed:observe",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L35",
+      "source_location": "L36",
       "_origin": "ast",
       "id": "package_scripts_test_seed_observe",
       "community": 4,
@@ -3245,7 +3256,7 @@
       "label": "test:unit",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L36",
+      "source_location": "L37",
       "_origin": "ast",
       "id": "package_scripts_test_unit",
       "community": 4,
@@ -3256,7 +3267,7 @@
       "label": "test:wall-clock",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L37",
+      "source_location": "L38",
       "_origin": "ast",
       "id": "package_scripts_test_wall_clock",
       "community": 4,
@@ -3267,7 +3278,7 @@
       "label": "typecheck",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L38",
+      "source_location": "L39",
       "_origin": "ast",
       "id": "package_scripts_typecheck",
       "community": 4,
@@ -3278,7 +3289,7 @@
       "label": "devDependencies",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L40",
+      "source_location": "L41",
       "_origin": "ast",
       "id": "package_devdependencies",
       "community": 58,
@@ -3289,7 +3300,7 @@
       "label": "@astrojs/check",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L41",
+      "source_location": "L42",
       "_origin": "ast",
       "id": "package_devdependencies_astrojs_check",
       "community": 58,
@@ -3300,7 +3311,7 @@
       "label": "@astrojs/check",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L41",
+      "source_location": "L42",
       "_origin": "ast",
       "id": "astrojs_check",
       "community": 58,
@@ -3311,7 +3322,7 @@
       "label": "@playwright/test",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L42",
+      "source_location": "L43",
       "_origin": "ast",
       "id": "package_devdependencies_playwright_test",
       "community": 58,
@@ -3322,7 +3333,7 @@
       "label": "@playwright/test",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L42",
+      "source_location": "L43",
       "_origin": "ast",
       "id": "playwright_test",
       "community": 58,
@@ -3333,7 +3344,7 @@
       "label": "@types/node",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L43",
+      "source_location": "L44",
       "_origin": "ast",
       "id": "package_devdependencies_types_node",
       "community": 58,
@@ -3344,7 +3355,7 @@
       "label": "@types/node",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L43",
+      "source_location": "L44",
       "_origin": "ast",
       "id": "types_node",
       "community": 58,
@@ -3355,7 +3366,7 @@
       "label": "jsqr",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L44",
+      "source_location": "L45",
       "_origin": "ast",
       "id": "package_devdependencies_jsqr",
       "community": 58,
@@ -3366,7 +3377,7 @@
       "label": "jsqr",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L44",
+      "source_location": "L45",
       "_origin": "ast",
       "id": "jsqr",
       "community": 58,
@@ -3377,7 +3388,7 @@
       "label": "pngjs",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L45",
+      "source_location": "L46",
       "_origin": "ast",
       "id": "package_devdependencies_pngjs",
       "community": 58,
@@ -3388,7 +3399,7 @@
       "label": "pngjs",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L45",
+      "source_location": "L46",
       "_origin": "ast",
       "id": "pngjs",
       "community": 58,
@@ -3399,7 +3410,7 @@
       "label": "qrcode",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L46",
+      "source_location": "L47",
       "_origin": "ast",
       "id": "package_devdependencies_qrcode",
       "community": 58,
@@ -3410,7 +3421,7 @@
       "label": "qrcode",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L46",
+      "source_location": "L47",
       "_origin": "ast",
       "id": "qrcode",
       "community": 58,
@@ -3421,7 +3432,7 @@
       "label": "typescript",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L47",
+      "source_location": "L48",
       "_origin": "ast",
       "id": "package_devdependencies_typescript",
       "community": 58,
@@ -3432,7 +3443,7 @@
       "label": "typescript",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L47",
+      "source_location": "L48",
       "_origin": "ast",
       "id": "typescript",
       "community": 58,
@@ -4221,6 +4232,83 @@
       "norm_label": "expectboundarycloses()"
     },
     {
+      "label": "tile-latency.mjs",
+      "file_type": "code",
+      "source_file": "tests/browser/tile-latency.mjs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_browser_tile_latency",
+      "community": 69,
+      "community_name": "tile-latency.mjs",
+      "norm_label": "tile-latency.mjs"
+    },
+    {
+      "label": "root",
+      "file_type": "code",
+      "source_file": "tests/browser/tile-latency.mjs",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "tests_browser_tile_latency_root",
+      "community": 69,
+      "community_name": "tile-latency.mjs",
+      "norm_label": "root"
+    },
+    {
+      "label": "cpuThrottle",
+      "file_type": "code",
+      "source_file": "tests/browser/tile-latency.mjs",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "tests_browser_tile_latency_cputhrottle",
+      "community": 69,
+      "community_name": "tile-latency.mjs",
+      "norm_label": "cputhrottle"
+    },
+    {
+      "label": "availablePort()",
+      "file_type": "code",
+      "source_file": "tests/browser/tile-latency.mjs",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "tests_browser_tile_latency_availableport",
+      "community": 69,
+      "community_name": "tile-latency.mjs",
+      "norm_label": "availableport()"
+    },
+    {
+      "label": "tapTile()",
+      "file_type": "code",
+      "source_file": "tests/browser/tile-latency.mjs",
+      "source_location": "L29",
+      "_origin": "ast",
+      "id": "tests_browser_tile_latency_taptile",
+      "community": 69,
+      "community_name": "tile-latency.mjs",
+      "norm_label": "taptile()"
+    },
+    {
+      "label": "elapsedUntil()",
+      "file_type": "code",
+      "source_file": "tests/browser/tile-latency.mjs",
+      "source_location": "L36",
+      "_origin": "ast",
+      "id": "tests_browser_tile_latency_elapseduntil",
+      "community": 69,
+      "community_name": "tile-latency.mjs",
+      "norm_label": "elapseduntil()"
+    },
+    {
+      "label": "measureTarget()",
+      "file_type": "code",
+      "source_file": "tests/browser/tile-latency.mjs",
+      "source_location": "L42",
+      "_origin": "ast",
+      "id": "tests_browser_tile_latency_measuretarget",
+      "community": 69,
+      "community_name": "tile-latency.mjs",
+      "norm_label": "measuretarget()"
+    },
+    {
       "label": "wall-clock-cap.mjs",
       "file_type": "code",
       "source_file": "tests/browser/wall-clock-cap.mjs",
@@ -4656,8 +4744,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "third_party_notices",
-      "community": 51,
-      "community_name": "Bedtime game evidence brief",
+      "community": 52,
+      "community_name": "Quiet Depth plan",
       "norm_label": "third_party_notices.md"
     },
     {
@@ -4667,8 +4755,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "third_party_notices_third_party_notices",
-      "community": 51,
-      "community_name": "Bedtime game evidence brief",
+      "community": 52,
+      "community_name": "Quiet Depth plan",
       "norm_label": "third-party notices"
     },
     {
@@ -4697,7 +4785,7 @@
       "label": "Shahi Raat palette",
       "file_type": "document",
       "source_file": "apps/site/src/content/docs/docs/visual-identity.md",
-      "source_location": "L12",
+      "source_location": "L14",
       "_origin": "ast",
       "id": "apps_site_src_content_docs_docs_visual_identity_shahi_raat_palette",
       "community": 60,
@@ -4708,7 +4796,7 @@
       "label": "Masala Mound silhouettes",
       "file_type": "document",
       "source_file": "apps/site/src/content/docs/docs/visual-identity.md",
-      "source_location": "L23",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "apps_site_src_content_docs_docs_visual_identity_masala_mound_silhouettes",
       "community": 60,
@@ -4719,7 +4807,7 @@
       "label": "Motion and provenance",
       "file_type": "document",
       "source_file": "apps/site/src/content/docs/docs/visual-identity.md",
-      "source_location": "L27",
+      "source_location": "L29",
       "_origin": "ast",
       "id": "apps_site_src_content_docs_docs_visual_identity_motion_and_provenance",
       "community": 60,
@@ -4733,8 +4821,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan",
-      "community": 51,
-      "community_name": "Bedtime game evidence brief",
+      "community": 52,
+      "community_name": "Quiet Depth plan",
       "norm_label": "layered-rasoi-plan.md"
     },
     {
@@ -4745,7 +4833,7 @@
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_layered_rasoi_plan",
       "community": 52,
-      "community_name": "Layered Rasoi plan",
+      "community_name": "Quiet Depth plan",
       "norm_label": "layered rasoi plan"
     },
     {
@@ -4756,7 +4844,7 @@
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_outcome",
       "community": 52,
-      "community_name": "Layered Rasoi plan",
+      "community_name": "Quiet Depth plan",
       "norm_label": "outcome"
     },
     {
@@ -4767,7 +4855,7 @@
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_experience_sequence",
       "community": 52,
-      "community_name": "Layered Rasoi plan",
+      "community_name": "Quiet Depth plan",
       "norm_label": "experience sequence"
     },
     {
@@ -4778,7 +4866,7 @@
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_board_contract",
       "community": 52,
-      "community_name": "Layered Rasoi plan",
+      "community_name": "Quiet Depth plan",
       "norm_label": "board contract"
     },
     {
@@ -4789,7 +4877,7 @@
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_geometry",
       "community": 52,
-      "community_name": "Layered Rasoi plan",
+      "community_name": "Quiet Depth plan",
       "norm_label": "geometry"
     },
     {
@@ -4800,7 +4888,7 @@
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_availability",
       "community": 52,
-      "community_name": "Layered Rasoi plan",
+      "community_name": "Quiet Depth plan",
       "norm_label": "availability"
     },
     {
@@ -4811,7 +4899,7 @@
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_solvability",
       "community": 52,
-      "community_name": "Layered Rasoi plan",
+      "community_name": "Quiet Depth plan",
       "norm_label": "solvability"
     },
     {
@@ -4822,7 +4910,7 @@
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_feedback_contract",
       "community": 52,
-      "community_name": "Layered Rasoi plan",
+      "community_name": "Quiet Depth plan",
       "norm_label": "feedback contract"
     },
     {
@@ -4833,7 +4921,7 @@
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_rest_and_replay_contract",
       "community": 52,
-      "community_name": "Layered Rasoi plan",
+      "community_name": "Quiet Depth plan",
       "norm_label": "rest and replay contract"
     },
     {
@@ -4844,7 +4932,7 @@
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_visual_system",
       "community": 52,
-      "community_name": "Layered Rasoi plan",
+      "community_name": "Quiet Depth plan",
       "norm_label": "visual system"
     },
     {
@@ -4855,7 +4943,7 @@
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_tokens",
       "community": 52,
-      "community_name": "Layered Rasoi plan",
+      "community_name": "Quiet Depth plan",
       "norm_label": "tokens"
     },
     {
@@ -4866,7 +4954,7 @@
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_phone_wireframe",
       "community": 52,
-      "community_name": "Layered Rasoi plan",
+      "community_name": "Quiet Depth plan",
       "norm_label": "phone wireframe"
     },
     {
@@ -4877,7 +4965,7 @@
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_desktop_wireframe",
       "community": 52,
-      "community_name": "Layered Rasoi plan",
+      "community_name": "Quiet Depth plan",
       "norm_label": "desktop wireframe"
     },
     {
@@ -4888,7 +4976,7 @@
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_self_critique",
       "community": 52,
-      "community_name": "Layered Rasoi plan",
+      "community_name": "Quiet Depth plan",
       "norm_label": "self-critique"
     },
     {
@@ -4899,7 +4987,7 @@
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_open_access",
       "community": 52,
-      "community_name": "Layered Rasoi plan",
+      "community_name": "Quiet Depth plan",
       "norm_label": "open access"
     },
     {
@@ -4910,7 +4998,7 @@
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_acceptance_gates",
       "community": 52,
-      "community_name": "Layered Rasoi plan",
+      "community_name": "Quiet Depth plan",
       "norm_label": "acceptance gates"
     },
     {
@@ -4921,7 +5009,7 @@
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_explicitly_out",
       "community": 52,
-      "community_name": "Layered Rasoi plan",
+      "community_name": "Quiet Depth plan",
       "norm_label": "explicitly out"
     },
     {
@@ -4931,8 +5019,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan",
-      "community": 51,
-      "community_name": "Bedtime game evidence brief",
+      "community": 52,
+      "community_name": "Quiet Depth plan",
       "norm_label": "quiet-depth-plan.md"
     },
     {
@@ -4942,7 +5030,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_quiet_depth_plan",
-      "community": 63,
+      "community": 52,
       "community_name": "Quiet Depth plan",
       "norm_label": "quiet depth plan"
     },
@@ -4953,7 +5041,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_decision",
-      "community": 63,
+      "community": 52,
       "community_name": "Quiet Depth plan",
       "norm_label": "decision"
     },
@@ -4964,7 +5052,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_why_this_direction",
-      "community": 63,
+      "community": 52,
       "community_name": "Quiet Depth plan",
       "norm_label": "why this direction"
     },
@@ -4975,7 +5063,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_board_profiles",
-      "community": 63,
+      "community": 52,
       "community_name": "Quiet Depth plan",
       "norm_label": "board profiles"
     },
@@ -4986,7 +5074,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_gentle_stack",
-      "community": 63,
+      "community": 52,
       "community_name": "Quiet Depth plan",
       "norm_label": "gentle stack"
     },
@@ -4997,7 +5085,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_deeper_stack",
-      "community": 63,
+      "community": 52,
       "community_name": "Quiet Depth plan",
       "norm_label": "deeper stack"
     },
@@ -5008,7 +5096,7 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_shared_proof",
-      "community": 63,
+      "community": 52,
       "community_name": "Quiet Depth plan",
       "norm_label": "shared proof"
     },
@@ -5019,7 +5107,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_match_confirmation",
-      "community": 63,
+      "community": 52,
       "community_name": "Quiet Depth plan",
       "norm_label": "match confirmation"
     },
@@ -5030,7 +5118,7 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_rasoi_image_drift",
-      "community": 63,
+      "community": 52,
       "community_name": "Quiet Depth plan",
       "norm_label": "rasoi image drift"
     },
@@ -5041,7 +5129,7 @@
       "source_location": "L82",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_global_closure",
-      "community": 63,
+      "community": 52,
       "community_name": "Quiet Depth plan",
       "norm_label": "global closure"
     },
@@ -5052,7 +5140,7 @@
       "source_location": "L86",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_no_weekly_grade",
-      "community": 63,
+      "community": 52,
       "community_name": "Quiet Depth plan",
       "norm_label": "no weekly grade"
     },
@@ -5063,7 +5151,7 @@
       "source_location": "L92",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_sleep_education",
-      "community": 63,
+      "community": 52,
       "community_name": "Quiet Depth plan",
       "norm_label": "sleep education"
     },
@@ -5074,7 +5162,7 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_open_and_local_boundary",
-      "community": 63,
+      "community": 52,
       "community_name": "Quiet Depth plan",
       "norm_label": "open and local boundary"
     },
@@ -5085,7 +5173,7 @@
       "source_location": "L103",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_implementation_slices",
-      "community": 63,
+      "community": 52,
       "community_name": "Quiet Depth plan",
       "norm_label": "implementation slices"
     },
@@ -5096,7 +5184,7 @@
       "source_location": "L111",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_release_gates",
-      "community": 63,
+      "community": 52,
       "community_name": "Quiet Depth plan",
       "norm_label": "release gates"
     },
@@ -5107,8 +5195,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "docs_adr_0011_layer_rasoi_and_keep_replay_deliberate",
-      "community": 51,
-      "community_name": "Bedtime game evidence brief",
+      "community": 52,
+      "community_name": "Quiet Depth plan",
       "norm_label": "0011-layer-rasoi-and-keep-replay-deliberate.md"
     },
     {
@@ -5118,8 +5206,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "docs_adr_0011_layer_rasoi_and_keep_replay_deliberate_layer_rasoi_and_keep_replay_deliberate",
-      "community": 51,
-      "community_name": "Bedtime game evidence brief",
+      "community": 52,
+      "community_name": "Quiet Depth plan",
       "norm_label": "layer rasoi and keep replay deliberate"
     },
     {
@@ -5129,8 +5217,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "docs_adr_0012_add_tonight_only_depth_and_image_drift",
-      "community": 51,
-      "community_name": "Bedtime game evidence brief",
+      "community": 52,
+      "community_name": "Quiet Depth plan",
       "norm_label": "0012-add-tonight-only-depth-and-image-drift.md"
     },
     {
@@ -5140,8 +5228,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "docs_adr_0012_add_tonight_only_depth_and_image_drift_add_tonight_only_depth_and_optional_image_drift",
-      "community": 51,
-      "community_name": "Bedtime game evidence brief",
+      "community": 52,
+      "community_name": "Quiet Depth plan",
       "norm_label": "add tonight-only depth and optional image drift"
     },
     {
@@ -5181,7 +5269,7 @@
       "label": "apps/session/assets/motifs/",
       "file_type": "document",
       "source_file": "docs/brand/ASSET-MANIFEST.md",
-      "source_location": "L28",
+      "source_location": "L30",
       "_origin": "ast",
       "id": "docs_brand_asset_manifest_apps_session_assets_motifs",
       "community": 61,
@@ -5192,7 +5280,7 @@
       "label": "docs/brand/",
       "file_type": "document",
       "source_file": "docs/brand/ASSET-MANIFEST.md",
-      "source_location": "L35",
+      "source_location": "L37",
       "_origin": "ast",
       "id": "docs_brand_asset_manifest_docs_brand",
       "community": 61,
@@ -5470,8 +5558,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence",
-      "community": 51,
-      "community_name": "Bedtime game evidence brief",
+      "community": 52,
+      "community_name": "Quiet Depth plan",
       "norm_label": "bedtime-game-evidence.md"
     },
     {
@@ -6554,9 +6642,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 63,
       "norm_label": "nindova v0.1.0 distribution",
-      "community_name": "Rasoi Pairs v0.1.0 Change Set",
+      "community_name": "PWA and Standalone Distribution Boundary",
       "id": "readme_nindova_v0_1_0"
     },
     {
@@ -6726,9 +6814,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 63,
       "norm_label": "scoped pwa bootstrap",
-      "community_name": "Rasoi Pairs v0.1.0 Change Set",
+      "community_name": "PWA and Standalone Distribution Boundary",
       "id": "apps_session_index_pwa_bootstrap"
     },
     {
@@ -6797,9 +6885,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 63,
       "norm_label": "nindova getting started",
-      "community_name": "Rasoi Pairs v0.1.0 Change Set",
+      "community_name": "PWA and Standalone Distribution Boundary",
       "id": "apps_site_src_content_docs_docs_getting_started_getting_started"
     },
     {
@@ -6811,9 +6899,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 63,
       "norm_label": "standalone and composed release surfaces",
-      "community_name": "Rasoi Pairs v0.1.0 Change Set",
+      "community_name": "PWA and Standalone Distribution Boundary",
       "id": "apps_site_src_content_docs_docs_getting_started_release_surfaces"
     },
     {
@@ -7111,9 +7199,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 5,
       "norm_label": "historical browser-first build plan",
-      "community_name": "Rasoi Pairs v0.1.0 Change Set",
+      "community_name": "Rasoi Pairs Session Interface",
       "id": "docs_build_plan_historical_build_plan"
     },
     {
@@ -7126,9 +7214,9 @@
       "author": null,
       "contributor": null,
       "rationale": "Although the Vista-specific arc is historical, the immutable language, privacy boundary, accessibility floor, Two-Loop Law, fifteen-minute maximum, browser/PWA/standalone boundary, and zero-telemetry requirements remain active.",
-      "community": 28,
+      "community": 5,
       "norm_label": "active baseline invariants",
-      "community_name": "Rasoi Pairs v0.1.0 Change Set",
+      "community_name": "Rasoi Pairs Session Interface",
       "id": "docs_build_plan_active_baseline_invariants"
     },
     {
@@ -7351,9 +7439,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 71,
       "norm_label": "m5 website docs and offline pwa evidence",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Public-surface Evidence Ledger",
       "id": "docs_testing_m5_site_docs_offline_pwa_m5_evidence"
     },
     {
@@ -7463,9 +7551,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 1,
       "norm_label": "rasoi redesign honest limits",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Rasoi Pairs",
       "id": "docs_testing_rasoi_redesign_honest_limits"
     },
     {
@@ -8179,9 +8267,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 67,
       "norm_label": "shared rasoi legality kernel",
-      "community_name": "Rasoi Pairs v0.1.0 Change Set",
+      "community_name": "Rasoi Pairs Session Arc",
       "id": "changelog_shared_legality_kernel"
     },
     {
@@ -8277,9 +8365,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 70,
       "norm_label": "deterministic keyboard focus and semantic hint",
-      "community_name": "Rasoi Pairs v0.1.0 Change Set",
+      "community_name": "Rasoi Browser Architecture",
       "id": "changelog_keyboard_focus_semantic_hint"
     },
     {
@@ -8305,9 +8393,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 1,
       "norm_label": "rasoi pairs redesign plan",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Rasoi Pairs",
       "id": "docs_redesign_plan_rasoi_pairs_redesign_plan"
     },
     {
@@ -8319,9 +8407,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 1,
       "norm_label": "calm bounded pair-removal promise",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Rasoi Pairs",
       "id": "docs_redesign_plan_product_promise"
     },
     {
@@ -8335,7 +8423,7 @@
       "contributor": null,
       "community": 32,
       "norm_label": "enter pair settle dawn experience",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Rasoi v0.1.0 Highlights",
       "id": "docs_redesign_plan_enter_pair_settle_dawn"
     },
     {
@@ -8347,9 +8435,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 67,
       "norm_label": "rasoi non-negotiable checks",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Rasoi Pairs Session Arc",
       "id": "docs_redesign_plan_non_negotiable_checks"
     },
     {
@@ -8361,9 +8449,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 1,
       "norm_label": "punjabi-inspired kitchen cultural direction",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Rasoi Pairs",
       "id": "docs_redesign_plan_cultural_direction"
     },
     {
@@ -8375,9 +8463,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 1,
       "norm_label": "behavioral design evidence boundary",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Rasoi Pairs",
       "id": "docs_redesign_plan_evidence_boundary"
     },
     {
@@ -8389,9 +8477,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 71,
       "norm_label": "public-surface evidence ledger",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Public-surface Evidence Ledger",
       "id": "docs_public_surface_evidence_public_surface_evidence_ledger"
     },
     {
@@ -8403,9 +8491,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 71,
       "norm_label": "verified release-facing surfaces",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Public-surface Evidence Ledger",
       "id": "docs_public_surface_evidence_verified_release_surfaces"
     },
     {
@@ -8417,9 +8505,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 67,
       "norm_label": "343-state verified browser arc",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Rasoi Pairs Session Arc",
       "id": "docs_public_surface_evidence_343_state_browser_arc"
     },
     {
@@ -8431,9 +8519,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 71,
       "norm_label": "all eighteen pairs by keyboard at 200 percent zoom",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Public-surface Evidence Ledger",
       "id": "docs_public_surface_evidence_continuous_keyboard_200_zoom"
     },
     {
@@ -8445,9 +8533,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 72,
       "norm_label": "source-proven state timing and privacy boundaries",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Source-proven State Timing and Privacy Boundaries",
       "id": "docs_public_surface_evidence_source_proven_boundaries"
     },
     {
@@ -8459,9 +8547,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 72,
       "norm_label": "strict reachable active-session recovery and reload settlement",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Source-proven State Timing and Privacy Boundaries",
       "id": "docs_public_surface_evidence_strict_active_session_v2"
     },
     {
@@ -8473,9 +8561,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 72,
       "norm_label": "production twelve-minute automatic settle",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Source-proven State Timing and Privacy Boundaries",
       "id": "docs_public_surface_evidence_twelve_minute_automatic_settle"
     },
     {
@@ -8487,9 +8575,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 72,
       "norm_label": "production fifteen-minute hard ceiling",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Source-proven State Timing and Privacy Boundaries",
       "id": "docs_public_surface_evidence_fifteen_minute_ceiling"
     },
     {
@@ -8501,9 +8589,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 71,
       "norm_label": "untested human device and deployment risks",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Public-surface Evidence Ledger",
       "id": "docs_public_surface_evidence_untested_release_risks"
     },
     {
@@ -8517,7 +8605,7 @@
       "contributor": null,
       "community": 32,
       "norm_label": "nindova v0.1.0 rasoi pairs release notes",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Rasoi v0.1.0 Highlights",
       "id": "docs_releases_v0_1_0_release_notes"
     },
     {
@@ -8531,7 +8619,7 @@
       "contributor": null,
       "community": 32,
       "norm_label": "rasoi v0.1.0 highlights",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Rasoi v0.1.0 Highlights",
       "id": "docs_releases_v0_1_0_release_highlights"
     },
     {
@@ -8545,7 +8633,7 @@
       "contributor": null,
       "community": 32,
       "norm_label": "checksummed standalone and web bundle",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Rasoi v0.1.0 Highlights",
       "id": "docs_releases_v0_1_0_release_downloads"
     },
     {
@@ -8557,9 +8645,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 72,
       "norm_label": "strictly validated same-tab resume",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Source-proven State Timing and Privacy Boundaries",
       "id": "docs_releases_v0_1_0_strict_same_tab_resume"
     },
     {
@@ -8573,7 +8661,7 @@
       "contributor": null,
       "community": 32,
       "norm_label": "release twelve-minute automatic settle",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Rasoi v0.1.0 Highlights",
       "id": "docs_releases_v0_1_0_twelve_minute_automatic_settle"
     },
     {
@@ -8587,7 +8675,7 @@
       "contributor": null,
       "community": 32,
       "norm_label": "release fifteen-minute hard ceiling",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Rasoi v0.1.0 Highlights",
       "id": "docs_releases_v0_1_0_fifteen_minute_ceiling"
     },
     {
@@ -8601,7 +8689,7 @@
       "contributor": null,
       "community": 32,
       "norm_label": "release evidence and open limits",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Rasoi v0.1.0 Highlights",
       "id": "docs_releases_v0_1_0_evidence_and_limits"
     },
     {
@@ -8615,7 +8703,7 @@
       "contributor": null,
       "community": 32,
       "norm_label": "continuous keyboard and strict recovery evidence",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Rasoi v0.1.0 Highlights",
       "id": "docs_releases_v0_1_0_continuous_keyboard_and_recovery_evidence"
     },
     {
@@ -8697,9 +8785,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 70,
       "norm_label": "rasoi browser architecture",
-      "community_name": "Rasoi Pairs v0.1.0 Change Set",
+      "community_name": "Rasoi Browser Architecture",
       "id": "apps_site_src_content_docs_docs_architecture_architecture"
     },
     {
@@ -8711,9 +8799,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 70,
       "norm_label": "session site and composition workspace",
-      "community_name": "Rasoi Pairs v0.1.0 Change Set",
+      "community_name": "Rasoi Browser Architecture",
       "id": "apps_site_src_content_docs_docs_architecture_workspace_composition"
     },
     {
@@ -8725,9 +8813,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 70,
       "norm_label": "shared rasoi legality kernel architecture",
-      "community_name": "Rasoi Pairs v0.1.0 Change Set",
+      "community_name": "Rasoi Browser Architecture",
       "id": "apps_site_src_content_docs_docs_architecture_legality_kernel"
     },
     {
@@ -8753,9 +8841,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 63,
       "norm_label": "pwa and standalone distribution boundary",
-      "community_name": "Rasoi Pairs v0.1.0 Change Set",
+      "community_name": "PWA and Standalone Distribution Boundary",
       "id": "apps_site_src_content_docs_docs_architecture_distribution_boundary"
     },
     {
@@ -8767,9 +8855,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 67,
       "norm_label": "rasoi pairs session arc",
-      "community_name": "Rasoi Pairs Session Interface",
+      "community_name": "Rasoi Pairs Session Arc",
       "id": "apps_site_src_content_docs_docs_nightly_arc_rasoi_pairs_session"
     },
     {
@@ -8781,9 +8869,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 67,
       "norm_label": "mahjong-solitaire rule inspiration",
-      "community_name": "Rasoi Pairs Session Interface",
+      "community_name": "Rasoi Pairs Session Arc",
       "id": "apps_site_src_content_docs_docs_nightly_arc_mahjong_solitaire_inspiration"
     },
     {
@@ -8795,9 +8883,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 70,
       "norm_label": "voluntary pair-removal session path",
-      "community_name": "Rasoi Pairs v0.1.0 Change Set",
+      "community_name": "Rasoi Browser Architecture",
       "id": "apps_site_src_content_docs_docs_nightly_arc_fixed_session_path"
     },
     {
@@ -8809,9 +8897,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 70,
       "norm_label": "semantic safe-pair hint",
-      "community_name": "Rasoi Pairs v0.1.0 Change Set",
+      "community_name": "Rasoi Browser Architecture",
       "id": "apps_site_src_content_docs_docs_nightly_arc_semantic_hint"
     },
     {
@@ -8823,9 +8911,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 67,
       "norm_label": "universal 343-state board guarantee",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Rasoi Pairs Session Arc",
       "id": "apps_site_src_content_docs_docs_nightly_arc_board_guarantee"
     },
     {
@@ -8837,9 +8925,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 67,
       "norm_label": "twelve-minute settle and fifteen-minute ceiling",
-      "community_name": "Rasoi Pairs Session Interface",
+      "community_name": "Rasoi Pairs Session Arc",
       "id": "apps_site_src_content_docs_docs_nightly_arc_timing_boundary"
     },
     {
@@ -8851,9 +8939,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 5,
       "norm_label": "privacy and local state",
-      "community_name": "Rasoi Pairs v0.1.0 Change Set",
+      "community_name": "Rasoi Pairs Session Interface",
       "id": "apps_site_src_content_docs_docs_privacy_local_state_privacy_local_state"
     },
     {
@@ -8865,9 +8953,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 5,
       "norm_label": "same-origin static runtime boundary",
-      "community_name": "Rasoi Pairs v0.1.0 Change Set",
+      "community_name": "Rasoi Pairs Session Interface",
       "id": "apps_site_src_content_docs_docs_privacy_local_state_runtime_boundary"
     },
     {
@@ -8879,9 +8967,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 5,
       "norm_label": "bounded version 3 night record",
-      "community_name": "Rasoi Pairs v0.1.0 Change Set",
+      "community_name": "Rasoi Pairs Session Interface",
       "id": "apps_site_src_content_docs_docs_privacy_local_state_long_lived_record"
     },
     {
@@ -8907,9 +8995,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 5,
       "norm_label": "scoped static offline cache",
-      "community_name": "Rasoi Pairs v0.1.0 Change Set",
+      "community_name": "Rasoi Pairs Session Interface",
       "id": "apps_site_src_content_docs_docs_privacy_local_state_offline_cache"
     },
     {
@@ -8921,9 +9009,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 71,
       "norm_label": "nindova v0.1.0 roadmap",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Public-surface Evidence Ledger",
       "id": "apps_site_src_content_docs_docs_roadmap_roadmap"
     },
     {
@@ -8935,9 +9023,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 71,
       "norm_label": "shipped rasoi v0.1.0 surface",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Public-surface Evidence Ledger",
       "id": "apps_site_src_content_docs_docs_roadmap_shipped_v0_1_0"
     },
     {
@@ -8949,9 +9037,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 71,
       "norm_label": "human and device hardening",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Public-surface Evidence Ledger",
       "id": "apps_site_src_content_docs_docs_roadmap_next_hardening"
     },
     {
@@ -8963,9 +9051,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 71,
       "norm_label": "deliberately deferred ios wall",
-      "community_name": "Calm Bounded Pair-removal Promise",
+      "community_name": "Public-surface Evidence Ledger",
       "id": "apps_site_src_content_docs_docs_roadmap_deferred_ios_wall"
     },
     {
@@ -14268,7 +14356,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L40",
+      "source_location": "L41",
       "weight": 1.0,
       "_origin": "ast",
       "source": "package",
@@ -14545,7 +14633,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L34",
+      "source_location": "L35",
       "weight": 1.0,
       "_origin": "ast",
       "source": "package_scripts",
@@ -14560,6 +14648,17 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "package_scripts",
+      "target": "package_scripts_test_latency",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package_scripts",
       "target": "package_scripts_test_layered",
       "confidence_score": 1.0
     },
@@ -14567,7 +14666,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L31",
+      "source_location": "L32",
       "weight": 1.0,
       "_origin": "ast",
       "source": "package_scripts",
@@ -14589,7 +14688,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L33",
+      "source_location": "L34",
       "weight": 1.0,
       "_origin": "ast",
       "source": "package_scripts",
@@ -14600,7 +14699,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L32",
+      "source_location": "L33",
       "weight": 1.0,
       "_origin": "ast",
       "source": "package_scripts",
@@ -14611,7 +14710,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L35",
+      "source_location": "L36",
       "weight": 1.0,
       "_origin": "ast",
       "source": "package_scripts",
@@ -14622,7 +14721,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0,
       "_origin": "ast",
       "source": "package_scripts",
@@ -14633,7 +14732,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L36",
+      "source_location": "L37",
       "weight": 1.0,
       "_origin": "ast",
       "source": "package_scripts",
@@ -14644,7 +14743,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L37",
+      "source_location": "L38",
       "weight": 1.0,
       "_origin": "ast",
       "source": "package_scripts",
@@ -14655,7 +14754,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L38",
+      "source_location": "L39",
       "weight": 1.0,
       "_origin": "ast",
       "source": "package_scripts",
@@ -14666,7 +14765,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L41",
+      "source_location": "L42",
       "weight": 1.0,
       "_origin": "ast",
       "source": "package_devdependencies",
@@ -14677,7 +14776,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L44",
+      "source_location": "L45",
       "weight": 1.0,
       "_origin": "ast",
       "source": "package_devdependencies",
@@ -14688,7 +14787,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L42",
+      "source_location": "L43",
       "weight": 1.0,
       "_origin": "ast",
       "source": "package_devdependencies",
@@ -14699,7 +14798,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L45",
+      "source_location": "L46",
       "weight": 1.0,
       "_origin": "ast",
       "source": "package_devdependencies",
@@ -14710,7 +14809,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L46",
+      "source_location": "L47",
       "weight": 1.0,
       "_origin": "ast",
       "source": "package_devdependencies",
@@ -14721,7 +14820,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L43",
+      "source_location": "L44",
       "weight": 1.0,
       "_origin": "ast",
       "source": "package_devdependencies",
@@ -14732,7 +14831,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L47",
+      "source_location": "L48",
       "weight": 1.0,
       "_origin": "ast",
       "source": "package_devdependencies",
@@ -14743,7 +14842,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L41",
+      "source_location": "L42",
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
@@ -14755,7 +14854,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L42",
+      "source_location": "L43",
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
@@ -14767,7 +14866,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L43",
+      "source_location": "L44",
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
@@ -14779,7 +14878,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L44",
+      "source_location": "L45",
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
@@ -14791,7 +14890,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L45",
+      "source_location": "L46",
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
@@ -14803,7 +14902,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L46",
+      "source_location": "L47",
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
@@ -14815,7 +14914,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L47",
+      "source_location": "L48",
       "weight": 1.0,
       "context": "import",
       "_origin": "ast",
@@ -15478,6 +15577,96 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "tests/browser/tile-latency.mjs",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_tile_latency",
+      "target": "tests_browser_tile_latency_availableport",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/tile-latency.mjs",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_tile_latency",
+      "target": "tests_browser_tile_latency_cputhrottle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/tile-latency.mjs",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_tile_latency",
+      "target": "tests_browser_tile_latency_elapseduntil",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/tile-latency.mjs",
+      "source_location": "L42",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_tile_latency",
+      "target": "tests_browser_tile_latency_measuretarget",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/tile-latency.mjs",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_tile_latency",
+      "target": "tests_browser_tile_latency_root",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/tile-latency.mjs",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_tile_latency",
+      "target": "tests_browser_tile_latency_taptile",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/tile-latency.mjs",
+      "source_location": "L81",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_tile_latency_measuretarget",
+      "target": "tests_browser_tile_latency_taptile",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/tile-latency.mjs",
+      "source_location": "L80",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_tile_latency_measuretarget",
+      "target": "tests_browser_tile_latency_elapseduntil",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "tests/browser/wall-clock-cap.mjs",
       "source_location": "L21",
       "weight": 1.0,
@@ -15880,7 +16069,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/site/src/content/docs/docs/visual-identity.md",
-      "source_location": "L23",
+      "source_location": "L25",
       "weight": 1.0,
       "_origin": "ast",
       "source": "apps_site_src_content_docs_docs_visual_identity",
@@ -15891,7 +16080,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/site/src/content/docs/docs/visual-identity.md",
-      "source_location": "L27",
+      "source_location": "L29",
       "weight": 1.0,
       "_origin": "ast",
       "source": "apps_site_src_content_docs_docs_visual_identity",
@@ -15913,7 +16102,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/site/src/content/docs/docs/visual-identity.md",
-      "source_location": "L12",
+      "source_location": "L14",
       "weight": 1.0,
       "_origin": "ast",
       "source": "apps_site_src_content_docs_docs_visual_identity",
@@ -16353,7 +16542,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/brand/ASSET-MANIFEST.md",
-      "source_location": "L28",
+      "source_location": "L30",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_brand_asset_manifest_nindova_asset_manifest",
@@ -16375,7 +16564,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/brand/ASSET-MANIFEST.md",
-      "source_location": "L35",
+      "source_location": "L37",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_brand_asset_manifest_nindova_asset_manifest",
@@ -19852,5 +20041,5 @@
       "source_file": "reference/nindova-master-brief.md"
     }
   ],
-  "built_at_commit": "f78d0d3eaa5d6da58fc0d355a78fc0aaa2d7aec2"
+  "built_at_commit": "0b1fade179c67ad8f09e0ab096c093541ee68c14"
 }

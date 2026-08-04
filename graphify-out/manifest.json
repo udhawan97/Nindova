@@ -50,13 +50,13 @@
     "semantic_hash": "9da5b344274fa94c0650dcb1a257aacc"
   },
   "apps/site/src/pages/index.astro": {
-    "mtime": 1785813753.594408,
-    "ast_hash": "acf3add1a1ec0ea43c1301836f198291",
+    "mtime": 1785817564.324365,
+    "ast_hash": "ed45cc0503e8d3de7764983352688a3d",
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1785813318.335968,
-    "ast_hash": "0db8ed4e51d79e3a85e44a924686cc78",
+    "mtime": 1785821138.780372,
+    "ast_hash": "c50c4554c948fcb0584f700a9ef8547e",
     "semantic_hash": ""
   },
   "reference/test-demo.mjs": {
@@ -145,13 +145,13 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1785814097.421101,
-    "ast_hash": "2cc67b545a179a53cfd2684adf67409e",
+    "mtime": 1785820550.1962159,
+    "ast_hash": "814d3d920af0a5a0b441520f3d540242",
     "semantic_hash": ""
   },
   "apps/session/index.html": {
-    "mtime": 1785813069.793305,
-    "ast_hash": "7c78c2d152b80f7ff7f2a13f20d9affc",
+    "mtime": 1785821032.1706924,
+    "ast_hash": "4c9c8a53fea11ec332f71120231a40d4",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/accessibility.md": {
@@ -465,7 +465,7 @@
     "semantic_hash": ""
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1785815805.2347572,
+    "mtime": 1785821443.9153922,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": ""
   },
@@ -525,28 +525,28 @@
     "semantic_hash": ""
   },
   "tests/browser/public-surface.mjs": {
-    "mtime": 1785813344.7710705,
-    "ast_hash": "eec242eebba1716e10339409949a38e5",
+    "mtime": 1785821138.7811186,
+    "ast_hash": "822829d960bb2e699d047789a037dfa6",
     "semantic_hash": ""
   },
   "tests/unit/brand-assets.test.mjs": {
-    "mtime": 1785812529.6845453,
-    "ast_hash": "2ef0370d10c57ac391415a22b4c0c59e",
+    "mtime": 1785821138.7808697,
+    "ast_hash": "5d5433643b348684efcaf117d6b7165a",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/visual-identity.md": {
-    "mtime": 1785813753.5941658,
-    "ast_hash": "d2f88a20139609bcf3f2d273d0c572f0",
+    "mtime": 1785820584.5847814,
+    "ast_hash": "19d6e4cf867519c2121df540c861308f",
     "semantic_hash": ""
   },
   "docs/brand/ASSET-MANIFEST.md": {
-    "mtime": 1785813753.5934305,
-    "ast_hash": "a8ff99ec822569c47f5db7e2f900d590",
+    "mtime": 1785820584.5840542,
+    "ast_hash": "b04c43a29ee126777095a7419af2208d",
     "semantic_hash": ""
   },
   "docs/brand/BRAND-GUIDE.md": {
-    "mtime": 1785815402.8162236,
-    "ast_hash": "42ce4c0f2108832673ef7ebfbca737b0",
+    "mtime": 1785821138.7812865,
+    "ast_hash": "17be720ed60a95096a10ef96d70b5c7e",
     "semantic_hash": ""
   },
   "docs/releases/v0.3.0.md": {
@@ -772,6 +772,21 @@
   "apps/site/public/brand/src/wordmark.src.svg": {
     "mtime": 1785815625.3560088,
     "ast_hash": "975594524ce5b5dfcf0d442dadff9153",
+    "semantic_hash": ""
+  },
+  "apps/site/public/brand/nindova-logo-horizontal-animated.svg": {
+    "mtime": 1785820550.195506,
+    "ast_hash": "3e16100c1cbfb27fe184a877f8c1f5be",
+    "semantic_hash": ""
+  },
+  "tests/browser/tile-latency.mjs": {
+    "mtime": 1785821477.5863173,
+    "ast_hash": "d000a20058a8ce2579e8108c4f8254ae",
+    "semantic_hash": ""
+  },
+  "apps/site/public/brand/nindova-logo-horizontal-animated-light.svg": {
+    "mtime": 1785821138.7806175,
+    "ast_hash": "6c19e5773b5dbc9d6ccd9d552b422d71",
     "semantic_hash": ""
   }
 }

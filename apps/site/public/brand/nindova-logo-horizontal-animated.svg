@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 202 64" role="img" aria-label="Nindova">
+  <defs>
+    <radialGradient id="logo-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#E0A64B" stop-opacity=".3"/>
+      <stop offset=".62" stop-color="#E0A64B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <style>
+    .logo-glow { opacity: 0; animation: glow 7s ease-in-out infinite; }
+    .diamond { opacity: 0; animation: stitch 7s steps(1, end) infinite; }
+    .pair-one { animation-delay: 0s; }
+    .pair-two { animation-delay: .35s; }
+    .pair-three { animation-delay: .7s; }
+    .pair-four { animation-delay: 1.05s; }
+    .center { animation-delay: 1.6s; }
+    @keyframes stitch { 0% { opacity: 0; } 6%, 88% { opacity: 1; } 94%, 100% { opacity: 0; } }
+    @keyframes glow { 0%, 100% { opacity: 0; } 55% { opacity: .55; } }
+    @media (prefers-reduced-motion: reduce) {
+      .diamond { animation: none; opacity: 1; }
+      .logo-glow { animation: none; opacity: 0; }
+    }
+  </style>
+  <g transform="translate(8 8)">
+    <circle class="logo-glow" cx="24" cy="24" r="28" fill="url(#logo-glow)"/>
+    <path class="diamond pair-one" d="M24 3.4 29 8.4 24 13.4 19 8.4Z" fill="#9A3A42"/>
+    <path class="diamond pair-one" d="M24 34.6 29 39.6 24 44.6 19 39.6Z" fill="#9A3A42"/>
+    <path class="diamond pair-two" d="M8.4 19 13.4 24 8.4 29 3.4 24Z" fill="#3A4A9E"/>
+    <path class="diamond pair-two" d="M39.6 19 44.6 24 39.6 29 34.6 24Z" fill="#3A4A9E"/>
+    <path class="diamond pair-three" d="M31.8 11.2 36.8 16.2 31.8 21.2 26.8 16.2Z" fill="#C4638A"/>
+    <path class="diamond pair-three" d="M16.2 26.8 21.2 31.8 16.2 36.8 11.2 31.8Z" fill="#C4638A"/>
+    <path class="diamond pair-four" d="M16.2 11.2 21.2 16.2 16.2 21.2 11.2 16.2Z" fill="#EFE1C4"/>
+    <path class="diamond pair-four" d="M31.8 26.8 36.8 31.8 31.8 36.8 26.8 31.8Z" fill="#EFE1C4"/>
+    <path class="diamond center" d="M24 19 29 24 24 29 19 24Z" fill="#E0A64B"/>
+  </g>
+  <g transform="translate(72 22.6) scale(.783)" stroke="#EFE1C4" stroke-width="3.4" fill="none" stroke-linejoin="round">
+    <path transform="translate(0)" d="M1.7 24V0l12.6 24V0"/>
+    <path transform="translate(25)" d="M1.7 0v24"/>
+    <path transform="translate(37.4)" d="M1.7 24V0l12.6 24V0"/>
+    <path transform="translate(62.4)" d="M1.7 0v24m0-22.3h4.8Q15 1.7 15 12T6.5 22.3H1.7"/>
+    <ellipse cx="96.6" cy="12" rx="6.8" ry="10.3"/>
+    <path transform="translate(114.1)" d="M1.7 0 8 24 14.3 0"/>
+    <path transform="translate(139.1)" d="M1.7 24 8 0l6.3 24M4.8 15.5h6.4"/>
+  </g>
+</svg>

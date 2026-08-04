@@ -40,7 +40,10 @@ const motifs = [
   <body class="landing">
     <header class="site-nav" aria-label="Primary navigation">
       <a class="brand" href={href("/")} aria-label="Nindova home">
-        <img class="brand-lockup" src={href("/brand/nindova-logo-horizontal.svg")} alt="" width="202" height="64" />
+        <picture class="brand-lockup-picture">
+          <source media="(prefers-reduced-motion: reduce)" srcset={href("/brand/nindova-logo-horizontal.svg")} />
+          <img class="brand-lockup" src={href("/brand/nindova-logo-horizontal-animated.svg")} alt="" width="202" height="64" />
+        </picture>
       </a>
       <nav>
         <a href={href("/docs/")}>Docs</a>

@@ -47,6 +47,7 @@ try {
     { width: 1440, height: 900 },
   ]) {
     const { context, page } = await open(viewport);
+    assert.match(await page.locator("header .brand-lockup").evaluate((image) => image.currentSrc), /nindova-logo-horizontal-animated\.svg$/);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), viewport.width);
     for (const selector of [".nav-play", ".button-primary", ".button-secondary"]) {
       const box = await page.locator(selector).first().boundingBox();
@@ -73,6 +74,7 @@ try {
 
   const reduced = await open({ width: 375, height: 812 }, { reducedMotion: "reduce" });
   assert.match(await reduced.page.locator(".button-primary").first().evaluate((element) => getComputedStyle(element).transitionDuration), /0\.00001s|1e-05s|0s/);
+  assert.match(await reduced.page.locator("header .brand-lockup").evaluate((image) => image.currentSrc), /nindova-logo-horizontal\.svg$/);
   await reduced.context.close();
 
   assert.deepEqual(errors, []);

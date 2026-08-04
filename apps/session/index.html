@@ -100,7 +100,39 @@
       font-size: 18px;
       letter-spacing: .02em;
     }
-    .wordmark-mark { width: 30px; height: 30px; }
+    .wordmark-mark { width: 30px; height: 30px; overflow: visible; }
+    .wordmark-mark .mark-diamond {
+      opacity: 0;
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: mark-stitch-in .48s steps(5, end) both;
+    }
+    .wordmark-mark .mark-north { --from-x: 0px; --from-y: -7px; animation-delay: .08s; }
+    .wordmark-mark .mark-south { --from-x: 0px; --from-y: 7px; animation-delay: .08s; }
+    .wordmark-mark .mark-west { --from-x: -7px; --from-y: 0px; animation-delay: .24s; }
+    .wordmark-mark .mark-east { --from-x: 7px; --from-y: 0px; animation-delay: .24s; }
+    .wordmark-mark .mark-north-east { --from-x: 5px; --from-y: -5px; animation-delay: .4s; }
+    .wordmark-mark .mark-south-west { --from-x: -5px; --from-y: 5px; animation-delay: .4s; }
+    .wordmark-mark .mark-north-west { --from-x: -5px; --from-y: -5px; animation-delay: .56s; }
+    .wordmark-mark .mark-south-east { --from-x: 5px; --from-y: 5px; animation-delay: .56s; }
+    .wordmark-mark .mark-center {
+      opacity: 0;
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: mark-center-settle .42s steps(4, end) .74s both;
+    }
+    .wordmark-label { opacity: 0; animation: mark-label-reveal .46s ease-out .92s both; }
+    @keyframes mark-stitch-in {
+      0% { opacity: 0; transform: translate(var(--from-x), var(--from-y)) scale(.58); }
+      62% { opacity: 1; transform: translate(0, 0) scale(1.12); }
+      100% { opacity: 1; transform: translate(0, 0) scale(1); }
+    }
+    @keyframes mark-center-settle {
+      0% { opacity: 0; transform: scale(.35) rotate(45deg); }
+      70% { opacity: 1; transform: scale(1.18) rotate(0); }
+      100% { opacity: 1; transform: scale(1) rotate(0); }
+    }
+    @keyframes mark-label-reveal { to { opacity: 1; } }
     .top-actions { display: flex; align-items: center; gap: 8px; }
     .quiet-button, .primary-button, .text-button {
       border: 0;
@@ -283,8 +315,12 @@
         linear-gradient(180deg, var(--tile-face-1), var(--tile-face-2));
       box-shadow: 2px 5px 0 var(--tile-edge), 0 12px 20px rgba(0,0,0,.34), inset 0 1px rgba(255,255,255,.72);
       cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: manipulation;
       transform-origin: center bottom;
-      transition: transform 180ms cubic-bezier(.2,.8,.2,1), opacity 340ms ease, filter 180ms ease, box-shadow 180ms ease;
+      transition: transform 90ms cubic-bezier(.2,.8,.2,1), opacity 260ms ease, filter 90ms ease, box-shadow 90ms ease;
     }
     .tile::before {
       position: absolute;
@@ -307,7 +343,6 @@
     .tile.is-side-blocked::before { background: rgba(8,9,26,.2); }
     .tile.is-covered svg { opacity: .58; }
     .tile.is-side-blocked svg { opacity: .72; }
-    .tile:not(:disabled):hover { transform: translateY(-4px); filter: brightness(1.06); }
     .tile.is-selected { z-index: 60 !important; transform: translateY(-9px) scale(1.045); box-shadow: 3px 7px 0 var(--tile-edge), 0 18px 24px rgba(0,0,0,.36), 0 0 0 3px var(--focus), 0 0 28px color-mix(in srgb, var(--motif) 52%, transparent); }
     .tile.is-hinted { animation: hint-breathe 1.2s ease-in-out 2; }
     .tile.is-removed { opacity: 0; pointer-events: none; }
@@ -353,6 +388,14 @@
       0% { opacity: 0; transform: translate(-50%, -50%) scale(.42); }
       42% { opacity: .82; }
       100% { opacity: 0; transform: translate(-50%, -50%) scale(1.28); }
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .tile:not(:disabled):hover { transform: translateY(-4px); filter: brightness(1.06); }
+    }
+    @media (hover: none) and (pointer: coarse) {
+      .tile { transition-property: transform, opacity; transition-duration: 80ms, 220ms; }
+      .tile:not(:disabled):active { transform: translateY(-5px) scale(.985); filter: brightness(1.07); }
     }
 
     .board-status { min-height: 1.6em; margin: 16px auto 0; color: #eadab9; font-family: "Iowan Old Style", Palatino, Georgia, serif; text-align: center; }
@@ -446,6 +489,7 @@
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+      .wordmark-mark .mark-diamond, .wordmark-mark .mark-center, .wordmark-label { animation: none !important; opacity: 1 !important; transform: none !important; }
       .tile.is-pairing.is-removed { animation-name: pair-fade !important; animation-duration: 80ms !important; transform: none !important; }
       .pair-bloom { display: none; }
     }
@@ -456,13 +500,13 @@
     <header class="topbar">
       <div class="wordmark">
         <svg class="wordmark-mark" viewBox="0 0 48 48" aria-hidden="true">
-          <path d="M24 3.4 29 8.4 24 13.4 19 8.4Z" fill="#a6424a"/><path d="M24 34.6 29 39.6 24 44.6 19 39.6Z" fill="#a6424a"/>
-          <path d="M8.4 19 13.4 24 8.4 29 3.4 24Z" fill="#3a4a9e"/><path d="M39.6 19 44.6 24 39.6 29 34.6 24Z" fill="#3a4a9e"/>
-          <path d="M31.8 11.2 36.8 16.2 31.8 21.2 26.8 16.2Z" fill="#c4638a"/><path d="M16.2 26.8 21.2 31.8 16.2 36.8 11.2 31.8Z" fill="#c4638a"/>
-          <path d="M16.2 11.2 21.2 16.2 16.2 21.2 11.2 16.2Z" fill="#f6e8c9"/><path d="M31.8 26.8 36.8 31.8 31.8 36.8 26.8 31.8Z" fill="#f6e8c9"/>
-          <path d="M24 19 29 24 24 29 19 24Z" fill="#f1b84b"/>
+          <path class="mark-diamond mark-north" d="M24 3.4 29 8.4 24 13.4 19 8.4Z" fill="#a6424a"/><path class="mark-diamond mark-south" d="M24 34.6 29 39.6 24 44.6 19 39.6Z" fill="#a6424a"/>
+          <path class="mark-diamond mark-west" d="M8.4 19 13.4 24 8.4 29 3.4 24Z" fill="#3a4a9e"/><path class="mark-diamond mark-east" d="M39.6 19 44.6 24 39.6 29 34.6 24Z" fill="#3a4a9e"/>
+          <path class="mark-diamond mark-north-east" d="M31.8 11.2 36.8 16.2 31.8 21.2 26.8 16.2Z" fill="#c4638a"/><path class="mark-diamond mark-south-west" d="M16.2 26.8 21.2 31.8 16.2 36.8 11.2 31.8Z" fill="#c4638a"/>
+          <path class="mark-diamond mark-north-west" d="M16.2 11.2 21.2 16.2 16.2 21.2 11.2 16.2Z" fill="#f6e8c9"/><path class="mark-diamond mark-south-east" d="M31.8 26.8 36.8 31.8 31.8 36.8 26.8 31.8Z" fill="#f6e8c9"/>
+          <path class="mark-center" d="M24 19 29 24 24 29 19 24Z" fill="#f1b84b"/>
         </svg>
-        <span>Nindova</span>
+        <span class="wordmark-label">Nindova</span>
       </div>
       <div class="top-actions">
         <button class="quiet-button" id="muteBtn" type="button" aria-pressed="false">sound off</button>
