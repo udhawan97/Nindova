@@ -14,6 +14,10 @@ await cp(resolve(root, "dist"), previewRoot, { recursive: true });
 const publishedHouseFiles = await readdir(resolve(previewRoot, "house"), { recursive: true });
 assert.equal(publishedHouseFiles.some((path) => String(path).includes("assessment-readiness")), false, "assessment contract stays out of the production House");
 assert.doesNotMatch(await readFile(resolve(previewRoot, "house/sw.js"), "utf8"), /assessment-readiness/);
+const publishedHouseText = (await Promise.all(publishedHouseFiles
+  .filter((path) => /\.(?:html|js|css|webmanifest)$/.test(String(path)))
+  .map((path) => readFile(resolve(previewRoot, "house", String(path)), "utf8")))).join("\n");
+assert.doesNotMatch(publishedHouseText, /\b(?:Contra|Subway Surfers|Flappy Bird)\b/i, "the shipped game remains an original work");
 const server = spawn(process.execPath, [resolve(root, "scripts/serve.mjs"), previewRoot], {
   cwd: root,
   env: { ...process.env, NINDOVA_PREVIEW_PORT: String(port) },
@@ -34,8 +38,37 @@ const browser = await chromium.launch({ headless: true });
 const errors = [];
 const externalRequests = [];
 
-async function openHouse(viewport, options = {}, { audioProbe = false, audioDenied = false } = {}) {
+async function openHouse(viewport, options = {}, {
+  audioProbe = false,
+  audioDenied = false,
+  acceleratedRaf = false,
+  fakeClock = false,
+  controllableVisibility = false,
+} = {}) {
   const context = await browser.newContext({ viewport, ...options });
+  if (acceleratedRaf) {
+    await context.addInitScript(() => {
+      const nativeRequestAnimationFrame = globalThis.requestAnimationFrame.bind(globalThis);
+      let authoredTimestamp = 0;
+      Object.defineProperty(globalThis, "requestAnimationFrame", {
+        configurable: true,
+        value: (callback) => nativeRequestAnimationFrame(() => {
+          authoredTimestamp += 800;
+          callback(authoredTimestamp);
+        }),
+      });
+    });
+  }
+  if (controllableVisibility) {
+    await context.addInitScript(() => {
+      let testHidden = false;
+      Object.defineProperty(document, "hidden", { configurable: true, get: () => testHidden });
+      globalThis.__setHouseTestHidden = (hidden) => {
+        testHidden = hidden;
+        document.dispatchEvent(new Event("visibilitychange"));
+      };
+    });
+  }
   if (audioDenied) {
     await context.addInitScript(() => {
       class DeniedAudioContext { constructor() { throw new Error("audio unavailable in test"); } }
@@ -54,6 +87,7 @@ async function openHouse(viewport, options = {}, { audioProbe = false, audioDeni
     });
   }
   const page = await context.newPage();
+  if (fakeClock) await page.clock.install();
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   page.on("pageerror", (error) => errors.push(error.message));
   page.on("request", (request) => {
@@ -103,6 +137,29 @@ async function completeStackGame(page) {
   }
 }
 
+async function completeRunnerStory(page) {
+  await page.locator('[data-game="sector-sprint"]').first().click();
+  const narratedRoute = page.locator("[data-runner-story]");
+  if (await narratedRoute.count()) await narratedRoute.click();
+  await page.click("[data-runner-pause]");
+  assert.equal(await page.locator("[data-runner-pause]").getAttribute("aria-pressed"), "true");
+  assert.equal(await page.locator("[data-story-advance]").isEnabled(), true, "Pause holds boundary time without blocking narrated completion");
+  for (let act = 0; act < 5; act += 1) {
+    assert.equal(await page.evaluate(() => window.__house.active?.storyBeat), 0);
+    for (let beat = 0; beat < 3; beat += 1) {
+      await page.click("[data-story-advance]");
+      if (beat < 2) {
+        await page.waitForFunction((next) => window.__house.active?.storyBeat === next, beat + 1);
+      } else if (act < 4) {
+        await page.waitForFunction((next) => window.__house.active?.chapter === next && window.__house.active?.storyBeat === 0, act + 1);
+        assert.equal(await page.locator("[data-runner-pause]").getAttribute("aria-pressed"), "true", "narrated Pause persists between Acts");
+      } else {
+        await page.waitForSelector(".curtain-call");
+      }
+    }
+  }
+}
+
 async function keyboardActivate(page, selector) {
   await page.waitForSelector(selector, { state: "visible" });
   for (let attempt = 0; attempt < 120; attempt += 1) {
@@ -134,7 +191,7 @@ try {
   ]) {
     const { context, page } = await openHouse(viewport);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), viewport.width);
-    assert.equal(await page.locator(".game-door").count(), 4);
+    assert.equal(await page.locator(".game-door").count(), 5);
     assert.equal(await page.locator("text=For adults 18+").first().isVisible(), true);
     assert.doesNotMatch((await page.locator("body").innerText()).toLowerCase(), /\biq\b|intelligence result|leaderboard/);
     for (const button of await page.locator(".game-door").all()) {
@@ -248,6 +305,120 @@ try {
   assert.equal(await stack.page.evaluate(() => window.__house.active?.chapter), 1);
   await stack.context.close();
 
+  const runner = await openHouse({ width: 375, height: 812 });
+  await runner.page.click('[data-game="sector-sprint"]');
+  await runner.page.waitForSelector("#runnerCanvas");
+  assert.deepEqual(await runner.page.evaluate(() => {
+    const saved = JSON.parse(sessionStorage.getItem("nindova:house:active:v1") ?? "{}");
+    return { keys: Object.keys(saved).sort(), value: saved };
+  }), {
+    keys: ["chapter", "gameId", "runId", "storyBeat"],
+    value: {
+      gameId: "sector-sprint",
+      chapter: 0,
+      runId: await runner.page.evaluate(() => window.__house.active?.runId),
+      storyBeat: null,
+    },
+  });
+  for (const control of await runner.page.locator(".runner-controls button").all()) {
+    const box = await control.boundingBox();
+    assert.ok(box && box.width >= 44 && box.height >= 44, "runner controls remain operable by touch");
+  }
+  await runner.page.screenshot({ path: resolve(output, "sector-sprint-375x812.png"), fullPage: true, animations: "disabled" });
+  await runner.page.click('[data-runner-action="spark"]');
+  await runner.page.waitForFunction(() => /Message delivered|number 12 has left/i.test(document.querySelector("#runnerLive")?.textContent ?? ""), null, { timeout: 4_000 });
+  await runner.page.evaluate(() => document.querySelector("#houseMain")?.focus());
+  await runner.page.keyboard.press("Space");
+  await runner.page.waitForFunction(() => /jump/i.test(document.querySelector("#runnerLive")?.textContent ?? ""));
+  await runner.page.click("[data-runner-pause]");
+  assert.equal(await runner.page.locator("[data-runner-pause]").getAttribute("aria-pressed"), "true");
+  const pausedFrame = await runner.page.locator("#runnerCanvas").evaluate((canvas) => canvas.toDataURL());
+  const pausedMessage = await runner.page.locator("#runnerLive").innerText();
+  await runner.page.locator('[data-runner-action="jump"]').dispatchEvent("pointerdown", { pointerId: 7 });
+  await runner.page.locator("body").dispatchEvent("pointercancel", { pointerId: 7 });
+  await runner.page.waitForTimeout(250);
+  assert.equal(await runner.page.locator('[data-runner-action="jump"]').getAttribute("data-pressed"), null, "a cancelled pointer leaves no stuck pressed state");
+  assert.equal(await runner.page.locator("#runnerLive").innerText(), pausedMessage, "a cancelled pointer does not activate the control");
+  assert.equal(await runner.page.locator("#runnerCanvas").evaluate((canvas) => canvas.toDataURL()), pausedFrame, "the paused city remains still");
+  await runner.page.click("[data-runner-pause]");
+  await runner.page.waitForTimeout(250);
+  assert.notEqual(await runner.page.locator("#runnerCanvas").evaluate((canvas) => canvas.toDataURL()), pausedFrame, "the city resumes from the paused scene");
+  await runner.page.waitForFunction(() => /security deposit|Chandigarh splash/i.test(document.querySelector("#runnerLive")?.textContent ?? ""), null, { timeout: 9_000 });
+  assert.equal(await runner.page.evaluate(() => window.__house.active?.chapter), 0, "a comic collision never resets or loses the Act");
+  await runner.context.close();
+
+  for (const viewport of [{ width: 320, height: 568 }, { width: 1280, height: 800 }]) {
+    const runnerVisual = await openHouse(viewport);
+    await runnerVisual.page.click('[data-game="sector-sprint"]');
+    assert.equal(await runnerVisual.page.evaluate(() => document.documentElement.scrollWidth), viewport.width);
+    assert.equal(await runnerVisual.page.locator("#runnerCanvas").isVisible(), true);
+    assert.ok(Number.parseFloat(await runnerVisual.page.locator("#runnerApproach strong").evaluate((element) => getComputedStyle(element).fontSize)) >= 18);
+    await runnerVisual.page.screenshot({ path: resolve(output, `sector-sprint-${viewport.width}x${viewport.height}.png`), fullPage: true, animations: "disabled" });
+    await runnerVisual.context.close();
+  }
+
+  const autoRunner = await openHouse(
+    { width: 414, height: 896 },
+    {},
+    { acceleratedRaf: true, controllableVisibility: true },
+  );
+  await autoRunner.page.click('[data-game="sector-sprint"]');
+  await autoRunner.page.evaluate(() => globalThis.__setHouseTestHidden(true));
+  await autoRunner.page.waitForTimeout(1_200);
+  assert.equal(await autoRunner.page.evaluate(() => window.__house.active?.chapter), 0, "hidden time cannot complete an Act");
+  await autoRunner.page.evaluate(() => globalThis.__setHouseTestHidden(false));
+  await autoRunner.page.waitForFunction(() => window.__house.active?.chapter === 0 && window.__house.active?.resolving, null, { timeout: 5_000 });
+  await autoRunner.page.evaluate(() => globalThis.__setHouseTestHidden(true));
+  await autoRunner.page.waitForTimeout(1_000);
+  assert.deepEqual(await autoRunner.page.evaluate(() => ({ chapter: window.__house.active?.chapter, resolving: window.__house.active?.resolving })), { chapter: 0, resolving: true }, "hidden time cannot consume the inter-Act transition");
+  await autoRunner.page.evaluate(() => globalThis.__setHouseTestHidden(false));
+  await autoRunner.page.waitForFunction(() => window.__house.active?.chapter === 1 && !window.__house.active?.resolving, null, { timeout: 5_000 });
+  await autoRunner.page.waitForFunction(() => window.__house.active?.chapter === 1 && window.__house.active?.resolving, null, { timeout: 5_000 });
+  await autoRunner.page.locator("[data-runner-pause]").evaluate((button) => button.click());
+  await autoRunner.page.waitForTimeout(1_000);
+  assert.deepEqual(await autoRunner.page.evaluate(() => ({ chapter: window.__house.active?.chapter, resolving: window.__house.active?.resolving })), { chapter: 1, resolving: true }, "Pause holds a committed inter-Act transition");
+  await autoRunner.page.locator("[data-runner-pause]").evaluate((button) => button.click());
+  await autoRunner.page.waitForFunction(() => window.__house.active?.chapter === 2 && !window.__house.active?.resolving, null, { timeout: 5_000 });
+  await autoRunner.page.evaluate(() => window.dispatchEvent(new Event("blur")));
+  await autoRunner.page.waitForTimeout(1_200);
+  assert.equal(await autoRunner.page.evaluate(() => window.__house.active?.chapter), 2, "blurred time cannot complete an Act");
+  await autoRunner.page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await autoRunner.page.waitForFunction(() => window.__house.active?.chapter === 3 && !window.__house.active?.resolving, null, { timeout: 8_000 });
+  await autoRunner.page.locator("[data-runner-pause]").evaluate((button) => button.click());
+  await autoRunner.page.locator("#celebration").waitFor({ state: "hidden" });
+  await autoRunner.page.screenshot({ path: resolve(output, "sector-sprint-monsoon-414x896.png"), fullPage: true, animations: "disabled" });
+  await autoRunner.page.locator("[data-runner-pause]").evaluate((button) => button.click());
+  await autoRunner.page.waitForSelector(".curtain-call", { timeout: 15_000 });
+  assert.equal(await autoRunner.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]?.completionFacts.finalChapter), "Roti Relay", "the production action route advances and closes through all five Acts");
+  await autoRunner.context.close();
+
+  const reloadedBoundary = await openHouse({ width: 375, height: 812 }, {}, { fakeClock: true });
+  await reloadedBoundary.page.click('[data-game="sector-sprint"]');
+  await reloadedBoundary.page.click("[data-runner-story]");
+  await reloadedBoundary.page.clock.fastForward(239_000);
+  assert.equal(await reloadedBoundary.page.evaluate(() => window.__house.active?.gameId), "sector-sprint");
+  await reloadedBoundary.page.reload();
+  await reloadedBoundary.page.waitForFunction(() => Boolean(window.__house));
+  assert.equal(await reloadedBoundary.page.evaluate(() => window.__house.active), null, "reload cannot reset and extend the runner boundary");
+  assert.equal(await reloadedBoundary.page.evaluate(() => sessionStorage.getItem("nindova:house:active:v1")), null);
+  assert.equal(await reloadedBoundary.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]), undefined);
+  assert.match(await reloadedBoundary.page.locator(".runner-restore-note").innerText(), /closed on reload/i);
+  await reloadedBoundary.context.close();
+
+  const boundedStory = await openHouse({ width: 375, height: 812 }, {}, { fakeClock: true });
+  await boundedStory.page.click('[data-game="sector-sprint"]');
+  await boundedStory.page.click("[data-runner-story]");
+  await boundedStory.page.clock.fastForward(240_000);
+  await boundedStory.page.waitForSelector(".curtain-call");
+  assert.match(await boundedStory.page.locator(".curtain-call").innerText(), /No completion reading was recorded/i);
+  assert.equal(await boundedStory.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]), undefined, "the absolute boundary cannot create a false five-Act result");
+  assert.equal(await boundedStory.page.evaluate(() => sessionStorage.getItem("nindova:house:active:v1")), null);
+  await boundedStory.page.reload();
+  await boundedStory.page.waitForFunction(() => Boolean(window.__house));
+  assert.equal(await boundedStory.page.evaluate(() => window.__house.active), null, "a boundary exit cannot revive as a completed or active route after reload");
+  assert.equal(await boundedStory.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]), undefined);
+  await boundedStory.context.close();
+
   const keyboard = await openHouse({ width: 768, height: 1024 }, { reducedMotion: "reduce" });
   await keyboard.page.evaluate(() => document.querySelector("#houseMain")?.focus());
   await keyboardActivate(keyboard.page, '[data-game="pattern-court"]');
@@ -297,20 +468,23 @@ try {
   }
   await completeStackGame(catalog.page);
   assert.equal(await catalog.page.evaluate(() => window.__house.memory.latestByGame["stack-architect"]?.completionFacts.authoredChapters), 5);
+  await catalog.page.click('[data-route="home"]');
+  await completeRunnerStory(catalog.page);
+  assert.equal(await catalog.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]?.completionFacts.finalChapter), "Roti Relay");
   await catalog.page.click('[data-route="gallery"]');
-  assert.equal(await catalog.page.locator(".gallery-ledger article").filter({ hasText: "authored chapters completed" }).count(), 4);
+  assert.equal(await catalog.page.locator(".gallery-ledger article").filter({ hasText: "authored chapters completed" }).count(), 5);
   const mirrorRun = await catalog.page.evaluate(() => window.__house.memory.latestByGame["mirror-forge"].runId);
   await completeChoiceGame(catalog.page, "mirror-forge", [1, 0, 0, 0, 0]);
   const replacement = await catalog.page.evaluate(() => ({
     keys: Object.keys(window.__house.memory.latestByGame),
     runId: window.__house.memory.latestByGame["mirror-forge"].runId,
   }));
-  assert.equal(replacement.keys.length, 4);
+  assert.equal(replacement.keys.length, 5);
   assert.notEqual(replacement.runId, mirrorRun);
   await catalog.page.click('[data-route="gallery"]');
   await catalog.page.click("[data-clear-gallery]");
   assert.equal(await catalog.page.evaluate(() => Object.keys(window.__house.memory.latestByGame).length), 0);
-  assert.equal(await catalog.page.locator(".gallery-ledger article").filter({ hasText: "No completed reading is kept." }).count(), 4);
+  assert.equal(await catalog.page.locator(".gallery-ledger article").filter({ hasText: "No completed reading is kept." }).count(), 5);
   await catalog.context.close();
 
   const provenance = await openHouse({ width: 375, height: 812 });
@@ -342,7 +516,35 @@ try {
 
   const reduced = await openHouse({ width: 375, height: 812 }, { reducedMotion: "reduce" });
   assert.match(await reduced.page.locator(".game-door").first().evaluate((element) => getComputedStyle(element).transitionDuration), /0\.00001s|1e-05s|1e-08s|0s/);
+  await reduced.page.click('[data-game="sector-sprint"]');
+  assert.equal(await reduced.page.locator(".runner-story").isVisible(), true, "reduced motion starts with the complete narrated route");
+  assert.equal(await reduced.page.locator("#runnerCanvas").count(), 0);
   await reduced.context.close();
+
+  const restoredReduced = await openHouse({ width: 375, height: 812 });
+  await restoredReduced.page.click('[data-game="sector-sprint"]');
+  await restoredReduced.page.emulateMedia({ reducedMotion: "reduce" });
+  await restoredReduced.page.waitForSelector(".runner-story");
+  await restoredReduced.page.evaluate(() => {
+    const saved = JSON.parse(sessionStorage.getItem("nindova:house:active:v1"));
+    saved.storyBeat = null;
+    sessionStorage.setItem("nindova:house:active:v1", JSON.stringify(saved));
+  });
+  await restoredReduced.page.reload();
+  await restoredReduced.page.waitForFunction(() => Boolean(window.__house));
+  assert.equal(await restoredReduced.page.evaluate(() => window.__house.active), null, "a restored action route fails closed when reduced motion is now preferred");
+  assert.equal(await restoredReduced.page.locator("#runnerCanvas").count(), 0);
+  assert.equal(await restoredReduced.page.locator(".runner-restore-note").isVisible(), true);
+  await restoredReduced.context.close();
+
+  const pausedRunnerSound = await openHouse({ width: 375, height: 812 }, { reducedMotion: "reduce" }, { audioProbe: true });
+  await pausedRunnerSound.page.click("#soundButton");
+  await pausedRunnerSound.page.click('[data-game="sector-sprint"]');
+  await pausedRunnerSound.page.click("[data-runner-pause]");
+  for (let beat = 0; beat < 3; beat += 1) await pausedRunnerSound.page.click("[data-story-advance]");
+  await pausedRunnerSound.page.waitForFunction(() => window.__house.active?.chapter === 1);
+  assert.equal(await pausedRunnerSound.page.evaluate(() => globalThis.__houseAudioContexts), 0, "paused narration never plays an optional chime");
+  await pausedRunnerSound.context.close();
 
   const sound = await openHouse({ width: 375, height: 812 }, { reducedMotion: "reduce" }, { audioProbe: true });
   await sound.page.click('[data-game="pattern-court"]');
@@ -390,12 +592,12 @@ try {
   const coldResponse = await cold.goto(`http://127.0.0.1:${port}/house/`);
   assert.equal(coldResponse?.ok(), true);
   await cold.waitForFunction(() => Boolean(window.__house));
-  assert.equal(await cold.locator(".game-door").count(), 4);
+  assert.equal(await cold.locator(".game-door").count(), 5);
   await offline.context.close();
 
   assert.deepEqual(externalRequests, []);
   assert.deepEqual(errors, []);
-  console.log("Nindova House adult boundary, all four five-chapter games, keyboard/nonvisual play, replacement provenance, corrupt recovery, responsive layout, Night isolation, and cold-start offline shell passed.");
+  console.log("Nindova House adult boundary, all five five-chapter games, runner controls/narration, keyboard/nonvisual play, replacement provenance, corrupt recovery, responsive layout, Night isolation, and cold-start offline shell passed.");
 } finally {
   await browser.close();
   server.kill("SIGTERM");

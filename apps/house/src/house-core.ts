@@ -3,7 +3,7 @@ export const HOUSE_AUDIENCE_KEY = "nindova:house:adult-audience:v1";
 export const HOUSE_SCHEMA_VERSION = 1 as const;
 export const HOUSE_RULESET_VERSION = "entertainment-1" as const;
 
-export type GameId = "pattern-court" | "mirror-forge" | "stack-architect" | "lantern-ledger";
+export type GameId = "pattern-court" | "mirror-forge" | "stack-architect" | "lantern-ledger" | "sector-sprint";
 
 export type ChoiceChapter = {
   title: string;
@@ -19,10 +19,11 @@ export type GameDefinition = {
   title: string;
   houseLine: string;
   description: string;
-  kind: "choice" | "memory" | "stack";
+  kind: "choice" | "memory" | "stack" | "runner";
   version: "1.0.0";
   chapters: readonly ChoiceChapter[];
   diskCounts?: readonly number[];
+  chapterTitles?: readonly string[];
 };
 
 export type EntertainmentResult = {
@@ -89,6 +90,12 @@ export const GAMES: readonly GameDefinition[] = [
     description: "Five visible sequences. Close the screen when ready, then choose the line you held.",
     kind: "memory", version: "1.0.0", chapters: LANTERN_CHAPTERS,
   },
+  {
+    id: "sector-sprint", number: "V", title: "Sector Sprint", houseLine: "Run Chandigarh’s long way home.",
+    description: "Five authored city acts with automatic forward motion, optional jumps, harmless sparks, and a clean curtain call.",
+    kind: "runner", version: "1.0.0", chapters: [],
+    chapterTitles: ["Ghar Wapsi", "Sabzi Command", "Baraat Detour", "Monsoon Protocol", "Roti Relay"],
+  },
 ] as const;
 
 export function emptyHouseState(): HouseState {
@@ -151,7 +158,11 @@ export function completeEntertainmentGame(state: HouseState, game: GameDefinitio
     completedAt,
     completionFacts: {
       authoredChapters: 5,
-      finalChapter: game.kind === "stack" ? "Six-disc tower" : (game.chapters[4]?.title ?? "Fifth chapter"),
+      finalChapter: game.kind === "stack"
+        ? "Six-disc tower"
+        : game.kind === "runner"
+          ? (game.chapterTitles?.[4] ?? "Fifth chapter")
+          : (game.chapters[4]?.title ?? "Fifth chapter"),
     },
   };
   return {

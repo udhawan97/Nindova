@@ -11,8 +11,13 @@ _Avoid_: casino, arcade, assessment platform
 
 **Grand Salon**
 
-The entertainment room containing four authored games of five chapters each. Progress is local to the current chosen game and never becomes a population comparison, intelligence claim, streak, or randomized reward.
+The entertainment room containing five authored games of five chapters or Acts each. Progress is local to the current chosen game and never becomes a population comparison, intelligence claim, streak, randomized reward, or endless attention loop.
 _Avoid_: test center, leaderboard, daily challenge
+
+**Sector Sprint**
+
+The original, fixed five-Act Chandigarh route in the Grand Salon, led by Gurpreet and his mother Harjit. The street advances on its own; optional jumps and harmless message sparks change comic choreography around inanimate abstractions, while collisions only produce a quip. Every route closes, and the complete narrated route requires no timed response, sound, sight, or precision. Reaching the absolute boundary before all five Acts closes the table without recording a completion.
+_Avoid_: endless runner, shooter, score attack, Contra clone, sleep inducer
 
 **Gallery**
 

@@ -5,7 +5,7 @@ description: The promises Rasoi Pairs must keep for the person using it tonight.
 
 ## Two deliberately separate loops
 
-Nindova House is for adults 18 and over. The Grand Salon is an entertainment room with four authored games. The Night Room is the original bounded wind-down Session.
+Nindova House is for adults 18 and over. The Grand Salon is an entertainment room with five authored games. The Night Room is the original bounded wind-down Session.
 
 The Two-Loop Law applies without exception inside the Night Room: Nindova may be satisfying during the current Session and inviting when a person returns another night, but it must never use satisfaction to make the current Session harder to leave.
 
@@ -13,8 +13,9 @@ Anything that makes tonight harder to leave is a bug.
 
 ## Grand Salon contract
 
-- Four initial games, each with five authored chapters and a deterministic curtain call.
+- Five games, each with five authored chapters or Acts and a deterministic curtain call.
 - Chapter position is allowed inside the chosen entertainment game. There is no leaderboard, streak, randomized reward, social comparison, or attention-pressure language.
+- Sector Sprint is a fixed-route action table, not an endless runner. Automatic forward motion, jumps, and harmless sparks cannot create a score, high score, timer, lives, failure, progress loss, randomized reward, or claimed sleep effect. Its complete narrated route has the same entertainment provenance and curtain call. If the whole-table boundary arrives before every Act closes, the table exits without creating a Gallery completion.
 - Completion is recorded only as a versioned entertainment result. The Gallery keeps at most one replaceable result per game.
 - Entertainment play does not produce an assessment result or infer a cognitive trait.
 - The House has no account, analytics, advertising, app telemetry, app-controlled remote logging, or third-party runtime request.

@@ -5,15 +5,16 @@ import test from "node:test";
 const root = resolve(import.meta.dirname, "../..");
 const House = await import(resolve(root, "apps/house/dist/house-core.js"));
 
-test("the Grand Salon exposes four distinct five-chapter games", () => {
+test("the Grand Salon exposes five distinct five-chapter games", () => {
   assert.deepEqual(House.GAMES.map((game) => game.id), [
     "pattern-court",
     "mirror-forge",
     "stack-architect",
     "lantern-ledger",
+    "sector-sprint",
   ]);
   for (const game of House.GAMES) {
-    const chapterCount = game.kind === "stack" ? game.diskCounts.length : game.chapters.length;
+    const chapterCount = game.kind === "stack" ? game.diskCounts.length : game.kind === "runner" ? game.chapterTitles.length : game.chapters.length;
     assert.equal(chapterCount, 5, `${game.id} chapter count`);
     assert.equal(game.version, "1.0.0");
   }

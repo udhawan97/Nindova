@@ -10,3 +10,5 @@ The Salon may use visible chapter position, escalating authored challenge, repla
 Entertainment play is not a validated assessment. A future research build may use the same input and rendering primitives only after it has a versioned construct definition, representative adult norming sample, preregistered scoring plan, reliability and validity evidence, fairness analysis, uncertainty reporting, informed consent, independent ethics review, and explicit data governance. Until those gates exist, the production product must not emit or market an IQ estimate, intelligence result, percentile, diagnosis, or equivalent proxy. No data collection is authorized by this decision.
 
 The adult acknowledgement is audience framing, not identity or date-of-birth verification. It stores only a local acknowledgement. This decision supersedes the global one-game-menu and 13+ portions of the earlier contract while preserving them inside the Night Room where applicable.
+
+[ADR 0015](./0015-add-the-bounded-sector-sprint.md) adds Sector Sprint as the fifth Salon table without changing the Night Room contract or the original four-table historical scope of this decision.
