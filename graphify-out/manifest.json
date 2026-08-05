@@ -1,7 +1,7 @@
 {
   ".hallmark/log.json": {
-    "mtime": 1785952341.3026109,
-    "ast_hash": "0fd52b60882a762c059fdc71960ce246",
+    "mtime": 1785970216.1567838,
+    "ast_hash": "9945d508c956ec40525d2691e9569824",
     "semantic_hash": ""
   },
   ".hallmark/preflight.json": {
@@ -50,8 +50,8 @@
     "semantic_hash": "9da5b344274fa94c0650dcb1a257aacc"
   },
   "apps/site/src/pages/index.astro": {
-    "mtime": 1785953792.0442982,
-    "ast_hash": "eabc19cc9b57994b99bebfd1e1a53086",
+    "mtime": 1785971854.2173645,
+    "ast_hash": "21d35e8a01590ba1a3fe303110139830",
     "semantic_hash": ""
   },
   "package.json": {
@@ -140,13 +140,13 @@
     "semantic_hash": "938df30602889721e037bc1f25fd53ed"
   },
   "CONTEXT.md": {
-    "mtime": 1785951634.3101115,
-    "ast_hash": "0fae4c9ae81267d29a0bc14d306e4e16",
+    "mtime": 1785970096.1076021,
+    "ast_hash": "da94eca85264068b4b26a0e0b7e0f141",
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1785953791.9694674,
-    "ast_hash": "c7e4c763c444e3cf102a7dabbafd03ef",
+    "mtime": 1785970096.1079452,
+    "ast_hash": "b8d6b6d3affad3b9d57540a05ae3fd3b",
     "semantic_hash": ""
   },
   "apps/session/index.html": {
@@ -155,8 +155,8 @@
     "semantic_hash": "7d36f656007d44ff7fa23d353e61e018"
   },
   "apps/site/src/content/docs/docs/accessibility.md": {
-    "mtime": 1785953792.1117644,
-    "ast_hash": "6f18f35fc3997e2c4d5f3509414fac5f",
+    "mtime": 1785970195.5288224,
+    "ast_hash": "bc8a7129bd28cad31a4af99255ac0f11",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/architecture.md": {
@@ -205,8 +205,8 @@
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/product-contract.md": {
-    "mtime": 1785953792.0634434,
-    "ast_hash": "129b3b993941dd32f167766aa4b5f338",
+    "mtime": 1785970195.5284123,
+    "ast_hash": "d646e8c597facf16a2f31a617c1b3754",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/research-receipts.md": {
@@ -215,18 +215,18 @@
     "semantic_hash": "d9652f2265ec6d5a346e085a592e8206"
   },
   "apps/site/src/content/docs/docs/roadmap.md": {
-    "mtime": 1785953792.3294578,
-    "ast_hash": "987f7cb92ac285d260669a845a9ad411",
+    "mtime": 1785970195.5292413,
+    "ast_hash": "953f78667911d22582b4df276d11c8b3",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/testing.md": {
-    "mtime": 1785953792.1132534,
-    "ast_hash": "f81622fc15a77fdfc3bdc8f13b77fd8d",
+    "mtime": 1785970195.529602,
+    "ast_hash": "e8d0274b158c01094f6ad9cc72bbd024",
     "semantic_hash": ""
   },
   "docs/BUILD-PLAN.md": {
-    "mtime": 1785951634.3121674,
-    "ast_hash": "a1c974e2730f73e700432edfe1510c8d",
+    "mtime": 1785970096.108396,
+    "ast_hash": "005a77d6a2a3005a103853f0de485229",
     "semantic_hash": ""
   },
   "docs/adr/0001-hybrid-procedural-illustration.md": {
@@ -380,8 +380,8 @@
     "semantic_hash": "da62d036dbf5781cf7cd11dd67b9925b"
   },
   "docs/PUBLIC-SURFACE-EVIDENCE.md": {
-    "mtime": 1785956566.3578975,
-    "ast_hash": "69d10f8c437b9f97b43e9505b9f8b4b8",
+    "mtime": 1785971917.682502,
+    "ast_hash": "57db179204de84541ef440fca40f236a",
     "semantic_hash": ""
   },
   "docs/REDESIGN-PLAN.md": {
@@ -405,17 +405,17 @@
     "semantic_hash": "b440453d3216f7b45e0907063e4dc83a"
   },
   "apps/site/public/media/rasoi-board.png": {
-    "mtime": 1785955709.4710581,
+    "mtime": 1785970290.4025815,
     "ast_hash": "686426abf61ccdd5cb869f3b69297244",
     "semantic_hash": "686426abf61ccdd5cb869f3b69297244"
   },
   "apps/site/public/media/rasoi-dawn.png": {
-    "mtime": 1785955688.3940055,
+    "mtime": 1785970273.673841,
     "ast_hash": "5e1ed74e72541acb4e0f709bf4da3776",
     "semantic_hash": "5e1ed74e72541acb4e0f709bf4da3776"
   },
   "apps/site/public/media/rasoi-pairs-phone.png": {
-    "mtime": 1785955709.472221,
+    "mtime": 1785970290.4037051,
     "ast_hash": "97e33bbd5596e9e3c85769ef754f6f49",
     "semantic_hash": "97e33bbd5596e9e3c85769ef754f6f49"
   },
@@ -455,7 +455,7 @@
     "semantic_hash": "d82b998ec66d551fbdb0ae2215ebc8d1"
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1785956514.2812502,
+    "mtime": 1785972288.6678772,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": "9557448d4a3c6237efa8fe2648d21fa0"
   },
@@ -510,8 +510,8 @@
     "semantic_hash": "2d9de5eecef153aa720f4da2eb32decd"
   },
   "scripts/capture-public-media.mjs": {
-    "mtime": 1785953792.3354948,
-    "ast_hash": "dc1a467a1317066882c5cda99dc341fe",
+    "mtime": 1785970235.4424481,
+    "ast_hash": "21ab83c803f4fbc10747fdfa3c4f5f7b",
     "semantic_hash": ""
   },
   "tests/browser/public-surface.mjs": {
@@ -790,13 +790,13 @@
     "semantic_hash": ""
   },
   "apps/house/src/house-core.ts": {
-    "mtime": 1785955866.3408554,
-    "ast_hash": "237cd370293e2d9ec924d913c6f5654b",
+    "mtime": 1785969716.6431684,
+    "ast_hash": "e6ec96e30f618c288563bace34496d5e",
     "semantic_hash": ""
   },
   "apps/house/src/house.ts": {
-    "mtime": 1785955557.9583807,
-    "ast_hash": "fd1bb5a6679405a90b3e64dce90d7108",
+    "mtime": 1785971854.2171276,
+    "ast_hash": "a3f6cefbcfdbe7f575c86d48bb8e882b",
     "semantic_hash": ""
   },
   "apps/house/src/vite-env.d.ts": {
@@ -815,8 +815,8 @@
     "semantic_hash": "cbeabf8c6a1de2d27adb35311cff4de2"
   },
   "tests/browser/house.mjs": {
-    "mtime": 1785956323.3301587,
-    "ast_hash": "f33b3349ccf613623c4a21905195b0ac",
+    "mtime": 1785971890.280285,
+    "ast_hash": "0e73655b2ac8b11fd0a388ca5fa989cd",
     "semantic_hash": ""
   },
   "tests/unit/house-core.test.mjs": {
@@ -855,18 +855,18 @@
     "semantic_hash": "2b4fb1daaba81c59ee9c384430421c53"
   },
   "apps/house/src/sector-sprint.ts": {
-    "mtime": 1785956317.3192787,
-    "ast_hash": "0d250e2a928b530ca9577dca77899297",
+    "mtime": 1785972470.6172037,
+    "ast_hash": "04a0448491984a6b6cb57bd9c837703b",
     "semantic_hash": ""
   },
   "tests/unit/sector-sprint.test.mjs": {
-    "mtime": 1785956317.319882,
-    "ast_hash": "d9dc93b08035a4f75f3dc4cf97fe262c",
+    "mtime": 1785971946.83458,
+    "ast_hash": "c2e4d23e00dec22bd070654b87065ed6",
     "semantic_hash": ""
   },
   "docs/adr/0015-add-the-bounded-sector-sprint.md": {
-    "mtime": 1785951682.908718,
-    "ast_hash": "77cb60e7a8a076709f69cd070adb28bb",
+    "mtime": 1785970319.3175461,
+    "ast_hash": "64922aedbc5d284a6490c0b35d0b6f8b",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/downloads.md": {
@@ -875,38 +875,38 @@
     "semantic_hash": "3fdbbfc2674e46631233291cb404d73d"
   },
   "apps/site/public/media/nindova-house.png": {
-    "mtime": 1785955688.6472473,
+    "mtime": 1785970273.9055967,
     "ast_hash": "fea8a4cdee2093e228d5da2f44bb30e9",
     "semantic_hash": ""
   },
   "apps/site/public/media/sector-sprint.png": {
-    "mtime": 1785955688.9994721,
-    "ast_hash": "9b78877fb13687a2ca5992444ab23665",
+    "mtime": 1785970278.2805822,
+    "ast_hash": "9e86f714ed1f14a1dc8e2ad8dabd75d8",
     "semantic_hash": ""
   },
   "tests/browser/sector-sprint-feel.mjs": {
-    "mtime": 1785952114.9216425,
-    "ast_hash": "c57dead885a2993c060f8cff9d561b63",
+    "mtime": 1785971917.681629,
+    "ast_hash": "e015c5a4691c01330cc1152395f41060",
     "semantic_hash": ""
   },
   "docs/testing/sector-sprint-game-feel.md": {
-    "mtime": 1785956566.356798,
-    "ast_hash": "de9df9f6cdb5a2f1b50e1efb7b16d163",
+    "mtime": 1785971917.6820765,
+    "ast_hash": "f12b794d7554a2c7dbc5f4080823a243",
     "semantic_hash": ""
   },
   "apps/house/src/assets/sector-sprint-characters.md": {
-    "mtime": 1785904061.3150158,
-    "ast_hash": "5d13627271301da0d29b857d219d4a0f",
+    "mtime": 1785969735.2172818,
+    "ast_hash": "58279b4c14d6a150cd07e0700ba1c3e3",
     "semantic_hash": ""
   },
   "docs/adr/0016-deepen-sector-sprint-flight-and-illustration.md": {
-    "mtime": 1785951682.9102085,
-    "ast_hash": "417967733e0c20fcfc2539add08a4cd6",
+    "mtime": 1785970319.3180785,
+    "ast_hash": "d877b0782bbbbf168faddfe123a6abab",
     "semantic_hash": ""
   },
   "docs/adr/0017-make-sector-sprint-a-one-hit-jetpack-gauntlet.md": {
-    "mtime": 1785956317.3212016,
-    "ast_hash": "a451f9231174ab1ee496009f2c415f9e",
+    "mtime": 1785970113.7874913,
+    "ast_hash": "1822c9d7ccc70009b7fe3d5df2658c2b",
     "semantic_hash": ""
   },
   "graphify-out/memory/query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for.md": {
@@ -967,6 +967,11 @@
   "graphify-out/memory/query_20260805_045813_how_do_sector_sprint_hold_to_lift_input__fixed_ste.md": {
     "mtime": 1785905893.8959296,
     "ast_hash": "b395c693bfeed37546acd612abc42a2a",
+    "semantic_hash": ""
+  },
+  "docs/adr/0018-replace-sector-sprint-altitude-control-with-progressive-lanes.md": {
+    "mtime": 1785970113.7877624,
+    "ast_hash": "ebd0a8af22e88bb743065acaf5ff034e",
     "semantic_hash": ""
   }
 }
