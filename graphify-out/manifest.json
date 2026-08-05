@@ -455,7 +455,7 @@
     "semantic_hash": "d82b998ec66d551fbdb0ae2215ebc8d1"
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1785972288.6678772,
+    "mtime": 1785972544.8185248,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": "9557448d4a3c6237efa8fe2648d21fa0"
   },
@@ -815,8 +815,8 @@
     "semantic_hash": "cbeabf8c6a1de2d27adb35311cff4de2"
   },
   "tests/browser/house.mjs": {
-    "mtime": 1785971890.280285,
-    "ast_hash": "0e73655b2ac8b11fd0a388ca5fa989cd",
+    "mtime": 1785972540.674566,
+    "ast_hash": "3ccae2bb20b3579ac8e15d90adbccc76",
     "semantic_hash": ""
   },
   "tests/unit/house-core.test.mjs": {
