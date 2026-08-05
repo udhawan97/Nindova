@@ -1,4 +1,8 @@
 <p align="center">
+  <img src="./apps/site/public/brand/pwa-512.png" width="132" alt="Nindova app icon with nine paired diamonds on a blackened-indigo tile">
+</p>
+
+<p align="center">
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="./apps/site/public/brand/nindova-logo-horizontal-animated-light.svg">
     <img src="./apps/site/public/brand/nindova-logo-horizontal-animated.svg" width="303" alt="Nindova">

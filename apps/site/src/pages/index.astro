@@ -78,25 +78,68 @@ const tables = [
           <p class="source-note">Live web build · no account · no comparison · no app telemetry</p>
         </div>
 
-        <figure class="house-proof">
-          <div class="proof-frame">
-            <img
-              src={href("/media/nindova-house.png")}
-              width="1440"
-              height="937"
-              alt="The real Nindova House floor plan, with the Night Room, five Grand Salon tables, and local Gallery."
-            />
-          </div>
-          <figcaption>Current House floor plan · rendered from source</figcaption>
-        </figure>
+        <div class="house-stage">
+          <a class="app-icon-module" href="#inside">
+            <span class="app-icon-shell">
+              <span class="app-icon-depth app-icon-depth--back" aria-hidden="true"></span>
+              <span class="app-icon-depth app-icon-depth--middle" aria-hidden="true"></span>
+              <img
+                class="app-icon-face"
+                src={href("/brand/pwa-512.png")}
+                width="512"
+                height="512"
+                alt="Nindova app icon with nine paired diamonds on a blackened-indigo tile"
+              />
+            </span>
+            <span class="app-icon-copy">
+              <strong>The House, in one mark</strong>
+              <span>Begin with the five-game Grand Salon <span aria-hidden="true">↓</span></span>
+            </span>
+          </a>
+
+          <figure class="house-proof">
+            <div class="proof-frame">
+              <img
+                src={href("/media/nindova-house.png")}
+                width="1440"
+                height="937"
+                alt="The real Nindova House floor plan, with the Night Room, five Grand Salon tables, and local Gallery."
+              />
+            </div>
+            <figcaption>Current House floor plan · rendered from source</figcaption>
+          </figure>
+        </div>
       </section>
 
-      <aside class="trust-rail" aria-label="Nindova at a glance">
-        <p><strong>Five</strong><span>authored Salon tables</span></p>
-        <p><strong>Finite</strong><span>chapters and curtain calls</span></p>
-        <p><strong>Local</strong><span>browser storage only</span></p>
-        <p><strong>Separate</strong><span>bounded Night Room</span></p>
-      </aside>
+      <nav class="house-guide" aria-label="Explore Nindova">
+        <p class="guide-intro"><span>Follow the House</span> Four clear stops. Every door says where it leads.</p>
+        <ol>
+          <li>
+            <a href="#inside">
+              <img src={href("/brand/favicon.svg")} width="34" height="34" alt="" />
+              <span><small>01 · Grand Salon</small><strong>Meet all five authored games</strong></span>
+            </a>
+          </li>
+          <li>
+            <a href="#night-room">
+              <img src={href("/brand/motifs/chai.svg")} width="34" height="34" alt="" />
+              <span><small>02 · Separate loop</small><strong>Visit the bounded Night Room</strong></span>
+            </a>
+          </li>
+          <li>
+            <a href="#trust">
+              <img src={href("/brand/nindova-mark-monochrome.svg")} width="34" height="34" alt="" />
+              <span><small>03 · House rules</small><strong>See the privacy and limits</strong></span>
+            </a>
+          </li>
+          <li>
+            <a href="#downloads">
+              <img src={href("/brand/motifs/tiffin.svg")} width="34" height="34" alt="" />
+              <span><small>04 · Start your way</small><strong>Open live or keep a file</strong></span>
+            </a>
+          </li>
+        </ol>
+      </nav>
 
       <section id="inside" class="salon-section" aria-labelledby="salon-title">
         <header class="section-heading">
