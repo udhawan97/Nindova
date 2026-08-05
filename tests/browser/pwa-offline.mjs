@@ -101,11 +101,11 @@ try {
   const houseRegistration = await housePage.evaluate(async () => {
     const ready = await navigator.serviceWorker.ready;
     const keys = await caches.keys();
-    const cache = await caches.open("nindova-house-v5");
+    const cache = await caches.open("nindova-house-v6");
     return { scope: ready.scope, keys, entries: (await cache.keys()).map((request) => request.url) };
   });
   assert.equal(houseRegistration.scope, houseBase);
-  assert.ok(houseRegistration.keys.includes("nindova-house-v5"));
+  assert.ok(houseRegistration.keys.includes("nindova-house-v6"));
   assert.equal(houseRegistration.keys.includes("nindova-house-v3"), false);
   assert.ok(houseRegistration.entries.length > 0);
   assert.ok(houseRegistration.entries.every((url) => url.startsWith(houseBase) && !url.includes("assessment-readiness")));

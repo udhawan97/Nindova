@@ -45,6 +45,7 @@ type ActiveGame = {
   selectedPeg: number | null;
   resolving: boolean;
   storyBeat: number | null;
+  touched: boolean;
 };
 
 type DebugHouse = {
@@ -70,6 +71,9 @@ const main = requiredElement<HTMLElement>("#houseMain");
 const soundButton = requiredElement<HTMLButtonElement>("#soundButton");
 const audienceDialog = requiredElement<HTMLDialogElement>("#audienceDialog");
 const enterHouseButton = requiredElement<HTMLButtonElement>("#enterHouseButton");
+const leaveDialog = requiredElement<HTMLDialogElement>("#leaveDialog");
+const keepPlayingButton = requiredElement<HTMLButtonElement>("#keepPlayingButton");
+const leaveTableButton = requiredElement<HTMLButtonElement>("#leaveTableButton");
 const celebration = requiredElement<HTMLElement>("#celebration");
 
 const ACTIVE_KEY = "nindova:house:active:v1";
@@ -78,6 +82,10 @@ let memory = readHouseState(localStorage).state;
 let view: View = "home";
 let runnerRestoreWasDiscarded = false;
 let active: ActiveGame | null = restoreActiveGame();
+let restoreDecisionPending = Boolean(active);
+let pendingRunnerChoice = false;
+let exitReturnFocus: HTMLElement | null = null;
+let exitConfirmationPending = false;
 let soundOn = false;
 let statusMessage = "";
 let celebrationTimer = 0;
@@ -92,13 +100,14 @@ let runnerInterrupted = false;
 let runnerBoundaryTimer = 0;
 let runnerBoundaryStartedAt = 0;
 let runnerPaletteCache: RunnerPalette | null = null;
-let runnerTransitionTimer = 0;
-let runnerTransitionRemainingMs = 0;
-let runnerTransitionStartedAt: number | null = null;
-let runnerTransitionCallback: (() => void) | null = null;
+let chapterTransitionTimer = 0;
+let chapterTransitionRemainingMs = 0;
+let chapterTransitionStartedAt: number | null = null;
+let chapterTransitionCallback: (() => void) | null = null;
 let runnerRenderSequence = 0;
 let houseAudioContext: AudioContext | null = null;
 const houseAudioVoices = new Set<OscillatorNode>();
+let lastStackMove: { peg: number; disk: number } | null = null;
 
 if (active) view = "game";
 
@@ -127,6 +136,10 @@ function restoreActiveGame(): ActiveGame | null {
       selectedPeg: null,
       resolving: false,
       storyBeat: null,
+      touched: Boolean(parsed.touched)
+        || chapter > 0
+        || Boolean(parsed.memoryCovered)
+        || (game.kind === "stack" && JSON.stringify(pegs) !== JSON.stringify(initialPegs(diskCount))),
     };
   } catch {
     return null;
@@ -151,10 +164,13 @@ function saveActiveGame() {
 function route(next: View) {
   stopRunnerLoop();
   closeHouseAudio();
-  if (next !== "game") clearRunnerTransition();
+  if (next !== "game") clearChapterTransition();
   view = next;
   if (next !== "game") {
     active = null;
+    pendingRunnerChoice = false;
+    restoreDecisionPending = false;
+    exitConfirmationPending = false;
     saveActiveGame();
   }
   statusMessage = "";
@@ -162,15 +178,61 @@ function route(next: View) {
   main.focus({ preventScroll: true });
 }
 
+function hasMeaningfulProgress(candidate: ActiveGame): boolean {
+  const game = getGame(candidate.gameId);
+  if (game.kind === "runner") return true;
+  if (candidate.chapter > 0 || candidate.memoryCovered || candidate.touched || candidate.selectedPeg !== null) return true;
+  if (game.kind !== "stack") return false;
+  const diskCount = game.diskCounts?.[candidate.chapter] ?? 0;
+  return JSON.stringify(candidate.pegs) !== JSON.stringify(initialPegs(diskCount));
+}
+
+function requestRoute(next: View, invoker: HTMLElement | null = null) {
+  if (next === "home" && view === "game" && active && !restoreDecisionPending && hasMeaningfulProgress(active)) {
+    exitReturnFocus = invoker ?? document.activeElement as HTMLElement | null;
+    exitConfirmationPending = true;
+    stopRunnerLoop();
+    pauseChapterTransition();
+    closeHouseAudio();
+    leaveDialog.showModal();
+    focusElement("#keepPlayingButton");
+    return;
+  }
+  route(next);
+}
+
+function discardActiveGame() {
+  leaveDialog.close("leave");
+  exitConfirmationPending = false;
+  active = null;
+  restoreDecisionPending = false;
+  pendingRunnerChoice = false;
+  saveActiveGame();
+  route("home");
+}
+
 function startGame(gameId: GameId) {
   const game = getGame(gameId);
   stopRunnerLoop();
   closeHouseAudio();
-  clearRunnerTransition();
+  clearChapterTransition();
   runnerState = null;
   runnerSessionElapsedMs = 0;
   runnerPaused = false;
   runnerPaletteCache = null;
+  lastStackMove = null;
+  restoreDecisionPending = false;
+  if (game.kind === "runner" && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    active = null;
+    pendingRunnerChoice = true;
+    view = "game";
+    statusMessage = "";
+    saveActiveGame();
+    render();
+    focusElement('[data-runner-route="action"]');
+    return;
+  }
+  pendingRunnerChoice = false;
   active = {
     gameId,
     chapter: 0,
@@ -180,6 +242,7 @@ function startGame(gameId: GameId) {
     selectedPeg: null,
     resolving: false,
     storyBeat: game.kind === "runner" && matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : null,
+    touched: false,
   };
   view = "game";
   statusMessage = "";
@@ -188,8 +251,35 @@ function startGame(gameId: GameId) {
   main.focus({ preventScroll: true });
 }
 
+function beginRunnerRoute(routeChoice: "action" | "narrated") {
+  if (!pendingRunnerChoice && active) return;
+  const game = getGame("sector-sprint");
+  pendingRunnerChoice = false;
+  active = {
+    gameId: game.id,
+    chapter: 0,
+    runId: crypto.randomUUID(),
+    memoryCovered: false,
+    pegs: [],
+    selectedPeg: null,
+    resolving: false,
+    storyBeat: routeChoice === "narrated" ? 0 : null,
+    touched: false,
+  };
+  view = "game";
+  statusMessage = routeChoice === "narrated" ? "The narrated city route is ready." : "The city begins. Every action remains optional.";
+  saveActiveGame();
+  render();
+  focusFirstGameControl();
+}
+
 function escape(value: string): string {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+}
+
+function gameSigil(gameId: GameId): string {
+  const pieces = gameId === "sector-sprint" ? 5 : gameId === "stack-architect" ? 3 : 4;
+  return `<span class="game-sigil game-sigil-${gameId}" aria-hidden="true">${Array.from({ length: pieces }, (_, index) => `<i style="--sigil-index:${index}"></i>`).join("")}</span>`;
 }
 
 function render() {
@@ -234,6 +324,7 @@ function renderHome() {
         <div class="salon-plan">
           ${GAMES.map((game) => `
             <button class="game-door game-door-${escape(game.id)}" type="button" data-game="${escape(game.id)}">
+              ${gameSigil(game.id)}
               <span class="game-number">${game.number}</span>
               <span class="game-title">${escape(game.title)}</span>
               <span class="game-line">${escape(game.houseLine)}</span>
@@ -286,31 +377,81 @@ function renderGallery() {
 }
 
 function renderGame() {
-  if (!active) return route("home");
-  const game = getGame(active.gameId);
-  const chapterTitle = game.kind === "stack"
-    ? `${game.diskCounts?.[active.chapter]}-disc tower`
-    : game.kind === "runner"
-      ? RUNNER_ACTS[active.chapter]?.title
-      : game.chapters[active.chapter]?.title;
+  if (!active && !pendingRunnerChoice) return route("home");
+  const game = pendingRunnerChoice ? getGame("sector-sprint") : getGame(active!.gameId);
+  const chapter = active?.chapter ?? 0;
+  const chapterTitle = pendingRunnerChoice
+    ? "Choose your route"
+    : game.kind === "stack"
+      ? `${game.diskCounts?.[chapter]}-disc tower`
+      : game.kind === "runner"
+        ? RUNNER_ACTS[chapter]?.title
+        : game.chapters[chapter]?.title;
   main.innerHTML = `
-    <section class="game-view" aria-labelledby="gameTitle">
+    <section class="game-view game-view-${game.id}" aria-labelledby="gameTitle">
       <header class="game-masthead">
         <button class="back-link" type="button" data-route="home"><span aria-hidden="true">←</span> Grand Salon</button>
-        <div class="chapter-mark"><span>${game.kind === "runner" ? "Act" : "Chapter"} ${active.chapter + 1}</span><i aria-hidden="true"></i><span>of 5</span></div>
+        <div class="chapter-mark"><span>${pendingRunnerChoice ? "Before Act I" : `${game.kind === "runner" ? "Act" : "Chapter"} ${chapter + 1}`}</span><i aria-hidden="true"></i><span>${pendingRunnerChoice ? "Route choice" : "of 5"}</span></div>
       </header>
       <div class="game-title-block ${game.kind === "runner" ? "game-title-block-runner" : ""}">
         <p class="kicker">Table ${game.number} · ${escape(chapterTitle ?? (game.kind === "runner" ? "Act" : "Chapter"))}</p>
         <h1 id="gameTitle">${escape(game.title)}</h1>
         <p>${escape(game.description)}</p>
       </div>
-      <div class="game-chamber">
-        ${game.kind === "runner" ? renderRunner() : game.kind === "stack" ? renderStack(game) : renderChoice(game)}
+      <div class="game-chamber game-chamber-${game.id}">
+        ${pendingRunnerChoice
+          ? renderRunnerPrelude()
+          : restoreDecisionPending
+            ? renderRestoreGate(game)
+            : game.kind === "runner"
+              ? renderRunner()
+              : game.kind === "stack"
+                ? renderStack(game)
+                : renderChoice(game)}
       </div>
       <p id="gameStatus" class="game-status" role="status" aria-live="polite">${escape(statusMessage)}</p>
     </section>
   `;
-  if (game.kind === "runner") mountRunner();
+  if (game.kind === "runner" && active && !restoreDecisionPending) mountRunner();
+}
+
+function renderRestoreGate(game: GameDefinition): string {
+  if (!active) return "";
+  const unit = game.kind === "runner" ? "Act" : "Chapter";
+  return `
+    <section class="table-gate restore-gate" aria-labelledby="restoreTitle">
+      <div class="gate-sigil" aria-hidden="true"><i></i><span></span><i></i></div>
+      <p class="kicker">Unfinished table found</p>
+      <h2 id="restoreTitle">Continue ${escape(game.title)}?</h2>
+      <p>${unit} ${active.chapter + 1} is still held in this tab. Continuing keeps that exact chapter; starting over creates a fresh five-${unit.toLowerCase()} reading.</p>
+      <div class="gate-actions">
+        <button class="primary-action" type="button" data-restore="continue">Continue ${unit.toLowerCase()}</button>
+        <button class="quiet-action" type="button" data-restore="restart">Start over</button>
+        <button class="text-action" type="button" data-restore="exit">Exit to the Salon</button>
+      </div>
+      <p class="gate-note">Nothing is recorded until the fifth ${unit.toLowerCase()} closes.</p>
+    </section>
+  `;
+}
+
+function renderRunnerPrelude(): string {
+  return `
+    <section class="table-gate runner-prelude" aria-labelledby="runnerPreludeTitle">
+      <div class="route-miniature" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><span></span></div>
+      <p class="kicker">Choose how the city moves</p>
+      <h2 id="runnerPreludeTitle">One route. Two ways through.</h2>
+      <p>Action starts the code-drawn city with optional Leap, Dash, and Act tools. Narrated follows the same five Acts with text controls and no timed response. Both reach the same curtain call.</p>
+      <div class="route-choices">
+        <button class="route-choice route-choice-action" type="button" data-runner-route="action">
+          <span>Action route</span><strong>Begin moving</strong><small>Keyboard or touch · every action optional</small>
+        </button>
+        <button class="route-choice" type="button" data-runner-route="narrated">
+          <span>Narrated route</span><strong>Read the city</strong><small>No motion, precision, sight, or sound required</small>
+        </button>
+      </div>
+      <p class="gate-note">The authored foreground boundary begins only after you choose a route. Reloading an active Sector Sprint still closes it without recording a completion.</p>
+    </section>
+  `;
 }
 
 function renderRunner(): string {
@@ -379,10 +520,11 @@ function renderChoice(game: GameDefinition): string {
   return `
     <div class="prompt-column">
       <span class="prompt-label">${game.kind === "memory" ? "The procession" : "The inscription"}</span>
-      <div class="inscription ${covered ? "is-covered" : ""}" aria-label="${covered ? "Sequence covered" : escape(chapter.display.replaceAll("\n", ", "))}">
-        ${covered ? "The velvet is drawn." : escape(chapter.display).replaceAll("\n", "<br>")}
+      <div class="inscription inscription-${game.id} ${covered ? "is-covered" : ""}" aria-label="${covered ? "Sequence covered" : escape(chapter.display.replaceAll("\n", ", "))}">
+        ${renderChoiceVisual(game, chapter.display, covered)}
       </div>
       ${game.kind === "memory" && !covered ? `<button class="primary-action seal-action" type="button" data-cover-memory>Cover the procession</button>` : ""}
+      ${game.kind === "memory" && covered ? `<button class="quiet-action reveal-action" type="button" data-reveal-memory>Show the procession again</button>` : ""}
     </div>
     <div class="answer-column ${game.kind === "memory" && !covered ? "is-waiting" : ""}">
       <p>${escape(chapter.prompt)}</p>
@@ -393,20 +535,41 @@ function renderChoice(game: GameDefinition): string {
   `;
 }
 
+function renderChoiceVisual(game: GameDefinition, display: string, covered: boolean): string {
+  if (game.kind === "memory") {
+    if (covered) return `<div class="lantern-veil" aria-hidden="true"><i></i><span>The velvet is drawn.</span><i></i></div>`;
+    const lanterns = display.split(" · ");
+    return `<div class="lantern-procession" aria-hidden="true">${lanterns.map((name, index) => `
+      <span class="lantern lantern-${name.toLowerCase()}" style="--lantern-index:${index}"><i></i><small>${escape(name)}</small></span>
+    `).join("")}</div>`;
+  }
+  if (game.id === "mirror-forge") {
+    const arrows = display.trim().split(/\s+/);
+    return `<div class="mirror-stage" aria-hidden="true"><i class="mirror-ring mirror-ring-outer"></i><i class="mirror-ring mirror-ring-inner"></i><div class="mirror-orbit">${arrows.map((arrow, index) => `<span style="--glyph-index:${index}">${escape(arrow)}</span>`).join("")}</div></div>`;
+  }
+  const rows = display.split("\n").map((row) => row.trim().split(/\s+/));
+  let tokenIndex = 0;
+  return `<div class="pattern-matrix" aria-hidden="true">${rows.map((row) => `<div class="pattern-row">${row.map((token) => {
+    const index = tokenIndex;
+    tokenIndex += 1;
+    return `<span class="${token === "?" ? "is-missing" : ""}" style="--glyph-index:${index}">${escape(token)}</span>`;
+  }).join("")}</div>`).join("")}</div>`;
+}
+
 function renderStack(game: GameDefinition): string {
   if (!active) return "";
   const diskCount = game.diskCounts?.[active.chapter] ?? 2;
   return `
     <div class="stack-instruction">
-      <p>Move every disc from the first plinth to the third.</p>
-      <p>Only the top disc may move. A larger disc may never rest on a smaller one.</p>
+      <div><p>Move every disc from the first plinth to the third.</p><p>Only the top disc may move. A larger disc may never rest on a smaller one.</p></div>
+      <button class="quiet-action reset-stack" type="button" data-reset-stack>Reset this tower</button>
     </div>
     <div class="stack-board" style="--disc-count: ${diskCount}" aria-label="Three-plinth tower puzzle">
       ${active.pegs.map((peg, pegIndex) => `
         <button class="peg ${active?.selectedPeg === pegIndex ? "is-selected" : ""}" type="button" data-peg="${pegIndex}" aria-pressed="${active?.selectedPeg === pegIndex}" aria-label="${describePeg(peg, pegIndex)}">
           <span class="peg-post" aria-hidden="true"></span>
           <span class="discs" aria-hidden="true">
-            ${[...peg].reverse().map((disk) => `<i class="disc" data-disc="${disk}" style="--disc: ${disk}"></i>`).join("")}
+            ${[...peg].reverse().map((disk) => `<i class="disc ${lastStackMove?.peg === pegIndex && lastStackMove.disk === disk ? "is-placed" : ""}" data-disc="${disk}" style="--disc: ${disk}"></i>`).join("")}
           </span>
           <span class="peg-label">${["First", "Second", "Third"][pegIndex]} plinth</span>
         </button>
@@ -447,50 +610,50 @@ function runnerPalette(): RunnerPalette {
 }
 
 function runnerIsSuspended(): boolean {
-  return runnerPaused || runnerInterrupted || document.hidden;
+  return runnerPaused || runnerInterrupted || exitConfirmationPending || document.hidden;
 }
 
-function clearRunnerTransition() {
-  if (runnerTransitionTimer) window.clearTimeout(runnerTransitionTimer);
-  runnerTransitionTimer = 0;
-  runnerTransitionRemainingMs = 0;
-  runnerTransitionStartedAt = null;
-  runnerTransitionCallback = null;
+function clearChapterTransition() {
+  if (chapterTransitionTimer) window.clearTimeout(chapterTransitionTimer);
+  chapterTransitionTimer = 0;
+  chapterTransitionRemainingMs = 0;
+  chapterTransitionStartedAt = null;
+  chapterTransitionCallback = null;
 }
 
-function pauseRunnerTransition() {
-  if (!runnerTransitionCallback || runnerTransitionStartedAt === null) return;
-  if (runnerTransitionTimer) window.clearTimeout(runnerTransitionTimer);
-  runnerTransitionTimer = 0;
-  runnerTransitionRemainingMs = Math.max(0, runnerTransitionRemainingMs - (performance.now() - runnerTransitionStartedAt));
-  runnerTransitionStartedAt = null;
+function pauseChapterTransition() {
+  if (!chapterTransitionCallback || chapterTransitionStartedAt === null) return;
+  if (chapterTransitionTimer) window.clearTimeout(chapterTransitionTimer);
+  chapterTransitionTimer = 0;
+  chapterTransitionRemainingMs = Math.max(0, chapterTransitionRemainingMs - (performance.now() - chapterTransitionStartedAt));
+  chapterTransitionStartedAt = null;
 }
 
-function resumeRunnerTransition() {
-  if (!runnerTransitionCallback || runnerTransitionTimer || runnerIsSuspended()) return;
-  if (runnerTransitionRemainingMs <= 0) {
-    const callback = runnerTransitionCallback;
-    clearRunnerTransition();
+function resumeChapterTransition() {
+  if (!chapterTransitionCallback || chapterTransitionTimer || runnerIsSuspended()) return;
+  if (chapterTransitionRemainingMs <= 0) {
+    const callback = chapterTransitionCallback;
+    clearChapterTransition();
     callback();
     return;
   }
-  runnerTransitionStartedAt = performance.now();
-  runnerTransitionTimer = window.setTimeout(() => {
-    const callback = runnerTransitionCallback;
-    clearRunnerTransition();
+  chapterTransitionStartedAt = performance.now();
+  chapterTransitionTimer = window.setTimeout(() => {
+    const callback = chapterTransitionCallback;
+    clearChapterTransition();
     callback?.();
-  }, runnerTransitionRemainingMs);
+  }, chapterTransitionRemainingMs);
 }
 
-function scheduleRunnerTransition(delay: number, callback: () => void) {
-  clearRunnerTransition();
+function scheduleChapterTransition(delay: number, callback: () => void) {
+  clearChapterTransition();
   if (delay <= 0) {
     callback();
     return;
   }
-  runnerTransitionRemainingMs = delay;
-  runnerTransitionCallback = callback;
-  resumeRunnerTransition();
+  chapterTransitionRemainingMs = delay;
+  chapterTransitionCallback = callback;
+  resumeChapterTransition();
 }
 
 function stopRunnerLoop() {
@@ -505,7 +668,7 @@ function stopRunnerLoop() {
   runnerLastTimestamp = 0;
   runnerInput = {};
   runnerJumpHeld = false;
-  pauseRunnerTransition();
+  pauseChapterTransition();
 }
 
 function startRunnerStoryBoundary() {
@@ -625,7 +788,7 @@ function runRunnerFrame(timestamp: number) {
 function mountRunner() {
   if (!active || getGame(active.gameId).kind !== "runner" || view !== "game") return;
   if (active.resolving) {
-    resumeRunnerTransition();
+    resumeChapterTransition();
     return;
   }
   stopRunnerLoop();
@@ -688,6 +851,7 @@ function chooseNarratedRoute() {
 
 function advanceStoryBeat() {
   if (!active || active.storyBeat === null) return;
+  active.touched = true;
   const act = RUNNER_ACTS[active.chapter];
   if (active.storyBeat >= act.storyBeats.length - 1) {
     advanceChapter();
@@ -707,15 +871,24 @@ function answerChoice(choiceIndex: number) {
   const chapter = game.chapters[active.chapter];
   if (game.kind === "memory" && !active.memoryCovered) {
     statusMessage = "Cover the procession before choosing.";
-    render();
+    const status = document.querySelector<HTMLElement>("#gameStatus");
+    if (status) status.textContent = statusMessage;
     return;
   }
+  active.touched = true;
+  const choice = document.querySelector<HTMLElement>(`[data-answer="${choiceIndex}"]`);
   if (choiceIndex !== chapter.answerIndex) {
     statusMessage = "Not this inscription. Read the order once more.";
-    render();
-    focusElement(`[data-answer="${choiceIndex}"]`);
+    choice?.classList.remove("is-wrong");
+    void choice?.offsetWidth;
+    choice?.classList.add("is-wrong");
+    const status = document.querySelector<HTMLElement>("#gameStatus");
+    if (status) status.textContent = statusMessage;
+    saveActiveGame();
+    choice?.focus({ preventScroll: true });
     return;
   }
+  choice?.classList.add("is-correct");
   advanceChapter();
 }
 
@@ -757,19 +930,20 @@ function advanceChapter() {
     render();
     focusFirstGameControl();
   };
-  if (currentGame.kind === "runner") scheduleRunnerTransition(delay, finishTransition);
-  else window.setTimeout(finishTransition, delay);
+  scheduleChapterTransition(delay, finishTransition);
 }
 
 function finishGame() {
   if (!active) return;
   stopRunnerLoop();
   closeHouseAudio();
-  clearRunnerTransition();
+  clearChapterTransition();
+  exitConfirmationPending = false;
   runnerState = null;
   runnerPaused = false;
   celebration.hidden = true;
   const game = getGame(active.gameId);
+  const authoredUnit = game.kind === "runner" ? "Acts" : "chapters";
   const completed = completeEntertainmentGame(memory, game, active.runId, new Date().toISOString());
   memory = completed.state;
   writeHouseState(localStorage, memory);
@@ -779,7 +953,7 @@ function finishGame() {
       <p class="kicker">The curtain call</p>
       <div class="curtain-ornament" aria-hidden="true"><span></span><i></i><span></span></div>
       <h1 id="curtainTitle">${escape(game.title)}<br><em>is complete.</em></h1>
-      <p>You completed all five authored chapters, ending with ${escape(completed.result.completionFacts.finalChapter)}.</p>
+      <p>You completed all five authored ${authoredUnit}, ending with ${escape(completed.result.completionFacts.finalChapter)}.</p>
       <p class="result-boundary">Entertainment result · ruleset ${escape(completed.result.rulesetVersion)} · stored only on this device</p>
       <div class="curtain-actions">
         <button class="primary-action" type="button" data-route="home">Return to the Grand Salon</button>
@@ -795,7 +969,8 @@ function closeRunnerAtBoundary() {
   if (!active || getGame(active.gameId).kind !== "runner") return;
   stopRunnerLoop();
   closeHouseAudio();
-  clearRunnerTransition();
+  clearChapterTransition();
+  exitConfirmationPending = false;
   runnerState = null;
   runnerPaused = false;
   celebration.hidden = true;
@@ -826,6 +1001,7 @@ function selectPeg(pegIndex: number) {
       statusMessage = "That plinth is empty.";
     } else {
       active.selectedPeg = pegIndex;
+      active.touched = true;
       statusMessage = `Disc lifted from the ${["first", "second", "third"][pegIndex]} plinth.`;
     }
   } else {
@@ -834,8 +1010,14 @@ function selectPeg(pegIndex: number) {
       statusMessage = from === pegIndex ? "The disc remains where it is." : "A larger disc cannot rest on a smaller one.";
       active.selectedPeg = null;
     } else {
+      const moving = active.pegs[from]?.at(-1);
       active.pegs = moveStackDisc(active.pegs, from, pegIndex);
       active.selectedPeg = null;
+      active.touched = true;
+      if (moving !== undefined) {
+        lastStackMove = { peg: pegIndex, disk: moving };
+        window.setTimeout(() => { lastStackMove = null; }, 520);
+      }
       statusMessage = "Disc placed.";
       const diskCount = game.diskCounts?.[active.chapter] ?? 0;
       if (stackSolved(active.pegs, diskCount)) {
@@ -851,8 +1033,24 @@ function selectPeg(pegIndex: number) {
   focusElement(`[data-peg="${pegIndex}"]`);
 }
 
+function resetStackChapter() {
+  if (!active) return;
+  const game = getGame(active.gameId);
+  if (game.kind !== "stack" || active.resolving) return;
+  const diskCount = game.diskCounts?.[active.chapter] ?? 0;
+  active.pegs = initialPegs(diskCount);
+  active.selectedPeg = null;
+  active.touched = true;
+  lastStackMove = null;
+  statusMessage = `The ${diskCount}-disc tower is reset to the first plinth.`;
+  saveActiveGame();
+  render();
+  focusElement('[data-peg="0"]');
+}
+
 function showCelebration(message: string) {
   window.clearTimeout(celebrationTimer);
+  celebration.dataset.game = active?.gameId ?? "house";
   celebration.innerHTML = `<div class="celebration-inlay" aria-hidden="true">${Array.from({ length: 11 }, (_, index) => `<i style="--spark: ${index}"></i>`).join("")}</div><strong>${escape(message)}</strong>`;
   celebration.hidden = false;
   celebrationTimer = window.setTimeout(() => { celebration.hidden = true; }, 980);
@@ -929,12 +1127,35 @@ document.addEventListener("click", (event) => {
   const target = event.target as Element;
   const routeButton = target.closest<HTMLElement>("[data-route]");
   if (routeButton) {
-    route(routeButton.dataset.route as View);
+    requestRoute(routeButton.dataset.route as View, routeButton);
     return;
   }
   const gameButton = target.closest<HTMLElement>("[data-game]");
   if (gameButton) {
     startGame(gameButton.dataset.game as GameId);
+    return;
+  }
+  const restoreButton = target.closest<HTMLElement>("[data-restore]");
+  if (restoreButton && active) {
+    const choice = restoreButton.dataset.restore;
+    if (choice === "continue") {
+      restoreDecisionPending = false;
+      statusMessage = `Chapter ${active.chapter + 1} restored in this tab.`;
+      render();
+      focusFirstGameControl();
+    } else if (choice === "restart") {
+      const gameId = active.gameId;
+      active = null;
+      saveActiveGame();
+      startGame(gameId);
+    } else if (choice === "exit") {
+      discardActiveGame();
+    }
+    return;
+  }
+  const runnerRoute = target.closest<HTMLElement>("[data-runner-route]");
+  if (runnerRoute) {
+    beginRunnerRoute(runnerRoute.dataset.runnerRoute as "action" | "narrated");
     return;
   }
   const runnerAction = target.closest<HTMLElement>("[data-runner-action]");
@@ -965,10 +1186,24 @@ document.addEventListener("click", (event) => {
   }
   if (target.closest("[data-cover-memory]") && active) {
     active.memoryCovered = true;
+    active.touched = true;
     statusMessage = "The procession is covered. Choose the line you held.";
     saveActiveGame();
     render();
     focusElement('[data-answer="0"]');
+    return;
+  }
+  if (target.closest("[data-reveal-memory]") && active) {
+    active.memoryCovered = false;
+    active.touched = true;
+    statusMessage = "The same fixed procession is visible again. Cover it when ready.";
+    saveActiveGame();
+    render();
+    focusElement("[data-cover-memory]");
+    return;
+  }
+  if (target.closest("[data-reset-stack]")) {
+    resetStackChapter();
     return;
   }
   if (target.closest("[data-clear-gallery]")) {
@@ -1028,7 +1263,10 @@ document.addEventListener("visibilitychange", () => {
     stopRunnerLoop();
     closeHouseAudio();
   }
-  else mountRunner();
+  else {
+    resumeChapterTransition();
+    mountRunner();
+  }
   drawCurrentRunnerFrame();
 });
 
@@ -1044,6 +1282,7 @@ window.addEventListener("blur", () => {
 
 window.addEventListener("focus", () => {
   runnerInterrupted = false;
+  resumeChapterTransition();
   mountRunner();
   drawCurrentRunnerFrame();
 });
@@ -1051,7 +1290,9 @@ window.addEventListener("focus", () => {
 window.addEventListener("resize", () => drawCurrentRunnerFrame());
 
 matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", (event) => {
-  if (event.matches && active && getGame(active.gameId).kind === "runner" && active.storyBeat === null) chooseNarratedRoute();
+  if (!event.matches) return;
+  if (pendingRunnerChoice) beginRunnerRoute("narrated");
+  else if (active && getGame(active.gameId).kind === "runner" && active.storyBeat === null) chooseNarratedRoute();
 });
 
 soundButton.addEventListener("click", () => {
@@ -1066,6 +1307,32 @@ enterHouseButton.addEventListener("click", () => {
 });
 
 audienceDialog.addEventListener("cancel", (event) => event.preventDefault());
+
+keepPlayingButton.addEventListener("click", () => {
+  leaveDialog.close("keep");
+  exitConfirmationPending = false;
+  const focusTarget = exitReturnFocus;
+  exitReturnFocus = null;
+  resumeChapterTransition();
+  mountRunner();
+  requestAnimationFrame(() => focusTarget?.focus({ preventScroll: true }));
+});
+
+leaveTableButton.addEventListener("click", () => {
+  exitReturnFocus = null;
+  discardActiveGame();
+});
+
+leaveDialog.addEventListener("cancel", (event) => {
+  event.preventDefault();
+  leaveDialog.close("keep");
+  exitConfirmationPending = false;
+  const focusTarget = exitReturnFocus;
+  exitReturnFocus = null;
+  resumeChapterTransition();
+  mountRunner();
+  requestAnimationFrame(() => focusTarget?.focus({ preventScroll: true }));
+});
 
 try {
   if (localStorage.getItem(HOUSE_AUDIENCE_KEY) !== "acknowledged") audienceDialog.showModal();

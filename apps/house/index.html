@@ -48,6 +48,17 @@
       </form>
     </dialog>
 
+    <dialog id="leaveDialog" class="leave-dialog" aria-labelledby="leaveTitle" aria-describedby="leaveCopy">
+      <div class="dialog-inlay dialog-inlay-small" aria-hidden="true"></div>
+      <p class="kicker">Leave this table?</p>
+      <h2 id="leaveTitle">Your unfinished chapter will close.</h2>
+      <p id="leaveCopy">Nothing will be recorded in the Gallery. You can open the table again whenever you choose.</p>
+      <form method="dialog">
+        <button id="keepPlayingButton" class="primary-action" value="keep">Keep playing</button>
+        <button id="leaveTableButton" class="quiet-action" value="leave">Leave table</button>
+      </form>
+    </dialog>
+
     <div id="celebration" class="celebration" role="status" aria-live="polite" aria-atomic="true" hidden></div>
     <script type="module" src="/src/house.ts"></script>
   </body>

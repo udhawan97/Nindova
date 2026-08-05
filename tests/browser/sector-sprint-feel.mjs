@@ -47,6 +47,7 @@ async function openRunner(viewport, cpuRate = 1) {
   }
   await page.goto(`http://127.0.0.1:${port}/house/`, { waitUntil: "networkidle" });
   await page.click('[data-game="sector-sprint"]');
+  await page.click('[data-runner-route="action"]');
   await page.waitForSelector("#runnerCanvas");
   await page.waitForFunction(() => Number(document.querySelector("#runnerCanvas")?.dataset.renderSequence ?? 0) > 1);
   return { context, page };

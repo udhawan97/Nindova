@@ -15,7 +15,7 @@ The House and Night Room make same-origin static requests only. They have no acc
 
 The source-only assessment-readiness contract creates no research record and no storage key. Research collection and public cognitive output remain disabled.
 
-`nindova:house:active:v1` in session storage contains the current game, chapter, local run identifier, Lantern cover state, Stack plinth state, or Sector Sprint narrated-story beat. Lantern and Stack use it for same-tab reload recovery. Sector Sprint position, elapsed time, inputs, collisions, and interaction history remain in memory and are never persisted; because persisting a clock would create performance history, any Sector Sprint document reload fails closed to the Salon, clears the active record, records no completion, and explains the boundary exit. The record is discarded when a game ends or the tab session ends. Corrupt or illegal Stack state resets to its authored opening.
+`nindova:house:active:v1` in session storage contains the current game, chapter, local run identifier, Lantern cover state, Stack plinth state, Sector Sprint narrated-story beat, or one session-only `touched` boolean used solely to decide whether leaving needs confirmation. It does not count actions or enter the completion record. Lantern and Stack use the active snapshot for same-tab reload recovery. Sector Sprint position, elapsed time, inputs, collisions, and interaction history remain in memory and are never persisted; because persisting a clock would create performance history, any Sector Sprint document reload fails closed to the Salon, clears the active record, records no completion, and explains the boundary exit. The record is discarded when a game ends or the tab session ends. Corrupt or illegal Stack state resets to its authored opening.
 
 ## Night Room long-lived record
 
@@ -29,4 +29,4 @@ Version 1 and version 2 state is copied into the v3 union and sanitized. The sou
 
 ## Offline cache
 
-The `/house/` worker precaches the complete versioned static House asset graph in `nindova-house-v5` so a fresh controlled navigation works with the HTTP cache cleared and the network offline. The `/play/` worker owns the separately scoped Night shell in `nindova-session-v5`. Neither worker can read local storage or cache state keys, Dawn blobs, or share payloads. The standalone `nindova.html` registers no worker.
+The `/house/` worker precaches the complete versioned static House asset graph in `nindova-house-v6` so a fresh controlled navigation works with the HTTP cache cleared and the network offline. The `/play/` worker owns the separately scoped Night shell in `nindova-session-v5`. Neither worker can read local storage or cache state keys, Dawn blobs, or share payloads. The standalone `nindova.html` registers no worker.

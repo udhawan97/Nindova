@@ -95,9 +95,9 @@
     "semantic_hash": "048d91047bac6fcc917176a987171c2b"
   },
   "tests/browser/pwa-offline.mjs": {
-    "mtime": 1785885456.9989362,
-    "ast_hash": "08dae4edf6cec7664af7ed8b447b56e3",
-    "semantic_hash": "08dae4edf6cec7664af7ed8b447b56e3"
+    "mtime": 1785896326.497638,
+    "ast_hash": "86af8aa2eb309134a55dc017e9bc9355",
+    "semantic_hash": ""
   },
   "tests/browser/seed-asserted.mjs": {
     "mtime": 1785735156.2257402,
@@ -200,9 +200,9 @@
     "semantic_hash": "9251370f0ad526545ecb97bc10a90ad8"
   },
   "apps/site/src/content/docs/docs/privacy-local-state.md": {
-    "mtime": 1785880290.4505532,
-    "ast_hash": "a8c8170220694cf92ddf5451f2f920d9",
-    "semantic_hash": "a8c8170220694cf92ddf5451f2f920d9"
+    "mtime": 1785897853.3978992,
+    "ast_hash": "a843e7a5448ac8f59bb887accf67782b",
+    "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/product-contract.md": {
     "mtime": 1785892687.0953112,
@@ -380,8 +380,8 @@
     "semantic_hash": "da62d036dbf5781cf7cd11dd67b9925b"
   },
   "docs/PUBLIC-SURFACE-EVIDENCE.md": {
-    "mtime": 1785893075.3629682,
-    "ast_hash": "baf52b374c406acc4c1f0d6239adbfa9",
+    "mtime": 1785897472.1430287,
+    "ast_hash": "4b53c4be787a50696a3936d43866f8a4",
     "semantic_hash": ""
   },
   "docs/REDESIGN-PLAN.md": {
@@ -410,17 +410,17 @@
     "semantic_hash": "2a1652b1bf1570a5d01c8e248948174e"
   },
   "apps/site/public/media/rasoi-board.png": {
-    "mtime": 1785892803.5009694,
+    "mtime": 1785896239.0395262,
     "ast_hash": "686426abf61ccdd5cb869f3b69297244",
     "semantic_hash": "686426abf61ccdd5cb869f3b69297244"
   },
   "apps/site/public/media/rasoi-dawn.png": {
-    "mtime": 1785892803.910464,
+    "mtime": 1785896239.496074,
     "ast_hash": "5e1ed74e72541acb4e0f709bf4da3776",
     "semantic_hash": "5e1ed74e72541acb4e0f709bf4da3776"
   },
   "apps/site/public/media/rasoi-pairs-phone.png": {
-    "mtime": 1785892841.9334545,
+    "mtime": 1785896239.317459,
     "ast_hash": "97e33bbd5596e9e3c85769ef754f6f49",
     "semantic_hash": "97e33bbd5596e9e3c85769ef754f6f49"
   },
@@ -465,7 +465,7 @@
     "semantic_hash": "680dac07d2abbdecd3b82ca427d9eb7a"
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1785893041.522069,
+    "mtime": 1785897694.0418475,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": "9557448d4a3c6237efa8fe2648d21fa0"
   },
@@ -520,9 +520,9 @@
     "semantic_hash": "2d9de5eecef153aa720f4da2eb32decd"
   },
   "scripts/capture-public-media.mjs": {
-    "mtime": 1785886659.7778907,
-    "ast_hash": "798484343e3f0dde3ad67e19a509fcc5",
-    "semantic_hash": "798484343e3f0dde3ad67e19a509fcc5"
+    "mtime": 1785896229.5943503,
+    "ast_hash": "9ec555d2c4116536d45259c1a12c7cd7",
+    "semantic_hash": ""
   },
   "tests/browser/public-surface.mjs": {
     "mtime": 1785887723.5841217,
@@ -800,9 +800,9 @@
     "semantic_hash": "b46e635abc9185ac6f3d4bb28701b80c"
   },
   "apps/house/public/sw.js": {
-    "mtime": 1785880290.4499454,
-    "ast_hash": "9cd30b1bed326a0a6c748c3a9a7c2e81",
-    "semantic_hash": "9cd30b1bed326a0a6c748c3a9a7c2e81"
+    "mtime": 1785895459.1458464,
+    "ast_hash": "4ccaa096d37bf5a204dc67f0dff14ce6",
+    "semantic_hash": ""
   },
   "apps/house/src/house-core.ts": {
     "mtime": 1785892232.2485662,
@@ -810,8 +810,8 @@
     "semantic_hash": ""
   },
   "apps/house/src/house.ts": {
-    "mtime": 1785892867.2854493,
-    "ast_hash": "43496670842f50a88a414e30e2613e3a",
+    "mtime": 1785897671.8178866,
+    "ast_hash": "8fb6c3a55acaa3c40b3b84f5a38b23e3",
     "semantic_hash": ""
   },
   "apps/house/src/vite-env.d.ts": {
@@ -830,8 +830,8 @@
     "semantic_hash": "cbeabf8c6a1de2d27adb35311cff4de2"
   },
   "tests/browser/house.mjs": {
-    "mtime": 1785892220.287572,
-    "ast_hash": "250f5acd31fa427a9f474c6a448aebbd",
+    "mtime": 1785897684.0397286,
+    "ast_hash": "63153307fc1411a886e01321b95a06ed",
     "semantic_hash": ""
   },
   "tests/unit/house-core.test.mjs": {
@@ -840,9 +840,9 @@
     "semantic_hash": "3a6c5c155428a3a0f58a107a9c2b63fb"
   },
   "apps/house/index.html": {
-    "mtime": 1785878394.5388098,
-    "ast_hash": "b79115e26ad096e2e2fad47e4630fb86",
-    "semantic_hash": "b79115e26ad096e2e2fad47e4630fb86"
+    "mtime": 1785895459.1447418,
+    "ast_hash": "bec262bd84f5d4edaf4009d74d0b357e",
+    "semantic_hash": ""
   },
   "docs/adr/0013-add-the-adult-nindova-house.md": {
     "mtime": 1785878394.5414023,
@@ -920,23 +920,28 @@
     "semantic_hash": "3fdbbfc2674e46631233291cb404d73d"
   },
   "apps/site/public/media/nindova-house.png": {
-    "mtime": 1785892804.1560385,
-    "ast_hash": "dbdf104dcc8fd6c42a1fb5044d5cf6ed",
-    "semantic_hash": "dbdf104dcc8fd6c42a1fb5044d5cf6ed"
+    "mtime": 1785896239.8013732,
+    "ast_hash": "fea8a4cdee2093e228d5da2f44bb30e9",
+    "semantic_hash": ""
   },
   "apps/site/public/media/sector-sprint.png": {
-    "mtime": 1785892804.3640177,
-    "ast_hash": "b3f7dd0b4cd311d8df60c798a255cc9e",
+    "mtime": 1785896240.1238804,
+    "ast_hash": "310423199ffcf36a0c39a99a74d699c3",
     "semantic_hash": ""
   },
   "tests/browser/sector-sprint-feel.mjs": {
-    "mtime": 1785892554.2767427,
-    "ast_hash": "61820cae1947099527d37c79c324b0d5",
+    "mtime": 1785895968.566263,
+    "ast_hash": "bcd930159ac23ffee876053a669de5d5",
     "semantic_hash": ""
   },
   "docs/testing/sector-sprint-game-feel.md": {
-    "mtime": 1785892767.965441,
-    "ast_hash": "a8590afc23d06ff89c7a4f1afeeaab1d",
+    "mtime": 1785897472.143363,
+    "ast_hash": "4bd4d1f00bda767b2808ebad97e50605",
+    "semantic_hash": ""
+  },
+  "graphify-out/memory/query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t.md": {
+    "mtime": 1785894810.9854045,
+    "ast_hash": "b36616ccf55a6372bcdf3791a053bd8a",
     "semantic_hash": ""
   }
 }

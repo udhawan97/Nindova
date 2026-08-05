@@ -96,6 +96,7 @@ try {
     animations: "disabled",
   });
   await housePage.evaluate(() => window.__house.start("sector-sprint"));
+  await housePage.locator('[data-runner-route="action"]').click();
   await housePage.locator("#runnerCanvas").waitFor({ state: "visible" });
   await housePage.locator(".runner-stage-frame").screenshot({
     path: resolve("apps/site/public/media/sector-sprint.png"),

@@ -16,7 +16,9 @@ Every encounter is deterministic. Times are derived from fixed world positions o
 
 - `node --test tests/unit/sector-sprint.test.mjs` proves four distinct movement expressions plus contextual vault, five distinct tool grammars, three deterministic temporary effects, allowlisted target classes, presentation-only collisions, exact 32-second closure, and explicit effect budgets.
 - `npm run test:house` completes the five-Act action and narrated routes, inspects every Act at 375×812, verifies 320px and desktop layouts, touch targets, keyboard controls, pause/blur/hidden suspension, the 240-second boundary, compact active storage, reduced motion, audio closure, same-origin requests, and cold offline House navigation.
+- The House runtime gate proves that the prelude holds no active run, stored marker, or mounted Canvas before Action or Narrated is chosen; source tracing confirms that the Canvas loop and foreground clock begin only after that choice. The gate also proves that reduced motion begins directly on narration and that final-Act exit confirmation cannot complete or record the route in the background.
 - `npm run test:runner-feel` measures six samples each for Leap, Dash, and Tool from the input event to the first Canvas frame tagged with that action at 375×812 under 4× CPU throttling. It also measures 120 sustained frame intervals under that profile and at 1440×900. The gate requires action p95 below 150 ms, throttled frame p95 at or below 50 ms, and desktop frame p95 at or below 25 ms.
+- The 2026-08-04 post-prelude run measured p95 Leap 3.5 ms, Dash 3.3 ms, Tool 4.2 ms, throttled-phone frame interval 33.8 ms, and desktop frame interval 18.1 ms.
 
 ## Evidence boundary
 
