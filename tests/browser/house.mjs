@@ -535,7 +535,10 @@ try {
   await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(1, 17));
   await runner.page.waitForFunction(() => window.__house.runner?.targetLane === 0);
   await captureRunnerCanvas(runner.page, "sector-sprint-motion-up.png");
-  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(30, 17));
+  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(15, 17));
+  assert.ok(await runner.page.evaluate(() => (window.__house.runner?.landingMs ?? 0) > 0), "lane arrival activates the shared settlement state");
+  await captureRunnerCanvas(runner.page, "sector-sprint-motion-settlement.png");
+  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(15, 17));
   assert.deepEqual(await runner.page.evaluate(() => ({ lane: window.__house.runner?.lane, target: window.__house.runner?.targetLane, pending: window.__house.runner?.pendingLaneDelta })), { lane: 0, target: 0, pending: null }, "held and repeated letter input produces exactly one adjacent move");
   await runner.page.keyboard.up("w");
   await runner.page.locator('[data-runner-action="down"]').focus();
