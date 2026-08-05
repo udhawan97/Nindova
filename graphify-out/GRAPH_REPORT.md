@@ -1,16 +1,16 @@
-# Graph Report - Nindova  (2026-08-04)
+# Graph Report - nindova-graph-scope.wS6nWH  (2026-08-05)
 
 ## Corpus Check
-- 133 files · ~156,650 words
+- 121 files · ~155,038 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1187 nodes · 1595 edges · 116 communities (96 shown, 20 thin omitted)
+- 1128 nodes · 1548 edges · 104 communities (84 shown, 20 thin omitted)
 - Extraction: 92% EXTRACTED · 8% INFERRED · 0% AMBIGUOUS · INFERRED: 120 edges (avg confidence: 0.74)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4c1d2cab`
+- Built from commit: `fa4da6b8`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -81,27 +81,16 @@
 - house/package.json
 - Nindova v0.2.0 — Quiet Depth
 - Nindova v0.3.0 — Shahi Mound
-- Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks
-- Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?
-- Q: Make the app theme more royal and sophisticated
-- Q: rasoi dawn looks so ugly
-- Q: Council coverage review of the adult Nindova House entertainment implementation
-- Q: Build entertainment first for adults above 18, test it, run a council review, then implement assessment grade.
-- Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?
-- Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?
-- Q: How does the polished Sector Sprint connect rendering, state, audio, accessibility, and tests?
 - serve.mjs
 - seed-asserted.mjs
 - Nindova Roadmap
 - render
 - compilerOptions
-- Q: How do the adult House and Sector Sprint connect through house source/core to Night state, public surface, and PWA/offline boundary?
 - workspaces
 - self-closing.mjs
 - wall-clock-cap.mjs
 - assessment-readiness.test.mjs
 - Punjabi and Indian Material World
-- Q: How do Sector Sprint hold-to-lift input, fixed-step flight, lazy illustrated art, deterministic complications, adaptive Canvas quality, audio suspension, narrated fallback, and offline caching connect without changing the House completion contract?
 - night-memory.mjs
 - brand-assets.test.mjs
 - copy-contract.test.mjs
@@ -122,7 +111,6 @@
 - Sector Sprint cinematic game-feel checkpoint
 - finishGame
 - Sector Sprint character sheet
-- Q: How is Sector Sprint's runner state, input, Canvas renderer, audio loop, mobile performance, and reduced-motion route structured?
 
 ## God Nodes (most connected - your core abstractions)
 1. `scripts` - 29 edges
@@ -170,7 +158,7 @@
 - **Three Visible Free Kitchen Pairs** — apps_site_public_media_rasoi_pairs_phone_chimta_pair, apps_site_public_media_rasoi_pairs_phone_chai_pair, apps_site_public_media_rasoi_pairs_phone_katori_pair [EXTRACTED 1.00]
 - **Bounded Session Decision and Proof** — reference_nindova_master_brief_two_loop_law, reference_nindova_demo_fixed_session_state_arc, docs_adr_0005_cap_the_real_session_at_fifteen_minutes_fifteen_minute_session_cap [INFERRED 0.95]
 
-## Communities (116 total, 20 thin omitted)
+## Communities (104 total, 20 thin omitted)
 
 ### Community 0 - "house.ts"
 Cohesion: 0.07
@@ -428,42 +416,6 @@ Nodes (4): Added, Evidence boundary, Improved, Nindova v0.2.0 — Quiet Depth
 Cohesion: 0.40
 Nodes (4): Added, Evidence boundary, Improved, Nindova v0.3.0 — Shahi Mound
 
-### Community 66 - "Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks"
-Cohesion: 0.40
-Nodes (4): Answer, Outcome, Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks, Source Nodes
-
-### Community 67 - "Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?"
-Cohesion: 0.40
-Nodes (4): Answer, Outcome, Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?, Source Nodes
-
-### Community 68 - "Q: Make the app theme more royal and sophisticated"
-Cohesion: 0.40
-Nodes (4): Answer, Outcome, Q: Make the app theme more royal and sophisticated, Source Nodes
-
-### Community 69 - "Q: rasoi dawn looks so ugly"
-Cohesion: 0.40
-Nodes (4): Answer, Outcome, Q: rasoi dawn looks so ugly, Source Nodes
-
-### Community 70 - "Q: Council coverage review of the adult Nindova House entertainment implementation"
-Cohesion: 0.40
-Nodes (4): Answer, Outcome, Q: Council coverage review of the adult Nindova House entertainment implementation, Source Nodes
-
-### Community 71 - "Q: Build entertainment first for adults above 18, test it, run a council review, then implement assessment grade."
-Cohesion: 0.40
-Nodes (4): Answer, Outcome, Q: Build entertainment first for adults above 18, test it, run a council review, then implement assessment grade., Source Nodes
-
-### Community 72 - "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?"
-Cohesion: 0.40
-Nodes (4): Answer, Outcome, Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?, Source Nodes
-
-### Community 73 - "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?"
-Cohesion: 0.40
-Nodes (4): Answer, Outcome, Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?, Source Nodes
-
-### Community 74 - "Q: How does the polished Sector Sprint connect rendering, state, audio, accessibility, and tests?"
-Cohesion: 0.40
-Nodes (4): Answer, Outcome, Q: How does the polished Sector Sprint connect rendering, state, audio, accessibility, and tests?, Source Nodes
-
 ### Community 75 - "serve.mjs"
 Cohesion: 0.40
 Nodes (4): mime, port, root, server
@@ -484,10 +436,6 @@ Nodes (11): escape(), gameSigil(), render(), renderChoice(), renderChoiceVisual(
 Cohesion: 0.12
 Nodes (16): compilerOptions, lib, module, moduleResolution, noEmit, skipLibCheck, strict, target (+8 more)
 
-### Community 80 - "Q: How do the adult House and Sector Sprint connect through house source/core to Night state, public surface, and PWA/offline boundary?"
-Cohesion: 0.40
-Nodes (4): Answer, Outcome, Q: How do the adult House and Sector Sprint connect through house source/core to Night state, public surface, and PWA/offline boundary?, Source Nodes
-
 ### Community 81 - "workspaces"
 Cohesion: 0.50
 Nodes (4): workspaces, apps/house, apps/session, apps/site
@@ -499,10 +447,6 @@ Nodes (3): errors, root, server
 ### Community 87 - "Punjabi and Indian Material World"
 Cohesion: 0.67
 Nodes (3): Cultural Visual Guardrails, Punjabi and Indian Material World, Theme and Behavior Independence
-
-### Community 88 - "Q: How do Sector Sprint hold-to-lift input, fixed-step flight, lazy illustrated art, deterministic complications, adaptive Canvas quality, audio suspension, narrated fallback, and offline caching connect without changing the House completion contract?"
-Cohesion: 0.40
-Nodes (4): Answer, Outcome, Q: How do Sector Sprint hold-to-lift input, fixed-step flight, lazy illustrated art, deterministic complications, adaptive Canvas quality, audio suspension, narrated fallback, and offline caching connect without changing the House completion contract?, Source Nodes
 
 ### Community 111 - "sector-sprint-feel.mjs"
 Cohesion: 0.25
@@ -520,40 +464,22 @@ Nodes (7): clearChapterTransition(), completeEntertainmentGame(), writeHouseStat
 Cohesion: 0.50
 Nodes (3): Generation prompt, Provenance, Sector Sprint character sheet
 
-### Community 115 - "Q: How is Sector Sprint's runner state, input, Canvas renderer, audio loop, mobile performance, and reduced-motion route structured?"
-Cohesion: 0.50
-Nodes (3): Answer, Outcome, Q: How is Sector Sprint's runner state, input, Canvas renderer, audio loop, mobile performance, and reduced-motion route structured?
-
 ## Knowledge Gaps
-- **517 isolated node(s):** `name`, `version`, `license`, `private`, `type` (+512 more)
+- **482 isolated node(s):** `name`, `version`, `license`, `private`, `type` (+477 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
-
-## Work-memory lessons
-
-**Preferred sources** — corroborated by past sessions; start here.
-- `house.ts` (3× useful, score=2.985400274) _(code changed — re-verify)_
-- `sector-sprint.ts` (2× useful, score=1.991290568) _(code changed — re-verify)_
-- `sector-sprint.test.mjs` (2× useful, score=1.991290568) _(code changed — re-verify)_
-- `house-core.ts` (2× useful, score=1.9891659)
-- `Theme and Behavior Independence` (2× useful, score=1.973691895)
-- `Rasoi Pairs Session Interface` (2× useful, score=1.950366981)
-- `Dawn` (2× useful, score=1.950045856) _(code changed — re-verify)_
-
-**Known dead ends** — questions that led nowhere; don't re-derive.
-- "Council coverage review of the adult Nindova House entertainment implementation" -> `Offline PWA and Public Surface`, `pwa-offline.mjs`
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Rasoi Pairs` connect `Rasoi Pairs` to `Visible Free Edge Pairs`, `ADR 0010 Replace the Vista Arc with Rasoi Pairs`, `Calm Bounded Pair-removal Promise`, `Rasoi Pairs Redesign Evidence`?**
-  _High betweenness centrality (0.017) - this node is a cross-community bridge._
+  _High betweenness centrality (0.019) - this node is a cross-community bridge._
 - **Why does `Nindova` connect `Nindova House` to `Rasoi Pairs`, `Nindova Social Preview`?**
-  _High betweenness centrality (0.016) - this node is a cross-community bridge._
-- **Why does `Session` connect `Rasoi Pairs` to `Nindova House`?**
   _High betweenness centrality (0.015) - this node is a cross-community bridge._
+- **Why does `Session` connect `Rasoi Pairs` to `Nindova House`?**
+  _High betweenness centrality (0.014) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `license` to the rest of the system?**
-  _517 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _482 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `house.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.07386363636363637 - nodes in this community are weakly interconnected._
 - **Should `session.ts` be split into smaller, more focused modules?**
