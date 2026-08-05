@@ -164,6 +164,7 @@ img { max-width: 100%; }
   z-index: 5;
   inset: 0 auto auto 0;
   width: clamp(9.5rem, 13vw, 13rem);
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-sm);
   color: var(--color-ink);
   text-decoration: none;
@@ -171,8 +172,10 @@ img { max-width: 100%; }
 .app-icon-shell {
   display: block;
   position: relative;
+  min-width: 0;
   width: 100%;
   aspect-ratio: 1;
+  justify-self: stretch;
   transform: rotateX(10deg) rotateY(14deg) rotateZ(-2deg);
   transform-style: preserve-3d;
   transition: transform var(--dur-long) var(--ease-out);
@@ -220,6 +223,7 @@ img { max-width: 100%; }
 .app-icon-copy {
   display: grid;
   width: min(18rem, 74vw);
+  justify-self: start;
   gap: var(--space-3xs);
   padding: var(--space-sm) var(--space-md);
   border: 1px solid var(--color-rule-strong);
@@ -467,7 +471,7 @@ img { max-width: 100%; }
   .button-primary, .button-secondary { width: 100%; white-space: normal; text-align: center; }
   .house-stage { display: grid; justify-items: center; gap: var(--space-xl); padding: 0; perspective: none; }
   .app-icon-module { position: relative; inset: auto; width: min(10.5rem, 54vw); justify-items: center; }
-  .app-icon-copy { width: min(18rem, calc(100vw - (2 * var(--content-gutter)))); text-align: center; }
+  .app-icon-copy { width: min(18rem, calc(100vw - (2 * var(--content-gutter)))); justify-self: center; text-align: center; }
   .house-proof { transform: none; }
   .proof-frame { padding: .35rem; box-shadow: .7rem .7rem 0 rgba(58,74,158,.2); }
   .guide-intro { align-items: flex-start; flex-direction: column; gap: var(--space-xs); }
