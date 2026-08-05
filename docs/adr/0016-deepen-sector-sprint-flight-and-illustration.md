@@ -1,6 +1,6 @@
 # Deepen Sector Sprint flight and illustration
 
-> **Status:** Partially superseded by [ADR 0017](./0017-make-sector-sprint-a-one-hit-jetpack-gauntlet.md) for ceiling, thrust-success, and failure behavior. The fixed-step engine, original illustration, adaptive-quality, privacy, audio, and narrated-route boundaries remain in force.
+> **Status:** Partially superseded by [ADR 0018](./0018-replace-sector-sprint-altitude-control-with-progressive-lanes.md) for current Action input, collision, difficulty, and movement behavior. The fixed-step engine, original illustration, adaptive-quality, privacy, audio, and narrated-route boundaries remain in force.
 
 Sector Sprint keeps its fixed five-Act, self-closing entertainment route and deepens the moment-to-moment play as an original thrust-and-glide action comedy. A single pointer held anywhere on the stage or on the Lift control raises the lead; release settles the lead into a glide. The Act tool stays a separate large control. Keyboard Lift/Glide, Dash/Vault/Stomp, and Act-tool expression remains available on Mac without becoming necessary for completion. Pointer cancellation, orientation changes, blur, pause, and route exit all release held thrust. The complete narrated route remains the non-gesture completion path.
 

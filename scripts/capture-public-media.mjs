@@ -100,7 +100,9 @@ try {
   await housePage.locator("#runnerCanvas").waitFor({ state: "visible" });
   await housePage.waitForFunction(() => {
     const canvas = document.querySelector("#runnerCanvas");
-    return Number(canvas?.dataset.renderSequence ?? 0) > 8 && canvas?.dataset.nextMaterial === "sandstone";
+    return Number(canvas?.dataset.renderSequence ?? 0) > 8
+      && canvas?.dataset.nextMaterial === "sandstone"
+      && (window.__house.runner?.elapsedMs ?? 0) > 4_100;
   });
   await housePage.locator(".runner-stage-frame").screenshot({
     path: resolve("apps/site/public/media/sector-sprint.png"),

@@ -1,6 +1,6 @@
 # Add the bounded Sector Sprint table
 
-> **Status:** Partially superseded by [ADR 0017](./0017-make-sector-sprint-a-one-hit-jetpack-gauntlet.md) for Action input, collision, and recovery behavior. The five-Act, timing, privacy, accessibility, rendering-budget, and Night Room boundaries remain in force.
+> **Status:** Partially superseded by [ADR 0018](./0018-replace-sector-sprint-altitude-control-with-progressive-lanes.md) for current Action input, collision, difficulty, and recovery behavior. The five-Act, timing, privacy, accessibility, rendering-budget, and Night Room boundaries remain in force.
 
 Sector Sprint is the fifth Grand Salon table: an original, code-drawn side-scrolling Chandigarh action comedy for adults, led by Gurpreet and his mother Harjit. It combines automatic forward motion with optional variable-height leaps, one air step, dash, contextual vault, aerial stomp, five Act-local harmless tools, three deterministic temporary effects, escalating authored scenes, Punjabi-family wit, and a five-Act city journey while rejecting an endless route, score, high score, health, lives, failure loop, randomized loot, persistent inventory, and fatigue-to-sleep framing.
 

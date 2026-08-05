@@ -46,7 +46,7 @@ Each table has five fixed chapters or Acts and a designed curtain call. You repl
 - **Mirror Forge** — turn forms without losing their bearing.
 - **Stack Architect** — move a tower by law, one disc at a time.
 - **Lantern Ledger** — hold an ordered procession of light.
-- **Sector Sprint** — steer Gurpreet and Harjit through five tightening Chandigarh jetpack corridors. One road, ceiling, or architectural contact wipes the Action route; textured authored obstacles, harmless Act tools, and a complete narrated route keep the challenge bounded and accessible.
+- **Sector Sprint** — steer Gurpreet and Harjit through five progressively faster Chandigarh lane routes. Each marked gate takes at most one adjacent move; one architectural contact pauses the Action route, while textured obstacles, harmless Act tools, and a complete narrated route keep the challenge bounded and accessible.
 
 The Salon has no public ranking, streak, randomized prize, social comparison, or assessment result. The local Gallery may keep only the latest completion fact for each game, and you can clear it from the interface.
 

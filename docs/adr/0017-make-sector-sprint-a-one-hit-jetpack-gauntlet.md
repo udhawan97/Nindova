@@ -1,5 +1,7 @@
 # Make Sector Sprint a one-hit jetpack gauntlet
 
+> Superseded on 2026-08-05 by [ADR 0018](./0018-replace-sector-sprint-altitude-control-with-progressive-lanes.md). This file remains the historical record of the short-lived continuous-altitude design.
+
 Sector Sprint keeps its fixed five authored Acts but changes the Action route from optional movement theatre into a deterministic one-hit jetpack gauntlet. The lead begins with a 900 ms ignition hover, then flies under constant gravity. Holding the stage or Pulse control applies bounded upward thrust; release preserves inertia and lets gravity pull the lead down. The simulation remains fixed at 60 Hz. Vertical speed is capped in both directions, and the same authored geometry is used at every render-quality tier.
 
 Each Act contains a fixed set of paired architectural faces. Passage count rises from eight to twelve, gap height tightens from 132 to 116 logical pixels, and cadence tightens from about 3.0 to 2.2 seconds. The forgiving `34 × 48` logical collision hull remains inset inside the illustrated lead. Swept collision checks the whole movement segment so a delayed frame cannot tunnel through a face. The earliest contact wins, with stable obstacle identifiers breaking exact ties. Road, ceiling, and the lit inner faces are the only lethal geometry; comic targets, tools, pickups, and complications are harmless choreography.
