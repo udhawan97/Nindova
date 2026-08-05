@@ -8,10 +8,8 @@ export const RUNNER_PROJECTILE_CAP = 6;
 export const RUNNER_CAMERA_SHAKE_CAP = 6;
 export const RUNNER_FIXED_STEP_MS = 1_000 / 60;
 export const RUNNER_MAX_CATCH_UP_STEPS = 120;
-export const RUNNER_PLAYER_CEILING_Y = 58;
 export const RUNNER_PLAYER_HITBOX = { offsetX: 10, offsetY: 14, width: 34, height: 48 } as const;
 export const RUNNER_ACTION_ROUTE_MINIMUM_MS = (RUNNER_ACT_SECONDS * 1_000 + RUNNER_FIXED_STEP_MS * RUNNER_MAX_CATCH_UP_STEPS) * 5 + 720 * 5 + 1;
-export const RUNNER_LAUNCH_GRACE_MS = 900;
 
 export type RunnerLead = "son" | "mother" | "duo";
 export type RunnerTargetKind =
@@ -23,13 +21,14 @@ export type RunnerTargetKind =
   | "streamer"
   | "grocery-list";
 
-export type RunnerToolKind = "phone-pulse" | "bargain-burst" | "dhaaga-arc" | "umbrella-wave" | "ghar-flare";
+export type RunnerToolKind = "phone-flare" | "bargain-burst" | "dhaaga-arc" | "umbrella-wave" | "ghar-flare";
 export type RunnerPowerKind = "phulkari-guard" | "chaa-overdrive" | "monsoon-lift";
 export type RunnerComplicationKind = "sabzi-load" | "monsoon-headwind";
-export type RunnerActionKind = "thrust" | "leap" | "air-step" | "dash" | "vault" | "stomp" | "tool" | "power" | "complication" | "collision";
+export type RunnerActionKind = "lane-change" | "tool" | "power" | "complication" | "collision";
 export type RunnerRenderQuality = "high" | "balanced" | "quiet";
 export type RunnerObstacleMaterial = "sandstone" | "market-timber" | "hammered-brass" | "wet-terrazzo" | "phulkari-inlay";
-export type RunnerFailureReason = "ceiling" | "road" | "corridor";
+export type RunnerFailureReason = "corridor";
+export type RunnerLane = 0 | 1 | 2;
 
 export function runnerRenderQualityForIntervals(frameIntervals: readonly number[]): RunnerRenderQuality {
   const ordered = frameIntervals.filter((interval) => interval > 0 && interval <= 250).sort((left, right) => left - right);
@@ -49,7 +48,7 @@ export const RUNNER_TARGET_KINDS: readonly RunnerTargetKind[] = [
 ] as const;
 
 export const RUNNER_TOOL_TARGETS: Readonly<Record<RunnerToolKind, readonly RunnerTargetKind[]>> = {
-  "phone-pulse": ["missed-call", "grocery-list", "puddle-splash"],
+  "phone-flare": ["missed-call", "grocery-list", "puddle-splash"],
   "bargain-burst": ["price-tag", "produce-basket", "grocery-list"],
   "dhaaga-arc": ["streamer", "traffic-bubble"],
   "umbrella-wave": ["puddle-splash", "grocery-list", "traffic-bubble"],
@@ -115,6 +114,9 @@ export type RunnerObstacle = {
   width: number;
   gapY: number;
   gapHeight: number;
+  safeLane: RunnerLane;
+  contactMs: number;
+  warningMs: number;
   material: RunnerObstacleMaterial;
   label: string;
 };
@@ -134,19 +136,14 @@ export type RunnerProjectile = {
 export type RunnerState = {
   actIndex: number;
   elapsedMs: number;
-  launchGraceMs: number;
   worldX: number;
   y: number;
-  velocityY: number;
-  grounded: boolean;
-  coyoteMs: number;
-  jumpBufferMs: number;
-  jumpHoldMs: number;
-  airStepsRemaining: number;
-  airStepMs: number;
-  dashMs: number;
-  vaultMs: number;
-  stompMs: number;
+  lane: RunnerLane;
+  targetLane: RunnerLane;
+  laneFromY: number;
+  laneTransitionMs: number;
+  laneTransitionDurationMs: number;
+  pendingLaneDelta: -1 | 1 | null;
   stumbleMs: number;
   toolRecoveryMs: number;
   pendingTool: boolean;
@@ -175,21 +172,12 @@ export type RunnerState = {
   landingMs: number;
   impactMs: number;
   lastEncounteredTargetId: string | null;
-  thrusting: boolean;
 };
 
 export type RunnerInput = {
-  jump?: boolean;
   spark?: boolean;
-  dash?: boolean;
   tool?: boolean;
-  jumpPressed?: boolean;
-  jumpHeld?: boolean;
-  jumpReleased?: boolean;
-  thrustPressed?: boolean;
-  thrustHeld?: boolean;
-  thrustReleased?: boolean;
-  dashPressed?: boolean;
+  laneDelta?: -1 | 1;
   toolPressed?: boolean;
 };
 
@@ -216,20 +204,29 @@ const FLOOR_Y = 350;
 const PLAYER_HEIGHT = 76;
 const PLAYER_WIDTH = 54;
 export const RUNNER_PLAYER_SCREEN_X = 176;
-const WORLD_LENGTH = 4_080;
-export const RUNNER_WORLD_SPEED = WORLD_LENGTH / RUNNER_ACT_SECONDS;
-export const RUNNER_GRAVITY = 1_850;
-export const RUNNER_THRUST_ACCELERATION = 3_300;
-export const RUNNER_MAX_RISE_SPEED = -560;
-export const RUNNER_MAX_FALL_SPEED = 760;
-const JUMP_VELOCITY = -790;
-const AIR_STEP_VELOCITY = -650;
-const STOMP_VELOCITY = 920;
-const COYOTE_MS = 120;
-const JUMP_BUFFER_MS = 140;
-const JUMP_HOLD_MS = 180;
 const TOOL_RECOVERY_MS = 260;
-const THRUST_LAUNCH_VELOCITY = -240;
+export const RUNNER_LANE_Y: readonly [number, number, number] = [68, 168, 268];
+export const RUNNER_SPEED_RANGES = [
+  { start: 94, end: 104 },
+  { start: 104, end: 116 },
+  { start: 116, end: 130 },
+  { start: 130, end: 146 },
+  { start: 146, end: 164 },
+] as const;
+export const RUNNER_LANE_TRANSITION_MS = [260, 240, 220, 200, 180] as const;
+export const RUNNER_WARNING_SECONDS = [1.8, 1.6, 1.4, 1.15, 0.95] as const;
+
+export function runnerWorldSpeedAt(actIndex: number, elapsedMs: number): number {
+  const range = RUNNER_SPEED_RANGES[actIndex];
+  const progress = Math.max(0, Math.min(1, elapsedMs / (RUNNER_ACT_SECONDS * 1_000)));
+  return range.start + (range.end - range.start) * progress;
+}
+
+export function runnerWorldDistanceAt(actIndex: number, elapsedMs: number): number {
+  const range = RUNNER_SPEED_RANGES[actIndex];
+  const seconds = Math.max(0, Math.min(RUNNER_ACT_SECONDS, elapsedMs / 1_000));
+  return range.start * seconds + 0.5 * ((range.end - range.start) / RUNNER_ACT_SECONDS) * seconds * seconds;
+}
 
 const OBSTACLE_MATERIALS: readonly RunnerObstacleMaterial[] = [
   "sandstone",
@@ -238,32 +235,59 @@ const OBSTACLE_MATERIALS: readonly RunnerObstacleMaterial[] = [
   "wet-terrazzo",
   "phulkari-inlay",
 ] as const;
-const OBSTACLE_COUNTS = [8, 9, 10, 11, 12] as const;
-const OBSTACLE_GAPS = [132, 128, 124, 120, 116] as const;
-const OBSTACLE_CADENCE_SECONDS = [3, 2.8, 2.6, 2.4, 2.2] as const;
-const OBSTACLE_CENTER_SEQUENCE = [226, 172, 246, 196, 158, 232, 184, 252, 206, 166, 238, 190] as const;
+const OBSTACLE_GAPS = [104, 100, 96, 92, 88] as const;
+const OBSTACLE_CONTACT_SECONDS = [
+  [5.8, 10.8, 15.8, 20.8, 25.8],
+  [5.2, 9.6, 14, 18.4, 22.8, 27.2],
+  [4.8, 8.7, 12.6, 16.5, 20.4, 24.3, 28.2],
+  [4.4, 7.9, 11.4, 14.9, 18.4, 21.9, 25.4, 28.9],
+  [4, 7.1, 10.2, 13.3, 16.4, 19.5, 22.6, 25.7, 28.8],
+] as const;
+const OBSTACLE_SAFE_LANES: readonly (readonly RunnerLane[])[] = [
+  [1, 0, 1, 2, 1],
+  [1, 2, 1, 0, 1, 2],
+  [1, 0, 1, 2, 1, 0, 1],
+  [1, 2, 1, 0, 1, 2, 1, 0],
+  [1, 0, 1, 2, 1, 0, 1, 2, 1],
+] as const;
 
 function runnerObstacles(actIndex: number): readonly RunnerObstacle[] {
-  const count = OBSTACLE_COUNTS[actIndex];
   const gapHeight = OBSTACLE_GAPS[actIndex];
-  const spacing = RUNNER_WORLD_SPEED * OBSTACLE_CADENCE_SECONDS[actIndex];
   const material = OBSTACLE_MATERIALS[actIndex];
-  return Array.from({ length: count }, (_, index) => {
-    const center = OBSTACLE_CENTER_SEQUENCE[(index + actIndex * 2) % OBSTACLE_CENTER_SEQUENCE.length];
+  return OBSTACLE_CONTACT_SECONDS[actIndex].map((contactSeconds, index) => {
+    const safeLane = OBSTACLE_SAFE_LANES[actIndex][index];
+    const center = RUNNER_LANE_Y[safeLane] + RUNNER_PLAYER_HITBOX.offsetY + RUNNER_PLAYER_HITBOX.height / 2;
     return {
       id: `act-${actIndex + 1}-gate-${index + 1}`,
-      x: Math.round(620 + index * spacing),
-      width: 84 + ((index + actIndex) % 3) * 8,
+      x: runnerWorldDistanceAt(actIndex, contactSeconds * 1_000) + RUNNER_PLAYER_SCREEN_X + RUNNER_PLAYER_HITBOX.offsetX + RUNNER_PLAYER_HITBOX.width,
+      width: 78 + ((index + actIndex) % 3) * 8,
       gapY: center - gapHeight / 2,
       gapHeight,
+      safeLane,
+      contactMs: contactSeconds * 1_000,
+      warningMs: RUNNER_WARNING_SECONDS[actIndex] * 1_000,
       material,
-      label: `${material.replaceAll("-", " ")} passage ${index + 1}`,
+      label: `${material.replaceAll("-", " ")} lane gate ${index + 1}`,
     };
   });
 }
 
 export function runnerWorldToScreen(worldX: number, cameraWorldX: number): number {
   return worldX - cameraWorldX;
+}
+
+export function runnerUpcomingInstruction(state: Pick<RunnerState, "actIndex" | "elapsedMs" | "targetLane">) {
+  const obstacle = RUNNER_ACTS[state.actIndex].obstacles.find((candidate) => candidate.contactMs >= state.elapsedMs);
+  if (!obstacle) return null;
+  const timeToContactMs = obstacle.contactMs - state.elapsedMs;
+  if (timeToContactMs > obstacle.warningMs) return null;
+  const direction = obstacle.safeLane < state.targetLane ? "up" : obstacle.safeLane > state.targetLane ? "down" : "hold";
+  return {
+    obstacleId: obstacle.id,
+    direction,
+    label: direction === "up" ? "Move up" : direction === "down" ? "Move down" : "Hold lane",
+    timeToContactMs,
+  } as const;
 }
 
 function target(
@@ -306,15 +330,15 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     lead: "son",
     opening: "Gurpreet is an adult with a key, a plan, and twelve missed calls from home.",
     houseCall: "Harjit’s voice note: ‘Beta, the roti has cooled twice. Bring your explanation warm.’",
-    tool: "phone-pulse",
-    toolLabel: "Phone Pulse",
+    tool: "phone-flare",
+    toolLabel: "Phone Flare",
     toolLine: "A focused reply flare turns missed-call noise into a clear route home.",
     sparkLabel: "Send apology note",
     praise: "Shabaash — apology delivered with the groceries intact.",
     closing: "The front gate appears. Gurpreet arrives with dignity, groceries, and a revised estimate of ‘five minutes.’",
     storyBeats: [
-      "Gurpreet pulses through Sector 22 beneath long amber lamps, then releases into a measured glide to keep the grocery bag clear.",
-      "A Phone Pulse turns the missed-call wall into one calm ‘On my way’ note; Phulkari Guard folds a puddle splash into the road pattern.",
+      "Gurpreet reads the first amber lane marker, moves up once, and keeps the grocery bag clear through Sector 22.",
+      "A Phone Flare turns the missed-call wall into one calm ‘On my way’ note; Phulkari Guard folds a puddle splash into the route pattern.",
       "At the gate, Harjit checks the grocery bag first and the explanation second. The last home flare lands, and affection wins on a technicality.",
     ],
     targets: [
@@ -325,7 +349,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
       target("gw-puddle-2", "puddle-splash", 3_420, 320, 126, 32, "Last puddle", "Brass ripple", "A final clean hop for the household record.", "No fall. Only a very Chandigarh splash."),
     ],
     pickups: [pickup("gw-guard", "phulkari-guard", 1_665, 244, "Phulkari Guard", "Phulkari Guard ready. The next interference becomes part of the pattern.")],
-    complications: [complication("gw-load", "sabzi-load", 1_080, "Sabzi Load", "Sabzi Load: the bag settles low, and the whole flight becomes steadier.", "Sabzi Load balanced. The coriander remains dignified.")],
+    complications: [complication("gw-load", "sabzi-load", 1_080, "Sabzi Load", "Sabzi Load: the bag settles low while the marked lane stays steady.", "Sabzi Load balanced. The coriander remains dignified.")],
     obstacles: runnerObstacles(0),
   },
   {
@@ -343,7 +367,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     praise: "Kamaal — Harjit has balanced the bag and the budget.",
     closing: "The sabzi bag is balanced, the bill is legible, and the coriander has arrived free of unnecessary suspense.",
     storyBeats: [
-      "Harjit enters the mandi with a cloth bag, a written list, and one low jetpack glide through the opening timber aisle.",
+      "Harjit enters the mandi with a cloth bag, a written list, and one measured lane change through the opening timber aisle.",
       "Her Bargain Burst settles a whole cone of theatrical price tags; Chaa Overdrive returns runaway tomatoes to formation.",
       "She leaves with every item, exact change, and enough coriander to make the fridge smell optimistic.",
     ],
@@ -356,7 +380,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
       target("sc-basket-2", "produce-basket", 3_290, 286, 116, 66, "Rolling bhindi", "Bhindi packed", "Bhindi contained with cabinet-level efficiency.", "The bhindi has mistaken the aisle for Madhya Marg."),
     ],
     pickups: [pickup("sc-overdrive", "chaa-overdrive", 1_610, 240, "Chaa Overdrive", "Chaa Overdrive ready. The next bargain fills the whole aisle.")],
-    complications: [complication("sc-load", "sabzi-load", 2_250, "Full Jhola", "Full Jhola: rise and fall soften while Harjit balances the market properly.", "Full Jhola settled. Exact change survives.")],
+    complications: [complication("sc-load", "sabzi-load", 2_250, "Full Jhola", "Full Jhola: the bag sway softens while Harjit balances the market properly.", "Full Jhola settled. Exact change survives.")],
     obstacles: runnerObstacles(1),
   },
   {
@@ -375,7 +399,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     closing: "The celebration keeps dancing, the family keeps moving, and nobody has attempted to overtake a dhol.",
     storyBeats: [
       "The road fills with layered streamers and a cheerful ‘just two minutes’ bubble of uncertain legal meaning.",
-      "Harjit finds the side lane while Gurpreet sends a piercing Dhaaga Arc through only the loose ribbons; one shared pulse holds their flight line above the tangle.",
+      "Harjit calls the side lane while Gurpreet sends a piercing Dhaaga Arc through only the loose ribbons; one shared move clears the tangle.",
       "They pass without touching the celebration or interrupting one dance step. This counts as excellent city diplomacy.",
     ],
     targets: [
@@ -387,7 +411,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
       target("bd-bubble-2", "traffic-bubble", 2_720, 210, 112, 70, "Bas, bas!", "After you", "Politeness creates a lane of its own.", "Everyone says ‘bas’; nobody has defined the unit."),
       target("bd-stream-3", "streamer", 3_390, 176, 96, 150, "Final streamer", "Path complete", "Celebration preserved. Route restored.", "One last streamer requests a dance audition."),
     ],
-    pickups: [pickup("bd-lift", "monsoon-lift", 1_705, 214, "Monsoon Lift", "Monsoon Lift ready. The next aerial line stays open longer.")],
+    pickups: [pickup("bd-lift", "monsoon-lift", 1_705, 214, "Monsoon Lift", "Monsoon Lift ready. Brass light opens along the next marked lane.")],
     complications: [complication("bd-headwind", "monsoon-headwind", 1_535, "Dhol Headwind", "Dhol Headwind: ribbons lean, scarves stream, and the safe line stays exactly where it was.", "Dhol Headwind bows out on the beat.")],
     obstacles: runnerObstacles(2),
   },
@@ -408,7 +432,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     storyBeats: [
       "Rain cuts across Madhya Marg in lit sheets while a puddle spreads as if it received planning permission.",
       "An Umbrella Wave rises through water, paper, and one uncertain route bubble, turning each into a brass-edged clear line.",
-      "Harjit and Gurpreet glide into the dry-side glow together. Neither mentions who forgot to check the forecast.",
+      "Harjit and Gurpreet move into the dry-side glow together. Neither mentions who forgot to check the forecast.",
     ],
     targets: [
       target("mp-puddle-1", "puddle-splash", 650, 320, 132, 32, "Wide puddle", "Quiet ripple", "Rainwater accepts a smaller footprint.", "This puddle has applied for sector status."),
@@ -421,7 +445,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
       target("mp-puddle-3", "puddle-splash", 3_340, 318, 138, 34, "Final splash", "Rain settled", "The last splash becomes a quiet line of brass.", "Rain makes one final strongly worded submission."),
     ],
     pickups: [pickup("mp-guard", "phulkari-guard", 2_315, 232, "Phulkari Guard", "Phulkari Guard ready. The rain can make one dramatic entrance.")],
-    complications: [complication("mp-headwind", "monsoon-headwind", 1_455, "Monsoon Headwind", "Monsoon Headwind: the weather performs sideways while the flight line stays honest.", "Monsoon Headwind passes. The umbrella files no complaint.")],
+    complications: [complication("mp-headwind", "monsoon-headwind", 1_455, "Monsoon Headwind", "Monsoon Headwind: the weather performs sideways while the lane marker stays honest.", "Monsoon Headwind passes. The umbrella files no complaint.")],
     obstacles: runnerObstacles(3),
   },
   {
@@ -465,19 +489,14 @@ export function createRunnerState(actIndex: number): RunnerState {
   return {
     actIndex,
     elapsedMs: 0,
-    launchGraceMs: RUNNER_LAUNCH_GRACE_MS,
     worldX: 0,
-    y: 190,
-    velocityY: 0,
-    grounded: false,
-    coyoteMs: 0,
-    jumpBufferMs: 0,
-    jumpHoldMs: 0,
-    airStepsRemaining: 1,
-    airStepMs: 0,
-    dashMs: 0,
-    vaultMs: 0,
-    stompMs: 0,
+    y: RUNNER_LANE_Y[1],
+    lane: 1,
+    targetLane: 1,
+    laneFromY: RUNNER_LANE_Y[1],
+    laneTransitionMs: 0,
+    laneTransitionDurationMs: RUNNER_LANE_TRANSITION_MS[actIndex],
+    pendingLaneDelta: null,
     stumbleMs: 0,
     toolRecoveryMs: 0,
     pendingTool: false,
@@ -506,7 +525,6 @@ export function createRunnerState(actIndex: number): RunnerState {
     landingMs: 0,
     impactMs: 0,
     lastEncounteredTargetId: null,
-    thrusting: false,
   };
 }
 
@@ -565,8 +583,6 @@ function firstLethalContact(previous: RunnerState, next: RunnerState) {
     const time = sweptHitTime(start, end, rect);
     if (time !== null) candidates.push({ id, reason, time });
   };
-  addCandidate("ceiling", "ceiling", { x: -1_000, y: -1_000, width: WORLD_LENGTH + 2_000, height: RUNNER_PLAYER_CEILING_Y + 1_000 });
-  addCandidate("road", "road", { x: -1_000, y: FLOOR_Y, width: WORLD_LENGTH + 2_000, height: RUNNER_HEIGHT - FLOOR_Y + 1_000 });
   for (const obstacle of act.obstacles) {
     addCandidate(`${obstacle.id}-top`, "corridor", { x: obstacle.x, y: 0, width: obstacle.width, height: obstacle.gapY });
     addCandidate(`${obstacle.id}-bottom`, "corridor", {
@@ -582,18 +598,59 @@ function firstLethalContact(previous: RunnerState, next: RunnerState) {
 function failRunner(state: RunnerState, contact: { id: string; reason: RunnerFailureReason }) {
   state.failed = true;
   state.failureReason = contact.reason;
-  state.failedObstacleId = contact.reason === "corridor" ? contact.id.replace(/-(top|bottom)$/, "") : null;
-  state.velocityY = 0;
-  state.thrusting = false;
+  state.failedObstacleId = contact.id.replace(/-(top|bottom)$/, "");
+  state.laneTransitionMs = 0;
+  state.pendingLaneDelta = null;
   state.pendingTool = false;
   state.projectiles = [];
   state.impactMs = 420;
   state.lastAction = "collision";
-  state.message = contact.reason === "corridor"
-    ? "Route wiped. The jetpack sputters; the city holds the same boundary."
-    : contact.reason === "ceiling"
-      ? "Ceiling line touched. The jetpack sputters and the route closes cleanly."
-      : "Road line touched. The jetpack sputters and the route closes cleanly.";
+  state.message = "Route paused at the gate. The city holds the same boundary.";
+}
+
+function laneEase(progress: number): number {
+  const clamped = Math.max(0, Math.min(1, progress));
+  return clamped * clamped * (3 - 2 * clamped);
+}
+
+function beginLaneTransition(state: RunnerState, delta: -1 | 1): boolean {
+  const nextLane = state.targetLane + delta;
+  if (nextLane < 0 || nextLane > 2) return false;
+  state.laneFromY = state.y;
+  state.targetLane = nextLane as RunnerLane;
+  state.laneTransitionDurationMs = RUNNER_LANE_TRANSITION_MS[state.actIndex];
+  state.laneTransitionMs = state.laneTransitionDurationMs;
+  state.lastAction = "lane-change";
+  state.message = delta < 0 ? "Moving up one lane." : "Moving down one lane.";
+  return true;
+}
+
+function requestLaneTransition(state: RunnerState, delta: -1 | 1) {
+  if (state.laneTransitionMs > 0) {
+    if (state.pendingLaneDelta !== null) return;
+    const bufferedLane = state.targetLane + delta;
+    if (bufferedLane >= 0 && bufferedLane <= 2) state.pendingLaneDelta = delta;
+    return;
+  }
+  beginLaneTransition(state, delta);
+}
+
+function advanceLaneTransition(state: RunnerState, stepMs: number) {
+  if (state.laneTransitionMs <= 0) return;
+  state.laneTransitionMs = Math.max(0, state.laneTransitionMs - stepMs);
+  const progress = 1 - state.laneTransitionMs / state.laneTransitionDurationMs;
+  const destinationY = RUNNER_LANE_Y[state.targetLane];
+  state.y = state.laneFromY + (destinationY - state.laneFromY) * laneEase(progress);
+  if (state.laneTransitionMs > 0) return;
+  state.lane = state.targetLane;
+  state.y = destinationY;
+  const buffered = state.pendingLaneDelta;
+  state.pendingLaneDelta = null;
+  state.landingMs = 240;
+  if (buffered !== null) {
+    state.landingMs = 0;
+    beginLaneTransition(state, buffered);
+  }
 }
 
 export function stepRunner(previous: RunnerState, input: RunnerInput, deltaMs: number): RunnerState {
@@ -612,20 +669,9 @@ export function stepRunner(previous: RunnerState, input: RunnerInput, deltaMs: n
   state.impactMs = Math.max(0, state.impactMs - stepMs);
   state.pickupFlourishMs = Math.max(0, state.pickupFlourishMs - stepMs);
   state.complicationFlourishMs = Math.max(0, state.complicationFlourishMs - stepMs);
-  state.airStepMs = Math.max(0, state.airStepMs - stepMs);
-  state.dashMs = Math.max(0, state.dashMs - stepMs);
-  state.vaultMs = Math.max(0, state.vaultMs - stepMs);
-  state.stompMs = Math.max(0, state.stompMs - stepMs);
   state.stumbleMs = Math.max(0, state.stumbleMs - stepMs);
   state.toolRecoveryMs = Math.max(0, state.toolRecoveryMs - stepMs);
-  state.jumpBufferMs = Math.max(0, state.jumpBufferMs - stepMs);
-  state.launchGraceMs = Math.max(0, state.launchGraceMs - stepMs);
-  state.thrusting = false;
   const dt = stepMs / 1_000;
-  const jumpPressed = Boolean(input.jumpPressed || input.jump);
-  const thrustPressed = Boolean(input.thrustPressed);
-  const thrustHeld = Boolean(input.thrustHeld);
-  const dashPressed = Boolean(input.dashPressed || input.dash);
   const toolPressed = Boolean(input.toolPressed || input.tool || input.spark);
 
   if (state.activeComplication && state.activeComplicationRemainingMs > 0) {
@@ -640,16 +686,7 @@ export function stepRunner(previous: RunnerState, input: RunnerInput, deltaMs: n
     }
   }
 
-  if (thrustPressed || jumpPressed) {
-    state.lastAction = "thrust";
-    state.message = "Jetpack pulse engaged. Release early; inertia carries the line.";
-  }
-
-  if (dashPressed) {
-    state.dashMs = 420;
-    state.lastAction = "dash";
-    state.message = "Jetpack trim. The silhouette tightens; the flight line stays honest.";
-  }
+  if (input.laneDelta) requestLaneTransition(state, input.laneDelta);
 
   if (toolPressed) {
     if (state.toolRecoveryMs > 0) state.pendingTool = true;
@@ -659,19 +696,8 @@ export function stepRunner(previous: RunnerState, input: RunnerInput, deltaMs: n
     launchRunnerTool(state);
   }
   state.elapsedMs = Math.min(RUNNER_ACT_SECONDS * 1_000, state.elapsedMs + stepMs);
-  state.worldX = WORLD_LENGTH * (state.elapsedMs / (RUNNER_ACT_SECONDS * 1_000));
-  if (state.launchGraceMs > 0) {
-    state.thrusting = thrustHeld;
-    state.velocityY = 0;
-  } else {
-    if (thrustHeld) {
-      state.thrusting = true;
-      state.velocityY -= RUNNER_THRUST_ACCELERATION * dt;
-    }
-    state.velocityY = Math.max(RUNNER_MAX_RISE_SPEED, Math.min(RUNNER_MAX_FALL_SPEED, state.velocityY + RUNNER_GRAVITY * dt));
-    state.y += state.velocityY * dt;
-  }
-  state.grounded = false;
+  state.worldX = runnerWorldDistanceAt(state.actIndex, state.elapsedMs);
+  advanceLaneTransition(state, stepMs);
   state.projectiles = state.projectiles
     .map((projectile) => advanceProjectile(projectile, stepMs, dt))
     .filter((projectile) => projectile.ageMs < projectile.ttlMs && projectile.x < state.worldX + RUNNER_WIDTH + 180);
@@ -765,14 +791,13 @@ function launchRunnerTool(state: RunnerState) {
   const act = RUNNER_ACTS[state.actIndex];
   const empowered = state.activePower === "chaa-overdrive";
   const additions: RunnerProjectile[] = [];
-  if (act.tool === "phone-pulse") additions.push(projectile(state, act.tool, -24, 660, 0, empowered ? 34 : 20, 1_350, empowered));
+  if (act.tool === "phone-flare") additions.push(projectile(state, act.tool, -24, 660, 0, empowered ? 34 : 20, 1_350, empowered));
   else if (act.tool === "bargain-burst") {
     const lanes = empowered ? [-26, 0, 26] : [-15, 15];
     lanes.forEach((lane) => additions.push(projectile(state, act.tool, lane, 520, lane * 0.45, empowered ? 42 : 30, 680, empowered)));
   } else if (act.tool === "dhaaga-arc") additions.push(projectile(state, act.tool, 0, 540, -95, empowered ? 40 : 28, 1_500, true));
   else if (act.tool === "umbrella-wave") {
     additions.push(projectile(state, act.tool, 12, 480, -165, empowered ? 50 : 38, 1_300, true));
-    if (!state.grounded) state.velocityY = Math.min(state.velocityY, -260);
   } else {
     const lanes = empowered ? [-54, -27, 0, 27, 54] : [-38, 0, 38];
     lanes.forEach((lane) => additions.push(projectile(state, act.tool, lane, 610, lane * 0.7, empowered ? 32 : 22, 1_250, true)));
@@ -1119,6 +1144,24 @@ function drawRunnerObstacles(context: CanvasRenderingContext2D, state: RunnerSta
       context.restore();
     }
   }
+  const instruction = runnerUpcomingInstruction(state);
+  if (instruction) {
+    context.save();
+    const centerX = RUNNER_PLAYER_SCREEN_X + 28;
+    const panelY = 90;
+    context.fillStyle = "#090d18e8";
+    context.strokeStyle = "#f4c66d";
+    context.lineWidth = 2;
+    context.fillRect(centerX - 54, panelY - 22, 108, 44);
+    context.strokeRect(centerX - 54, panelY - 22, 108, 44);
+    context.fillStyle = "#fff1c2";
+    context.font = "800 11px ui-monospace, monospace";
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    const marker = instruction.direction === "up" ? "↑" : instruction.direction === "down" ? "↓" : "◆";
+    context.fillText(`${marker} ${instruction.label.toUpperCase()}`, centerX, panelY);
+    context.restore();
+  }
 }
 
 function drawLeadSprite(
@@ -1132,15 +1175,17 @@ function drawLeadSprite(
   reducedMotion = false,
 ) {
   const runFrame = Math.floor(state.elapsedMs / 95) % 4;
-  const stride = state.grounded ? [-9, 1, 9, -1][runFrame] : state.stompMs > 0 ? 1 : 5;
-  const bounce = state.grounded && state.landingMs === 0 ? [0, -2.5, 0, -1.5][runFrame] : 0;
-  const velocityStretch = reducedMotion ? 0 : Math.min(0.07, Math.abs(state.velocityY) / 9_000);
-  const squash = state.failed ? 0.94 : state.thrusting ? 0.97 : 1;
-  const stretch = state.failed ? 1.02 : 1 + velocityStretch;
+  const stride = [-6, 1, 6, -1][runFrame];
+  const bounce = state.laneTransitionMs === 0 ? [0, -1.5, 0, -0.75][runFrame] : 0;
+  const laneDistance = Math.abs(RUNNER_LANE_Y[state.targetLane] - state.y);
+  const travelStretch = reducedMotion ? 0 : Math.min(0.06, laneDistance / 1_600);
+  const settlement = reducedMotion ? 0 : state.landingMs / 240;
+  const squash = state.failed ? 0.94 : state.laneTransitionMs > 0 ? 0.98 : 1 + settlement * 0.05;
+  const stretch = state.failed ? 1.02 : 1 + travelStretch - settlement * 0.05;
   const cloth = role === "mother" ? "#9d304f" : "#244e8e";
   const skin = "#d3a06f";
   const recoil = state.stumbleMs > 0 ? Math.sin(state.stumbleMs * 0.08) * 4 : 0;
-  const lean = reducedMotion ? 0 : runnerVelocityPitch(state);
+  const lean = reducedMotion ? 0 : runnerLanePitch(state);
   context.save();
   context.translate(Math.round(x + PLAYER_WIDTH / 2 + recoil), Math.round(y + PLAYER_HEIGHT));
   context.rotate(lean);
@@ -1155,16 +1200,17 @@ function drawLeadSprite(
   context.fill();
   context.stroke();
   context.strokeStyle = state.failed ? palette.muted : palette.accent;
-  context.lineWidth = state.thrusting ? 6 : 3;
+  context.lineWidth = state.laneTransitionMs > 0 ? 5 : 3;
   context.beginPath();
   context.moveTo(4, 58);
-  context.lineTo(-8 - (state.thrusting ? 14 : 4), 58 + (reducedMotion ? 0 : Math.min(12, state.velocityY * 0.016)));
+  const laneLag = reducedMotion ? 0 : Math.sign(RUNNER_LANE_Y[state.targetLane] - state.y) * 8;
+  context.lineTo(-8 - (state.laneTransitionMs > 0 ? 12 : 4), 58 + laneLag);
   context.stroke();
 
   context.globalAlpha = 0.32;
   context.fillStyle = "#000000";
   context.beginPath();
-  context.ellipse(29, 78, state.dashMs > 0 ? 34 : 24, 5, 0, 0, Math.PI * 2);
+  context.ellipse(29, 78, state.laneTransitionMs > 0 ? 31 : 24, 5, 0, 0, Math.PI * 2);
   context.fill();
   context.globalAlpha = 1;
 
@@ -1236,22 +1282,22 @@ function drawLeadSprite(
 export function runnerAuthoredPoseIndex(state: RunnerState): number {
   if (state.impactMs > 0 || state.stumbleMs > 0) return 3;
   if (state.toolRecoveryMs > 80 && state.lastAction === "tool") return 2;
-  if (state.thrusting) return 0;
-  if (!state.grounded) return 1;
+  if (state.laneTransitionMs > 0) return state.targetLane < state.lane ? 0 : 4;
   if (state.landingMs > 0) return 4;
   return Math.floor(state.elapsedMs / 180) % 2 === 0 ? 1 : 4;
 }
 
-export function runnerVelocityPitch(state: Pick<RunnerState, "velocityY" | "failed">): number {
+export function runnerLanePitch(state: Pick<RunnerState, "y" | "targetLane" | "laneTransitionMs" | "failed">): number {
   if (state.failed) return 0.09;
-  return Math.max(-0.2, Math.min(0.2, state.velocityY / 3_200));
+  if (state.laneTransitionMs <= 0) return 0;
+  return Math.max(-0.16, Math.min(0.16, (RUNNER_LANE_Y[state.targetLane] - state.y) / 420));
 }
 
 export function runnerAuthoredPoseBlend(state: RunnerState) {
   const pose = runnerAuthoredPoseIndex(state);
   if (state.failed || state.impactMs > 0) return { from: pose, to: pose, mix: 0 };
   const phase = (state.elapsedMs % 160) / 160;
-  const adjacent = state.thrusting ? 1 : state.velocityY > 180 ? 4 : state.velocityY < -180 ? 0 : pose === 1 ? 4 : 1;
+  const adjacent = state.laneTransitionMs > 0 ? 1 : pose === 1 ? 4 : 1;
   return { from: pose, to: adjacent, mix: Math.min(0.38, phase * 0.76) };
 }
 
@@ -1275,7 +1321,7 @@ function drawFlightRig(
 ) {
   const rigX = destinationX + destinationWidth * 0.26;
   const rigY = destinationY + destinationHeight * 0.49;
-  const lag = reducedMotion ? 0 : Math.max(-14, Math.min(14, state.velocityY * 0.022));
+  const lag = reducedMotion ? 0 : Math.max(-14, Math.min(14, (RUNNER_LANE_Y[state.targetLane] - state.y) * 0.16));
   context.save();
   context.fillStyle = "#9a7130";
   context.strokeStyle = "#f4c66d";
@@ -1295,19 +1341,19 @@ function drawFlightRig(
   context.beginPath();
   context.roundRect(rigX + 5, rigY + 17 + lag * 0.18, 15, 18, 4);
   context.fill();
-  if (state.thrusting || state.failed) {
+  if (state.laneTransitionMs > 0 || state.failed) {
     context.globalAlpha = state.failed ? 0.56 : 0.9;
     context.strokeStyle = state.failed ? "#c6bca7" : "#70e7f0";
-    context.lineWidth = state.thrusting ? 7 : 3;
+    context.lineWidth = state.laneTransitionMs > 0 ? 5 : 3;
     context.beginPath();
     context.moveTo(rigX + 2, rigY + 23);
-    context.lineTo(rigX - (state.thrusting ? 31 : 14), rigY + 24 + lag * 0.22);
+    context.lineTo(rigX - (state.laneTransitionMs > 0 ? 26 : 14), rigY + 24 + lag * 0.22);
     context.stroke();
     context.strokeStyle = "#f7c35c";
-    context.lineWidth = state.thrusting ? 3 : 1.5;
+    context.lineWidth = state.laneTransitionMs > 0 ? 2.5 : 1.5;
     context.beginPath();
     context.moveTo(rigX + 1, rigY + 23);
-    context.lineTo(rigX - (state.thrusting ? 21 : 8), rigY + 24 + lag * 0.16);
+    context.lineTo(rigX - (state.laneTransitionMs > 0 ? 18 : 8), rigY + 24 + lag * 0.16);
     context.stroke();
   }
   context.restore();
@@ -1334,14 +1380,14 @@ function drawAuthoredLead(
   const destinationX = PLAYER_WIDTH / 2 - destinationWidth / 2;
   const destinationY = PLAYER_HEIGHT - destinationHeight;
   const recoil = state.failed && !reducedMotion ? 4 : 0;
-  const velocityStretch = reducedMotion ? 0 : Math.min(0.06, Math.abs(state.velocityY) / 10_000);
+  const laneStretch = reducedMotion ? 0 : Math.min(0.06, Math.abs(RUNNER_LANE_Y[state.targetLane] - state.y) / 1_600);
   context.save();
   context.translate(Math.round(x + PLAYER_WIDTH / 2 + recoil), Math.round(y + PLAYER_HEIGHT / 2));
-  context.rotate(reducedMotion ? 0 : runnerVelocityPitch(state));
-  context.scale(state.thrusting ? 0.98 : 1, 1 + velocityStretch);
+  context.rotate(reducedMotion ? 0 : runnerLanePitch(state));
+  context.scale(state.laneTransitionMs > 0 ? 0.98 : 1, 1 + laneStretch);
   context.translate(-PLAYER_WIDTH / 2, -PLAYER_HEIGHT / 2);
-  context.shadowColor = state.thrusting ? "#55d6e8" : "#000000b8";
-  context.shadowBlur = state.thrusting ? 15 : 6;
+  context.shadowColor = state.laneTransitionMs > 0 ? "#55d6e8" : "#000000b8";
+  context.shadowBlur = state.laneTransitionMs > 0 ? 12 : 6;
   drawFlightRig(context, destinationX, destinationY, destinationWidth, destinationHeight, role, state, reducedMotion);
   context.globalAlpha = 1 - blend.mix;
   context.drawImage(
@@ -1673,9 +1719,9 @@ function drawComplicationAura(
   context.lineWidth = 3;
   context.globalAlpha = state.activeComplication ? 0.58 : Math.min(0.58, state.complicationFlourishMs / 520);
   if (complicationKind === "sabzi-load") {
-    const pulse = reducedMotion ? 0 : Math.sin(state.elapsedMs * 0.01) * 4;
+    const breath = reducedMotion ? 0 : Math.sin(state.elapsedMs * 0.01) * 4;
     context.beginPath();
-    context.ellipse(RUNNER_PLAYER_SCREEN_X + 28, FLOOR_Y + 2, 44 + pulse, 9, 0, 0, Math.PI * 2);
+    context.ellipse(RUNNER_PLAYER_SCREEN_X + 28, FLOOR_Y + 2, 44 + breath, 9, 0, 0, Math.PI * 2);
     context.stroke();
     drawDiamond(context, RUNNER_PLAYER_SCREEN_X + 28, FLOOR_Y - 18, 10, palette.jade, false);
   } else {
@@ -1693,7 +1739,7 @@ function drawComplicationAura(
 
 function drawPickup(context: CanvasRenderingContext2D, power: RunnerPickup, screenX: number, state: RunnerState, palette: RunnerPalette, reducedMotion: boolean) {
   const grade = ACT_GRADES[state.actIndex];
-  const pulse = reducedMotion ? 0 : Math.sin(state.elapsedMs * 0.006) * 5;
+  const breath = reducedMotion ? 0 : Math.sin(state.elapsedMs * 0.006) * 5;
   context.save();
   context.translate(screenX, power.y);
   context.shadowColor = power.kind === "phulkari-guard" ? "#e7495e" : power.kind === "chaa-overdrive" ? grade.glow : grade.energy;
@@ -1702,7 +1748,7 @@ function drawPickup(context: CanvasRenderingContext2D, power: RunnerPickup, scre
   context.lineWidth = 2;
   context.globalAlpha = 0.78;
   context.beginPath();
-  context.arc(0, 0, 24 + pulse, 0, Math.PI * 2);
+  context.arc(0, 0, 24 + breath, 0, Math.PI * 2);
   context.stroke();
   context.globalAlpha = 1;
   context.rotate(Math.PI / 4 + (reducedMotion ? 0 : state.elapsedMs * 0.00045));
@@ -1721,7 +1767,7 @@ function drawPickup(context: CanvasRenderingContext2D, power: RunnerPickup, scre
 function drawPowerAura(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette, reducedMotion: boolean) {
   if (!state.activePower) return;
   const color = state.activePower === "phulkari-guard" ? "#e7495e" : state.activePower === "chaa-overdrive" ? "#f4b32b" : "#55d6e8";
-  const pulse = reducedMotion ? 0 : Math.sin(state.elapsedMs * 0.012) * 4;
+  const breath = reducedMotion ? 0 : Math.sin(state.elapsedMs * 0.012) * 4;
   context.save();
   context.globalAlpha = 0.58;
   context.strokeStyle = color;
@@ -1729,7 +1775,7 @@ function drawPowerAura(context: CanvasRenderingContext2D, state: RunnerState, pa
   context.shadowColor = color;
   context.shadowBlur = 18;
   context.beginPath();
-  context.ellipse(RUNNER_PLAYER_SCREEN_X + 27, state.y + 40, 42 + pulse, 58 + pulse, 0, 0, Math.PI * 2);
+  context.ellipse(RUNNER_PLAYER_SCREEN_X + 27, state.y + 40, 42 + breath, 58 + breath, 0, 0, Math.PI * 2);
   context.stroke();
   context.shadowBlur = 0;
   context.restore();
@@ -1745,61 +1791,26 @@ function drawMovementFx(
   if (reducedMotion) return;
   const grade = ACT_GRADES[state.actIndex];
   context.save();
-  if (state.thrusting) {
-    const plumeCount = quality === "high" ? 9 : quality === "balanced" ? 6 : 3;
-    for (let plume = 0; plume < plumeCount; plume += 1) {
-      const phase = (state.elapsedMs * 0.018 + plume * 0.73) % 7;
-      const offsetY = 58 + plume * 9 + phase;
-      const spread = (plume % 3 - 1) * (5 + plume * 1.2);
-      context.globalAlpha = Math.max(0.12, 0.72 - plume * 0.065);
-      drawDiamond(
-        context,
-        RUNNER_PLAYER_SCREEN_X + 28 + spread,
-        state.y + offsetY,
-        Math.max(4, 13 - plume),
-        plume % 2 ? grade.energy : grade.glow,
-        plume % 3 !== 0,
-      );
-    }
-    context.globalAlpha = 0.34;
-    context.fillStyle = grade.energy;
+  const trailCount = quality === "high" ? 5 : quality === "balanced" ? 3 : 2;
+  for (let trail = 1; trail <= trailCount; trail += 1) {
+    context.globalAlpha = 0.18 - trail * 0.02;
+    context.strokeStyle = trail % 2 ? grade.energy : grade.glow;
+    context.lineWidth = Math.max(1, 5 - trail * 0.65);
     context.beginPath();
-    context.moveTo(RUNNER_PLAYER_SCREEN_X + 17, state.y + 62);
-    context.lineTo(RUNNER_PLAYER_SCREEN_X + 39, state.y + 62);
-    context.lineTo(RUNNER_PLAYER_SCREEN_X + 28, state.y + 118);
-    context.closePath();
-    context.fill();
-  }
-  if (state.dashMs > 0) {
-    const progress = 1 - state.dashMs / 420;
-    for (let trail = 1; trail <= 4; trail += 1) {
-      context.globalAlpha = (0.24 - trail * 0.035) * (1 - progress * 0.6);
-      context.strokeStyle = trail % 2 ? grade.energy : grade.glow;
-      context.lineWidth = 7 - trail;
-      context.beginPath();
-      context.moveTo(RUNNER_PLAYER_SCREEN_X - trail * 18, state.y + 35 + trail * 4);
-      context.lineTo(RUNNER_PLAYER_SCREEN_X - 72 - trail * 28, state.y + 35 + trail * 4);
-      context.stroke();
-    }
-  }
-  if (state.airStepMs > 0) {
-    const progress = 1 - state.airStepMs / 340;
-    context.globalAlpha = 1 - progress;
-    context.strokeStyle = grade.energy;
-    context.lineWidth = 4;
-    context.beginPath();
-    context.ellipse(RUNNER_PLAYER_SCREEN_X + 25, state.y + 68, 18 + progress * 40, 7 + progress * 14, 0, 0, Math.PI * 2);
+    context.moveTo(RUNNER_PLAYER_SCREEN_X - trail * 17, state.y + 34 + trail * 5);
+    context.lineTo(RUNNER_PLAYER_SCREEN_X - 64 - trail * 24, state.y + 34 + trail * 5);
     context.stroke();
   }
-  if (state.stompMs > 0 && !state.grounded) {
-    context.globalAlpha = 0.48;
-    context.fillStyle = grade.glow;
+  if (state.laneTransitionMs > 0) {
+    const destinationY = RUNNER_LANE_Y[state.targetLane] + PLAYER_HEIGHT / 2;
+    context.globalAlpha = 0.52;
+    context.strokeStyle = grade.energy;
+    context.lineWidth = 3;
+    context.setLineDash([8, 8]);
     context.beginPath();
-    context.moveTo(RUNNER_PLAYER_SCREEN_X + 16, state.y - 54);
-    context.lineTo(RUNNER_PLAYER_SCREEN_X + 40, state.y - 54);
-    context.lineTo(RUNNER_PLAYER_SCREEN_X + 30, state.y + 60);
-    context.closePath();
-    context.fill();
+    context.moveTo(RUNNER_PLAYER_SCREEN_X + PLAYER_WIDTH / 2, state.y + PLAYER_HEIGHT / 2);
+    context.quadraticCurveTo(RUNNER_PLAYER_SCREEN_X + 86, (state.y + destinationY) / 2, RUNNER_PLAYER_SCREEN_X + 116, destinationY);
+    context.stroke();
   }
   context.restore();
 }
@@ -1879,6 +1890,7 @@ function drawImpact(context: CanvasRenderingContext2D, state: RunnerState, act: 
 function drawLandingDust(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette) {
   if (state.landingMs <= 0) return;
   const progress = (240 - state.landingMs) / 240;
+  const settleY = Math.min(FLOOR_Y - 5, state.y + PLAYER_HEIGHT - 5);
   context.globalAlpha = 1 - progress;
   for (let index = 0; index < 8; index += 1) {
     const direction = index < 4 ? -1 : 1;
@@ -1886,7 +1898,7 @@ function drawLandingDust(context: CanvasRenderingContext2D, state: RunnerState, 
     pixelRect(
       context,
       RUNNER_PLAYER_SCREEN_X + PLAYER_WIDTH / 2 + direction * (18 + local * 9 + progress * 26),
-      FLOOR_Y - 5 - local * 3 - progress * 9,
+      settleY - local * 3 - progress * 9,
       8 - local,
       4,
       local % 2 ? palette.rule : palette.accentSoft,
@@ -1898,19 +1910,19 @@ function drawLandingDust(context: CanvasRenderingContext2D, state: RunnerState, 
 function drawSpark(context: CanvasRenderingContext2D, projectile: RunnerProjectile, state: RunnerState, palette: RunnerPalette) {
   const screenX = runnerWorldToScreen(projectile.x, state.worldX);
   const grade = ACT_GRADES[state.actIndex];
-  const pulse = Math.floor(projectile.ageMs / 60) % 2;
+  const shimmer = Math.floor(projectile.ageMs / 60) % 2;
   const color = projectile.tool === "dhaaga-arc" ? "#e7495e" : projectile.tool === "umbrella-wave" ? "#55d6e8" : grade.glow;
   context.save();
   context.shadowColor = color;
   context.shadowBlur = 18;
-  if (projectile.tool === "phone-pulse") {
+  if (projectile.tool === "phone-flare") {
     context.strokeStyle = color;
     context.lineWidth = 3;
     context.beginPath();
     context.moveTo(screenX - 48, projectile.y);
     context.lineTo(screenX, projectile.y);
     context.stroke();
-    drawDiamond(context, screenX, projectile.y, pulse ? 15 : 12, color);
+    drawDiamond(context, screenX, projectile.y, shimmer ? 15 : 12, color);
     drawDiamond(context, screenX, projectile.y, 5, palette.ink);
   } else if (projectile.tool === "bargain-burst") {
     const spread = projectile.radius + projectile.ageMs * 0.035;
@@ -1976,8 +1988,7 @@ export function drawRunnerFrame(
   context.fillStyle = palette.paper;
   context.fillRect(0, 0, RUNNER_WIDTH, RUNNER_HEIGHT);
   const impactKick = state.impactMs > 0 ? Math.sin(state.impactMs * 0.09) * RUNNER_CAMERA_SHAKE_CAP : 0;
-  const stompKick = state.landingMs > 0 && state.lastAction === "stomp" ? Math.sin(state.landingMs * 0.11) * 4 : 0;
-  const cameraKick = ambientReduced ? 0 : Math.round(Math.max(-RUNNER_CAMERA_SHAKE_CAP, Math.min(RUNNER_CAMERA_SHAKE_CAP, impactKick + stompKick)));
+  const cameraKick = ambientReduced ? 0 : Math.round(Math.max(-RUNNER_CAMERA_SHAKE_CAP, Math.min(RUNNER_CAMERA_SHAKE_CAP, impactKick)));
   context.translate(cameraKick, Math.abs(cameraKick) * 0.28);
   drawSky(context, state, palette, ambientReduced);
   drawCityLayers(context, state, palette, ambientReduced);
@@ -2051,7 +2062,7 @@ export function drawRunnerFrame(
     context.fillStyle = palette.accent;
     context.font = `700 12px ${palette.fontMono}`;
     context.textAlign = "right";
-    context.fillText("JETPACK SPUTTER · CURTAIN HELD", RUNNER_WIDTH - 30, RUNNER_HEIGHT - 28);
+    context.fillText("LANE CONTACT · CURTAIN HELD", RUNNER_WIDTH - 30, RUNNER_HEIGHT - 28);
   }
 
   if (state.paused) {
