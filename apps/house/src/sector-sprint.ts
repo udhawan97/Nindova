@@ -4,6 +4,8 @@ export const RUNNER_WIDTH = 960;
 export const RUNNER_HEIGHT = 432;
 export const RUNNER_DPR_CAP = 2;
 export const RUNNER_EFFECT_PARTICLE_CAP = 24;
+export const RUNNER_PROJECTILE_CAP = 6;
+export const RUNNER_CAMERA_SHAKE_CAP = 6;
 
 export type RunnerLead = "son" | "mother" | "duo";
 export type RunnerTargetKind =
@@ -15,6 +17,10 @@ export type RunnerTargetKind =
   | "streamer"
   | "grocery-list";
 
+export type RunnerToolKind = "phone-pulse" | "bargain-burst" | "dhaaga-arc" | "umbrella-wave" | "ghar-flare";
+export type RunnerPowerKind = "phulkari-guard" | "chaa-overdrive" | "monsoon-lift";
+export type RunnerActionKind = "leap" | "air-step" | "dash" | "vault" | "stomp" | "tool" | "power" | "collision";
+
 export const RUNNER_TARGET_KINDS: readonly RunnerTargetKind[] = [
   "missed-call",
   "price-tag",
@@ -24,6 +30,14 @@ export const RUNNER_TARGET_KINDS: readonly RunnerTargetKind[] = [
   "streamer",
   "grocery-list",
 ] as const;
+
+export const RUNNER_TOOL_TARGETS: Readonly<Record<RunnerToolKind, readonly RunnerTargetKind[]>> = {
+  "phone-pulse": ["missed-call", "grocery-list", "puddle-splash"],
+  "bargain-burst": ["price-tag", "produce-basket", "grocery-list"],
+  "dhaaga-arc": ["streamer", "traffic-bubble"],
+  "umbrella-wave": ["puddle-splash", "grocery-list", "traffic-bubble"],
+  "ghar-flare": RUNNER_TARGET_KINDS,
+};
 
 export type RunnerTarget = {
   id: string;
@@ -38,6 +52,15 @@ export type RunnerTarget = {
   collisionQuip: string;
 };
 
+export type RunnerPickup = {
+  id: string;
+  kind: RunnerPowerKind;
+  x: number;
+  y: number;
+  label: string;
+  acquiredLine: string;
+};
+
 export type RunnerAct = {
   id: string;
   title: string;
@@ -46,14 +69,28 @@ export type RunnerAct = {
   lead: RunnerLead;
   opening: string;
   houseCall: string;
+  tool: RunnerToolKind;
+  toolLabel: string;
+  toolLine: string;
   sparkLabel: string;
   praise: string;
   closing: string;
   storyBeats: readonly string[];
   targets: readonly RunnerTarget[];
+  pickups: readonly RunnerPickup[];
 };
 
-export type RunnerProjectile = { x: number; y: number; ageMs: number };
+export type RunnerProjectile = {
+  x: number;
+  y: number;
+  velocityX: number;
+  velocityY: number;
+  ageMs: number;
+  ttlMs: number;
+  radius: number;
+  tool: RunnerToolKind;
+  pierce: boolean;
+};
 
 export type RunnerState = {
   actIndex: number;
@@ -62,6 +99,22 @@ export type RunnerState = {
   y: number;
   velocityY: number;
   grounded: boolean;
+  coyoteMs: number;
+  jumpBufferMs: number;
+  jumpHoldMs: number;
+  airStepsRemaining: number;
+  airStepMs: number;
+  dashMs: number;
+  vaultMs: number;
+  stompMs: number;
+  stumbleMs: number;
+  toolRecoveryMs: number;
+  pendingTool: boolean;
+  activePower: RunnerPowerKind | null;
+  collectedPickupIds: string[];
+  lastCollectedPickupId: string | null;
+  pickupFlourishMs: number;
+  lastAction: RunnerActionKind | null;
   paused: boolean;
   finished: boolean;
   projectiles: RunnerProjectile[];
@@ -75,7 +128,17 @@ export type RunnerState = {
   lastEncounteredTargetId: string | null;
 };
 
-export type RunnerInput = { jump?: boolean; spark?: boolean };
+export type RunnerInput = {
+  jump?: boolean;
+  spark?: boolean;
+  dash?: boolean;
+  tool?: boolean;
+  jumpPressed?: boolean;
+  jumpHeld?: boolean;
+  jumpReleased?: boolean;
+  dashPressed?: boolean;
+  toolPressed?: boolean;
+};
 
 export type RunnerPalette = {
   paper: string;
@@ -103,7 +166,12 @@ export const RUNNER_PLAYER_SCREEN_X = 176;
 const WORLD_LENGTH = 4_080;
 const GRAVITY = 2_120;
 const JUMP_VELOCITY = -790;
-const PROJECTILE_SPEED = 540;
+const AIR_STEP_VELOCITY = -650;
+const STOMP_VELOCITY = 920;
+const COYOTE_MS = 120;
+const JUMP_BUFFER_MS = 140;
+const JUMP_HOLD_MS = 180;
+const TOOL_RECOVERY_MS = 260;
 
 export function runnerWorldToScreen(worldX: number, cameraWorldX: number): number {
   return worldX - cameraWorldX;
@@ -124,6 +192,10 @@ function target(
   return { id, kind, x, y, width, height, label, transformedLabel, sparkQuip, collisionQuip };
 }
 
+function pickup(id: string, kind: RunnerPowerKind, x: number, y: number, label: string, acquiredLine: string): RunnerPickup {
+  return { id, kind, x, y, label, acquiredLine };
+}
+
 export const RUNNER_ACTS: readonly RunnerAct[] = [
   {
     id: "ghar-wapsi",
@@ -133,6 +205,9 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     lead: "son",
     opening: "Gurpreet is an adult with a key, a plan, and twelve missed calls from home.",
     houseCall: "Harjit’s voice note: ‘Beta, the roti has cooled twice. Bring your explanation warm.’",
+    tool: "phone-pulse",
+    toolLabel: "Phone Pulse",
+    toolLine: "A focused reply flare turns missed-call noise into a clear route home.",
     sparkLabel: "Send apology note",
     praise: "Shabaash — apology delivered with the groceries intact.",
     closing: "The front gate appears. Gurpreet arrives with dignity, groceries, and a revised estimate of ‘five minutes.’",
@@ -148,6 +223,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
       target("gw-call-2", "missed-call", 2_820, 220, 96, 58, "Where are you?", "At the gate", "Location updated with unusual accuracy.", "The speech bubble is faster than the shortcut."),
       target("gw-puddle-2", "puddle-splash", 3_420, 320, 126, 32, "Last puddle", "Brass ripple", "A final clean hop for the household record.", "No fall. Only a very Chandigarh splash."),
     ],
+    pickups: [pickup("gw-guard", "phulkari-guard", 1_665, 244, "Phulkari Guard", "Phulkari Guard ready. The next interference becomes part of the pattern.")],
   },
   {
     id: "sabzi-command",
@@ -157,6 +233,9 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     lead: "mother",
     opening: "Gurpreet’s mother, Harjit, takes the market route with exact change and the calm authority of a cabinet minister.",
     houseCall: "House message: ‘Bhindi, tomatoes, dhania—and do not let one dramatic price tag write the budget.’",
+    tool: "bargain-burst",
+    toolLabel: "Bargain Burst",
+    toolLine: "A broad close-range wave settles price tags and runaway produce together.",
     sparkLabel: "Send bargain burst",
     praise: "Kamaal — Harjit has balanced the bag and the budget.",
     closing: "The sabzi bag is balanced, the bill is legible, and the coriander has arrived free of unnecessary suspense.",
@@ -173,6 +252,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
       target("sc-list-1", "grocery-list", 2_590, 238, 76, 92, "Dhania?", "Dhania ✓", "The most important line is now impossible to miss.", "Without dhania, this mission has no closing argument."),
       target("sc-basket-2", "produce-basket", 3_290, 286, 116, 66, "Rolling bhindi", "Bhindi packed", "Bhindi contained with cabinet-level efficiency.", "The bhindi has mistaken the aisle for Madhya Marg."),
     ],
+    pickups: [pickup("sc-overdrive", "chaa-overdrive", 1_610, 240, "Chaa Overdrive", "Chaa Overdrive ready. The next bargain fills the whole aisle.")],
   },
   {
     id: "baraat-detour",
@@ -182,6 +262,9 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     lead: "duo",
     opening: "Gurpreet and Harjit meet a cheerful road-wide celebration. Going around is now the family strategy.",
     houseCall: "Joint decision: ‘Respect the dhol. Also respect that the paneer is waiting.’",
+    tool: "dhaaga-arc",
+    toolLabel: "Dhaaga Arc",
+    toolLine: "A returning ribbon arc passes through festive tangles without touching the celebration.",
     sparkLabel: "Send polite path",
     praise: "Wah ji wah — full celebration, zero lane argument.",
     closing: "The celebration keeps dancing, the family keeps moving, and nobody has attempted to overtake a dhol.",
@@ -199,6 +282,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
       target("bd-bubble-2", "traffic-bubble", 2_720, 210, 112, 70, "Bas, bas!", "After you", "Politeness creates a lane of its own.", "Everyone says ‘bas’; nobody has defined the unit."),
       target("bd-stream-3", "streamer", 3_390, 176, 96, 150, "Final streamer", "Path complete", "Celebration preserved. Route restored.", "One last streamer requests a dance audition."),
     ],
+    pickups: [pickup("bd-lift", "monsoon-lift", 1_705, 214, "Monsoon Lift", "Monsoon Lift ready. The next aerial line stays open longer.")],
   },
   {
     id: "monsoon-protocol",
@@ -208,6 +292,9 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     lead: "duo",
     opening: "The rain has arrived sideways. Harjit and Gurpreet’s umbrella has entered coalition government.",
     houseCall: "Harjit: ‘We are not fighting the rain. We are negotiating with its paperwork.’",
+    tool: "umbrella-wave",
+    toolLabel: "Umbrella Wave",
+    toolLine: "A rising guard wave clears water and paper while opening a higher route.",
     sparkLabel: "Send umbrella signal",
     praise: "Balle — the umbrella coalition survives another crossing.",
     closing: "The clouds keep their dignity. So do the groceries. The umbrella is promoted without a ceremony.",
@@ -226,6 +313,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
       target("mp-bubble-mid", "traffic-bubble", 3_000, 224, 110, 66, "Cloud meeting", "Clear patch →", "The clouds adjourn without another motion.", "Three clouds have formed a very wet committee."),
       target("mp-puddle-3", "puddle-splash", 3_340, 318, 138, 34, "Final splash", "Rain settled", "The last splash becomes a quiet line of brass.", "Rain makes one final strongly worded submission."),
     ],
+    pickups: [pickup("mp-guard", "phulkari-guard", 2_315, 232, "Phulkari Guard", "Phulkari Guard ready. The rain can make one dramatic entrance.")],
   },
   {
     id: "roti-relay",
@@ -235,6 +323,9 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     lead: "duo",
     opening: "One bag, two umbrellas, and a dinner that has waited with admirable restraint.",
     houseCall: "Family bulletin: ‘Come home safely. The rotis can be reheated; your filmi entrance cannot.’",
+    tool: "ghar-flare",
+    toolLabel: "Ghar Flare",
+    toolLine: "Mother and son send a three-lane home signal through the last loose reminders.",
     sparkLabel: "Send ghar spark",
     praise: "Kya baat — sabzi home, story ready, dinner resumed.",
     closing: "Door open. Sabzi accounted for. Roti reheated. The city keeps the punchline and lets the family eat.",
@@ -254,6 +345,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
       target("rr-stream-mid", "streamer", 3_030, 188, 88, 138, "Gate ribbon", "Welcome bow", "The gate ribbon performs the smallest possible welcome.", "The ribbon is holding one final family function."),
       target("rr-bubble-1", "traffic-bubble", 3_360, 214, 118, 72, "Welcome home", "Dinner this way", "The final bubble points toward dinner.", "The house has issued a warm summons."),
     ],
+    pickups: [pickup("rr-overdrive", "chaa-overdrive", 1_805, 236, "Chaa Overdrive", "Chaa Overdrive ready. The home signal now reaches every lane.")],
   },
 ] as const;
 
@@ -266,6 +358,22 @@ export function createRunnerState(actIndex: number): RunnerState {
     y: FLOOR_Y - PLAYER_HEIGHT,
     velocityY: 0,
     grounded: true,
+    coyoteMs: COYOTE_MS,
+    jumpBufferMs: 0,
+    jumpHoldMs: 0,
+    airStepsRemaining: 1,
+    airStepMs: 0,
+    dashMs: 0,
+    vaultMs: 0,
+    stompMs: 0,
+    stumbleMs: 0,
+    toolRecoveryMs: 0,
+    pendingTool: false,
+    activePower: null,
+    collectedPickupIds: [],
+    lastCollectedPickupId: null,
+    pickupFlourishMs: 0,
+    lastAction: null,
     paused: false,
     finished: false,
     projectiles: [],
@@ -290,60 +398,156 @@ export function stepRunner(previous: RunnerState, input: RunnerInput, deltaMs: n
     projectiles: previous.projectiles.map((projectile) => ({ ...projectile })),
     transformedTargetIds: [...previous.transformedTargetIds],
     encounteredTargetIds: [...previous.encounteredTargetIds],
+    collectedPickupIds: [...previous.collectedPickupIds],
   };
   if (state.finished || state.paused) return state;
   const stepMs = Math.max(0, Math.min(deltaMs, 50));
   state.flourishMs = Math.max(0, state.flourishMs - stepMs);
   state.landingMs = Math.max(0, state.landingMs - stepMs);
   state.impactMs = Math.max(0, state.impactMs - stepMs);
+  state.pickupFlourishMs = Math.max(0, state.pickupFlourishMs - stepMs);
+  state.airStepMs = Math.max(0, state.airStepMs - stepMs);
+  state.dashMs = Math.max(0, state.dashMs - stepMs);
+  state.vaultMs = Math.max(0, state.vaultMs - stepMs);
+  state.stompMs = Math.max(0, state.stompMs - stepMs);
+  state.stumbleMs = Math.max(0, state.stumbleMs - stepMs);
+  state.toolRecoveryMs = Math.max(0, state.toolRecoveryMs - stepMs);
+  state.jumpBufferMs = Math.max(0, state.jumpBufferMs - stepMs);
   const dt = stepMs / 1_000;
   const wasGrounded = state.grounded;
-  if (input.jump && state.grounded) {
-    state.velocityY = JUMP_VELOCITY;
+  state.coyoteMs = state.grounded ? COYOTE_MS : Math.max(0, state.coyoteMs - stepMs);
+  const jumpPressed = Boolean(input.jumpPressed || input.jump);
+  const dashPressed = Boolean(input.dashPressed || input.dash);
+  const toolPressed = Boolean(input.toolPressed || input.tool || input.spark);
+  if (jumpPressed) state.jumpBufferMs = JUMP_BUFFER_MS;
+
+  const beginJump = (velocity: number, action: RunnerActionKind, line: string) => {
+    const lifted = state.activePower === "monsoon-lift";
+    state.velocityY = velocity * (lifted ? 1.14 : 1);
     state.grounded = false;
-    state.message = "Clean jump. The city keeps moving.";
+    state.coyoteMs = 0;
+    state.jumpBufferMs = 0;
+    state.jumpHoldMs = lifted ? JUMP_HOLD_MS + 120 : JUMP_HOLD_MS;
+    state.lastAction = action;
+    state.message = lifted ? `${line} Monsoon Lift opens the air.` : line;
+    if (lifted) state.activePower = null;
+  };
+
+  if (state.jumpBufferMs > 0 && (state.grounded || state.coyoteMs > 0)) {
+    state.airStepsRemaining = 1;
+    beginJump(JUMP_VELOCITY, "leap", "Leap committed. The city drops away.");
+  } else if (jumpPressed && !state.grounded && state.airStepsRemaining > 0) {
+    state.airStepsRemaining -= 1;
+    state.airStepMs = 340;
+    beginJump(AIR_STEP_VELOCITY, "air-step", "Air step. One more line through the skyline.");
   }
-  if (input.spark && state.projectiles.length < 4) {
-    state.projectiles.push({ x: state.worldX + RUNNER_PLAYER_SCREEN_X + 58, y: state.y + 28, ageMs: 0 });
-    state.message = `${RUNNER_ACTS[state.actIndex].sparkLabel}.`;
+
+  if (input.jumpReleased) {
+    state.jumpHoldMs = 0;
+    if (state.velocityY < -300) state.velocityY *= 0.58;
+  }
+
+  if (dashPressed) {
+    if (state.grounded) {
+      const act = RUNNER_ACTS[state.actIndex];
+      const nextLow = act.targets.find((candidate) => (
+        !state.transformedTargetIds.includes(candidate.id)
+        && candidate.x >= state.worldX + RUNNER_PLAYER_SCREEN_X + 20
+        && candidate.x <= state.worldX + RUNNER_PLAYER_SCREEN_X + 190
+        && candidate.height <= 72
+      ));
+      if (nextLow) {
+        state.vaultMs = 420;
+        state.airStepsRemaining = 1;
+        beginJump(-570, "vault", `Context vault. ${nextLow.label} stays below the line.`);
+      } else {
+        state.dashMs = 420;
+        state.lastAction = "dash";
+        state.message = "Street dash. Same route, sharper silhouette.";
+      }
+    } else {
+      state.stompMs = 420;
+      state.velocityY = Math.max(STOMP_VELOCITY, state.velocityY);
+      state.jumpHoldMs = 0;
+      state.lastAction = "stomp";
+      state.message = "Aerial stomp. The road answers in brass.";
+    }
+  }
+
+  if (toolPressed) {
+    if (state.toolRecoveryMs > 0) state.pendingTool = true;
+    else launchRunnerTool(state);
+  } else if (state.pendingTool && state.toolRecoveryMs === 0) {
+    state.pendingTool = false;
+    launchRunnerTool(state);
   }
   state.elapsedMs = Math.min(RUNNER_ACT_SECONDS * 1_000, state.elapsedMs + stepMs);
   state.worldX = WORLD_LENGTH * (state.elapsedMs / (RUNNER_ACT_SECONDS * 1_000));
-  state.velocityY += GRAVITY * dt;
+  const heldGravity = input.jumpHeld && state.jumpHoldMs > 0 && state.velocityY < 0 ? GRAVITY * 0.34 : GRAVITY;
+  state.jumpHoldMs = Math.max(0, state.jumpHoldMs - stepMs);
+  state.velocityY += heldGravity * dt;
   state.y += state.velocityY * dt;
   const restingY = FLOOR_Y - PLAYER_HEIGHT;
-  if (state.y >= restingY) {
+  if (state.y >= restingY && state.velocityY >= 0) {
     state.y = restingY;
     state.velocityY = 0;
     state.grounded = true;
-    if (!wasGrounded) state.landingMs = 240;
+    state.airStepsRemaining = 1;
+    state.stompMs = 0;
+    if (!wasGrounded) {
+      state.landingMs = 280;
+      if (state.jumpBufferMs > 0) beginJump(JUMP_VELOCITY, "leap", "Buffered leap. The landing becomes another launch.");
+    }
   }
   state.projectiles = state.projectiles
-    .map((projectile) => ({ ...projectile, x: projectile.x + PROJECTILE_SPEED * dt, ageMs: projectile.ageMs + stepMs }))
-    .filter((projectile) => projectile.x < state.worldX + RUNNER_WIDTH + 100);
+    .map((projectile) => advanceProjectile(projectile, stepMs, dt))
+    .filter((projectile) => projectile.ageMs < projectile.ttlMs && projectile.x < state.worldX + RUNNER_WIDTH + 180);
 
   const act = RUNNER_ACTS[state.actIndex];
+  const playerWorld = { x: state.worldX + RUNNER_PLAYER_SCREEN_X - 12, y: state.y - 14, width: PLAYER_WIDTH + 32, height: PLAYER_HEIGHT + 28 };
+  for (const power of act.pickups) {
+    if (state.collectedPickupIds.includes(power.id)) continue;
+    const gate = { x: power.x - 54, y: power.y - 62, width: 156, height: 170 };
+    if (overlaps(playerWorld, gate)) {
+      state.collectedPickupIds.push(power.id);
+      state.lastCollectedPickupId = power.id;
+      state.activePower = power.kind;
+      state.pickupFlourishMs = 900;
+      state.lastAction = "power";
+      state.message = power.acquiredLine;
+    }
+  }
   for (const candidate of act.targets) {
     if (!state.transformedTargetIds.includes(candidate.id)) {
       const hit = state.projectiles.find((projectile) => overlaps(
-        { x: projectile.x, y: projectile.y - 48, width: 18, height: 96 },
+        projectileBounds(projectile),
         candidate,
-      ));
+      ) && runnerToolTargets(projectile.tool, candidate.kind));
       if (hit) {
         state.transformedTargetIds.push(candidate.id);
-        state.projectiles = state.projectiles.filter((projectile) => projectile !== hit);
+        if (!hit.pierce) state.projectiles = state.projectiles.filter((projectile) => projectile !== hit);
         state.message = candidate.sparkQuip;
         state.flourishMs = 720;
         state.lastTransformedTargetId = candidate.id;
+        state.lastAction = "tool";
       }
     }
     if (!state.encounteredTargetIds.includes(candidate.id) && !state.transformedTargetIds.includes(candidate.id)) {
-      const playerWorld = { x: state.worldX + RUNNER_PLAYER_SCREEN_X, y: state.y, width: PLAYER_WIDTH, height: PLAYER_HEIGHT };
       if (overlaps(playerWorld, candidate)) {
         state.encounteredTargetIds.push(candidate.id);
-        state.message = candidate.collisionQuip;
-        state.impactMs = 260;
+        if (state.activePower === "phulkari-guard") {
+          state.transformedTargetIds.push(candidate.id);
+          state.activePower = null;
+          state.flourishMs = 720;
+          state.lastTransformedTargetId = candidate.id;
+          state.message = `Phulkari Guard: ${candidate.transformedLabel}.`;
+        } else {
+          state.message = candidate.collisionQuip;
+          state.stumbleMs = 420;
+        }
+        state.impactMs = 320;
         state.lastEncounteredTargetId = candidate.id;
+        state.lastAction = "collision";
       }
     }
   }
@@ -352,6 +556,76 @@ export function stepRunner(previous: RunnerState, input: RunnerInput, deltaMs: n
     state.message = act.closing;
   }
   return state;
+}
+
+function runnerToolTargets(tool: RunnerToolKind, kind: RunnerTargetKind): boolean {
+  return RUNNER_TOOL_TARGETS[tool].includes(kind);
+}
+
+function projectile(
+  state: RunnerState,
+  tool: RunnerToolKind,
+  yOffset: number,
+  velocityX: number,
+  velocityY: number,
+  radius: number,
+  ttlMs: number,
+  pierce: boolean,
+): RunnerProjectile {
+  return {
+    x: state.worldX + RUNNER_PLAYER_SCREEN_X + 66,
+    y: state.y + 28 + yOffset,
+    velocityX,
+    velocityY,
+    ageMs: 0,
+    ttlMs,
+    radius,
+    tool,
+    pierce,
+  };
+}
+
+function launchRunnerTool(state: RunnerState) {
+  if (state.projectiles.length >= RUNNER_PROJECTILE_CAP) return;
+  const act = RUNNER_ACTS[state.actIndex];
+  const empowered = state.activePower === "chaa-overdrive";
+  const additions: RunnerProjectile[] = [];
+  if (act.tool === "phone-pulse") additions.push(projectile(state, act.tool, -24, 660, 0, empowered ? 34 : 20, 1_350, empowered));
+  else if (act.tool === "bargain-burst") {
+    const lanes = empowered ? [-26, 0, 26] : [-15, 15];
+    lanes.forEach((lane) => additions.push(projectile(state, act.tool, lane, 520, lane * 0.45, empowered ? 42 : 30, 680, empowered)));
+  } else if (act.tool === "dhaaga-arc") additions.push(projectile(state, act.tool, 0, 540, -95, empowered ? 40 : 28, 1_500, true));
+  else if (act.tool === "umbrella-wave") {
+    additions.push(projectile(state, act.tool, 12, 480, -165, empowered ? 50 : 38, 1_300, true));
+    if (!state.grounded) state.velocityY = Math.min(state.velocityY, -260);
+  } else {
+    const lanes = empowered ? [-54, -27, 0, 27, 54] : [-38, 0, 38];
+    lanes.forEach((lane) => additions.push(projectile(state, act.tool, lane, 610, lane * 0.7, empowered ? 32 : 22, 1_250, true)));
+  }
+  state.projectiles.push(...additions.slice(0, RUNNER_PROJECTILE_CAP - state.projectiles.length));
+  state.toolRecoveryMs = TOOL_RECOVERY_MS;
+  state.pendingTool = false;
+  state.lastAction = "tool";
+  state.message = empowered ? `${act.toolLabel} overdrive.` : `${act.toolLabel}.`;
+  if (empowered) state.activePower = null;
+}
+
+function advanceProjectile(projectileState: RunnerProjectile, stepMs: number, dt: number): RunnerProjectile {
+  const next = {
+    ...projectileState,
+    x: projectileState.x + projectileState.velocityX * dt,
+    y: projectileState.y + projectileState.velocityY * dt,
+    ageMs: projectileState.ageMs + stepMs,
+  };
+  if (next.tool === "dhaaga-arc") next.y += Math.sin((next.ageMs / next.ttlMs) * Math.PI * 2) * 4;
+  if (next.tool === "umbrella-wave") next.velocityY += 280 * dt;
+  return next;
+}
+
+function projectileBounds(projectileState: RunnerProjectile) {
+  const growth = projectileState.tool === "bargain-burst" ? projectileState.ageMs * 0.035 : 0;
+  const radius = projectileState.radius + growth;
+  return { x: projectileState.x - radius, y: projectileState.y - radius, width: radius * 2, height: radius * 2 };
 }
 
 function pixelRect(context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, color: string) {
