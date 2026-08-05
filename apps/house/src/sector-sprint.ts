@@ -8,7 +8,10 @@ export const RUNNER_PROJECTILE_CAP = 6;
 export const RUNNER_CAMERA_SHAKE_CAP = 6;
 export const RUNNER_FIXED_STEP_MS = 1_000 / 60;
 export const RUNNER_MAX_CATCH_UP_STEPS = 120;
-export const RUNNER_PLAYER_CEILING_Y = 104;
+export const RUNNER_PLAYER_CEILING_Y = 58;
+export const RUNNER_PLAYER_HITBOX = { offsetX: 10, offsetY: 14, width: 34, height: 48 } as const;
+export const RUNNER_ACTION_ROUTE_MINIMUM_MS = (RUNNER_ACT_SECONDS * 1_000 + RUNNER_FIXED_STEP_MS * RUNNER_MAX_CATCH_UP_STEPS) * 5 + 720 * 5 + 1;
+export const RUNNER_LAUNCH_GRACE_MS = 900;
 
 export type RunnerLead = "son" | "mother" | "duo";
 export type RunnerTargetKind =
@@ -25,6 +28,8 @@ export type RunnerPowerKind = "phulkari-guard" | "chaa-overdrive" | "monsoon-lif
 export type RunnerComplicationKind = "sabzi-load" | "monsoon-headwind";
 export type RunnerActionKind = "thrust" | "leap" | "air-step" | "dash" | "vault" | "stomp" | "tool" | "power" | "complication" | "collision";
 export type RunnerRenderQuality = "high" | "balanced" | "quiet";
+export type RunnerObstacleMaterial = "sandstone" | "market-timber" | "hammered-brass" | "wet-terrazzo" | "phulkari-inlay";
+export type RunnerFailureReason = "ceiling" | "road" | "corridor";
 
 export function runnerRenderQualityForIntervals(frameIntervals: readonly number[]): RunnerRenderQuality {
   const ordered = frameIntervals.filter((interval) => interval > 0 && interval <= 250).sort((left, right) => left - right);
@@ -101,6 +106,17 @@ export type RunnerAct = {
   targets: readonly RunnerTarget[];
   pickups: readonly RunnerPickup[];
   complications: readonly RunnerComplication[];
+  obstacles: readonly RunnerObstacle[];
+};
+
+export type RunnerObstacle = {
+  id: string;
+  x: number;
+  width: number;
+  gapY: number;
+  gapHeight: number;
+  material: RunnerObstacleMaterial;
+  label: string;
 };
 
 export type RunnerProjectile = {
@@ -118,6 +134,7 @@ export type RunnerProjectile = {
 export type RunnerState = {
   actIndex: number;
   elapsedMs: number;
+  launchGraceMs: number;
   worldX: number;
   y: number;
   velocityY: number;
@@ -146,6 +163,9 @@ export type RunnerState = {
   lastAction: RunnerActionKind | null;
   paused: boolean;
   finished: boolean;
+  failed: boolean;
+  failureReason: RunnerFailureReason | null;
+  failedObstacleId: string | null;
   projectiles: RunnerProjectile[];
   transformedTargetIds: string[];
   encounteredTargetIds: string[];
@@ -197,7 +217,11 @@ const PLAYER_HEIGHT = 76;
 const PLAYER_WIDTH = 54;
 export const RUNNER_PLAYER_SCREEN_X = 176;
 const WORLD_LENGTH = 4_080;
-const GRAVITY = 2_120;
+export const RUNNER_WORLD_SPEED = WORLD_LENGTH / RUNNER_ACT_SECONDS;
+export const RUNNER_GRAVITY = 1_850;
+export const RUNNER_THRUST_ACCELERATION = 3_300;
+export const RUNNER_MAX_RISE_SPEED = -560;
+export const RUNNER_MAX_FALL_SPEED = 760;
 const JUMP_VELOCITY = -790;
 const AIR_STEP_VELOCITY = -650;
 const STOMP_VELOCITY = 920;
@@ -205,9 +229,38 @@ const COYOTE_MS = 120;
 const JUMP_BUFFER_MS = 140;
 const JUMP_HOLD_MS = 180;
 const TOOL_RECOVERY_MS = 260;
-const THRUST_LAUNCH_VELOCITY = -330;
-const THRUST_ACCELERATION = 2_760;
-const THRUST_MAX_RISE_SPEED = -690;
+const THRUST_LAUNCH_VELOCITY = -240;
+
+const OBSTACLE_MATERIALS: readonly RunnerObstacleMaterial[] = [
+  "sandstone",
+  "market-timber",
+  "hammered-brass",
+  "wet-terrazzo",
+  "phulkari-inlay",
+] as const;
+const OBSTACLE_COUNTS = [8, 9, 10, 11, 12] as const;
+const OBSTACLE_GAPS = [132, 128, 124, 120, 116] as const;
+const OBSTACLE_CADENCE_SECONDS = [3, 2.8, 2.6, 2.4, 2.2] as const;
+const OBSTACLE_CENTER_SEQUENCE = [226, 172, 246, 196, 158, 232, 184, 252, 206, 166, 238, 190] as const;
+
+function runnerObstacles(actIndex: number): readonly RunnerObstacle[] {
+  const count = OBSTACLE_COUNTS[actIndex];
+  const gapHeight = OBSTACLE_GAPS[actIndex];
+  const spacing = RUNNER_WORLD_SPEED * OBSTACLE_CADENCE_SECONDS[actIndex];
+  const material = OBSTACLE_MATERIALS[actIndex];
+  return Array.from({ length: count }, (_, index) => {
+    const center = OBSTACLE_CENTER_SEQUENCE[(index + actIndex * 2) % OBSTACLE_CENTER_SEQUENCE.length];
+    return {
+      id: `act-${actIndex + 1}-gate-${index + 1}`,
+      x: Math.round(620 + index * spacing),
+      width: 84 + ((index + actIndex) % 3) * 8,
+      gapY: center - gapHeight / 2,
+      gapHeight,
+      material,
+      label: `${material.replaceAll("-", " ")} passage ${index + 1}`,
+    };
+  });
+}
 
 export function runnerWorldToScreen(worldX: number, cameraWorldX: number): number {
   return worldX - cameraWorldX;
@@ -260,7 +313,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     praise: "Shabaash — apology delivered with the groceries intact.",
     closing: "The front gate appears. Gurpreet arrives with dignity, groceries, and a revised estimate of ‘five minutes.’",
     storyBeats: [
-      "Gurpreet cuts through Sector 22 beneath long amber lamps, using a street dash and a high air step to keep the grocery bag clear.",
+      "Gurpreet pulses through Sector 22 beneath long amber lamps, then releases into a measured glide to keep the grocery bag clear.",
       "A Phone Pulse turns the missed-call wall into one calm ‘On my way’ note; Phulkari Guard folds a puddle splash into the road pattern.",
       "At the gate, Harjit checks the grocery bag first and the explanation second. The last home flare lands, and affection wins on a technicality.",
     ],
@@ -273,6 +326,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     ],
     pickups: [pickup("gw-guard", "phulkari-guard", 1_665, 244, "Phulkari Guard", "Phulkari Guard ready. The next interference becomes part of the pattern.")],
     complications: [complication("gw-load", "sabzi-load", 1_080, "Sabzi Load", "Sabzi Load: the bag settles low, and the whole flight becomes steadier.", "Sabzi Load balanced. The coriander remains dignified.")],
+    obstacles: runnerObstacles(0),
   },
   {
     id: "sabzi-command",
@@ -289,7 +343,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     praise: "Kamaal — Harjit has balanced the bag and the budget.",
     closing: "The sabzi bag is balanced, the bill is legible, and the coriander has arrived free of unnecessary suspense.",
     storyBeats: [
-      "Harjit enters the mandi with a cloth bag, a written list, and a low vault through the opening aisle.",
+      "Harjit enters the mandi with a cloth bag, a written list, and one low jetpack glide through the opening timber aisle.",
       "Her Bargain Burst settles a whole cone of theatrical price tags; Chaa Overdrive returns runaway tomatoes to formation.",
       "She leaves with every item, exact change, and enough coriander to make the fridge smell optimistic.",
     ],
@@ -303,6 +357,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     ],
     pickups: [pickup("sc-overdrive", "chaa-overdrive", 1_610, 240, "Chaa Overdrive", "Chaa Overdrive ready. The next bargain fills the whole aisle.")],
     complications: [complication("sc-load", "sabzi-load", 2_250, "Full Jhola", "Full Jhola: rise and fall soften while Harjit balances the market properly.", "Full Jhola settled. Exact change survives.")],
+    obstacles: runnerObstacles(1),
   },
   {
     id: "baraat-detour",
@@ -320,7 +375,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     closing: "The celebration keeps dancing, the family keeps moving, and nobody has attempted to overtake a dhol.",
     storyBeats: [
       "The road fills with layered streamers and a cheerful ‘just two minutes’ bubble of uncertain legal meaning.",
-      "Harjit finds the side lane while Gurpreet sends a piercing Dhaaga Arc through only the loose ribbons; Monsoon Lift holds their air step above the tangle.",
+      "Harjit finds the side lane while Gurpreet sends a piercing Dhaaga Arc through only the loose ribbons; one shared pulse holds their flight line above the tangle.",
       "They pass without touching the celebration or interrupting one dance step. This counts as excellent city diplomacy.",
     ],
     targets: [
@@ -334,6 +389,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     ],
     pickups: [pickup("bd-lift", "monsoon-lift", 1_705, 214, "Monsoon Lift", "Monsoon Lift ready. The next aerial line stays open longer.")],
     complications: [complication("bd-headwind", "monsoon-headwind", 1_535, "Dhol Headwind", "Dhol Headwind: ribbons lean, scarves stream, and the safe line stays exactly where it was.", "Dhol Headwind bows out on the beat.")],
+    obstacles: runnerObstacles(2),
   },
   {
     id: "monsoon-protocol",
@@ -352,7 +408,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     storyBeats: [
       "Rain cuts across Madhya Marg in lit sheets while a puddle spreads as if it received planning permission.",
       "An Umbrella Wave rises through water, paper, and one uncertain route bubble, turning each into a brass-edged clear line.",
-      "Harjit and Gurpreet stomp into the dry-side glow together. Neither mentions who forgot to check the forecast.",
+      "Harjit and Gurpreet glide into the dry-side glow together. Neither mentions who forgot to check the forecast.",
     ],
     targets: [
       target("mp-puddle-1", "puddle-splash", 650, 320, 132, 32, "Wide puddle", "Quiet ripple", "Rainwater accepts a smaller footprint.", "This puddle has applied for sector status."),
@@ -366,6 +422,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     ],
     pickups: [pickup("mp-guard", "phulkari-guard", 2_315, 232, "Phulkari Guard", "Phulkari Guard ready. The rain can make one dramatic entrance.")],
     complications: [complication("mp-headwind", "monsoon-headwind", 1_455, "Monsoon Headwind", "Monsoon Headwind: the weather performs sideways while the flight line stays honest.", "Monsoon Headwind passes. The umbrella files no complaint.")],
+    obstacles: runnerObstacles(3),
   },
   {
     id: "roti-relay",
@@ -399,6 +456,7 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     ],
     pickups: [pickup("rr-overdrive", "chaa-overdrive", 1_805, 236, "Chaa Overdrive", "Chaa Overdrive ready. The home signal now reaches every lane.")],
     complications: [complication("rr-load", "sabzi-load", 2_435, "Dinner Cargo", "Dinner Cargo: both bags settle into one slower, steadier home line.", "Dinner Cargo balanced. Roti approach restored.")],
+    obstacles: runnerObstacles(4),
   },
 ] as const;
 
@@ -407,11 +465,12 @@ export function createRunnerState(actIndex: number): RunnerState {
   return {
     actIndex,
     elapsedMs: 0,
+    launchGraceMs: RUNNER_LAUNCH_GRACE_MS,
     worldX: 0,
-    y: FLOOR_Y - PLAYER_HEIGHT,
+    y: 190,
     velocityY: 0,
-    grounded: true,
-    coyoteMs: COYOTE_MS,
+    grounded: false,
+    coyoteMs: 0,
     jumpBufferMs: 0,
     jumpHoldMs: 0,
     airStepsRemaining: 1,
@@ -435,6 +494,9 @@ export function createRunnerState(actIndex: number): RunnerState {
     lastAction: null,
     paused: false,
     finished: false,
+    failed: false,
+    failureReason: null,
+    failedObstacleId: null,
     projectiles: [],
     transformedTargetIds: [],
     encounteredTargetIds: [],
@@ -452,6 +514,88 @@ function overlaps(a: { x: number; y: number; width: number; height: number }, b:
   return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
 }
 
+export function runnerPlayerHitbox(state: Pick<RunnerState, "worldX" | "y">) {
+  return {
+    x: state.worldX + RUNNER_PLAYER_SCREEN_X + RUNNER_PLAYER_HITBOX.offsetX,
+    y: state.y + RUNNER_PLAYER_HITBOX.offsetY,
+    width: RUNNER_PLAYER_HITBOX.width,
+    height: RUNNER_PLAYER_HITBOX.height,
+  };
+}
+
+function sweptHitTime(
+  start: { x: number; y: number; width: number; height: number },
+  end: { x: number; y: number; width: number; height: number },
+  obstacle: { x: number; y: number; width: number; height: number },
+): number | null {
+  if (overlaps(start, obstacle)) return 0;
+  const expanded = {
+    left: obstacle.x - start.width,
+    right: obstacle.x + obstacle.width,
+    top: obstacle.y - start.height,
+    bottom: obstacle.y + obstacle.height,
+  };
+  const deltaX = end.x - start.x;
+  const deltaY = end.y - start.y;
+  let near = 0;
+  let far = 1;
+  for (const [origin, delta, minimum, maximum] of [
+    [start.x, deltaX, expanded.left, expanded.right],
+    [start.y, deltaY, expanded.top, expanded.bottom],
+  ] as const) {
+    if (Math.abs(delta) < 0.00001) {
+      if (origin < minimum || origin > maximum) return null;
+      continue;
+    }
+    const first = (minimum - origin) / delta;
+    const second = (maximum - origin) / delta;
+    near = Math.max(near, Math.min(first, second));
+    far = Math.min(far, Math.max(first, second));
+    if (near > far) return null;
+  }
+  return near >= 0 && near <= 1 ? near : null;
+}
+
+function firstLethalContact(previous: RunnerState, next: RunnerState) {
+  const start = runnerPlayerHitbox(previous);
+  const end = runnerPlayerHitbox(next);
+  const act = RUNNER_ACTS[next.actIndex];
+  const candidates: Array<{ id: string; reason: RunnerFailureReason; time: number }> = [];
+  const addCandidate = (id: string, reason: RunnerFailureReason, rect: { x: number; y: number; width: number; height: number }) => {
+    const time = sweptHitTime(start, end, rect);
+    if (time !== null) candidates.push({ id, reason, time });
+  };
+  addCandidate("ceiling", "ceiling", { x: -1_000, y: -1_000, width: WORLD_LENGTH + 2_000, height: RUNNER_PLAYER_CEILING_Y + 1_000 });
+  addCandidate("road", "road", { x: -1_000, y: FLOOR_Y, width: WORLD_LENGTH + 2_000, height: RUNNER_HEIGHT - FLOOR_Y + 1_000 });
+  for (const obstacle of act.obstacles) {
+    addCandidate(`${obstacle.id}-top`, "corridor", { x: obstacle.x, y: 0, width: obstacle.width, height: obstacle.gapY });
+    addCandidate(`${obstacle.id}-bottom`, "corridor", {
+      x: obstacle.x,
+      y: obstacle.gapY + obstacle.gapHeight,
+      width: obstacle.width,
+      height: FLOOR_Y - obstacle.gapY - obstacle.gapHeight,
+    });
+  }
+  return candidates.sort((left, right) => left.time - right.time || left.id.localeCompare(right.id))[0] ?? null;
+}
+
+function failRunner(state: RunnerState, contact: { id: string; reason: RunnerFailureReason }) {
+  state.failed = true;
+  state.failureReason = contact.reason;
+  state.failedObstacleId = contact.reason === "corridor" ? contact.id.replace(/-(top|bottom)$/, "") : null;
+  state.velocityY = 0;
+  state.thrusting = false;
+  state.pendingTool = false;
+  state.projectiles = [];
+  state.impactMs = 420;
+  state.lastAction = "collision";
+  state.message = contact.reason === "corridor"
+    ? "Route wiped. The jetpack sputters; the city holds the same boundary."
+    : contact.reason === "ceiling"
+      ? "Ceiling line touched. The jetpack sputters and the route closes cleanly."
+      : "Road line touched. The jetpack sputters and the route closes cleanly.";
+}
+
 export function stepRunner(previous: RunnerState, input: RunnerInput, deltaMs: number): RunnerState {
   const state: RunnerState = {
     ...previous,
@@ -461,7 +605,7 @@ export function stepRunner(previous: RunnerState, input: RunnerInput, deltaMs: n
     collectedPickupIds: [...previous.collectedPickupIds],
     encounteredComplicationIds: [...previous.encounteredComplicationIds],
   };
-  if (state.finished || state.paused) return state;
+  if (state.finished || state.failed || state.paused) return state;
   const stepMs = Math.max(0, Math.min(deltaMs, 50));
   state.flourishMs = Math.max(0, state.flourishMs - stepMs);
   state.landingMs = Math.max(0, state.landingMs - stepMs);
@@ -475,28 +619,14 @@ export function stepRunner(previous: RunnerState, input: RunnerInput, deltaMs: n
   state.stumbleMs = Math.max(0, state.stumbleMs - stepMs);
   state.toolRecoveryMs = Math.max(0, state.toolRecoveryMs - stepMs);
   state.jumpBufferMs = Math.max(0, state.jumpBufferMs - stepMs);
+  state.launchGraceMs = Math.max(0, state.launchGraceMs - stepMs);
   state.thrusting = false;
   const dt = stepMs / 1_000;
-  const wasGrounded = state.grounded;
-  state.coyoteMs = state.grounded ? COYOTE_MS : Math.max(0, state.coyoteMs - stepMs);
   const jumpPressed = Boolean(input.jumpPressed || input.jump);
   const thrustPressed = Boolean(input.thrustPressed);
   const thrustHeld = Boolean(input.thrustHeld);
   const dashPressed = Boolean(input.dashPressed || input.dash);
   const toolPressed = Boolean(input.toolPressed || input.tool || input.spark);
-  if (jumpPressed) state.jumpBufferMs = JUMP_BUFFER_MS;
-
-  const beginJump = (velocity: number, action: RunnerActionKind, line: string) => {
-    const lifted = state.activePower === "monsoon-lift";
-    state.velocityY = velocity * (lifted ? 1.14 : 1);
-    state.grounded = false;
-    state.coyoteMs = 0;
-    state.jumpBufferMs = 0;
-    state.jumpHoldMs = lifted ? JUMP_HOLD_MS + 120 : JUMP_HOLD_MS;
-    state.lastAction = action;
-    state.message = lifted ? `${line} Monsoon Lift opens the air.` : line;
-    if (lifted) state.activePower = null;
-  };
 
   if (state.activeComplication && state.activeComplicationRemainingMs > 0) {
     state.activeComplicationRemainingMs = Math.max(0, state.activeComplicationRemainingMs - stepMs);
@@ -510,51 +640,15 @@ export function stepRunner(previous: RunnerState, input: RunnerInput, deltaMs: n
     }
   }
 
-  if (thrustPressed && state.grounded) {
-    beginJump(THRUST_LAUNCH_VELOCITY, "thrust", "Steam lift. Hold the line; release to settle.");
+  if (thrustPressed || jumpPressed) {
+    state.lastAction = "thrust";
+    state.message = "Jetpack pulse engaged. Release early; inertia carries the line.";
   }
-
-  if (state.jumpBufferMs > 0 && (state.grounded || state.coyoteMs > 0)) {
-    state.airStepsRemaining = 1;
-    beginJump(JUMP_VELOCITY, "leap", "Leap committed. The city drops away.");
-  } else if (jumpPressed && !state.grounded && state.airStepsRemaining > 0) {
-    state.airStepsRemaining -= 1;
-    state.airStepMs = 340;
-    beginJump(AIR_STEP_VELOCITY, "air-step", "Air step. One more line through the skyline.");
-  }
-
-  if (input.jumpReleased) {
-    state.jumpHoldMs = 0;
-    if (state.velocityY < -300) state.velocityY *= 0.58;
-  }
-
-  if (input.thrustReleased && state.velocityY < -260) state.velocityY *= 0.72;
 
   if (dashPressed) {
-    if (state.grounded) {
-      const act = RUNNER_ACTS[state.actIndex];
-      const nextLow = act.targets.find((candidate) => (
-        !state.transformedTargetIds.includes(candidate.id)
-        && candidate.x >= state.worldX + RUNNER_PLAYER_SCREEN_X + 20
-        && candidate.x <= state.worldX + RUNNER_PLAYER_SCREEN_X + 190
-        && candidate.height <= 72
-      ));
-      if (nextLow) {
-        state.vaultMs = 420;
-        state.airStepsRemaining = 1;
-        beginJump(-570, "vault", `Context vault. ${nextLow.label} stays below the line.`);
-      } else {
-        state.dashMs = 420;
-        state.lastAction = "dash";
-        state.message = "Street dash. Same route, sharper silhouette.";
-      }
-    } else {
-      state.stompMs = 420;
-      state.velocityY = Math.max(STOMP_VELOCITY, state.velocityY);
-      state.jumpHoldMs = 0;
-      state.lastAction = "stomp";
-      state.message = "Aerial stomp. The road answers in brass.";
-    }
+    state.dashMs = 420;
+    state.lastAction = "dash";
+    state.message = "Jetpack trim. The silhouette tightens; the flight line stays honest.";
   }
 
   if (toolPressed) {
@@ -566,36 +660,27 @@ export function stepRunner(previous: RunnerState, input: RunnerInput, deltaMs: n
   }
   state.elapsedMs = Math.min(RUNNER_ACT_SECONDS * 1_000, state.elapsedMs + stepMs);
   state.worldX = WORLD_LENGTH * (state.elapsedMs / (RUNNER_ACT_SECONDS * 1_000));
-  const motionScale = state.activeComplication === "sabzi-load" ? 0.72 : 1;
-  if (thrustHeld) {
-    if (state.grounded) beginJump(THRUST_LAUNCH_VELOCITY, "thrust", "Steam lift. Hold the line; release to settle.");
-    state.thrusting = true;
-    const liftScale = state.activePower === "monsoon-lift" ? 1.14 : 1;
-    state.velocityY = Math.max(THRUST_MAX_RISE_SPEED * liftScale, state.velocityY - THRUST_ACCELERATION * motionScale * liftScale * dt);
-  }
-  const heldGravity = input.jumpHeld && state.jumpHoldMs > 0 && state.velocityY < 0 ? GRAVITY * 0.34 : GRAVITY;
-  state.jumpHoldMs = Math.max(0, state.jumpHoldMs - stepMs);
-  state.velocityY += heldGravity * motionScale * dt;
-  state.y += state.velocityY * motionScale * dt;
-  if (state.y < RUNNER_PLAYER_CEILING_Y) {
-    state.y = RUNNER_PLAYER_CEILING_Y;
-    if (state.velocityY < 0) state.velocityY = 0;
-  }
-  const restingY = FLOOR_Y - PLAYER_HEIGHT;
-  if (state.y >= restingY && state.velocityY >= 0) {
-    state.y = restingY;
+  if (state.launchGraceMs > 0) {
+    state.thrusting = thrustHeld;
     state.velocityY = 0;
-    state.grounded = true;
-    state.airStepsRemaining = 1;
-    state.stompMs = 0;
-    if (!wasGrounded) {
-      state.landingMs = 280;
-      if (state.jumpBufferMs > 0) beginJump(JUMP_VELOCITY, "leap", "Buffered leap. The landing becomes another launch.");
+  } else {
+    if (thrustHeld) {
+      state.thrusting = true;
+      state.velocityY -= RUNNER_THRUST_ACCELERATION * dt;
     }
+    state.velocityY = Math.max(RUNNER_MAX_RISE_SPEED, Math.min(RUNNER_MAX_FALL_SPEED, state.velocityY + RUNNER_GRAVITY * dt));
+    state.y += state.velocityY * dt;
   }
+  state.grounded = false;
   state.projectiles = state.projectiles
     .map((projectile) => advanceProjectile(projectile, stepMs, dt))
     .filter((projectile) => projectile.ageMs < projectile.ttlMs && projectile.x < state.worldX + RUNNER_WIDTH + 180);
+
+  const lethalContact = firstLethalContact(previous, state);
+  if (lethalContact) {
+    failRunner(state, lethalContact);
+    return state;
+  }
 
   const act = RUNNER_ACTS[state.actIndex];
   const playerWorld = { x: state.worldX + RUNNER_PLAYER_SCREEN_X - 12, y: state.y - 14, width: PLAYER_WIDTH + 32, height: PLAYER_HEIGHT + 28 };
@@ -638,24 +723,6 @@ export function stepRunner(previous: RunnerState, input: RunnerInput, deltaMs: n
         state.flourishMs = 720;
         state.lastTransformedTargetId = candidate.id;
         state.lastAction = "tool";
-      }
-    }
-    if (!state.encounteredTargetIds.includes(candidate.id) && !state.transformedTargetIds.includes(candidate.id)) {
-      if (overlaps(playerWorld, candidate)) {
-        state.encounteredTargetIds.push(candidate.id);
-        if (state.activePower === "phulkari-guard") {
-          state.transformedTargetIds.push(candidate.id);
-          state.activePower = null;
-          state.flourishMs = 720;
-          state.lastTransformedTargetId = candidate.id;
-          state.message = `Phulkari Guard: ${candidate.transformedLabel}.`;
-        } else {
-          state.message = candidate.collisionQuip;
-          state.stumbleMs = 420;
-        }
-        state.impactMs = 320;
-        state.lastEncounteredTargetId = candidate.id;
-        state.lastAction = "collision";
       }
     }
   }
@@ -773,7 +840,7 @@ const ACT_GRADES = [
   { sky: "#060d19", horizon: "#52283b", glow: "#ffbd52", energy: "#f7e8c6" },
 ] as const;
 
-function drawTarget(context: CanvasRenderingContext2D, candidate: RunnerTarget, screenX: number, transformed: boolean, palette: RunnerPalette) {
+function drawTarget(context: CanvasRenderingContext2D, candidate: RunnerTarget, screenX: number, transformed: boolean, palette: RunnerPalette, quality: RunnerRenderQuality = "high") {
   const x = Math.round(screenX);
   const y = candidate.y;
   const grade = ACT_GRADES[Math.max(0, Math.min(4, RUNNER_ACTS.findIndex((act) => act.targets.includes(candidate))))];
@@ -781,7 +848,7 @@ function drawTarget(context: CanvasRenderingContext2D, candidate: RunnerTarget, 
   context.save();
   context.translate(x, y);
   context.shadowColor = transformed ? palette.jade : grade.glow;
-  context.shadowBlur = transformed ? 20 : 12;
+  context.shadowBlur = quality === "quiet" ? 0 : transformed ? 20 : 12;
   const surface = context.createLinearGradient(0, 0, candidate.width, candidate.height);
   surface.addColorStop(0, transformed ? "#173e39" : "#101f36");
   surface.addColorStop(1, transformed ? "#0b2525" : "#07111f");
@@ -891,6 +958,169 @@ function drawTarget(context: CanvasRenderingContext2D, candidate: RunnerTarget, 
   context.restore();
 }
 
+const OBSTACLE_COLORS: Readonly<Record<RunnerObstacleMaterial, { light: string; mid: string; dark: string; line: string }>> = {
+  sandstone: { light: "#c98f5d", mid: "#865337", dark: "#321f20", line: "#f1c98d" },
+  "market-timber": { light: "#a8673d", mid: "#603921", dark: "#251719", line: "#eab36d" },
+  "hammered-brass": { light: "#d8aa45", mid: "#806326", dark: "#292019", line: "#ffe09a" },
+  "wet-terrazzo": { light: "#6c8d94", mid: "#34545d", dark: "#17252c", line: "#b8edf0" },
+  "phulkari-inlay": { light: "#b84768", mid: "#6e264d", dark: "#25152d", line: "#ffd06a" },
+};
+
+function drawObstacleTexture(
+  context: CanvasRenderingContext2D,
+  obstacle: RunnerObstacle,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  quality: RunnerRenderQuality,
+) {
+  const colors = OBSTACLE_COLORS[obstacle.material];
+  const detail = quality === "high" ? 1 : quality === "balanced" ? 0.68 : 0.38;
+  context.save();
+  context.beginPath();
+  context.rect(x, y, width, height);
+  context.clip();
+  context.globalAlpha = 0.42;
+  context.strokeStyle = colors.line;
+  context.fillStyle = colors.line;
+  context.lineWidth = 1;
+  if (obstacle.material === "sandstone") {
+    for (let line = y + 18; line < y + height; line += quality === "high" ? 21 : 32) {
+      context.beginPath();
+      context.moveTo(x, line);
+      context.lineTo(x + width, line);
+      context.stroke();
+      if (quality !== "quiet") {
+        const offset = Math.floor((line - y) / 21) % 2 ? width * 0.35 : width * 0.68;
+        context.beginPath();
+        context.moveTo(x + offset, line - 21);
+        context.lineTo(x + offset, line);
+        context.stroke();
+      }
+    }
+  } else if (obstacle.material === "market-timber") {
+    for (let plank = x + 16; plank < x + width; plank += 22) {
+      context.beginPath();
+      context.moveTo(plank, y);
+      context.lineTo(plank, y + height);
+      context.stroke();
+      if (quality === "high") {
+        context.beginPath();
+        context.ellipse(plank - 8, y + 32 + (plank % 3) * 19, 5, 11, 0, 0, Math.PI * 2);
+        context.stroke();
+      }
+    }
+  } else if (obstacle.material === "hammered-brass") {
+    const step = quality === "high" ? 18 : 28;
+    for (let row = y + step / 2; row < y + height; row += step) {
+      for (let column = x + step / 2; column < x + width; column += step) {
+        context.globalAlpha = detail * 0.46;
+        context.beginPath();
+        context.arc(column, row, quality === "quiet" ? 1.4 : 2.4, 0, Math.PI * 2);
+        context.fill();
+      }
+    }
+  } else if (obstacle.material === "wet-terrazzo") {
+    const chips = Math.floor(height * width / (quality === "high" ? 520 : 940));
+    for (let chip = 0; chip < chips; chip += 1) {
+      const seed = hashText(`${obstacle.id}-${y}-${chip}`);
+      const chipX = x + 6 + (seed % Math.max(1, Math.floor(width - 12)));
+      const chipY = y + 6 + ((seed >>> 8) % Math.max(1, Math.floor(height - 12)));
+      drawDiamond(context, chipX, chipY, 2 + (seed % 3), chip % 3 === 0 ? "#f4b32b" : colors.line);
+    }
+  } else {
+    const step = quality === "high" ? 22 : 32;
+    for (let row = y + step / 2; row < y + height; row += step) {
+      for (let column = x + step / 2; column < x + width; column += step) {
+        drawDiamond(context, column, row, quality === "quiet" ? 5 : 7, (Math.round(row / step) + Math.round(column / step)) % 2 ? colors.line : "#69d1c5", false);
+      }
+    }
+  }
+  context.restore();
+}
+
+function drawObstacleFace(
+  context: CanvasRenderingContext2D,
+  obstacle: RunnerObstacle,
+  screenX: number,
+  y: number,
+  height: number,
+  innerEdgeY: number,
+  edgeDirection: 1 | -1,
+  quality: RunnerRenderQuality,
+) {
+  if (height <= 0) return;
+  const colors = OBSTACLE_COLORS[obstacle.material];
+  const gradient = quality === "quiet" ? null : context.createLinearGradient(screenX, 0, screenX + obstacle.width, 0);
+  gradient?.addColorStop(0, colors.dark);
+  gradient?.addColorStop(0.22, colors.mid);
+  gradient?.addColorStop(0.72, colors.light);
+  gradient?.addColorStop(1, colors.dark);
+  context.save();
+  context.shadowColor = quality === "quiet" ? "transparent" : "#000000a8";
+  context.shadowBlur = quality === "high" ? 16 : quality === "balanced" ? 6 : 0;
+  context.shadowOffsetX = quality === "quiet" ? 0 : -6;
+  context.fillStyle = gradient ?? colors.mid;
+  context.fillRect(screenX, y, obstacle.width, height);
+  context.shadowBlur = 0;
+  if (quality !== "quiet") drawObstacleTexture(context, obstacle, screenX, y, obstacle.width, height, quality);
+  context.fillStyle = colors.dark;
+  context.fillRect(screenX, y, 7, height);
+  context.fillStyle = `${colors.line}42`;
+  context.fillRect(screenX + obstacle.width - 9, y, 4, height);
+  context.strokeStyle = colors.line;
+  context.lineWidth = 3;
+  context.beginPath();
+  context.moveTo(screenX, innerEdgeY);
+  context.lineTo(screenX + obstacle.width, innerEdgeY);
+  context.stroke();
+  context.strokeStyle = "#fff1c2";
+  context.lineWidth = 1;
+  context.beginPath();
+  context.moveTo(screenX, innerEdgeY + edgeDirection * 5);
+  context.lineTo(screenX + obstacle.width, innerEdgeY + edgeDirection * 5);
+  context.stroke();
+  context.fillStyle = colors.line;
+  for (let notch = 12; notch < obstacle.width - 5; notch += 22) {
+    context.beginPath();
+    context.moveTo(screenX + notch - 5, innerEdgeY);
+    context.lineTo(screenX + notch, innerEdgeY - edgeDirection * 7);
+    context.lineTo(screenX + notch + 5, innerEdgeY);
+    context.closePath();
+    context.fill();
+  }
+  context.strokeStyle = "#080a12";
+  context.lineWidth = 2;
+  context.strokeRect(screenX + 1, y + 1, obstacle.width - 2, Math.max(0, height - 2));
+  context.restore();
+}
+
+function drawRunnerObstacles(context: CanvasRenderingContext2D, state: RunnerState, quality: RunnerRenderQuality) {
+  const act = RUNNER_ACTS[state.actIndex];
+  for (const obstacle of act.obstacles) {
+    const screenX = runnerWorldToScreen(obstacle.x, state.worldX);
+    if (screenX < -obstacle.width - 24 || screenX > RUNNER_WIDTH + 24) continue;
+    const gapBottom = obstacle.gapY + obstacle.gapHeight;
+    drawObstacleFace(context, obstacle, screenX, 0, obstacle.gapY, obstacle.gapY, -1, quality);
+    drawObstacleFace(context, obstacle, screenX, gapBottom, FLOOR_Y - gapBottom, gapBottom, 1, quality);
+    if (quality !== "quiet" && gapBottom + 40 < FLOOR_Y) {
+      context.save();
+      context.fillStyle = "#090d18d9";
+      context.strokeStyle = OBSTACLE_COLORS[obstacle.material].line;
+      context.lineWidth = 1;
+      context.fillRect(screenX + 9, gapBottom + 15, obstacle.width - 18, 25);
+      context.strokeRect(screenX + 9, gapBottom + 15, obstacle.width - 18, 25);
+      context.fillStyle = "#fff1c2";
+      context.font = "700 8px ui-monospace, monospace";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(String(act.obstacles.indexOf(obstacle) + 1).padStart(2, "0"), screenX + obstacle.width / 2, gapBottom + 27.5);
+      context.restore();
+    }
+  }
+}
+
 function drawLeadSprite(
   context: CanvasRenderingContext2D,
   x: number,
@@ -899,21 +1129,37 @@ function drawLeadSprite(
   state: RunnerState,
   palette: RunnerPalette,
   scale = 1.22,
+  reducedMotion = false,
 ) {
   const runFrame = Math.floor(state.elapsedMs / 95) % 4;
   const stride = state.grounded ? [-9, 1, 9, -1][runFrame] : state.stompMs > 0 ? 1 : 5;
   const bounce = state.grounded && state.landingMs === 0 ? [0, -2.5, 0, -1.5][runFrame] : 0;
-  const squash = state.landingMs > 0 ? 0.9 : 1;
-  const stretch = state.grounded ? 1 : 1.07;
+  const velocityStretch = reducedMotion ? 0 : Math.min(0.07, Math.abs(state.velocityY) / 9_000);
+  const squash = state.failed ? 0.94 : state.thrusting ? 0.97 : 1;
+  const stretch = state.failed ? 1.02 : 1 + velocityStretch;
   const cloth = role === "mother" ? "#9d304f" : "#244e8e";
   const skin = "#d3a06f";
   const recoil = state.stumbleMs > 0 ? Math.sin(state.stumbleMs * 0.08) * 4 : 0;
-  const lean = state.dashMs > 0 ? 0.12 : state.stompMs > 0 ? -0.06 : 0;
+  const lean = reducedMotion ? 0 : runnerVelocityPitch(state);
   context.save();
   context.translate(Math.round(x + PLAYER_WIDTH / 2 + recoil), Math.round(y + PLAYER_HEIGHT));
   context.rotate(lean);
   context.scale(scale * squash, scale * stretch);
   context.translate(-PLAYER_WIDTH / 2, -PLAYER_HEIGHT + bounce);
+
+  context.fillStyle = "#b68135";
+  context.strokeStyle = palette.ink;
+  context.lineWidth = 2;
+  context.beginPath();
+  context.roundRect(2, 29, 13, 30, 4);
+  context.fill();
+  context.stroke();
+  context.strokeStyle = state.failed ? palette.muted : palette.accent;
+  context.lineWidth = state.thrusting ? 6 : 3;
+  context.beginPath();
+  context.moveTo(4, 58);
+  context.lineTo(-8 - (state.thrusting ? 14 : 4), 58 + (reducedMotion ? 0 : Math.min(12, state.velocityY * 0.016)));
+  context.stroke();
 
   context.globalAlpha = 0.32;
   context.fillStyle = "#000000";
@@ -996,6 +1242,77 @@ export function runnerAuthoredPoseIndex(state: RunnerState): number {
   return Math.floor(state.elapsedMs / 180) % 2 === 0 ? 1 : 4;
 }
 
+export function runnerVelocityPitch(state: Pick<RunnerState, "velocityY" | "failed">): number {
+  if (state.failed) return 0.09;
+  return Math.max(-0.2, Math.min(0.2, state.velocityY / 3_200));
+}
+
+export function runnerAuthoredPoseBlend(state: RunnerState) {
+  const pose = runnerAuthoredPoseIndex(state);
+  if (state.failed || state.impactMs > 0) return { from: pose, to: pose, mix: 0 };
+  const phase = (state.elapsedMs % 160) / 160;
+  const adjacent = state.thrusting ? 1 : state.velocityY > 180 ? 4 : state.velocityY < -180 ? 0 : pose === 1 ? 4 : 1;
+  return { from: pose, to: adjacent, mix: Math.min(0.38, phase * 0.76) };
+}
+
+export function runnerLeadFormation(lead: RunnerLead) {
+  if (lead === "duo") return [
+    { role: "mother", offsetX: -12, offsetY: 6, scale: 0.82 },
+    { role: "son", offsetX: 8, offsetY: 0, scale: 0.9 },
+  ] as const;
+  return [{ role: lead, offsetX: 0, offsetY: 0, scale: lead === "mother" ? 1.05 : 1.05 }] as const;
+}
+
+function drawFlightRig(
+  context: CanvasRenderingContext2D,
+  destinationX: number,
+  destinationY: number,
+  destinationWidth: number,
+  destinationHeight: number,
+  role: "son" | "mother",
+  state: RunnerState,
+  reducedMotion: boolean,
+) {
+  const rigX = destinationX + destinationWidth * 0.26;
+  const rigY = destinationY + destinationHeight * 0.49;
+  const lag = reducedMotion ? 0 : Math.max(-14, Math.min(14, state.velocityY * 0.022));
+  context.save();
+  context.fillStyle = "#9a7130";
+  context.strokeStyle = "#f4c66d";
+  context.lineWidth = 1.5;
+  context.beginPath();
+  context.roundRect(rigX, rigY, 12, 25, 3);
+  context.fill();
+  context.stroke();
+  context.strokeStyle = role === "mother" ? "#f4b32b" : "#55d6e8";
+  context.lineWidth = 4;
+  context.lineCap = "round";
+  context.beginPath();
+  context.moveTo(rigX + 2, rigY + 6);
+  context.bezierCurveTo(rigX - 20, rigY + 2 + lag, rigX - 29, rigY + 19 + lag, rigX - 42, rigY + 12 + lag);
+  context.stroke();
+  context.fillStyle = "#bb7c39";
+  context.beginPath();
+  context.roundRect(rigX + 5, rigY + 17 + lag * 0.18, 15, 18, 4);
+  context.fill();
+  if (state.thrusting || state.failed) {
+    context.globalAlpha = state.failed ? 0.56 : 0.9;
+    context.strokeStyle = state.failed ? "#c6bca7" : "#70e7f0";
+    context.lineWidth = state.thrusting ? 7 : 3;
+    context.beginPath();
+    context.moveTo(rigX + 2, rigY + 23);
+    context.lineTo(rigX - (state.thrusting ? 31 : 14), rigY + 24 + lag * 0.22);
+    context.stroke();
+    context.strokeStyle = "#f7c35c";
+    context.lineWidth = state.thrusting ? 3 : 1.5;
+    context.beginPath();
+    context.moveTo(rigX + 1, rigY + 23);
+    context.lineTo(rigX - (state.thrusting ? 21 : 8), rigY + 24 + lag * 0.16);
+    context.stroke();
+  }
+  context.restore();
+}
+
 function drawAuthoredLead(
   context: CanvasRenderingContext2D,
   spriteSheet: HTMLImageElement,
@@ -1004,23 +1321,32 @@ function drawAuthoredLead(
   role: "son" | "mother",
   state: RunnerState,
   scale = 1,
+  reducedMotion = false,
 ): boolean {
   if (!spriteSheet.complete || spriteSheet.naturalWidth <= 0 || spriteSheet.naturalHeight <= 0) return false;
   const sourceWidth = spriteSheet.naturalWidth / 5;
   const sourceHeight = spriteSheet.naturalHeight / 2;
-  const pose = runnerAuthoredPoseIndex(state);
-  const destinationHeight = 156 * scale;
+  const blend = reducedMotion
+    ? { from: runnerAuthoredPoseIndex(state), to: runnerAuthoredPoseIndex(state), mix: 0 }
+    : runnerAuthoredPoseBlend(state);
+  const destinationHeight = 96 * scale;
   const destinationWidth = destinationHeight * (sourceWidth / sourceHeight);
   const destinationX = PLAYER_WIDTH / 2 - destinationWidth / 2;
   const destinationY = PLAYER_HEIGHT - destinationHeight;
-  const recoil = state.stumbleMs > 0 ? Math.sin(state.stumbleMs * 0.08) * 3 : 0;
+  const recoil = state.failed && !reducedMotion ? 4 : 0;
+  const velocityStretch = reducedMotion ? 0 : Math.min(0.06, Math.abs(state.velocityY) / 10_000);
   context.save();
-  context.translate(Math.round(x + recoil), Math.round(y));
+  context.translate(Math.round(x + PLAYER_WIDTH / 2 + recoil), Math.round(y + PLAYER_HEIGHT / 2));
+  context.rotate(reducedMotion ? 0 : runnerVelocityPitch(state));
+  context.scale(state.thrusting ? 0.98 : 1, 1 + velocityStretch);
+  context.translate(-PLAYER_WIDTH / 2, -PLAYER_HEIGHT / 2);
   context.shadowColor = state.thrusting ? "#55d6e8" : "#000000b8";
   context.shadowBlur = state.thrusting ? 15 : 6;
+  drawFlightRig(context, destinationX, destinationY, destinationWidth, destinationHeight, role, state, reducedMotion);
+  context.globalAlpha = 1 - blend.mix;
   context.drawImage(
     spriteSheet,
-    pose * sourceWidth,
+    blend.from * sourceWidth,
     role === "mother" ? sourceHeight : 0,
     sourceWidth,
     sourceHeight,
@@ -1029,6 +1355,21 @@ function drawAuthoredLead(
     destinationWidth,
     destinationHeight,
   );
+  if (blend.mix > 0) {
+    context.globalAlpha = blend.mix;
+    context.drawImage(
+      spriteSheet,
+      blend.to * sourceWidth,
+      role === "mother" ? sourceHeight : 0,
+      sourceWidth,
+      sourceHeight,
+      destinationX,
+      destinationY,
+      destinationWidth,
+      destinationHeight,
+    );
+  }
+  context.globalAlpha = 1;
   context.restore();
   return true;
 }
@@ -1039,15 +1380,19 @@ function drawPerson(
   lead: RunnerLead,
   palette: RunnerPalette,
   spriteSheet: HTMLImageElement | null,
+  reducedMotion = false,
 ) {
   const x = RUNNER_PLAYER_SCREEN_X;
+  const formation = runnerLeadFormation(lead);
   if (spriteSheet?.complete && spriteSheet.naturalWidth > 0) {
-    if (lead === "duo") drawAuthoredLead(context, spriteSheet, x - 56, state.y + 7, "mother", state, 0.86);
-    drawAuthoredLead(context, spriteSheet, x, state.y, lead === "mother" ? "mother" : "son", state, lead === "duo" ? 0.98 : 1.12);
+    for (const rider of formation) {
+      drawAuthoredLead(context, spriteSheet, x + rider.offsetX, state.y + rider.offsetY, rider.role, state, rider.scale, reducedMotion);
+    }
     return;
   }
-  if (lead === "duo") drawLeadSprite(context, x - 46, state.y + 8, "mother", state, palette, 1.08);
-  drawLeadSprite(context, x, state.y, lead === "mother" ? "mother" : "son", state, palette, 1.28);
+  for (const rider of formation) {
+    drawLeadSprite(context, x + rider.offsetX, state.y + rider.offsetY, rider.role, state, palette, rider.scale, reducedMotion);
+  }
 }
 
 function drawSky(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette, reducedMotion: boolean) {
@@ -1638,6 +1983,7 @@ export function drawRunnerFrame(
   drawCityLayers(context, state, palette, ambientReduced);
   drawActSetting(context, state, palette, ambientReduced);
   drawForeground(context, state, palette, ambientReduced);
+  drawRunnerObstacles(context, state, quality);
 
   pixelRect(context, 28, 24, 158, 58, palette.paper2);
   context.strokeStyle = palette.accent;
@@ -1655,7 +2001,9 @@ export function drawRunnerFrame(
   context.fillText(act.toolLabel.toUpperCase(), RUNNER_WIDTH - 30, 42);
   context.fillStyle = palette.inkSoft;
   context.font = `600 10px ${palette.fontMono}`;
-  const statusLine = state.activeComplication
+  const statusLine = state.failed
+    ? "ROUTE WIPED"
+    : state.activeComplication
     ? state.activeComplication.replaceAll("-", " ").toUpperCase()
     : state.activePower
       ? state.activePower.replaceAll("-", " ").toUpperCase()
@@ -1671,7 +2019,7 @@ export function drawRunnerFrame(
   for (const candidate of act.targets) {
     const screenX = runnerWorldToScreen(candidate.x, state.worldX);
     if (screenX > -candidate.width - 20 && screenX < RUNNER_WIDTH + 20) {
-      drawTarget(context, candidate, screenX, state.transformedTargetIds.includes(candidate.id), palette);
+      drawTarget(context, candidate, screenX, state.transformedTargetIds.includes(candidate.id), palette, quality);
     }
   }
   for (const power of act.pickups) {
@@ -1690,8 +2038,21 @@ export function drawRunnerFrame(
     drawImpact(context, state, act, palette);
     drawLandingDust(context, state, palette);
   }
-  drawPerson(context, state, act.lead, palette, spriteSheet);
+  drawPerson(context, state, act.lead, palette, spriteSheet, ambientReduced);
   drawCinematicGrade(context, state);
+
+  if (state.failed) {
+    const wash = context.createLinearGradient(0, 0, RUNNER_WIDTH, 0);
+    wash.addColorStop(0, "#080b14b8");
+    wash.addColorStop(0.48, "#080b1440");
+    wash.addColorStop(1, "#080b14d1");
+    context.fillStyle = wash;
+    context.fillRect(0, 0, RUNNER_WIDTH, RUNNER_HEIGHT);
+    context.fillStyle = palette.accent;
+    context.font = `700 12px ${palette.fontMono}`;
+    context.textAlign = "right";
+    context.fillText("JETPACK SPUTTER · CURTAIN HELD", RUNNER_WIDTH - 30, RUNNER_HEIGHT - 28);
+  }
 
   if (state.paused) {
     context.globalAlpha = 0.66;
