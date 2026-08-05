@@ -95,8 +95,8 @@
     "semantic_hash": "048d91047bac6fcc917176a987171c2b"
   },
   "tests/browser/pwa-offline.mjs": {
-    "mtime": 1785896326.497638,
-    "ast_hash": "86af8aa2eb309134a55dc017e9bc9355",
+    "mtime": 1785905241.2765286,
+    "ast_hash": "d5b2836f5164139003a9a43ae2178891",
     "semantic_hash": ""
   },
   "tests/browser/seed-asserted.mjs": {
@@ -140,8 +140,8 @@
     "semantic_hash": "938df30602889721e037bc1f25fd53ed"
   },
   "CONTEXT.md": {
-    "mtime": 1785892687.0947413,
-    "ast_hash": "f3d042b9e3744bd7476047ce66cad57b",
+    "mtime": 1785904061.3133764,
+    "ast_hash": "f7cc9cbf8119b08d79246805ecbed50d",
     "semantic_hash": ""
   },
   "README.md": {
@@ -225,9 +225,9 @@
     "semantic_hash": ""
   },
   "docs/BUILD-PLAN.md": {
-    "mtime": 1785873237.8132756,
-    "ast_hash": "e688b758293b7523cf242475be84d6e3",
-    "semantic_hash": "e688b758293b7523cf242475be84d6e3"
+    "mtime": 1785904061.3141744,
+    "ast_hash": "6229859e97ad5b66f5f7a017d5f273d5",
+    "semantic_hash": ""
   },
   "docs/adr/0001-hybrid-procedural-illustration.md": {
     "mtime": 1785654645.5270188,
@@ -465,7 +465,7 @@
     "semantic_hash": "680dac07d2abbdecd3b82ca427d9eb7a"
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1785897694.0418475,
+    "mtime": 1785905736.3429308,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": "9557448d4a3c6237efa8fe2648d21fa0"
   },
@@ -810,8 +810,8 @@
     "semantic_hash": ""
   },
   "apps/house/src/house.ts": {
-    "mtime": 1785897671.8178866,
-    "ast_hash": "8fb6c3a55acaa3c40b3b84f5a38b23e3",
+    "mtime": 1785905459.8666172,
+    "ast_hash": "eb55b976abe0af95dfce231e0dd8a666",
     "semantic_hash": ""
   },
   "apps/house/src/vite-env.d.ts": {
@@ -830,8 +830,8 @@
     "semantic_hash": "cbeabf8c6a1de2d27adb35311cff4de2"
   },
   "tests/browser/house.mjs": {
-    "mtime": 1785897684.0397286,
-    "ast_hash": "63153307fc1411a886e01321b95a06ed",
+    "mtime": 1785905295.9652615,
+    "ast_hash": "c5a2e1fc2f0f5e411fdfb308b773d98e",
     "semantic_hash": ""
   },
   "tests/unit/house-core.test.mjs": {
@@ -880,18 +880,18 @@
     "semantic_hash": "2b4fb1daaba81c59ee9c384430421c53"
   },
   "apps/house/src/sector-sprint.ts": {
-    "mtime": 1785891911.5472,
-    "ast_hash": "e44ae45f616cefa1e809011e74d61ccc",
+    "mtime": 1785905241.276004,
+    "ast_hash": "b94e86dc4392d6f9d8126cd3abe07f19",
     "semantic_hash": ""
   },
   "tests/unit/sector-sprint.test.mjs": {
-    "mtime": 1785892778.3383272,
-    "ast_hash": "5d2a7dca3bbb77e72878483d38be393e",
+    "mtime": 1785905100.8075836,
+    "ast_hash": "bc9e8739501014e3a542b90f53724007",
     "semantic_hash": ""
   },
   "docs/adr/0015-add-the-bounded-sector-sprint.md": {
-    "mtime": 1785892654.4474409,
-    "ast_hash": "ae892a9a32549d23d6b244f7122fd93a",
+    "mtime": 1785904061.3145223,
+    "ast_hash": "aee85782e30582a2ab2ea5ea9dd406a3",
     "semantic_hash": ""
   },
   "graphify-out/memory/query_20260804_194501_build_entertainment_first_for_adults_above_18__tes.md": {
@@ -930,8 +930,8 @@
     "semantic_hash": ""
   },
   "tests/browser/sector-sprint-feel.mjs": {
-    "mtime": 1785895968.566263,
-    "ast_hash": "bcd930159ac23ffee876053a669de5d5",
+    "mtime": 1785905459.866997,
+    "ast_hash": "d32878f5eac9d6652091b236005bb40b",
     "semantic_hash": ""
   },
   "docs/testing/sector-sprint-game-feel.md": {
@@ -942,6 +942,26 @@
   "graphify-out/memory/query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t.md": {
     "mtime": 1785894810.9854045,
     "ast_hash": "b36616ccf55a6372bcdf3791a053bd8a",
+    "semantic_hash": ""
+  },
+  "apps/house/src/assets/sector-sprint-characters.md": {
+    "mtime": 1785904061.3150158,
+    "ast_hash": "5d13627271301da0d29b857d219d4a0f",
+    "semantic_hash": ""
+  },
+  "docs/adr/0016-deepen-sector-sprint-flight-and-illustration.md": {
+    "mtime": 1785905100.8079677,
+    "ast_hash": "b3a05bccd9b2c74163ddf2d311c6fbc7",
+    "semantic_hash": ""
+  },
+  "graphify-out/memory/query_20260805_035832_how_is_sector_sprint_s_runner_state__input__canvas.md": {
+    "mtime": 1785902312.129962,
+    "ast_hash": "8c14f99b210babfb300e65faa5b46959",
+    "semantic_hash": ""
+  },
+  "graphify-out/memory/query_20260805_045813_how_do_sector_sprint_hold_to_lift_input__fixed_ste.md": {
+    "mtime": 1785905893.8959296,
+    "ast_hash": "b395c693bfeed37546acd612abc42a2a",
     "semantic_hash": ""
   }
 }

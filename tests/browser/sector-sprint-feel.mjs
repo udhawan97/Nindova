@@ -100,12 +100,11 @@ async function sampleFrames(page, count) {
 
 try {
   const throttled = await openRunner({ width: 375, height: 812 }, 4);
-  const actionSamples = { leap: [], dash: [], tool: [] };
+  const actionSamples = { lift: [], tool: [] };
   for (let sample = 0; sample < 6; sample += 1) {
     await throttled.page.waitForFunction(() => window.__house.runner?.grounded === true);
-    actionSamples.leap.push(await measureAction(throttled.page, '[data-runner-action="jump"]', ["leap", "air-step"]));
-    await throttled.page.waitForFunction(() => window.__house.runner?.grounded === true);
-    actionSamples.dash.push(await measureAction(throttled.page, '[data-runner-action="dash"]', ["dash", "vault", "stomp"]));
+    actionSamples.lift.push(await measureAction(throttled.page, '[data-runner-action="thrust"]', ["thrust"]));
+    await throttled.page.waitForTimeout(50);
     actionSamples.tool.push(await measureAction(throttled.page, '[data-runner-action="tool"]', ["tool"]));
     await throttled.page.waitForTimeout(300);
   }

@@ -26,22 +26,30 @@ test("Sector Sprint has five fixed original Acts and only allowlisted comic-obje
   const powers = new Set();
   const targetIds = [];
   const pickupIds = [];
+  const complicationIds = [];
   for (const [actIndex, act] of Runner.RUNNER_ACTS.entries()) {
     assert.equal(act.storyBeats.length, 3, `${act.id} narrated beats`);
     assert.equal(act.targets.length, 5 + actIndex, `${act.id} authored target density`);
     assert.ok(act.targets.every((target) => allowlist.has(target.kind)), `${act.id} target allowlist`);
     assert.ok(Runner.RUNNER_TOOL_TARGETS[act.tool].every((kind) => allowlist.has(kind)), `${act.id} tool target allowlist`);
     assert.equal(act.pickups.length, 1, `${act.id} has one broad authored temporary-effect gate`);
+    assert.equal(act.complications.length, 1, `${act.id} has one authored comic complication`);
+    assert.ok(["sabzi-load", "monsoon-headwind"].includes(act.complications[0].kind));
+    assert.ok(act.complications[0].durationMs >= 2_500 && act.complications[0].durationMs <= 5_000, `${act.id} complication stays brief`);
     tools.add(act.tool);
     powers.add(act.pickups[0].kind);
     targetIds.push(...act.targets.map((target) => target.id));
     pickupIds.push(...act.pickups.map((power) => power.id));
+    complicationIds.push(...act.complications.map((complication) => complication.id));
   }
   assert.equal(tools.size, 5, "every Act has a mechanically distinct tool");
   assert.equal(powers.size, 3, "the route authors all three temporary effects");
   assert.equal(new Set(targetIds).size, targetIds.length, "every authored target id is globally unique");
   assert.equal(new Set(pickupIds).size, pickupIds.length, "every authored pickup id is globally unique");
+  assert.equal(new Set(complicationIds).size, complicationIds.length, "every authored complication id is globally unique");
   assert.equal(Runner.RUNNER_DPR_CAP, 2);
+  assert.ok(Math.abs(Runner.RUNNER_FIXED_STEP_MS - (1_000 / 60)) < 0.001);
+  assert.equal(Runner.RUNNER_MAX_CATCH_UP_STEPS, 120, "the accumulator can catch up to the two-second visibility cap");
   assert.ok(Runner.RUNNER_EFFECT_PARTICLE_CAP <= 24, "effect work stays explicitly bounded");
   assert.ok(Runner.RUNNER_PROJECTILE_CAP <= 6, "active tool objects stay bounded");
   assert.ok(Runner.RUNNER_CAMERA_SHAKE_CAP <= 6, "camera response stays bounded");
@@ -49,6 +57,110 @@ test("Sector Sprint has five fixed original Acts and only allowlisted comic-obje
   const shippedCopy = JSON.stringify(Runner.RUNNER_ACTS).toLowerCase();
   assert.doesNotMatch(shippedCopy, /contra|subway surfers|flappy bird|chrome dino/);
   assert.doesNotMatch(shippedCopy, /\bleaderboard\b|\bhigh score\b|\bbest score\b|\bkill\b|\benemy\b|\bgun\b|\bbullet\b/);
+});
+
+test("hold-to-lift thrust is responsive, bounded, and releases into a glide", () => {
+  const start = Runner.createRunnerState(0);
+  const launched = Runner.stepRunner(start, { thrustPressed: true, thrustHeld: true }, Runner.RUNNER_FIXED_STEP_MS);
+  assert.equal(launched.grounded, false);
+  assert.equal(launched.thrusting, true);
+  assert.equal(launched.lastAction, "thrust");
+  assert.ok(launched.y < start.y);
+
+  let held = launched;
+  for (let frame = 0; frame < 30; frame += 1) {
+    held = Runner.stepRunner(held, { thrustHeld: true }, Runner.RUNNER_FIXED_STEP_MS);
+  }
+  assert.ok(held.velocityY >= -690 * 1.14, "continuous thrust never exceeds the authored rise-speed cap");
+  const released = Runner.stepRunner(held, { thrustReleased: true }, Runner.RUNNER_FIXED_STEP_MS);
+  assert.equal(released.thrusting, false);
+  assert.ok(released.velocityY > held.velocityY, "release immediately softens the climb into a glide");
+});
+
+test("a sustained hold stays on-stage and cannot fly over authored complication gates", () => {
+  let state = Runner.createRunnerState(0);
+  for (let frame = 0; frame < 600; frame += 1) {
+    state = Runner.stepRunner(state, { thrustHeld: true }, Runner.RUNNER_FIXED_STEP_MS);
+    assert.ok(state.y >= Runner.RUNNER_PLAYER_CEILING_Y, "the illustrated lead remains inside the visible flight lane");
+  }
+  assert.equal(state.y, Runner.RUNNER_PLAYER_CEILING_Y);
+  assert.equal(state.velocityY, 0, "the ceiling absorbs upward velocity instead of accumulating a hidden launch");
+  assert.ok(state.encounteredComplicationIds.includes("gw-load"), "the full-height complication stays reachable during a continuous hold");
+  assert.equal(state.finished, false, "the fixed Act continues without a fail state");
+});
+
+test("illustrated thrust and glide poses follow held input rather than ground state", () => {
+  const grounded = Runner.createRunnerState(0);
+  assert.equal(Runner.runnerAuthoredPoseIndex({ ...grounded, thrusting: true, grounded: false }), 0, "held thrust uses the rising pose");
+  assert.equal(Runner.runnerAuthoredPoseIndex({ ...grounded, thrusting: false, grounded: false }), 1, "release in the air uses the authored glide pose");
+  assert.equal(Runner.runnerAuthoredPoseIndex({ ...grounded, impactMs: 100 }), 3, "comic impact remains visually explicit");
+  assert.equal(Runner.runnerAuthoredPoseIndex({ ...grounded, landingMs: 100 }), 4, "landing remains visually explicit");
+});
+
+test("adaptive visual quality has deterministic thresholds and never enters game state", () => {
+  assert.equal(Runner.runnerRenderQualityForIntervals(Array(90).fill(16)), "high");
+  assert.equal(Runner.runnerRenderQualityForIntervals([...Array(85).fill(16), ...Array(5).fill(25)]), "balanced");
+  assert.equal(Runner.runnerRenderQualityForIntervals([...Array(85).fill(16), ...Array(5).fill(45)]), "quiet");
+  assert.equal(Runner.runnerRenderQualityForIntervals([0, 300, 16]), "high", "background and invalid intervals are excluded");
+  const state = Runner.createRunnerState(2);
+  const expected = Runner.stepRunner(state, { thrustHeld: true }, Runner.RUNNER_FIXED_STEP_MS);
+  for (const tier of ["high", "balanced", "quiet"]) {
+    assert.deepEqual(Runner.stepRunner(state, { thrustHeld: true }, Runner.RUNNER_FIXED_STEP_MS), expected, `${tier} cannot alter simulation state`);
+  }
+});
+
+test("comic complications trigger on a full-height safe gate and expire without persistence", () => {
+  for (const [actIndex, act] of Runner.RUNNER_ACTS.entries()) {
+    const authored = act.complications[0];
+    const worldX = authored.x - Runner.RUNNER_PLAYER_SCREEN_X;
+    let state = {
+      ...Runner.createRunnerState(actIndex),
+      elapsedMs: (worldX / 4_080) * Runner.RUNNER_ACT_SECONDS * 1_000,
+      worldX,
+      y: 40,
+      velocityY: 0,
+      grounded: false,
+    };
+    state = Runner.stepRunner(state, {}, 0);
+    assert.equal(state.activeComplication, authored.kind, `${authored.id} is reachable at aerial height`);
+    assert.deepEqual(state.encounteredComplicationIds, [authored.id]);
+    assert.equal(state.lastAction, "complication");
+
+    const fresh = Runner.createRunnerState(actIndex);
+    assert.equal(fresh.activeComplication, null, "complications never persist into a fresh Act");
+    assert.deepEqual(fresh.encounteredComplicationIds, []);
+
+    for (let elapsed = 0; elapsed < authored.durationMs; elapsed += 50) state = Runner.stepRunner(state, {}, 50);
+    assert.equal(state.activeComplication, null, `${authored.id} expires deterministically`);
+    assert.equal(state.lastComplicationId, authored.id);
+    assert.ok(state.complicationFlourishMs > 0, `${authored.id} closes with bounded feedback`);
+  }
+});
+
+test("Sabzi Load changes vertical pacing while headwind stays visual-only", () => {
+  const airborne = {
+    ...Runner.createRunnerState(0),
+    y: 150,
+    velocityY: -240,
+    grounded: false,
+  };
+  const normal = Runner.stepRunner(airborne, {}, 50);
+  const loaded = Runner.stepRunner({
+    ...airborne,
+    activeComplication: "sabzi-load",
+    activeComplicationId: "test-load",
+    activeComplicationRemainingMs: 1_000,
+  }, {}, 50);
+  assert.ok(loaded.y > normal.y, "the load deliberately reduces vertical travel without blocking completion");
+
+  const headwind = Runner.stepRunner({
+    ...airborne,
+    activeComplication: "monsoon-headwind",
+    activeComplicationId: "test-wind",
+    activeComplicationRemainingMs: 1_000,
+  }, {}, 50);
+  assert.equal(headwind.y, normal.y, "headwind never separates the rendered hero from the collision body");
+  assert.equal(headwind.velocityY, normal.velocityY);
 });
 
 test("the action route closes deterministically at the exact Act boundary", () => {

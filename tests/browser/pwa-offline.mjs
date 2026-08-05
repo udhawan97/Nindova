@@ -108,6 +108,8 @@ try {
   assert.ok(houseRegistration.keys.includes("nindova-house-v6"));
   assert.equal(houseRegistration.keys.includes("nindova-house-v3"), false);
   assert.ok(houseRegistration.entries.length > 0);
+  const cachedRunnerSheet = houseRegistration.entries.find((url) => /sector-sprint-characters-.*\.png$/.test(url));
+  assert.ok(cachedRunnerSheet, "the original illustrated Sector Sprint sheet is precached");
   assert.ok(houseRegistration.entries.every((url) => url.startsWith(houseBase) && !url.includes("assessment-readiness")));
   assert.equal((await houseContext.request.get(`${houseBase}assessment-readiness.js`)).status(), 404);
   assert.doesNotMatch(await (await houseContext.request.get(`${houseBase}sw.js`)).text(), /assessment-readiness/);
@@ -121,6 +123,18 @@ try {
   assert.equal(coldHouseResponse?.ok(), true);
   await coldHouse.waitForFunction(() => Boolean(window.__house));
   assert.equal(await coldHouse.locator(".game-door").count(), 5);
+  const offlineRunnerSheet = await coldHouse.evaluate((source) => new Promise((resolveImage) => {
+    const image = new Image();
+    image.onload = () => resolveImage({ width: image.naturalWidth, height: image.naturalHeight });
+    image.onerror = () => resolveImage({ width: 0, height: 0 });
+    image.src = source;
+  }), cachedRunnerSheet);
+  assert.deepEqual(offlineRunnerSheet, { width: 1_536, height: 1_024 }, "the illustrated character sheet decodes while fully offline");
+  await coldHouse.click('[data-game="sector-sprint"]');
+  await coldHouse.click('[data-runner-route="action"]');
+  await coldHouse.waitForSelector("#runnerCanvas");
+  await coldHouse.waitForFunction(() => document.querySelector("#runnerCanvas")?.dataset.art === "illustrated");
+  assert.equal(await coldHouse.locator("#runnerCanvas").isVisible(), true, "the offline House enters the action route");
   assert.ok(houseRequests.every((url) => new URL(url).origin === new URL(houseBase).origin));
   assert.deepEqual(houseErrors, []);
   await houseContext.setOffline(false);

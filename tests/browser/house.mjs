@@ -107,10 +107,14 @@ async function openHouse(viewport, options = {}, {
     await context.addInitScript(() => {
       globalThis.__houseAudioContexts = 0;
       globalThis.__houseAudioCloses = 0;
+      globalThis.__houseAudioSuspends = 0;
+      globalThis.__houseAudioResumes = 0;
       class ProbeAudioContext {
         constructor() { globalThis.__houseAudioContexts += 1; this.currentTime = 0; this.destination = {}; this.state = "running"; }
         createOscillator() { return { type: "sine", frequency: { value: 0 }, connect: (destination) => destination, start() {}, stop() { this.onended?.(); }, onended: null }; }
         createGain() { return { gain: { setValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect() { return this; } }; }
+        suspend() { this.state = "suspended"; globalThis.__houseAudioSuspends += 1; return Promise.resolve(); }
+        resume() { this.state = "running"; globalThis.__houseAudioResumes += 1; return Promise.resolve(); }
         close() { this.state = "closed"; globalThis.__houseAudioCloses += 1; return Promise.resolve(); }
       }
       Object.defineProperty(globalThis, "AudioContext", { configurable: true, value: ProbeAudioContext });
@@ -442,13 +446,18 @@ try {
   await runner.page.screenshot({ path: resolve(output, "sector-sprint-prelude-375x812.png"), fullPage: true });
   await runner.page.click('[data-runner-route="action"]');
   await runner.page.waitForSelector("#runnerCanvas");
+  await runner.page.waitForFunction(() => document.querySelector("#runnerCanvas")?.dataset.art === "illustrated");
   assert.deepEqual(await runner.page.locator("#runnerCanvas").evaluate((canvas) => ({
     width: canvas.width,
     height: canvas.height,
     ratio: canvas.dataset.pixelRatio,
     logicalWidth: canvas.dataset.logicalWidth,
     logicalHeight: canvas.dataset.logicalHeight,
-  })), { width: 960, height: 432, ratio: "1", logicalWidth: "960", logicalHeight: "432" });
+    quality: canvas.dataset.quality,
+    camera: canvas.dataset.camera,
+    art: canvas.dataset.art,
+  })), { width: 960, height: 432, ratio: "1", logicalWidth: "960", logicalHeight: "432", quality: "high", camera: "portrait-close", art: "illustrated" });
+  assert.ok((await runner.page.locator(".runner-canvas-window").boundingBox())?.height >= 250, "the portrait close camera keeps the illustrated action legible");
   assert.ok((await runner.page.locator(".runner-stage-frame").boundingBox())?.y < 812, "the moving miniature enters the first phone viewport");
   assert.deepEqual(await runner.page.evaluate(() => {
     const saved = JSON.parse(sessionStorage.getItem("nindova:house:active:v1") ?? "{}");
@@ -469,18 +478,36 @@ try {
   await runner.page.screenshot({ path: resolve(output, "sector-sprint-375x812.png"), fullPage: true, animations: "disabled" });
   await runner.page.click('[data-runner-action="tool"]');
   await runner.page.waitForFunction(() => /Message delivered|number 12 has left/i.test(document.querySelector("#runnerLive")?.textContent ?? ""), null, { timeout: 4_000 });
+  await runner.page.locator('[data-runner-action="thrust"]').focus();
+  await runner.page.keyboard.down("Space");
+  await runner.page.waitForFunction(() => window.__house.runner?.thrusting === true);
+  await runner.page.keyboard.up("Space");
+  await runner.page.waitForFunction(() => window.__house.runner?.thrusting === false);
+  await runner.page.locator(".runner-canvas-window").dispatchEvent("pointerdown", { pointerId: 7, pointerType: "touch", isPrimary: true });
+  await runner.page.waitForFunction(() => window.__house.runner?.thrusting === true);
+  const projectilesBeforeSecondaryPointer = await runner.page.evaluate(() => window.__house.runner?.projectiles.length);
+  await runner.page.locator('[data-runner-action="tool"]').dispatchEvent("pointerdown", { pointerId: 8, pointerType: "touch", isPrimary: false });
+  await runner.page.locator("body").dispatchEvent("pointerup", { pointerId: 8, pointerType: "touch", isPrimary: false });
+  await runner.page.waitForTimeout(50);
+  assert.equal(await runner.page.evaluate(() => window.__house.runner?.thrusting), true, "an unrelated secondary pointer cannot release the primary hold");
+  assert.notEqual(await runner.page.evaluate(() => window.__house.runner?.lastAction), "tool", "an unrelated secondary pointer cannot replace the primary action");
+  assert.equal(await runner.page.evaluate(() => window.__house.runner?.projectiles.length), projectilesBeforeSecondaryPointer, "an unrelated secondary pointer cannot queue the Act tool");
+  await runner.page.locator("body").dispatchEvent("pointercancel", { pointerId: 7, pointerType: "touch", isPrimary: true });
+  await runner.page.waitForFunction(() => window.__house.runner?.thrusting === false);
+  assert.equal(await runner.page.locator(".runner-canvas-window").getAttribute("data-pressed"), null, "a cancelled stage pointer leaves no stuck held state");
   await runner.page.evaluate(() => document.querySelector("#houseMain")?.focus());
-  await runner.page.keyboard.press("Space");
-  await runner.page.waitForFunction(() => /leap|air step/i.test(document.querySelector("#runnerLive")?.textContent ?? ""));
+  await runner.page.keyboard.press("d");
+  await runner.page.waitForFunction(() => ["dash", "stomp", "vault"].includes(window.__house.runner?.lastAction ?? ""), null, { timeout: 2_000 });
+  await runner.page.locator('[data-runner-action="thrust"]').dispatchEvent("pointerdown", { pointerId: 9, pointerType: "touch", isPrimary: true });
+  await runner.page.locator("body").dispatchEvent("pointerup", { pointerId: 9, pointerType: "touch", isPrimary: true });
+  await runner.page.locator("#runnerLive").evaluate((element) => { element.textContent = "Activation sentinel"; });
+  await runner.page.locator('[data-runner-action="thrust"]').focus();
+  await runner.page.keyboard.press("Enter");
+  await runner.page.waitForFunction(() => /Lift engaged/i.test(document.querySelector("#runnerLive")?.textContent ?? ""), null, { timeout: 2_000 });
   await runner.page.click("[data-runner-pause]");
   assert.equal(await runner.page.locator("[data-runner-pause]").getAttribute("aria-pressed"), "true");
   const pausedFrame = await runner.page.locator("#runnerCanvas").evaluate((canvas) => canvas.toDataURL());
   const pausedMessage = await runner.page.locator("#runnerLive").innerText();
-  await runner.page.locator('[data-runner-action="jump"]').dispatchEvent("pointerdown", { pointerId: 7 });
-  await runner.page.locator("body").dispatchEvent("pointercancel", { pointerId: 7 });
-  await runner.page.waitForTimeout(250);
-  assert.equal(await runner.page.locator('[data-runner-action="jump"]').getAttribute("data-pressed"), null, "a cancelled pointer leaves no stuck pressed state");
-  assert.equal(await runner.page.locator("#runnerLive").innerText(), pausedMessage, "a cancelled pointer does not activate the control");
   assert.equal(await runner.page.locator("#runnerCanvas").evaluate((canvas) => canvas.toDataURL()), pausedFrame, "the paused city remains still");
   await runner.page.click("[data-runner-pause]");
   await runner.page.waitForTimeout(250);
@@ -749,12 +776,13 @@ try {
   const activeRunnerSound = await openHouse({ width: 375, height: 812 }, {}, { audioProbe: true });
   await activeRunnerSound.page.click("#soundButton");
   await enterRunnerAction(activeRunnerSound.page);
-  await activeRunnerSound.page.click('[data-runner-action="jump"]');
+  await activeRunnerSound.page.click('[data-runner-action="thrust"]');
   await activeRunnerSound.page.waitForFunction(() => globalThis.__houseAudioContexts === 1);
   await activeRunnerSound.page.click("[data-runner-pause]");
-  await activeRunnerSound.page.waitForFunction(() => globalThis.__houseAudioCloses === 1);
+  await activeRunnerSound.page.waitForFunction(() => globalThis.__houseAudioSuspends === 1);
+  assert.equal(await activeRunnerSound.page.evaluate(() => globalThis.__houseAudioCloses), 0, "pause suspends rather than destroying optional audio");
   await activeRunnerSound.page.click("[data-runner-pause]");
-  await activeRunnerSound.page.waitForTimeout(250);
+  await activeRunnerSound.page.waitForFunction(() => globalThis.__houseAudioResumes === 1);
   assert.equal(await activeRunnerSound.page.evaluate(() => globalThis.__houseAudioContexts), 1, "resume never queues or invents a sound");
   await activeRunnerSound.context.close();
 
