@@ -1,5 +1,42 @@
 # Public-surface evidence ledger
 
+## Verified locally on 2026-08-04 — House-first public-surface refresh
+
+- The local README, Astro landing page, Starlight docs, download guide, social card, and source-rendered product captures tell one House-first story while keeping the Night Room as a deliberately separate bounded loop.
+- The landing page renders without horizontal overflow at 320×812, 375×812, 414×896, 768×1024, and 1440×900 under both `/` and `/Nindova/`. Primary targets remain at least 44×44 CSS pixels; keyboard-only order begins with Skip to Nindova, then the home brand; every Salon table action is a focused, Enter-activated House link; reduced motion swaps the animated lockup and suppresses transitions; a 200% effective viewport keeps content within the page.
+- The Downloads page renders at 375×812 and 1440×900. The local README renders through a GitHub-Flavored Markdown pipeline at desktop and narrow widths with its hero image, centered CTA row, tables, and contributor details intact.
+- The new `nindova-house.png` and `sector-sprint.png` proofs are captured from the built House source. The refreshed `nindova-og.png` is regenerated from the checked-in social-card script at 1200×630.
+- The live root, House, Night Room, and docs routes; repository; release history; v0.3.0 tag; standalone HTML; static ZIP; and `SHA256SUMS.txt` each returned HTTP 200 before this local refresh was delivered. The hosted landing page, README, and docs still show the pre-task revision because this work was not committed, pushed, or deployed.
+- The release boundary is explicit: the current live/source House contains the Grand Salon, Gallery, and Sector Sprint, while the latest tagged v0.3.0 download contains the earlier Night Room release. Per-file checksum commands were executed successfully with only the named HTML or ZIP and the published manifest present.
+- After the council corrections, `npm run check` passes with zero Astro diagnostics, 75 unit tests, and the complete composed build; `npm run test:public` passes at five widths under both root and `/Nindova/` with real House-link targets, assets, docs, 44px targets, 200% zoom, reduced motion, keyboard order/activation, and light/dark Starlight rendering. Capture generation and both isolated per-file checksum commands were also rerun successfully. House, Night, Dawn, standalone, latency, deterministic-closure, and base-path PWA/offline gates passed individually earlier in this task, before the final documentation and landing-link corrections.
+- The base-path sitemap contains 17 canonical URLs and omits the generated 404 route. The refreshed Graphify corpus contains 1098 nodes and 1460 edges across 111 communities; its diagnostic reports no dangling, missing, collapsed, duplicate, or self-loop edges, and a scoped query returns the new overview, download, live, tagged, source, asset-manifest, and evidence-ledger concepts.
+
+### Round 2 pre-acceptance visual-system rubric
+
+The required eight-axis score was not written into this ledger before Round 1. That recording gap was corrected before targeted Round 2 acceptance; every current-surface axis was then checked against the rendered root and base-path builds.
+
+| Axis | Score | Evidence |
+| --- | ---: | --- |
+| Product fidelity | 5/5 | Shahi Raat materials, House floor plan, real game captures, and bounded voice match the current source. |
+| Hierarchy | 5/5 | Promise, current-source proof, House/Night boundary, trust ledger, downloads, and next steps appear in that order. |
+| Originality | 5/5 | The architectural Salon directory, room split, brass ledger, and source miniatures derive from Nindova rather than a generic landing template. |
+| Restraint | 4/5 | Motion is limited, ornament supports room hierarchy, and reduced motion removes the animated lockup and transitions. |
+| Proof | 5/5 | Current captures, live-link checks, exact release checksums, evidence ledger, and current-source/tag distinctions are traceable. |
+| Download clarity | 5/5 | Live House/Night routes, tagged HTML/ZIP, checksums, current source, and their version boundary are separated. |
+| Accessibility | 4/5 | Semantic links, visible focus, keyboard activation, 44px targets, zoom, reduced motion, alt text, responsive widths, and docs light/dark themes pass automated browser checks; real-device AT remains open. |
+| Maintenance | 5/5 | Canonical URLs, sitemap, captures, OG art, checksums, asset provenance, and Graphify outputs have checked-in sources or repeatable commands. |
+
+### Source-proven for this refresh
+
+- Capture automation builds both House and Night sources, requests an available local port, and terminates the spawned House preview even if readiness or browser launch fails.
+- `public-facts.json` is the shared canonical/release URL source for the landing page and PWA verification. README local targets resolve in the working tree, and direct release URLs resolve independently.
+- No House or Night game/state logic, service-worker scope, telemetry boundary, release tag, deployment, or native iOS capability changed in this refresh.
+
+### Untested risk for this refresh
+
+- The refreshed landing page, README, docs, social preview, and captures are local until an authorized commit/push/deploy workflow delivers them.
+- Real-device VoiceOver and TalkBack, installed Safari and broader Android PWA behavior, physical QR scanning, human Punjabi cultural-authenticity review, and human calmness or perceived-challenge outcomes remain unverified.
+
 ## Verified on 2026-08-03
 
 - The standalone `nindova.html` opens with no manifest or controlling service worker and exposes the same 36-tile runtime as `/play/`.

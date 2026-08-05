@@ -59,6 +59,19 @@ test("the social card is the publication-sized regenerated artifact", async () =
   const image = PNG.sync.read(await readFile(resolve(root, "apps/site/public/brand/nindova-og.png")));
   assert.deepEqual([image.width, image.height], [1200, 630]);
   const generator = await readFile(resolve(root, "scripts/capture-brand-social.mjs"), "utf8");
-  assert.match(generator, /one Session, then goodnight/);
-  assert.doesNotMatch(generator, /one round/i);
+  assert.match(generator, /A house of authored games/);
+  assert.match(generator, /Choose a room/);
+  assert.doesNotMatch(generator, /bedtime game|one round/i);
+});
+
+test("single-file download instructions isolate the matching checksum row", async () => {
+  const documents = await Promise.all([
+    readFile(resolve(root, "README.md"), "utf8"),
+    readFile(resolve(root, "apps/site/src/content/docs/docs/downloads.md"), "utf8"),
+  ]);
+
+  for (const document of documents) {
+    assert.match(document, /grep ' nindova-v0\.3\.0\.html\$' SHA256SUMS\.txt \| shasum -a 256 -c -/);
+    assert.match(document, /grep ' nindova-web-v0\.3\.0\.zip\$' SHA256SUMS\.txt \| shasum -a 256 -c -/);
+  }
 });

@@ -19,9 +19,27 @@
       "output_tokens": 0,
       "files": 37,
       "accounting_note": "Collaboration runtime did not expose per-agent token usage. Zeroes are placeholders, not measured usage."
+    },
+    {
+      "date": "2026-08-04T23:29:23.932627+00:00",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 19
+    },
+    {
+      "date": "2026-08-04T23:46:25.281605+00:00",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 8
+    },
+    {
+      "date": "2026-08-05T00:05:01.970996+00:00",
+      "input_tokens": 560,
+      "output_tokens": 760,
+      "files": 6
     }
   ],
-  "total_input_tokens": 0,
-  "total_output_tokens": 0,
+  "total_input_tokens": 560,
+  "total_output_tokens": 760,
   "accounting_note": "Token totals are unavailable for this host-agent semantic extraction."
 }

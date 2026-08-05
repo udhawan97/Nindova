@@ -10,6 +10,7 @@ description: Honest evidence and product limits for the current Nindova House an
 - Chromium verifies the offline PWA and release surfaces. Broader installed Safari and Android proof remains pending.
 - The canonical GitHub Pages route, rendered QR destination, service-worker control, same-origin requests, and offline reload are browser-verified. A physical-device QR scan remains pending.
 - The iOS Wall is deferred. No Family Controls entitlement, native interception, notification, or App Store capability is claimed.
+- The latest tagged download is v0.3.0 and predates the Grand Salon, Gallery, and Sector Sprint. Those House surfaces are available on the current live site and from current source, but not in that tagged archive.
 
 These are visible limits, not shipped claims hidden in a backlog.
 - Grand Salon games are authored entertainment. They have not been normed on a representative adult sample and do not produce a validated population-normed, percentile, diagnostic, or cognitive-trait result.

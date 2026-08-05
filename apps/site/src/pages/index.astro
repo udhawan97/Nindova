@@ -4,14 +4,19 @@ import publicFacts from "../../../../public-facts.json";
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const href = (path: string) => `${base}${path}` || "/";
-const releaseUrl = "https://github.com/udhawan97/Nindova/releases";
-const standaloneUrl = href("/nindova.html");
-const { canonicalPlayUrl } = publicFacts;
-const socialImageUrl = new URL("../brand/nindova-og.png", canonicalPlayUrl).href;
-const motifs = [
-  ["Belan", "belan"], ["Chakla", "chakla"], ["Tawa", "tawa"],
-  ["Chimta", "chimta"], ["Katori", "katori"], ["Tiffin", "tiffin"],
-  ["Masala dabba", "masala-dabba"], ["Chai", "chai"], ["Cooker", "pressure-cooker"],
+const {
+  canonicalSiteUrl,
+  sourceUrl,
+  releaseHistoryUrl,
+  latestRelease,
+} = publicFacts;
+const socialImageUrl = new URL("brand/nindova-og.png", canonicalSiteUrl).href;
+const tables = [
+  ["I", "Pattern Court", "Read the order beneath the ornament."],
+  ["II", "Mirror Forge", "Turn forms without losing their bearing."],
+  ["III", "Stack Architect", "Move the tower by law, one disc at a time."],
+  ["IV", "Lantern Ledger", "Hold an ordered procession of light."],
+  ["V", "Sector Sprint", "Follow Gurpreet and Harjit through five fixed Chandigarh Acts."],
 ];
 ---
 
@@ -24,20 +29,23 @@ const motifs = [
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; base-uri 'self'; object-src 'none'; connect-src 'self'; img-src 'self' data:; media-src 'self' blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
     />
-    <meta name="description" content="Nindova House is a private collection of authored thinking games for adults, with a separate quiet Night Session." />
-    <meta property="og:title" content="Nindova House — The Grand Salon" />
-    <meta property="og:description" content="Choose a room. Stay for the pleasure of solving. Nothing is tracked or compared." />
+    <meta name="description" content="Nindova is a private house of five authored games for adults, with a separate self-ending Night Room." />
+    <meta property="og:title" content="Nindova — A house of authored games" />
+    <meta property="og:description" content="Choose a room. Stay for the pleasure of solving. No account, public ranking, or telemetry." />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalSiteUrl} />
     <meta property="og:image" content={socialImageUrl} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href={canonicalSiteUrl} />
     <link rel="icon" href={href("/brand/favicon.svg")} type="image/svg+xml" />
     <link rel="icon" href={href("/brand/favicon-32.png")} sizes="32x32" type="image/png" />
     <link rel="apple-touch-icon" href={href("/brand/apple-touch-icon.png")} />
-    <title>Nindova House — The Grand Salon</title>
+    <title>Nindova — A house of authored games</title>
   </head>
   <body class="landing">
+    <a class="skip-link" href="#main">Skip to Nindova</a>
     <header class="site-nav" aria-label="Primary navigation">
       <a class="brand" href={href("/")} aria-label="Nindova home">
         <picture class="brand-lockup-picture">
@@ -45,205 +53,227 @@ const motifs = [
           <img class="brand-lockup" src={href("/brand/nindova-logo-horizontal-animated.svg")} alt="" width="202" height="64" />
         </picture>
       </a>
-      <nav>
+      <nav class="nav-links" aria-label="Site">
+        <a href="#inside">Inside</a>
+        <a href="#night-room">Night Room</a>
+        <a href="#downloads">Downloads</a>
         <a href={href("/docs/")}>Docs</a>
-        <a href={releaseUrl}>Release history</a>
-        <a class="nav-play" href={href("/house/")}>Enter the House</a>
+        <a class="nav-enter" href={href("/house/")}>Enter the House</a>
       </nav>
     </header>
 
-    <main>
-      <section class="rasoi-hero" aria-labelledby="hero-title">
+    <main id="main">
+      <section class="house-hero" aria-labelledby="hero-title">
         <div class="hero-copy">
           <p class="eyebrow">A private house of authored games · adults 18+</p>
-          <h1 id="hero-title">Enter the House.<br />Choose your table.</h1>
+          <h1 id="hero-title">Choose a room.<br /><em>Stay for the pleasure of solving.</em></h1>
           <p class="hero-lede">
-            Pattern Court, Mirror Forge, Stack Architect, Lantern Ledger, and the original Chandigarh
-            route Sector Sprint each unfold across five deliberate chapters or Acts. Masala Mound remains in its own quiet Night Room.
+            Five finite games live in the Grand Salon. A separate Night Room holds Masala Mound,
+            a calm Session with an ending it cannot bargain away.
           </p>
           <div class="hero-actions">
             <a class="button-primary" href={href("/house/")}>Enter Nindova House</a>
             <a class="button-secondary" href={href("/play/")}>Visit the Night Room</a>
           </div>
-          <p class="trust-line">Five authored tables. No account. No comparison.</p>
+          <p class="source-note">Live web build · no account · no comparison · no app telemetry</p>
         </div>
 
-        <figure class="hero-board">
-          <div class="board-frame">
+        <figure class="house-proof">
+          <div class="proof-frame">
+            <img
+              src={href("/media/nindova-house.png")}
+              width="1440"
+              height="937"
+              alt="The real Nindova House floor plan, with the Night Room, five Grand Salon tables, and local Gallery."
+            />
+          </div>
+          <figcaption>Current House floor plan · rendered from source</figcaption>
+        </figure>
+      </section>
+
+      <aside class="trust-rail" aria-label="Nindova at a glance">
+        <p><strong>Five</strong><span>authored Salon tables</span></p>
+        <p><strong>Finite</strong><span>chapters and curtain calls</span></p>
+        <p><strong>Local</strong><span>browser storage only</span></p>
+        <p><strong>Separate</strong><span>bounded Night Room</span></p>
+      </aside>
+
+      <section id="inside" class="salon-section" aria-labelledby="salon-title">
+        <header class="section-heading">
+          <div>
+            <p class="eyebrow">The centre of the House</p>
+            <h2 id="salon-title">Five tables.<br />Five clean endings.</h2>
+          </div>
+          <p>
+            Each game unfolds across five fixed chapters or Acts. Challenge can deepen inside the table;
+            nothing becomes a public ranking, streak, randomized prize, or population comparison.
+          </p>
+        </header>
+
+        <ol class="table-directory">
+          {tables.map(([number, title, line]) => (
+            <li>
+              <span class="table-number">{number}</span>
+              <h3>{title}</h3>
+              <p>{line}</p>
+              <a class="table-action" href={href("/house/")} aria-label={`Open ${title} in Nindova House`}>
+                Open in the House
+              </a>
+            </li>
+          ))}
+        </ol>
+
+        <article class="sector-proof">
+          <figure>
+            <img
+              src={href("/media/sector-sprint.png")}
+              width="1224"
+              height="594"
+              alt="Sector Sprint's real code-drawn Chandigarh route with Gurpreet and Harjit, optional controls, and a fixed authored Act."
+              loading="lazy"
+            />
+            <figcaption>Sector Sprint · current source · original code-drawn miniature</figcaption>
+          </figure>
+          <div>
+            <p class="eyebrow">Table V · Sector Sprint</p>
+            <h3>A city route that knows when to close.</h3>
+            <p>
+              The street moves forward on its own through five Chandigarh Acts. Jumps and harmless message
+              sparks change the comedy, not a score. Reduced motion begins with the complete narrated route.
+            </p>
+            <p class="honesty-note">No endless route, lives, failure loop, imported game art, or claim that play makes a person sleepy.</p>
+          </div>
+        </article>
+      </section>
+
+      <section id="night-room" class="night-section" aria-labelledby="night-title">
+        <div class="night-copy">
+          <p class="eyebrow">The north wing · a deliberately separate loop</p>
+          <h2 id="night-title">One quiet rule.<br />One Session, then rest.</h2>
+          <p>
+            Pair matching kitchen Tiles only when nothing covers them and one side is open. Gentle and Deeper
+            are equal tonight-only preferences. Every legal choice keeps a path to the ending, and help points
+            to a safe pair without playing it.
+          </p>
+          <ul>
+            <li>No score, visible timer, streak, grade, collection, or randomized reward.</li>
+            <li>The Session settles itself before its hidden fifteen-minute ceiling.</li>
+            <li>Dawn returns locally in the morning only if the person comes back.</li>
+          </ul>
+          <a class="text-link" href={href("/play/")}>Enter the Night Room <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="night-proof">
+          <figure class="board-proof">
             <img
               src={href("/media/rasoi-board.png")}
               width="840"
               height="476"
-              alt="The real Deeper Masala Mound board with four overlapping layers and four bright open-side crown tiles."
+              alt="The real Deeper Masala Mound board with four overlapping layers of labeled Indian kitchen Tiles."
+              loading="lazy"
             />
-          </div>
-          <figcaption>Night Room · rendered from source · no concept mockup</figcaption>
-        </figure>
-
-        <div class="motif-line" aria-label="Kitchen motifs in Rasoi Pairs">
-          {motifs.map(([label, slug]) => (
-            <span><img src={href(`/brand/motifs/${slug}.svg`)} alt="" width="48" height="48" />{label}</span>
-          ))}
-        </div>
-      </section>
-
-      <section class="rule-section" aria-labelledby="rule-title">
-        <div class="rule-intro">
-          <p class="eyebrow">One rule, two tonight-only profiles</p>
-          <h2 id="rule-title">Easy to understand.<br />Impossible to spoil.</h2>
-          <p>
-            A tile is free when nothing overlaps it from above and either its left or right side is open.
-            Gentle gives the mound broader openings; Deeper begins with unmatched open-side decoys and
-            one cross-layer pair, then reveals two more crown matches in sequence.
-            Every legal choice on either authored board keeps a path to the ending.
-          </p>
-        </div>
-        <ol class="rule-steps">
-          <li><span aria-hidden="true">01</span><div><h3>Choose tonight</h3><p>Gentle or Deeper. A preference, not a test.</p></div></li>
-          <li><span aria-hidden="true">02</span><div><h3>Look</h3><p>Read the overlaps. The brighter open-side tiles are free.</p></div></li>
-          <li><span aria-hidden="true">03</span><div><h3>Pair</h3><p>Belan with belan. Chai with chai.</p></div></li>
-          <li><span aria-hidden="true">04</span><div><h3>Settle</h3><p>The pair folds inward through one brief brass-and-peacock bloom and leaves.</p></div></li>
-        </ol>
-      </section>
-
-      <section class="material-section" aria-labelledby="material-title">
-        <figure class="phone-art">
-          <div class="phone-frame">
+            <figcaption>Masala Mound · real Deeper board</figcaption>
+          </figure>
+          <figure class="dawn-proof">
             <img
-              src={href("/media/rasoi-pairs-phone.png")}
-              width="375"
-              height="812"
-              alt="The real Masala Mound phone layout, with labeled overlapping kitchen tiles and a safe-pair help control."
+              src={href("/media/rasoi-dawn.png")}
+              width="1200"
+              height="750"
+              alt="The real Dawn canvas, with nine kitchen forms resting on brass plates in first light."
+              loading="lazy"
             />
-          </div>
-          <figcaption>375px v0.3.0 source surface</figcaption>
-        </figure>
-        <div class="material-copy">
-          <p class="eyebrow">Punjabi material, everyday kitchen</p>
-          <h2 id="material-title">Indigo cloth. Madder thread. Steel and brass.</h2>
-          <p>
-            The visual system draws from Punjabi material craft without turning it into decoration for
-            decoration's sake. Restrained phulkari-inspired geometry frames ordinary kitchen forms; the
-            object name remains visible so recognition never depends on illustration alone.
-          </p>
-          <dl class="material-ledger">
-            <div><dt>Palette</dt><dd>Indigo, madder, marigold, cream, brass</dd></div>
-            <div><dt>Objects</dt><dd>Everyday cooking and tea forms</dd></div>
-            <div><dt>Excluded</dt><dd>Flags, sacred symbols, festival collage</dd></div>
-          </dl>
-          <p class="honesty-note">Punjabi-inspired direction; completed human cultural-authenticity review is not claimed.</p>
+            <figcaption>Dawn · local first-light keepsake</figcaption>
+          </figure>
         </div>
       </section>
 
-      <section class="boundary-section" aria-labelledby="boundary-title">
+      <section id="trust" class="trust-section" aria-labelledby="trust-title">
         <header>
-          <p class="eyebrow">A game with an exit</p>
-          <h2 id="boundary-title">Feedback stays inside the Session.</h2>
+          <p class="eyebrow">The House rules</p>
+          <h2 id="trust-title">Pleasure, privacy,<br />and a clean exit.</h2>
         </header>
-        <div class="boundary-grid">
-          <div>
-            <h3>While you play</h3>
-            <p>Predictable lift, a paired brass-and-peacock bloom, and an optional three-note chime. Help points; it never plays.</p>
-          </div>
-          <div>
-            <h3>When it ends</h3>
-            <p>Rest is primary. An optional three-object Image Drift leads away from the screen, never back to play.</p>
-          </div>
-          <div>
-            <h3>If you leave it</h3>
-            <p>The kitchen settles itself before the hidden fifteen-minute ceiling. The ending stays the same.</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="sleep-section" aria-labelledby="sleep-title">
-        <div>
-          <p class="eyebrow">Why sleep matters</p>
-          <h2 id="sleep-title">Your brain has done enough.<br />It is allowed to clock out.</h2>
-        </div>
-        <div class="sleep-fact">
-          <p>
-            Sleep supports attention, learning, decision-making, mood, reaction time, and physical
-            health. The CDC lists at least 7 hours for adults 18–60; needs vary, and Nindova does not measure yours.
-          </p>
-          <p class="source-line">
-            Sources: <a href="https://www.cdc.gov/sleep/about/index.html">CDC sleep guidance</a>
-            · <a href="https://www.nhlbi.nih.gov/health/sleep-deprivation/health-effects">NIH/NHLBI health effects</a>
-          </p>
-        </div>
-      </section>
-
-      <section class="dawn-section" aria-labelledby="dawn-title">
-        <div class="dawn-copy">
-          <p class="eyebrow">Morning, only if you return</p>
-          <h2 id="dawn-title">First light keeps the forms, not the result.</h2>
-          <p>
-            From 06:00 through 11:59 in the captured Night ID zone, Dawn rearranges last night's kitchen
-            forms as a quiet local still. Save it, make a subtle silent loop, or leave it there. No notification asks you back.
-          </p>
-        </div>
-        <figure class="dawn-art">
-          <img
-            src={href("/media/rasoi-dawn.png")}
-            width="712"
-            height="452"
-            alt="The real Dawn canvas: nine kitchen forms resting on brass plates in warm first light."
-          />
-          <figcaption>Rendered Dawn canvas · local export surface</figcaption>
-        </figure>
-      </section>
-
-      <section class="trust-section" aria-labelledby="trust-title">
-        <div>
-          <p class="eyebrow">The technical promise</p>
-          <h2 id="trust-title">Your night stays on your device.</h2>
-        </div>
-        <ul>
-          <li><strong>No account</strong><span>Open the file or PWA and begin.</span></li>
-          <li><strong>Zero app telemetry</strong><span>No analytics, ads, or app-controlled remote logging.</span></li>
-          <li><strong>Offline-ready</strong><span>Installable PWA plus a standalone HTML.</span></li>
-          <li><strong>Accessible rule</strong><span>Native buttons, 44px targets, keyboard, reduced motion, and visible names.</span></li>
-        </ul>
-      </section>
-
-      <section class="qr-section" aria-labelledby="qr-title">
-        <div class="qr-copy">
-          <p class="eyebrow">Free, open, and direct</p>
-          <h2 id="qr-title">A direct QR, ready for publication.</h2>
-          <p>
-            This source release generates a QR containing the canonical play address—no
-            shortener, campaign parameter, account, or advertising identifier. The same address is printed below for verification.
-          </p>
-          <code class="canonical-url">{canonicalPlayUrl}</code>
-          <p class="honesty-note">The pinned GitHub Pages workflow publishes this static build from main. The live route is browser-verified; a physical-device scan remains a separate evidence lane.</p>
-        </div>
-        <figure class="qr-art">
-          <img src={href("/play-qr.svg")} width="396" height="396" alt={`QR code for ${canonicalPlayUrl}`} />
-          <figcaption>Proposed direct URL · no tracking parameters</figcaption>
-        </figure>
-      </section>
-
-      <section class="closing-section" aria-labelledby="closing-title">
-        <p class="eyebrow">Nindova House · The Grand Salon</p>
-        <h2 id="closing-title">Five tables. Five authored chapters or Acts each.</h2>
-        <p>
-          The Grand Salon is authored entertainment for adults. It does not produce an assessment result.
-          The separate Night Room remains a behavioral design study, not a sleep tracker or treatment.
+        <dl class="trust-ledger">
+          <div><dt>Authored</dt><dd>Every chapter, Act, and outcome is fixed by design. There are no random prizes.</dd></div>
+          <div><dt>Private</dt><dd>House and Night data stay in separate local browser records. Nothing is sent by the app.</dd></div>
+          <div><dt>Honest</dt><dd>Entertainment play is not presented as a cognitive, educational, sleep, or clinical assessment.</dd></div>
+          <div><dt>Accessible</dt><dd>Native controls, visible text, keyboard paths, reduced motion, and alternate narration carry required actions.</dd></div>
+        </dl>
+        <p class="trust-limit">
+          The Punjabi-inspired art direction has not completed human cultural-authenticity review. Real-device
+          VoiceOver and TalkBack acceptance, broader installed Safari/Android proof, and human outcome testing remain open.
         </p>
-        <div class="hero-actions">
-          <a class="button-primary" href={href("/house/")}>Enter the House</a>
-          <a class="button-secondary" href={standaloneUrl} download>Download the Night Session</a>
+      </section>
+
+      <section id="downloads" class="download-section" aria-labelledby="download-title">
+        <header class="section-heading">
+          <div>
+            <p class="eyebrow">Start your way</p>
+            <h2 id="download-title">Open live.<br />Keep a file. Build the source.</h2>
+          </div>
+          <p>
+            The current House is live from <code>main</code>. The latest tagged release is {latestRelease.tag} — {latestRelease.name}{" "}
+            and packages the earlier Night Room, not the later Grand Salon.
+          </p>
+        </header>
+
+        <div class="download-ledger">
+          <a href={href("/house/")}>
+            <img src={href("/brand/favicon.svg")} width="40" height="40" alt="" />
+            <span><strong>Enter Nindova House</strong><small>Current live web app and installable PWA</small></span>
+            <em>Open</em>
+          </a>
+          <a href={href("/play/")}>
+            <img src={href("/brand/motifs/chai.svg")} width="40" height="40" alt="" />
+            <span><strong>Visit the Night Room</strong><small>Current live Masala Mound PWA</small></span>
+            <em>Open</em>
+          </a>
+          <a href={href("/nindova.html")} download>
+            <img src={href("/brand/motifs/katori.svg")} width="40" height="40" alt="" />
+            <span><strong>Keep the current Night Room</strong><small>Source-built standalone HTML · no service worker</small></span>
+            <em>HTML</em>
+          </a>
+          <a href={latestRelease.standaloneUrl}>
+            <img src={href("/brand/nindova-mark-monochrome.svg")} width="40" height="40" alt="" />
+            <span><strong>Download standalone {latestRelease.tag}</strong><small>Portable Night Room HTML · no service worker</small></span>
+            <em>HTML</em>
+          </a>
+          <a href={latestRelease.webBundleUrl}>
+            <img src={href("/brand/motifs/tiffin.svg")} width="40" height="40" alt="" />
+            <span><strong>Download static {latestRelease.tag} archive</strong><small>Earlier landing, docs, Night PWA, and standalone file</small></span>
+            <em>ZIP</em>
+          </a>
+          <a href={sourceUrl}>
+            <img src={href("/brand/nindova-mark.svg")} width="40" height="40" alt="" />
+            <span><strong>Build current source</strong><small>Node.js 24+ · House, Night, docs, and standalone output</small></span>
+            <em>GitHub</em>
+          </a>
+        </div>
+        <p class="download-note">
+          <a href={latestRelease.checksumsUrl}>Verify tagged files with SHA-256</a> · HTML and ZIP files are not native signed or notarized apps ·
+          <a href={href("/docs/downloads/")}>Read the complete download guide</a>
+        </p>
+      </section>
+
+      <section class="help-section" aria-labelledby="help-title">
+        <p class="eyebrow">Continue with confidence</p>
+        <h2 id="help-title">Read the contract.<br />See the limits.</h2>
+        <div class="help-links">
+          <a href={href("/docs/getting-started/")}><strong>Getting started</strong><span>Run the House, Night Room, docs, and standalone file.</span></a>
+          <a href={href("/docs/product-contract/")}><strong>Product contract</strong><span>The promises neither loop may weaken.</span></a>
+          <a href={href("/docs/privacy-local-state/")}><strong>Privacy and local state</strong><span>Exactly what stays in each browser record.</span></a>
+          <a href={href("/docs/known-limitations/")}><strong>Known limitations</strong><span>Human, device, cultural, and release gaps kept visible.</span></a>
         </div>
       </section>
     </main>
 
     <footer class="site-footer">
-      <a class="brand" href={href("/")} aria-label="Nindova home"><img class="brand-lockup" src={href("/brand/nindova-logo-horizontal.svg")} alt="" width="202" height="64" /></a>
+      <a class="brand" href={href("/")} aria-label="Nindova home">
+        <img class="brand-lockup" src={href("/brand/nindova-logo-horizontal.svg")} alt="" width="202" height="64" />
+      </a>
       <nav aria-label="Footer navigation">
         <a href={href("/docs/")}>Documentation</a>
-        <a href="https://github.com/udhawan97/Nindova">GitHub</a>
-        <a href={href("/licenses/geist-OFL-1.1.txt")}>Third-party notices</a>
-        <a href={releaseUrl}>Release history</a>
+        <a href={sourceUrl}>Source</a>
+        <a href={releaseHistoryUrl}>Release history</a>
+        <a href={href("/licenses/geist-OFL-1.1.txt")}>Notices</a>
       </nav>
       <p>Authored entertainment and behavioral design study · 18+ · Apache-2.0</p>
     </footer>

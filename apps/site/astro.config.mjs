@@ -1,9 +1,13 @@
 import starlight from "@astrojs/starlight";
+import sitemap from "@astrojs/sitemap";
 import { defineConfig } from "astro/config";
 
 const base = process.env.NINDOVA_BASE_PATH ?? "/";
+const site = "https://udhawan97.github.io";
+const nonCanonical404Url = new URL(base, site).href.replace(/\/$/, "");
 
 export default defineConfig({
+  site,
   base,
   vite: {
     build: {
@@ -28,6 +32,7 @@ export default defineConfig({
           items: [
             { label: "Documentation", slug: "docs" },
             { label: "Getting started", slug: "docs/getting-started" },
+            { label: "Downloads", slug: "docs/downloads" },
             { label: "Product contract", slug: "docs/product-contract" },
             { label: "Masala Mound Session", slug: "docs/nightly-arc" },
             { label: "Night and local state", slug: "docs/night-and-local-state" },
@@ -50,5 +55,6 @@ export default defineConfig({
         },
       ],
     }),
+    sitemap({ filter: (page) => page !== nonCanonical404Url }),
   ],
 });

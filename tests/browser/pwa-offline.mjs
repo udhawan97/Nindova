@@ -39,13 +39,14 @@ try {
   await page.goto(prefix);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 375);
   const publicCopy = await page.locator("body").innerText();
-  assert.ok(publicCopy.includes("Five authored tables. No account. No comparison."));
+  assert.match(publicCopy, /Five tables\.\s+Five clean endings\./);
+  assert.ok(publicCopy.includes("no account · no comparison · no app telemetry"));
   const rootPath = mountPath ? `/${mountPath}/` : "/";
   const landingLinks = {
     house: await page.locator('a.button-primary').first().getAttribute("href"),
     docs: await page.locator('nav a[href$="/docs/"]').first().getAttribute("href"),
     standalone: await page.locator("a[download]").first().getAttribute("href"),
-    release: await page.locator('a[href*="/releases"]').first().getAttribute("href"),
+    release: await page.locator('a[href="https://github.com/udhawan97/Nindova/releases"]').first().getAttribute("href"),
   };
   assert.deepEqual(landingLinks, {
     house: `${rootPath}house/`,
@@ -53,10 +54,12 @@ try {
     standalone: `${rootPath}nindova.html`,
     release: "https://github.com/udhawan97/Nindova/releases",
   });
-  await page.waitForFunction(() => [...document.querySelectorAll(".brand-lockup, .motif-line img")]
-    .every((image) => image.complete && image.naturalWidth > 0));
+  for (const image of await page.locator(".brand-lockup, .house-proof img, .sector-proof img, .night-proof img").all()) {
+    await image.scrollIntoViewIfNeeded();
+    await image.evaluate((element) => element.decode());
+  }
   assert.equal(await page.locator(".brand-lockup").count(), 2);
-  assert.equal(await page.locator(".motif-line img").count(), 9);
+  assert.equal(await page.locator(".table-directory li").count(), 5);
   assert.match(await page.locator('meta[property="og:image"]').getAttribute("content") ?? "", /\/Nindova\/brand\/nindova-og\.png$/);
   for (const href of [landingLinks.house, landingLinks.docs, landingLinks.standalone]) {
     const linkedPage = await context.newPage();
@@ -64,7 +67,11 @@ try {
     assert.equal(response?.ok(), true);
     await linkedPage.close();
   }
-  const qrPng = PNG.sync.read(await page.locator(".qr-art img").screenshot());
+  const qrPage = await context.newPage();
+  await qrPage.setContent(`<img id="qr" src="${new URL(`${rootPath}play-qr.svg`, prefix).href}" alt="">`);
+  await qrPage.locator("#qr").waitFor({ state: "visible" });
+  const qrPng = PNG.sync.read(await qrPage.locator("#qr").screenshot());
+  await qrPage.close();
   const decodedQr = jsQR(new Uint8ClampedArray(qrPng.data), qrPng.width, qrPng.height);
   assert.equal(decodedQr?.data, publicFacts.canonicalPlayUrl);
   for (const licensePath of ["licenses/geist-OFL-1.1.txt", "licenses/newsreader-OFL-1.1.txt"]) {

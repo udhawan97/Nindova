@@ -17,7 +17,7 @@ const mime = new Map([
   [".woff2", "font/woff2"],
 ]);
 
-createServer(async (request, response) => {
+const server = createServer(async (request, response) => {
   const requestUrl = new URL(request.url ?? "/", `http://${host}:${port}`);
   const decodedPath = decodeURIComponent(requestUrl.pathname);
   if (mountPath && decodedPath !== mountPath && !decodedPath.startsWith(`${mountPath}/`)) {
@@ -44,6 +44,10 @@ createServer(async (request, response) => {
   } catch {
     response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" }).end("Not found");
   }
-}).listen(port, host, () => {
-  console.log(`Nindova preview: http://${host}:${port}${mountPath || "/"}`);
+});
+
+server.listen(port, host, () => {
+  const address = server.address();
+  const boundPort = typeof address === "object" && address ? address.port : port;
+  console.log(`Nindova preview: http://${host}:${boundPort}${mountPath || "/"}`);
 });

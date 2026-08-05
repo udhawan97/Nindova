@@ -21,7 +21,7 @@ description: What exists in the current source and what remains deliberately unc
 - Self-contained standalone HTML and separately tested installable offline PWA.
 - Synchronized brand kit, landing page, Starlight docs, rendered source media, Apache-2.0 code licensing, CC0-1.0 original-art provenance, and a locally verified QR artifact for the canonical public route.
 
-The pinned GitHub Pages workflow publishes the static build from `main`. The live route, rendered QR destination, service-worker control, and offline reload are browser-verified; a physical-device QR scan remains pending.
+The pinned GitHub Pages workflow publishes the static build from `main`. The deployed `main` revision exposes the live House, Night, docs, and standalone routes. This public-surface refresh remains local until authorized delivery. The latest tagged download is still v0.3.0 and packages the earlier Night Room release rather than the later House. The rendered QR destination, service-worker control, and offline reload are browser-verified; a physical-device QR scan remains pending.
 
 ## Next hardening
 

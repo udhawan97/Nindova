@@ -1,3 +1,15 @@
 {
-  "canonicalPlayUrl": "https://udhawan97.github.io/Nindova/play/"
+  "canonicalSiteUrl": "https://udhawan97.github.io/Nindova/",
+  "canonicalHouseUrl": "https://udhawan97.github.io/Nindova/house/",
+  "canonicalPlayUrl": "https://udhawan97.github.io/Nindova/play/",
+  "sourceUrl": "https://github.com/udhawan97/Nindova",
+  "releaseHistoryUrl": "https://github.com/udhawan97/Nindova/releases",
+  "latestRelease": {
+    "tag": "v0.3.0",
+    "name": "Shahi Mound",
+    "url": "https://github.com/udhawan97/Nindova/releases/tag/v0.3.0",
+    "standaloneUrl": "https://github.com/udhawan97/Nindova/releases/download/v0.3.0/nindova-v0.3.0.html",
+    "webBundleUrl": "https://github.com/udhawan97/Nindova/releases/download/v0.3.0/nindova-web-v0.3.0.zip",
+    "checksumsUrl": "https://github.com/udhawan97/Nindova/releases/download/v0.3.0/SHA256SUMS.txt"
+  }
 }
