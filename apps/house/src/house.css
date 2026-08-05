@@ -1,5 +1,5 @@
-/* Hallmark · genre: atmospheric · macrostructure: Map / Diagram (House) + Workbench (Sector Sprint) · theme: custom Shahi Raat House · tone: restrained luxury · anchor hue: aged brass · audience: adults 18+ · use: choose an authored entertainment game · enrichment: code-drawn Canvas miniature · nav: N9 edge-aligned mission bar · footer: Ft2 · contrast: pass (40–41) · slop: pass (1–58) · honest: pass (46) · chrome: pass (47) · tokens: pass (48) · responsive: pass (49) · icons: pass (30) · mobile: pass (34, 49, 50–57) */
-/* Hallmark · pre-emit critique: P5 H5 E5 S5 R4 V5 */
+/* Hallmark · genre: atmospheric · macrostructure: Map / Diagram (House) + Component Playground flight instrument (Sector Sprint) · theme: custom Shahi Raat House · tone: restrained luxury · anchor hue: aged brass · audience: adults 18+ · use: choose an authored entertainment game · enrichment: code-drawn Canvas jetpack corridor · nav: N9 edge-aligned mission bar · footer: Ft2 · contrast: pass (40–41) · slop: pass (1–58) · honest: pass (46) · chrome: pass (47) · tokens: pass (48) · responsive: pass (49) · icons: pass (30) · mobile: pass (34, 49, 50–57) */
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 */
 
 * { box-sizing: border-box; }
 
@@ -224,6 +224,7 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
 .runner-stage-frame::after { inset: auto 3px 3px auto; border-inline-end: 3px double; border-block-end: 3px double; }
 .runner-canvas-window { position: relative; overflow: clip; border: 1px solid var(--color-rule-strong); background: var(--color-paper); box-shadow: inset 0 0 0 4px color-mix(in oklch, var(--color-paper) 55%, transparent); cursor: pointer; touch-action: none; user-select: none; }
 .runner-canvas-window[data-pressed="true"] { box-shadow: inset 0 0 0 3px color-mix(in oklch, var(--color-accent) 78%, transparent), inset 0 0 4rem color-mix(in oklch, var(--color-jewel-sapphire) 24%, transparent); }
+.runner-canvas-window[data-runner-failed="true"] { cursor: default; }
 #runnerCanvas { display: block; width: 100%; height: auto; aspect-ratio: 20 / 9; background: var(--color-paper); image-rendering: auto; }
 .runner-thrust-prompt { position: absolute; z-index: var(--z-raised); inset: auto auto .7rem .7rem; padding: .38rem .55rem; border: 1px solid color-mix(in oklch, var(--color-accent) 48%, transparent); background: color-mix(in oklch, var(--color-paper) 76%, transparent); color: var(--color-ink); font-family: var(--font-mono); font-size: .62rem; letter-spacing: .09em; text-transform: uppercase; backdrop-filter: blur(8px); pointer-events: none; }
 .runner-action-hud { display: grid; position: absolute; z-index: calc(var(--z-raised) + 1); inset: 1.25rem 1.25rem auto auto; min-width: 12rem; grid-template-columns: auto; justify-items: end; padding: .65rem .8rem; border: 1px solid color-mix(in oklch, var(--color-accent) 54%, transparent); background: color-mix(in oklch, var(--color-paper) 76%, transparent); box-shadow: 0 .75rem 2.5rem color-mix(in oklch, var(--color-paper) 56%, transparent); backdrop-filter: blur(12px); pointer-events: none; }
@@ -258,6 +259,16 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
 .runner-copy-deck > p:first-child { color: var(--color-ink-soft); font-family: var(--font-display); font-size: var(--text-md); }
 .runner-copy-deck strong { color: var(--color-accent); font-weight: 620; }
 .runner-house-call { padding-inline-start: var(--space-md); border-inline-start: 1px solid var(--color-rule-strong); font-family: var(--font-display); }
+.runner-recovery { display: grid; grid-template-columns: minmax(14rem, .75fr) minmax(0, 1.25fr); gap: var(--space-lg) var(--space-2xl); margin-block-start: var(--space-md); padding: clamp(var(--space-lg), 4vw, var(--space-2xl)); border: 1px solid var(--color-rule-strong); border-block-start: 3px double var(--color-accent); background: linear-gradient(135deg, color-mix(in oklch, var(--color-paper-3) 91%, var(--color-jewel-ruby)), var(--color-paper-2)); box-shadow: inset 0 1px 0 color-mix(in oklch, var(--color-ink) 7%, transparent), 0 1.4rem 4rem color-mix(in oklch, var(--color-paper) 54%, transparent); }
+.runner-recovery > * { min-width: 0; }
+.runner-recovery h3 { max-width: 16ch; margin: var(--space-2xs) 0 0; font-size: clamp(1.7rem, 3vw, 2.65rem); line-height: 1; }
+.runner-recovery > p { max-width: 62ch; margin: 0; color: var(--color-muted); }
+.runner-recovery-actions { display: flex; grid-column: 1 / -1; flex-wrap: wrap; gap: var(--space-sm); align-items: center; }
+.runner-recovery-actions button { min-height: 3.2rem; }
+.runner-recovery-actions button:disabled { cursor: not-allowed; opacity: .48; }
+.runner-recovery .runner-route-note { grid-area: auto; padding-block-start: var(--space-md); border-block-start: 1px solid var(--color-rule-strong); }
+.runner-recovery-detail { padding-block-start: var(--space-md); border-block-start: 1px solid var(--color-rule-strong); }
+.runner-recovery-detail strong { color: var(--color-accent); }
 
 .runner-story { display: grid; min-height: 32rem; grid-template-columns: minmax(15rem, .75fr) minmax(0, 1.25fr); grid-template-areas: "heading beat" "actions beat" "note beat"; gap: var(--space-xl) var(--space-3xl); align-content: center; padding: clamp(1.5rem, 5vw, 5rem); border: 1px solid var(--color-rule-strong); background: var(--color-paper-2); }
 .runner-story-heading { grid-area: heading; }
@@ -359,6 +370,8 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
   .game-title-block-runner > p:last-child { position: static; width: auto; margin-block-start: var(--space-sm); padding-inline-start: var(--space-md); }
   .runner-brief { padding-block: var(--space-xs); }
   .runner-status-deck, .runner-copy-deck { grid-template-columns: minmax(0, 1fr); }
+  .runner-recovery { grid-template-columns: minmax(0, 1fr); }
+  .runner-recovery-actions { grid-column: 1; }
   .runner-live { border-inline-start: 2px solid var(--color-accent); border-block-start: 1px solid var(--color-rule-strong); }
   .runner-controls { grid-template-columns: repeat(6, minmax(0, 1fr)); }
   .runner-controls .runner-control-primary { grid-column: span 2; }
@@ -400,6 +413,9 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
   .runner-approach { align-items: flex-start; flex-direction: column; gap: var(--space-3xs); }
   .runner-stage-frame figcaption { align-items: flex-start; flex-direction: column; gap: var(--space-3xs); }
   .runner-story { padding: var(--space-lg); }
+  .runner-recovery { padding: var(--space-lg); }
+  .runner-recovery-actions { align-items: stretch; flex-direction: column; }
+  .runner-recovery-actions button { width: 100%; }
   .runner-story-beat { min-height: 14rem; padding: var(--space-lg) 0; }
   .table-gate { padding: var(--space-lg); }
   .gate-actions { width: 100%; align-items: stretch; flex-direction: column; }

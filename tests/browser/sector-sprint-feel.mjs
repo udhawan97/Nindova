@@ -49,6 +49,8 @@ async function openRunner(viewport, cpuRate = 1) {
   await page.click('[data-game="sector-sprint"]');
   await page.click('[data-runner-route="action"]');
   await page.waitForSelector("#runnerCanvas");
+  await page.keyboard.down("Space");
+  await startAutopilot(page);
   await page.waitForFunction(() => Number(document.querySelector("#runnerCanvas")?.dataset.renderSequence ?? 0) > 1);
   return { context, page };
 }
@@ -82,6 +84,52 @@ async function measureAction(page, selector, allowedActions) {
   }), { selector, allowed: allowedActions });
 }
 
+async function startAutopilot(page) {
+  await page.evaluate(() => {
+    let held = true;
+    let inputAt = 0;
+    let beforeSequence = 0;
+    globalThis.__runnerAutopilotLatencies = [];
+    const canvas = document.querySelector("#runnerCanvas");
+    const observer = new MutationObserver(() => {
+      const sequence = Number(canvas?.dataset.renderSequence ?? 0);
+      if (inputAt > 0 && sequence > beforeSequence) {
+        globalThis.__runnerAutopilotLatencies.push(performance.now() - inputAt);
+        inputAt = 0;
+      }
+    });
+    if (canvas) observer.observe(canvas, { attributes: true, attributeFilter: ["data-render-sequence"] });
+    const setHeld = (next, force = false) => {
+      if (next === held && !force) return;
+      held = next;
+      if (next && inputAt === 0) {
+        beforeSequence = Number(canvas?.dataset.renderSequence ?? 0);
+        inputAt = performance.now();
+      }
+      document.body.dispatchEvent(new KeyboardEvent(next ? "keydown" : "keyup", { key: " ", bubbles: true }));
+    };
+    globalThis.__stopRunnerAutopilot = () => {
+      cancelAnimationFrame(globalThis.__runnerAutopilotTimer);
+      observer.disconnect();
+      setHeld(false);
+    };
+    const control = () => {
+      const state = window.__house.runner;
+      const canvas = document.querySelector("#runnerCanvas");
+      if (!state || state.failed || !(canvas instanceof HTMLCanvasElement)) {
+        setHeld(false);
+        return;
+      }
+      const center = Number(canvas.dataset.nextGapCenter ?? 220);
+      const targetY = center - 38;
+      const nextHeld = state.y + state.velocityY * 0.18 > targetY;
+      setHeld(nextHeld);
+      globalThis.__runnerAutopilotTimer = requestAnimationFrame(control);
+    };
+    globalThis.__runnerAutopilotTimer = requestAnimationFrame(control);
+  });
+}
+
 async function sampleFrames(page, count) {
   return page.evaluate((sampleCount) => new Promise((resolveFrames) => {
     const intervals = [];
@@ -100,28 +148,28 @@ async function sampleFrames(page, count) {
 
 try {
   const throttled = await openRunner({ width: 375, height: 812 }, 4);
-  const actionSamples = { lift: [], tool: [] };
-  for (let sample = 0; sample < 6; sample += 1) {
-    await throttled.page.waitForFunction(() => window.__house.runner?.grounded === true);
-    actionSamples.lift.push(await measureAction(throttled.page, '[data-runner-action="thrust"]', ["thrust"]));
-    await throttled.page.waitForTimeout(50);
-    actionSamples.tool.push(await measureAction(throttled.page, '[data-runner-action="tool"]', ["tool"]));
-    await throttled.page.waitForTimeout(300);
-  }
+  await throttled.page.waitForFunction(() => (
+    (globalThis.__runnerAutopilotLatencies?.length ?? 0) >= 6
+    && (window.__house.runner?.worldX ?? 0) > 700
+    && window.__house.runner?.failed === false
+  ));
+  const actionSamples = { pulse: await throttled.page.evaluate(() => globalThis.__runnerAutopilotLatencies.slice(0, 6)) };
   const throttledFrames = await sampleFrames(throttled.page, 120);
+  const throttledQuality = await throttled.page.locator("#runnerCanvas").getAttribute("data-quality");
   const actionP95 = Object.fromEntries(Object.entries(actionSamples).map(([name, values]) => [name, percentile(values, 0.95)]));
   for (const [name, value] of Object.entries(actionP95)) assert.ok(value < 150, `${name} p95 ${value.toFixed(1)}ms must remain below 150ms under 4x CPU`);
-  assert.ok(percentile(throttledFrames, 0.95) <= 50, `375x812 4x CPU p95 frame interval ${percentile(throttledFrames, 0.95).toFixed(1)}ms must remain <= 50ms`);
+  assert.ok(percentile(throttledFrames, 0.95) <= 50, `375x812 4x CPU ${throttledQuality} p95 frame interval ${percentile(throttledFrames, 0.95).toFixed(1)}ms must remain <= 50ms`);
   await throttled.context.close();
 
   const desktop = await openRunner({ width: 1440, height: 900 });
+  await desktop.page.waitForFunction(() => (window.__house.runner?.worldX ?? 0) > 700 && window.__house.runner?.failed === false);
   const desktopFrames = await sampleFrames(desktop.page, 120);
   assert.ok(percentile(desktopFrames, 0.95) <= 25, `1440x900 p95 frame interval ${percentile(desktopFrames, 0.95).toFixed(1)}ms must remain <= 25ms`);
   await desktop.context.close();
 
   assert.deepEqual(errors, []);
   console.log(JSON.stringify({
-    profile: "Chromium · 375x812 · 4x CPU · 6 input samples per action · 120 frame samples",
+    profile: "Chromium · dense sandstone corridor · 375x812 at 4x CPU · 6 pulse samples · 120 frame samples",
     actionP95Ms: Object.fromEntries(Object.entries(actionP95).map(([name, value]) => [name, Number(value.toFixed(2))])),
     throttledFrameP95Ms: Number(percentile(throttledFrames, 0.95).toFixed(2)),
     desktopFrameP95Ms: Number(percentile(desktopFrames, 0.95).toFixed(2)),

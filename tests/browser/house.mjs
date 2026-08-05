@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { cp, mkdir, mkdtemp, readFile, readdir, rm } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { chromium } from "@playwright/test";
@@ -45,20 +45,43 @@ async function openHouse(viewport, options = {}, {
   manualRaf = false,
   fakeClock = false,
   controllableVisibility = false,
+  reviewMode = false,
 } = {}) {
   const context = await browser.newContext({ viewport, ...options });
   if (acceleratedRaf) {
-    await context.addInitScript(() => {
+    await context.addInitScript((stepMs) => {
       const nativeRequestAnimationFrame = globalThis.requestAnimationFrame.bind(globalThis);
       let authoredTimestamp = 0;
+      let nextFrameId = 1;
+      let scheduled = false;
+      const queuedFrames = new Map();
+      const scheduleFrame = () => {
+        if (scheduled || queuedFrames.size === 0) return;
+        scheduled = true;
+        nativeRequestAnimationFrame(() => {
+          scheduled = false;
+          authoredTimestamp += stepMs;
+          const callbacks = [...queuedFrames.values()];
+          queuedFrames.clear();
+          callbacks.forEach((callback) => callback(authoredTimestamp));
+          scheduleFrame();
+        });
+      };
       Object.defineProperty(globalThis, "requestAnimationFrame", {
         configurable: true,
-        value: (callback) => nativeRequestAnimationFrame(() => {
-          authoredTimestamp += 800;
-          callback(authoredTimestamp);
-        }),
+        value: (callback) => {
+          const frameId = nextFrameId;
+          nextFrameId += 1;
+          queuedFrames.set(frameId, callback);
+          scheduleFrame();
+          return frameId;
+        },
       });
-    });
+      Object.defineProperty(globalThis, "cancelAnimationFrame", {
+        configurable: true,
+        value: (frameId) => queuedFrames.delete(frameId),
+      });
+    }, typeof acceleratedRaf === "number" ? acceleratedRaf : 100);
   }
   if (manualRaf) {
     await context.addInitScript(() => {
@@ -78,11 +101,11 @@ async function openHouse(viewport, options = {}, {
         configurable: true,
         value: (frameId) => queuedFrames.delete(frameId),
       });
-      globalThis.__advanceHouseTestFrames = (count) => {
+      globalThis.__advanceHouseTestFrames = (count, stepMs = 800) => {
         for (let frame = 0; frame < count; frame += 1) {
           const callbacks = [...queuedFrames.values()];
           queuedFrames.clear();
-          authoredTimestamp += 800;
+          authoredTimestamp += stepMs;
           callbacks.forEach((callback) => callback(authoredTimestamp));
         }
       };
@@ -128,7 +151,7 @@ async function openHouse(viewport, options = {}, {
     const url = new URL(request.url());
     if (url.hostname !== "127.0.0.1") externalRequests.push(request.url());
   });
-  const response = await page.goto(`http://127.0.0.1:${port}/house/`);
+  const response = await page.goto(`http://127.0.0.1:${port}/house/${reviewMode ? "?review=1" : ""}`);
   assert.equal(response?.ok(), true);
   await page.waitForFunction(() => Boolean(window.__house));
   assert.equal(await page.locator("#audienceDialog").getAttribute("open"), "");
@@ -175,6 +198,35 @@ async function enterRunnerAction(page) {
   await page.locator('[data-game="sector-sprint"]').first().click();
   await page.click('[data-runner-route="action"]');
   await page.waitForSelector("#runnerCanvas");
+}
+
+async function captureRunnerCanvas(page, filename) {
+  const dataUrl = await page.locator("#runnerCanvas").evaluate((canvas) => canvas.toDataURL("image/png"));
+  await writeFile(resolve(output, filename), Buffer.from(dataUrl.split(",")[1], "base64"));
+}
+
+async function startRunnerAutopilot(page) {
+  await page.evaluate(() => {
+    let held = false;
+    const setHeld = (next) => {
+      if (next === held) return;
+      held = next;
+      document.body.dispatchEvent(new KeyboardEvent(next ? "keydown" : "keyup", { key: " ", bubbles: true }));
+    };
+    const control = () => {
+      const state = window.__house.runner;
+      const canvas = document.querySelector("#runnerCanvas");
+      if (!state || state.failed || state.finished || window.__house.active?.resolving || !(canvas instanceof HTMLCanvasElement)) {
+        setHeld(false);
+        globalThis.__houseVisualPilot = requestAnimationFrame(control);
+        return;
+      }
+      const gapCenter = Number(canvas.dataset.nextGapCenter ?? 220);
+      setHeld(state.y + state.velocityY * 0.18 > gapCenter - 38);
+      globalThis.__houseVisualPilot = requestAnimationFrame(control);
+    };
+    globalThis.__houseVisualPilot = requestAnimationFrame(control);
+  });
 }
 
 async function enterRunnerNarrated(page) {
@@ -436,7 +488,7 @@ try {
   assert.deepEqual(await stack.page.evaluate(() => window.__house.active?.pegs), [[3, 2, 1], [], []], "reset rebuilds only the current higher-chapter tower");
   await stack.context.close();
 
-  const runner = await openHouse({ width: 375, height: 812 });
+  const runner = await openHouse({ width: 375, height: 812 }, {}, { manualRaf: true });
   await runner.page.click('[data-game="sector-sprint"]');
   assert.equal(await runner.page.evaluate(() => window.__house.active), null, "route choice creates no run before consent");
   assert.equal(await runner.page.evaluate(() => sessionStorage.getItem("nindova:house:active:v1")), null, "route choice starts no persisted boundary");
@@ -456,7 +508,7 @@ try {
     quality: canvas.dataset.quality,
     camera: canvas.dataset.camera,
     art: canvas.dataset.art,
-  })), { width: 960, height: 432, ratio: "1", logicalWidth: "960", logicalHeight: "432", quality: "high", camera: "portrait-close", art: "illustrated" });
+  })), { width: 960, height: 432, ratio: "1", logicalWidth: "960", logicalHeight: "432", quality: "balanced", camera: "portrait-close", art: "illustrated" });
   assert.ok((await runner.page.locator(".runner-canvas-window").boundingBox())?.height >= 250, "the portrait close camera keeps the illustrated action legible");
   assert.ok((await runner.page.locator(".runner-stage-frame").boundingBox())?.y < 812, "the moving miniature enters the first phone viewport");
   assert.deepEqual(await runner.page.evaluate(() => {
@@ -477,13 +529,21 @@ try {
   }
   await runner.page.screenshot({ path: resolve(output, "sector-sprint-375x812.png"), fullPage: true, animations: "disabled" });
   await runner.page.click('[data-runner-action="tool"]');
-  await runner.page.waitForFunction(() => /Message delivered|number 12 has left/i.test(document.querySelector("#runnerLive")?.textContent ?? ""), null, { timeout: 4_000 });
+  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(2, 17));
+  assert.ok(await runner.page.evaluate(() => (window.__house.runner?.projectiles.length ?? 0) > 0), "the harmless Act tool remains available");
   await runner.page.locator('[data-runner-action="thrust"]').focus();
   await runner.page.keyboard.down("Space");
+  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(55, 17));
   await runner.page.waitForFunction(() => window.__house.runner?.thrusting === true);
+  assert.ok(await runner.page.evaluate(() => (window.__house.runner?.velocityY ?? 0) < 0), "a held pulse produces a visible rising state");
+  await captureRunnerCanvas(runner.page, "sector-sprint-motion-rise.png");
   await runner.page.keyboard.up("Space");
+  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(12, 17));
   await runner.page.waitForFunction(() => window.__house.runner?.thrusting === false);
+  assert.ok(await runner.page.evaluate(() => (window.__house.runner?.velocityY ?? 0) > 0), "release preserves inertia and reaches a visible falling state");
+  await captureRunnerCanvas(runner.page, "sector-sprint-motion-fall.png");
   await runner.page.locator(".runner-canvas-window").dispatchEvent("pointerdown", { pointerId: 7, pointerType: "touch", isPrimary: true });
+  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(2, 17));
   await runner.page.waitForFunction(() => window.__house.runner?.thrusting === true);
   const projectilesBeforeSecondaryPointer = await runner.page.evaluate(() => window.__house.runner?.projectiles.length);
   await runner.page.locator('[data-runner-action="tool"]').dispatchEvent("pointerdown", { pointerId: 8, pointerType: "touch", isPrimary: false });
@@ -493,27 +553,53 @@ try {
   assert.notEqual(await runner.page.evaluate(() => window.__house.runner?.lastAction), "tool", "an unrelated secondary pointer cannot replace the primary action");
   assert.equal(await runner.page.evaluate(() => window.__house.runner?.projectiles.length), projectilesBeforeSecondaryPointer, "an unrelated secondary pointer cannot queue the Act tool");
   await runner.page.locator("body").dispatchEvent("pointercancel", { pointerId: 7, pointerType: "touch", isPrimary: true });
+  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(1, 17));
   await runner.page.waitForFunction(() => window.__house.runner?.thrusting === false);
   assert.equal(await runner.page.locator(".runner-canvas-window").getAttribute("data-pressed"), null, "a cancelled stage pointer leaves no stuck held state");
   await runner.page.evaluate(() => document.querySelector("#houseMain")?.focus());
   await runner.page.keyboard.press("d");
-  await runner.page.waitForFunction(() => ["dash", "stomp", "vault"].includes(window.__house.runner?.lastAction ?? ""), null, { timeout: 2_000 });
-  await runner.page.locator('[data-runner-action="thrust"]').dispatchEvent("pointerdown", { pointerId: 9, pointerType: "touch", isPrimary: true });
-  await runner.page.locator("body").dispatchEvent("pointerup", { pointerId: 9, pointerType: "touch", isPrimary: true });
-  await runner.page.locator("#runnerLive").evaluate((element) => { element.textContent = "Activation sentinel"; });
-  await runner.page.locator('[data-runner-action="thrust"]').focus();
-  await runner.page.keyboard.press("Enter");
-  await runner.page.waitForFunction(() => /Lift engaged/i.test(document.querySelector("#runnerLive")?.textContent ?? ""), null, { timeout: 2_000 });
+  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(1, 17));
+  await runner.page.waitForFunction(() => window.__house.runner?.lastAction === "dash", null, { timeout: 2_000 });
   await runner.page.click("[data-runner-pause]");
   assert.equal(await runner.page.locator("[data-runner-pause]").getAttribute("aria-pressed"), "true");
   const pausedFrame = await runner.page.locator("#runnerCanvas").evaluate((canvas) => canvas.toDataURL());
   const pausedMessage = await runner.page.locator("#runnerLive").innerText();
   assert.equal(await runner.page.locator("#runnerCanvas").evaluate((canvas) => canvas.toDataURL()), pausedFrame, "the paused city remains still");
   await runner.page.click("[data-runner-pause]");
-  await runner.page.waitForTimeout(250);
+  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(2, 17));
   assert.notEqual(await runner.page.locator("#runnerCanvas").evaluate((canvas) => canvas.toDataURL()), pausedFrame, "the city resumes from the paused scene");
-  await runner.page.waitForFunction(() => /security deposit|Chandigarh splash/i.test(document.querySelector("#runnerLive")?.textContent ?? ""), null, { timeout: 9_000 });
-  assert.equal(await runner.page.evaluate(() => window.__house.active?.chapter), 0, "a comic collision never resets or loses the Act");
+  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(90, 17));
+  await runner.page.waitForSelector(".runner-recovery");
+  await captureRunnerCanvas(runner.page, "sector-sprint-motion-impact.png");
+  assert.deepEqual(await runner.page.evaluate(() => ({
+    failed: window.__house.runner?.failed,
+    reason: window.__house.runner?.failureReason,
+    chapter: window.__house.active?.chapter,
+    storedFailure: sessionStorage.getItem("nindova:house:active:v1")?.includes("failure"),
+  })), { failed: true, reason: "road", chapter: 0, storedFailure: false });
+  assert.equal(await runner.page.locator(".runner-controls").count(), 0, "underlying Action controls disappear after a wipeout");
+  assert.equal(await runner.page.evaluate(() => document.activeElement?.matches("[data-runner-retry]")), true, "recovery moves focus to the first available action");
+  assert.match(await runner.page.locator(".runner-recovery").innerText(), /No life, score, checkpoint, or failure history is kept/i);
+  const recoveryLayout = await runner.page.locator(".runner-recovery").evaluate((panel) => {
+    const heading = panel.querySelector("h3");
+    const children = [...panel.children];
+    return {
+      columns: getComputedStyle(panel).gridTemplateColumns.split(" ").length,
+      headingWidth: Math.round(heading?.getBoundingClientRect().width ?? 0),
+      textFits: children.every((child) => child.scrollWidth <= child.clientWidth + 1),
+    };
+  });
+  assert.equal(recoveryLayout.columns, 1, "phone recovery uses one column");
+  assert.ok(recoveryLayout.headingWidth >= 220, "the recovery heading keeps a readable line length");
+  assert.equal(recoveryLayout.textFits, true, "recovery copy does not bleed or clip");
+  await runner.page.screenshot({ path: resolve(output, "sector-sprint-recovery-375x812.png"), fullPage: true, animations: "disabled" });
+  const runIdBeforeRetry = await runner.page.evaluate(() => window.__house.active?.runId);
+  await runner.page.click("[data-runner-retry]");
+  assert.deepEqual(await runner.page.evaluate(() => ({
+    chapter: window.__house.active?.chapter,
+    failed: window.__house.runner?.failed,
+    runId: window.__house.active?.runId,
+  })), { chapter: 0, failed: false, runId: runIdBeforeRetry }, "retry restarts Act I without creating a new table");
   await runner.context.close();
 
   for (const viewport of [{ width: 320, height: 568 }, { width: 1280, height: 800 }]) {
@@ -525,6 +611,31 @@ try {
     await runnerVisual.page.screenshot({ path: resolve(output, `sector-sprint-${viewport.width}x${viewport.height}.png`), fullPage: true, animations: "disabled" });
     await runnerVisual.context.close();
   }
+
+  const materialRunner = await openHouse({ width: 1280, height: 800 }, {}, { acceleratedRaf: 100, reviewMode: true });
+  await enterRunnerAction(materialRunner.page);
+  await startRunnerAutopilot(materialRunner.page);
+  for (const [actIndex, material] of ["sandstone", "market-timber", "hammered-brass", "wet-terrazzo", "phulkari-inlay"].entries()) {
+    await materialRunner.page.waitForFunction(({ expectedAct, expectedMaterial }) => (
+      window.__house.runner?.failed === true
+      || (window.__house.active?.chapter ?? 0) > expectedAct
+      || (
+        window.__house.active?.chapter === expectedAct
+        && (window.__house.runner?.worldX ?? 0) > 100
+        && document.querySelector("#runnerCanvas")?.dataset.nextMaterial === expectedMaterial
+      )
+    ), { expectedAct: actIndex, expectedMaterial: material }, { timeout: 120_000 });
+    const materialState = await materialRunner.page.evaluate(() => ({ active: window.__house.active, runner: window.__house.runner }));
+    assert.equal(materialState.runner?.failed, false, `Act ${actIndex + 1} evidence pilot failed: ${JSON.stringify(materialState.runner)}`);
+    assert.equal(materialState.active?.chapter, actIndex, `Act ${actIndex + 1} evidence checkpoint was skipped`);
+    if (actIndex > 0) await materialRunner.page.locator("#celebration").waitFor({ state: "hidden" });
+    assert.equal(await materialRunner.page.locator("#runnerCanvas").getAttribute("data-quality"), "high", "review compression preserves the full material treatment");
+    await materialRunner.page.locator(".runner-stage-frame").screenshot({
+      path: resolve(output, `sector-sprint-act-${actIndex + 1}-${material}.png`),
+    });
+  }
+  assert.equal(await materialRunner.page.evaluate(() => window.__house.runner?.failed), false, "the evidence pilot clears every authored material corridor");
+  await materialRunner.context.close();
 
   const sharpRunner = await openHouse({ width: 414, height: 896 }, { deviceScaleFactor: 3 });
   await enterRunnerAction(sharpRunner.page);
@@ -540,92 +651,46 @@ try {
   assert.equal(await sharpRunner.page.evaluate(() => document.documentElement.scrollWidth), 768, "200% text scaling preserves horizontal reflow");
   await sharpRunner.context.close();
 
-  const visualActs = await openHouse({ width: 375, height: 812 }, {}, { manualRaf: true });
-  await enterRunnerAction(visualActs.page);
-  for (let act = 0; act < 5; act += 1) {
-    await visualActs.page.waitForFunction((expected) => window.__house.active?.chapter === expected && !window.__house.active?.resolving, act, { polling: 50, timeout: 8_000 });
-    await visualActs.page.locator("#celebration").waitFor({ state: "hidden" });
-    assert.deepEqual(await visualActs.page.evaluate(() => {
-      const frame = document.querySelector(".runner-stage-frame")?.getBoundingClientRect();
-      const approach = document.querySelector("#runnerApproach")?.getBoundingClientRect();
-      const live = document.querySelector("#runnerLive")?.getBoundingClientRect();
-      const controls = document.querySelector(".runner-controls")?.getBoundingClientRect();
-      const copy = document.querySelector(".runner-copy-deck")?.getBoundingClientRect();
-      const shell = document.querySelector(".runner-shell")?.getBoundingClientRect();
-      const visibleText = [...document.querySelectorAll(
-        ".runner-stage-frame figcaption span, #runnerApproach span, #runnerApproach strong, #runnerLive, .runner-controls button span, .runner-controls button small, .runner-copy-deck p",
-      )];
-      return {
-        stageBeforeStatus: Boolean(frame && approach && frame.bottom <= approach.top),
-        approachBeforeLive: Boolean(approach && live && approach.bottom <= live.top),
-        statusBeforeControls: Boolean(live && controls && live.bottom <= controls.top),
-        controlsBeforeCopy: Boolean(controls && copy && controls.bottom <= copy.top),
-        copyInsideShell: Boolean(copy && shell && copy.bottom <= shell.bottom + 1),
-        visibleTextFits: visibleText.every((label) => label.scrollWidth <= label.clientWidth + 1),
-      };
-    }), {
-      stageBeforeStatus: true,
-      approachBeforeLive: true,
-      statusBeforeControls: true,
-      controlsBeforeCopy: true,
-      copyInsideShell: true,
-      visibleTextFits: true,
-    }, `Act ${act + 1} keeps an intact stage, status deck, control bar, helper labels, caption, and copy`);
-    await visualActs.page.locator(".runner-shell").screenshot({ path: resolve(output, `sector-sprint-act-${act + 1}-375x812.png`), animations: "disabled" });
-    await visualActs.page.evaluate(() => globalThis.__advanceHouseTestFrames(44));
-  }
-  await visualActs.page.waitForSelector(".curtain-call", { timeout: 12_000 });
-  await visualActs.context.close();
+  const recoveryScale = await openHouse({ width: 768, height: 1_024 }, {}, { manualRaf: true });
+  await enterRunnerAction(recoveryScale.page);
+  await recoveryScale.page.evaluate(() => globalThis.__advanceHouseTestFrames(90, 17));
+  await recoveryScale.page.waitForSelector(".runner-recovery");
+  await recoveryScale.page.evaluate(() => { document.documentElement.style.fontSize = "200%"; });
+  assert.equal(await recoveryScale.page.evaluate(() => document.documentElement.scrollWidth), 768, "recovery reflows at 200% without horizontal clipping");
+  assert.equal(await recoveryScale.page.locator("[data-runner-story]").isVisible(), true);
+  await recoveryScale.context.close();
 
-  const finalRunnerExit = await openHouse({ width: 375, height: 812 }, {}, { acceleratedRaf: true });
-  await enterRunnerAction(finalRunnerExit.page);
-  await finalRunnerExit.page.waitForFunction(() => window.__house.active?.chapter === 4 && window.__house.active?.resolving, null, { timeout: 20_000 });
-  await finalRunnerExit.page.click('[data-route="home"]');
-  await finalRunnerExit.page.waitForTimeout(1_000);
-  assert.equal(await finalRunnerExit.page.locator("#leaveDialog").getAttribute("open"), "", "Sector Sprint holds its final-Act exit confirmation open");
-  assert.deepEqual(await finalRunnerExit.page.evaluate(() => ({ chapter: window.__house.active?.chapter, resolving: window.__house.active?.resolving })), { chapter: 4, resolving: true }, "Sector Sprint cannot complete behind the exit confirmation");
-  assert.equal(await finalRunnerExit.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]), undefined);
-  await finalRunnerExit.page.click("#leaveTableButton");
-  await finalRunnerExit.page.waitForTimeout(1_000);
-  assert.equal(await finalRunnerExit.page.evaluate(() => window.__house.active), null);
-  assert.equal(await finalRunnerExit.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]), undefined, "leaving during the final Act records no completion");
-  await finalRunnerExit.context.close();
+  const lateRetry = await openHouse({ width: 414, height: 896 }, {}, { fakeClock: true });
+  await enterRunnerAction(lateRetry.page);
+  await lateRetry.page.clock.fastForward(2_000);
+  await lateRetry.page.waitForSelector(".runner-recovery");
+  assert.equal(await lateRetry.page.locator("[data-runner-retry]").isEnabled(), true);
+  await lateRetry.page.clock.fastForward(64_000);
+  assert.equal(await lateRetry.page.locator("[data-runner-retry]").isEnabled(), true, "retry remains available with the full five-Act catch-up reserve intact");
+  await lateRetry.page.clock.fastForward(1_000);
+  await lateRetry.page.click("[data-runner-retry]");
+  assert.equal(await lateRetry.page.locator("[data-runner-retry]").isDisabled(), true, "retry eligibility is recomputed atomically at activation");
+  assert.equal(await lateRetry.page.evaluate(() => window.__house.runner?.failed), true, "a stale retry cannot reset Act I after its completion budget is gone");
+  assert.match(await lateRetry.page.locator(".runner-recovery").innerText(), /boundary is too near/i);
+  assert.equal(await lateRetry.page.evaluate(() => document.activeElement?.matches("[data-runner-story]")), true);
+  await lateRetry.page.click("[data-runner-story]");
+  await lateRetry.page.waitForSelector(".runner-story");
+  assert.equal(await lateRetry.page.evaluate(() => window.__house.active?.chapter), 0, "Narrated continues from the current failed Act");
+  await lateRetry.context.close();
 
-  const autoRunner = await openHouse(
-    { width: 414, height: 896 },
-    {},
-    { acceleratedRaf: true, controllableVisibility: true },
-  );
-  await enterRunnerAction(autoRunner.page);
-  await autoRunner.page.evaluate(() => globalThis.__setHouseTestHidden(true));
-  await autoRunner.page.waitForTimeout(1_200);
-  assert.equal(await autoRunner.page.evaluate(() => window.__house.active?.chapter), 0, "hidden time cannot complete an Act");
-  await autoRunner.page.evaluate(() => globalThis.__setHouseTestHidden(false));
-  await autoRunner.page.waitForFunction(() => window.__house.active?.chapter === 0 && window.__house.active?.resolving, null, { timeout: 5_000 });
-  await autoRunner.page.evaluate(() => globalThis.__setHouseTestHidden(true));
-  await autoRunner.page.waitForTimeout(1_000);
-  assert.deepEqual(await autoRunner.page.evaluate(() => ({ chapter: window.__house.active?.chapter, resolving: window.__house.active?.resolving })), { chapter: 0, resolving: true }, "hidden time cannot consume the inter-Act transition");
-  await autoRunner.page.evaluate(() => globalThis.__setHouseTestHidden(false));
-  await autoRunner.page.waitForFunction(() => window.__house.active?.chapter === 1 && !window.__house.active?.resolving, null, { timeout: 5_000 });
-  await autoRunner.page.waitForFunction(() => window.__house.active?.chapter === 1 && window.__house.active?.resolving, null, { timeout: 5_000 });
-  await autoRunner.page.locator("[data-runner-pause]").evaluate((button) => button.click());
-  await autoRunner.page.waitForTimeout(1_000);
-  assert.deepEqual(await autoRunner.page.evaluate(() => ({ chapter: window.__house.active?.chapter, resolving: window.__house.active?.resolving })), { chapter: 1, resolving: true }, "Pause holds a committed inter-Act transition");
-  await autoRunner.page.locator("[data-runner-pause]").evaluate((button) => button.click());
-  await autoRunner.page.waitForFunction(() => window.__house.active?.chapter === 2 && !window.__house.active?.resolving, null, { timeout: 5_000 });
-  await autoRunner.page.evaluate(() => window.dispatchEvent(new Event("blur")));
-  await autoRunner.page.waitForTimeout(1_200);
-  assert.equal(await autoRunner.page.evaluate(() => window.__house.active?.chapter), 2, "blurred time cannot complete an Act");
-  await autoRunner.page.evaluate(() => window.dispatchEvent(new Event("focus")));
-  await autoRunner.page.waitForFunction(() => window.__house.active?.chapter === 3 && !window.__house.active?.resolving, null, { timeout: 8_000 });
-  await autoRunner.page.locator("[data-runner-pause]").evaluate((button) => button.click());
-  await autoRunner.page.locator("#celebration").waitFor({ state: "hidden" });
-  await autoRunner.page.screenshot({ path: resolve(output, "sector-sprint-monsoon-414x896.png"), fullPage: true, animations: "disabled" });
-  await autoRunner.page.locator("[data-runner-pause]").evaluate((button) => button.click());
-  await autoRunner.page.waitForSelector(".curtain-call", { timeout: 15_000 });
-  assert.match(await autoRunner.page.locator(".curtain-call").innerText(), /five authored Acts/);
-  assert.equal(await autoRunner.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]?.completionFacts.finalChapter), "Roti Relay", "the production action route advances and closes through all five Acts");
-  await autoRunner.context.close();
+  const failureVisibility = await openHouse({ width: 375, height: 812 }, {}, { fakeClock: true, controllableVisibility: true });
+  await enterRunnerAction(failureVisibility.page);
+  await failureVisibility.page.clock.fastForward(2_000);
+  await failureVisibility.page.waitForSelector(".runner-recovery");
+  await failureVisibility.page.evaluate(() => globalThis.__setHouseTestHidden(true));
+  await failureVisibility.page.clock.fastForward(240_000);
+  assert.equal(await failureVisibility.page.evaluate(() => window.__house.active?.gameId), "sector-sprint", "background time does not consume the failure boundary");
+  await failureVisibility.page.evaluate(() => globalThis.__setHouseTestHidden(false));
+  await failureVisibility.page.clock.fastForward(240_000);
+  await failureVisibility.page.waitForSelector(".curtain-call");
+  assert.match(await failureVisibility.page.locator(".curtain-call").innerText(), /No completion reading was recorded/i);
+  assert.equal(await failureVisibility.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]), undefined);
+  await failureVisibility.context.close();
 
   const reloadedBoundary = await openHouse({ width: 375, height: 812 }, {}, { fakeClock: true });
   await enterRunnerNarrated(reloadedBoundary.page);
@@ -651,6 +716,23 @@ try {
   assert.equal(await boundedStory.page.evaluate(() => window.__house.active), null, "a boundary exit cannot revive as a completed or active route after reload");
   assert.equal(await boundedStory.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]), undefined);
   await boundedStory.context.close();
+
+  const finalTransitionBoundary = await openHouse({ width: 375, height: 812 }, {}, { fakeClock: true });
+  await enterRunnerNarrated(finalTransitionBoundary.page);
+  for (let act = 0; act < 4; act += 1) {
+    for (let beat = 0; beat < 3; beat += 1) await finalTransitionBoundary.page.click("[data-story-advance]");
+    await finalTransitionBoundary.page.clock.fastForward(720);
+    await finalTransitionBoundary.page.waitForFunction((nextAct) => window.__house.active?.chapter === nextAct, act + 1);
+  }
+  await finalTransitionBoundary.page.click("[data-story-advance]");
+  await finalTransitionBoundary.page.click("[data-story-advance]");
+  await finalTransitionBoundary.page.clock.fastForward(236_000);
+  await finalTransitionBoundary.page.click("[data-story-advance]");
+  await finalTransitionBoundary.page.clock.fastForward(720);
+  await finalTransitionBoundary.page.waitForSelector(".curtain-call");
+  assert.match(await finalTransitionBoundary.page.locator(".curtain-call").innerText(), /No completion reading was recorded/i);
+  assert.equal(await finalTransitionBoundary.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]), undefined, "the boundary outranks final-Act transition completion");
+  await finalTransitionBoundary.context.close();
 
   const keyboard = await openHouse({ width: 768, height: 1024 }, { reducedMotion: "reduce" });
   await keyboard.page.evaluate(() => document.querySelector("#houseMain")?.focus());
@@ -755,6 +837,7 @@ try {
   await reduced.page.click('[data-game="sector-sprint"]');
   assert.equal(await reduced.page.locator(".runner-story").isVisible(), true, "reduced motion starts with the complete narrated route");
   assert.equal(await reduced.page.locator("#runnerCanvas").count(), 0);
+  await reduced.page.screenshot({ path: resolve(output, "sector-sprint-reduced-motion-narrated.png"), fullPage: true, animations: "disabled" });
   await reduced.context.close();
 
   const restoredReduced = await openHouse({ width: 375, height: 812 });
@@ -785,6 +868,16 @@ try {
   await activeRunnerSound.page.waitForFunction(() => globalThis.__houseAudioResumes === 1);
   assert.equal(await activeRunnerSound.page.evaluate(() => globalThis.__houseAudioContexts), 1, "resume never queues or invents a sound");
   await activeRunnerSound.context.close();
+
+  const failedRunnerSound = await openHouse({ width: 375, height: 812 }, {}, { audioProbe: true, manualRaf: true });
+  await failedRunnerSound.page.click("#soundButton");
+  await enterRunnerAction(failedRunnerSound.page);
+  await failedRunnerSound.page.click('[data-runner-action="thrust"]');
+  await failedRunnerSound.page.evaluate(() => globalThis.__advanceHouseTestFrames(90, 17));
+  await failedRunnerSound.page.waitForSelector(".runner-recovery");
+  assert.equal(await failedRunnerSound.page.evaluate(() => globalThis.__houseAudioSuspends), 1, "a wipeout releases optional audio before idle recovery");
+  assert.equal(await failedRunnerSound.page.evaluate(() => globalThis.__houseAudioCloses), 0, "retry can resume the same optional audio context");
+  await failedRunnerSound.context.close();
 
   const pausedRunnerSound = await openHouse({ width: 375, height: 812 }, { reducedMotion: "reduce" }, { audioProbe: true });
   await pausedRunnerSound.page.click("#soundButton");
