@@ -18,6 +18,7 @@ const publishedHouseText = (await Promise.all(publishedHouseFiles
   .filter((path) => /\.(?:html|js|css|webmanifest)$/.test(String(path)))
   .map((path) => readFile(resolve(previewRoot, "house", String(path)), "utf8")))).join("\n");
 assert.doesNotMatch(publishedHouseText, /\b(?:Contra|Subway Surfers|Flappy Bird)\b/i, "the shipped game remains an original work");
+assert.doesNotMatch(publishedHouseText, /\b(?:Pulse|Glide|thrust|gravity|flight|aerial)\b|rise and fall/i, "the shipped controls contain no obsolete altitude language");
 const server = spawn(process.execPath, [resolve(root, "scripts/serve.mjs"), previewRoot], {
   cwd: root,
   env: { ...process.env, NINDOVA_PREVIEW_PORT: String(port) },
@@ -207,22 +208,19 @@ async function captureRunnerCanvas(page, filename) {
 
 async function startRunnerAutopilot(page) {
   await page.evaluate(() => {
-    let held = false;
-    const setHeld = (next) => {
-      if (next === held) return;
-      held = next;
-      document.body.dispatchEvent(new KeyboardEvent(next ? "keydown" : "keyup", { key: " ", bubbles: true }));
-    };
     const control = () => {
       const state = window.__house.runner;
       const canvas = document.querySelector("#runnerCanvas");
       if (!state || state.failed || state.finished || window.__house.active?.resolving || !(canvas instanceof HTMLCanvasElement)) {
-        setHeld(false);
         globalThis.__houseVisualPilot = requestAnimationFrame(control);
         return;
       }
-      const gapCenter = Number(canvas.dataset.nextGapCenter ?? 220);
-      setHeld(state.y + state.velocityY * 0.18 > gapCenter - 38);
+      const safeLane = Number(canvas.dataset.nextSafeLane ?? state.targetLane);
+      if (safeLane !== state.targetLane) {
+        const key = safeLane < state.targetLane ? "ArrowUp" : "ArrowDown";
+        document.body.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true, repeat: false }));
+        document.body.dispatchEvent(new KeyboardEvent("keyup", { key, bubbles: true }));
+      }
       globalThis.__houseVisualPilot = requestAnimationFrame(control);
     };
     globalThis.__houseVisualPilot = requestAnimationFrame(control);
@@ -531,35 +529,54 @@ try {
   await runner.page.click('[data-runner-action="tool"]');
   await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(2, 17));
   assert.ok(await runner.page.evaluate(() => (window.__house.runner?.projectiles.length ?? 0) > 0), "the harmless Act tool remains available");
-  await runner.page.locator('[data-runner-action="thrust"]').focus();
-  await runner.page.keyboard.down("Space");
-  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(55, 17));
-  await runner.page.waitForFunction(() => window.__house.runner?.thrusting === true);
-  assert.ok(await runner.page.evaluate(() => (window.__house.runner?.velocityY ?? 0) < 0), "a held pulse produces a visible rising state");
-  await captureRunnerCanvas(runner.page, "sector-sprint-motion-rise.png");
-  await runner.page.keyboard.up("Space");
-  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(12, 17));
-  await runner.page.waitForFunction(() => window.__house.runner?.thrusting === false);
-  assert.ok(await runner.page.evaluate(() => (window.__house.runner?.velocityY ?? 0) > 0), "release preserves inertia and reaches a visible falling state");
-  await captureRunnerCanvas(runner.page, "sector-sprint-motion-fall.png");
-  await runner.page.locator(".runner-canvas-window").dispatchEvent("pointerdown", { pointerId: 7, pointerType: "touch", isPrimary: true });
+  await runner.page.locator('[data-runner-action="up"]').focus();
+  await runner.page.keyboard.down("w");
+  await runner.page.locator('[data-runner-action="up"]').dispatchEvent("keydown", { key: "w", repeat: true });
+  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(1, 17));
+  await runner.page.waitForFunction(() => window.__house.runner?.targetLane === 0);
+  await captureRunnerCanvas(runner.page, "sector-sprint-motion-up.png");
+  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(30, 17));
+  assert.deepEqual(await runner.page.evaluate(() => ({ lane: window.__house.runner?.lane, target: window.__house.runner?.targetLane, pending: window.__house.runner?.pendingLaneDelta })), { lane: 0, target: 0, pending: null }, "held and repeated letter input produces exactly one adjacent move");
+  await runner.page.keyboard.up("w");
+  await runner.page.locator('[data-runner-action="down"]').focus();
+  await runner.page.keyboard.down("Enter");
+  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(1, 17));
+  await runner.page.waitForFunction(() => window.__house.runner?.targetLane === 1);
+  for (let repeat = 0; repeat < 3; repeat += 1) {
+    await runner.page.locator('[data-runner-action="down"]').dispatchEvent("keydown", { key: "Enter", repeat: true });
+  }
+  await captureRunnerCanvas(runner.page, "sector-sprint-motion-down.png");
+  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(30, 17));
+  assert.deepEqual(await runner.page.evaluate(() => ({ lane: window.__house.runner?.lane, target: window.__house.runner?.targetLane, pending: window.__house.runner?.pendingLaneDelta })), { lane: 1, target: 1, pending: null }, "held Enter on a native lane button cannot chain into the far lane");
+  await runner.page.keyboard.up("Enter");
+  await runner.page.locator('[data-runner-action="up"]').dispatchEvent("pointerdown", { pointerId: 7, pointerType: "touch", isPrimary: true });
+  await runner.page.locator("body").dispatchEvent("pointercancel", { pointerId: 7, pointerType: "touch", isPrimary: true });
+  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(1, 17));
+  assert.deepEqual(await runner.page.evaluate(() => ({ lane: window.__house.runner?.lane, target: window.__house.runner?.targetLane, pending: window.__house.runner?.pendingLaneDelta })), { lane: 1, target: 1, pending: null }, "pointer cancellation before the next frame discards the queued move");
+  assert.equal(await runner.page.locator('[data-runner-action="up"]').getAttribute("data-pressed"), null, "a cancelled pointer leaves no stuck pressed state");
+  await runner.page.locator('[data-runner-action="up"]').dispatchEvent("pointerdown", { pointerId: 9, pointerType: "touch", isPrimary: true });
   await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(2, 17));
-  await runner.page.waitForFunction(() => window.__house.runner?.thrusting === true);
+  await runner.page.waitForFunction(() => window.__house.runner?.targetLane === 0);
   const projectilesBeforeSecondaryPointer = await runner.page.evaluate(() => window.__house.runner?.projectiles.length);
   await runner.page.locator('[data-runner-action="tool"]').dispatchEvent("pointerdown", { pointerId: 8, pointerType: "touch", isPrimary: false });
   await runner.page.locator("body").dispatchEvent("pointerup", { pointerId: 8, pointerType: "touch", isPrimary: false });
   await runner.page.waitForTimeout(50);
-  assert.equal(await runner.page.evaluate(() => window.__house.runner?.thrusting), true, "an unrelated secondary pointer cannot release the primary hold");
+  assert.equal(await runner.page.evaluate(() => window.__house.runner?.targetLane), 0, "an unrelated secondary pointer cannot replace the primary lane request");
   assert.notEqual(await runner.page.evaluate(() => window.__house.runner?.lastAction), "tool", "an unrelated secondary pointer cannot replace the primary action");
   assert.equal(await runner.page.evaluate(() => window.__house.runner?.projectiles.length), projectilesBeforeSecondaryPointer, "an unrelated secondary pointer cannot queue the Act tool");
-  await runner.page.locator("body").dispatchEvent("pointercancel", { pointerId: 7, pointerType: "touch", isPrimary: true });
+  await runner.page.locator("body").dispatchEvent("pointercancel", { pointerId: 9, pointerType: "touch", isPrimary: true });
+  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(30, 17));
+  assert.equal(await runner.page.evaluate(() => window.__house.runner?.pendingLaneDelta), null, "pointer cancellation clears any buffered lane request");
+  assert.equal(await runner.page.locator('[data-runner-action="up"]').getAttribute("data-pressed"), null, "a cancelled pointer leaves no stuck pressed state");
+  await runner.page.locator('[data-runner-action="down"]').dispatchEvent("pointerdown", { pointerId: 10, pointerType: "touch", isPrimary: true });
+  await runner.page.evaluate(() => window.dispatchEvent(new Event("orientationchange")));
   await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(1, 17));
-  await runner.page.waitForFunction(() => window.__house.runner?.thrusting === false);
-  assert.equal(await runner.page.locator(".runner-canvas-window").getAttribute("data-pressed"), null, "a cancelled stage pointer leaves no stuck held state");
+  assert.deepEqual(await runner.page.evaluate(() => ({ lane: window.__house.runner?.lane, target: window.__house.runner?.targetLane, pending: window.__house.runner?.pendingLaneDelta })), { lane: 0, target: 0, pending: null }, "orientation change before the next frame discards the queued move");
+  assert.equal(await runner.page.locator('[data-runner-action="down"]').getAttribute("data-pressed"), null, "orientation change leaves no stuck pressed state");
   await runner.page.evaluate(() => document.querySelector("#houseMain")?.focus());
-  await runner.page.keyboard.press("d");
+  await runner.page.keyboard.press("ArrowDown");
   await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(1, 17));
-  await runner.page.waitForFunction(() => window.__house.runner?.lastAction === "dash", null, { timeout: 2_000 });
+  await runner.page.waitForFunction(() => window.__house.runner?.lastAction === "lane-change", null, { timeout: 2_000 });
   await runner.page.click("[data-runner-pause]");
   assert.equal(await runner.page.locator("[data-runner-pause]").getAttribute("aria-pressed"), "true");
   const pausedFrame = await runner.page.locator("#runnerCanvas").evaluate((canvas) => canvas.toDataURL());
@@ -568,7 +585,7 @@ try {
   await runner.page.click("[data-runner-pause]");
   await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(2, 17));
   assert.notEqual(await runner.page.locator("#runnerCanvas").evaluate((canvas) => canvas.toDataURL()), pausedFrame, "the city resumes from the paused scene");
-  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(90, 17));
+  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(700, 17));
   await runner.page.waitForSelector(".runner-recovery");
   await captureRunnerCanvas(runner.page, "sector-sprint-motion-impact.png");
   assert.deepEqual(await runner.page.evaluate(() => ({
@@ -576,7 +593,7 @@ try {
     reason: window.__house.runner?.failureReason,
     chapter: window.__house.active?.chapter,
     storedFailure: sessionStorage.getItem("nindova:house:active:v1")?.includes("failure"),
-  })), { failed: true, reason: "road", chapter: 0, storedFailure: false });
+  })), { failed: true, reason: "corridor", chapter: 0, storedFailure: false });
   assert.equal(await runner.page.locator(".runner-controls").count(), 0, "underlying Action controls disappear after a wipeout");
   assert.equal(await runner.page.evaluate(() => document.activeElement?.matches("[data-runner-retry]")), true, "recovery moves focus to the first available action");
   assert.match(await runner.page.locator(".runner-recovery").innerText(), /No life, score, checkpoint, or failure history is kept/i);
@@ -610,6 +627,17 @@ try {
     assert.ok(Number.parseFloat(await runnerVisual.page.locator("#runnerApproach strong").evaluate((element) => getComputedStyle(element).fontSize)) >= 18);
     await runnerVisual.page.screenshot({ path: resolve(output, `sector-sprint-${viewport.width}x${viewport.height}.png`), fullPage: true, animations: "disabled" });
     await runnerVisual.context.close();
+  }
+
+  for (const viewport of [{ width: 320, height: 568 }, { width: 375, height: 812 }, { width: 414, height: 896 }]) {
+    const warningRunner = await openHouse(viewport, {}, { manualRaf: true });
+    await enterRunnerAction(warningRunner.page);
+    await warningRunner.page.evaluate(() => globalThis.__advanceHouseTestFrames(250, 17));
+    assert.equal((await warningRunner.page.locator("#runnerApproach strong").innerText()).trim(), "Hold lane", `${viewport.width}px exposes the non-color gate instruction`);
+    await warningRunner.page.evaluate(() => { document.documentElement.style.fontSize = "200%"; });
+    assert.equal(await warningRunner.page.evaluate(() => document.documentElement.scrollWidth), viewport.width, `${viewport.width}px warning reflows at 200%`);
+    assert.equal(await warningRunner.page.locator("#runnerApproach strong").isVisible(), true);
+    await warningRunner.context.close();
   }
 
   const materialRunner = await openHouse({ width: 1280, height: 800 }, {}, { acceleratedRaf: 100, reviewMode: true });
@@ -653,7 +681,7 @@ try {
 
   const recoveryScale = await openHouse({ width: 768, height: 1_024 }, {}, { manualRaf: true });
   await enterRunnerAction(recoveryScale.page);
-  await recoveryScale.page.evaluate(() => globalThis.__advanceHouseTestFrames(90, 17));
+  await recoveryScale.page.evaluate(() => globalThis.__advanceHouseTestFrames(700, 17));
   await recoveryScale.page.waitForSelector(".runner-recovery");
   await recoveryScale.page.evaluate(() => { document.documentElement.style.fontSize = "200%"; });
   assert.equal(await recoveryScale.page.evaluate(() => document.documentElement.scrollWidth), 768, "recovery reflows at 200% without horizontal clipping");
@@ -662,7 +690,7 @@ try {
 
   const lateRetry = await openHouse({ width: 414, height: 896 }, {}, { fakeClock: true });
   await enterRunnerAction(lateRetry.page);
-  await lateRetry.page.clock.fastForward(2_000);
+  await lateRetry.page.clock.fastForward(12_000);
   await lateRetry.page.waitForSelector(".runner-recovery");
   assert.equal(await lateRetry.page.locator("[data-runner-retry]").isEnabled(), true);
   await lateRetry.page.clock.fastForward(64_000);
@@ -680,7 +708,7 @@ try {
 
   const failureVisibility = await openHouse({ width: 375, height: 812 }, {}, { fakeClock: true, controllableVisibility: true });
   await enterRunnerAction(failureVisibility.page);
-  await failureVisibility.page.clock.fastForward(2_000);
+  await failureVisibility.page.clock.fastForward(12_000);
   await failureVisibility.page.waitForSelector(".runner-recovery");
   await failureVisibility.page.evaluate(() => globalThis.__setHouseTestHidden(true));
   await failureVisibility.page.clock.fastForward(240_000);
@@ -859,7 +887,7 @@ try {
   const activeRunnerSound = await openHouse({ width: 375, height: 812 }, {}, { audioProbe: true });
   await activeRunnerSound.page.click("#soundButton");
   await enterRunnerAction(activeRunnerSound.page);
-  await activeRunnerSound.page.click('[data-runner-action="thrust"]');
+  await activeRunnerSound.page.click('[data-runner-action="up"]');
   await activeRunnerSound.page.waitForFunction(() => globalThis.__houseAudioContexts === 1);
   await activeRunnerSound.page.click("[data-runner-pause]");
   await activeRunnerSound.page.waitForFunction(() => globalThis.__houseAudioSuspends === 1);
@@ -872,8 +900,8 @@ try {
   const failedRunnerSound = await openHouse({ width: 375, height: 812 }, {}, { audioProbe: true, manualRaf: true });
   await failedRunnerSound.page.click("#soundButton");
   await enterRunnerAction(failedRunnerSound.page);
-  await failedRunnerSound.page.click('[data-runner-action="thrust"]');
-  await failedRunnerSound.page.evaluate(() => globalThis.__advanceHouseTestFrames(90, 17));
+  await failedRunnerSound.page.click('[data-runner-action="up"]');
+  await failedRunnerSound.page.evaluate(() => globalThis.__advanceHouseTestFrames(400, 17));
   await failedRunnerSound.page.waitForSelector(".runner-recovery");
   assert.equal(await failedRunnerSound.page.evaluate(() => globalThis.__houseAudioSuspends), 1, "a wipeout releases optional audio before idle recovery");
   assert.equal(await failedRunnerSound.page.evaluate(() => globalThis.__houseAudioCloses), 0, "retry can resume the same optional audio context");

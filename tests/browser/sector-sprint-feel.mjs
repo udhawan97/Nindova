@@ -49,7 +49,6 @@ async function openRunner(viewport, cpuRate = 1) {
   await page.click('[data-game="sector-sprint"]');
   await page.click('[data-runner-route="action"]');
   await page.waitForSelector("#runnerCanvas");
-  await page.keyboard.down("Space");
   await startAutopilot(page);
   await page.waitForFunction(() => Number(document.querySelector("#runnerCanvas")?.dataset.renderSequence ?? 0) > 1);
   return { context, page };
@@ -86,7 +85,6 @@ async function measureAction(page, selector, allowedActions) {
 
 async function startAutopilot(page) {
   await page.evaluate(() => {
-    let held = true;
     let inputAt = 0;
     let beforeSequence = 0;
     globalThis.__runnerAutopilotLatencies = [];
@@ -99,31 +97,28 @@ async function startAutopilot(page) {
       }
     });
     if (canvas) observer.observe(canvas, { attributes: true, attributeFilter: ["data-render-sequence"] });
-    const setHeld = (next, force = false) => {
-      if (next === held && !force) return;
-      held = next;
-      if (next && inputAt === 0) {
-        beforeSequence = Number(canvas?.dataset.renderSequence ?? 0);
-        inputAt = performance.now();
-      }
-      document.body.dispatchEvent(new KeyboardEvent(next ? "keydown" : "keyup", { key: " ", bubbles: true }));
-    };
     globalThis.__stopRunnerAutopilot = () => {
       cancelAnimationFrame(globalThis.__runnerAutopilotTimer);
       observer.disconnect();
-      setHeld(false);
     };
     const control = () => {
       const state = window.__house.runner;
       const canvas = document.querySelector("#runnerCanvas");
       if (!state || state.failed || !(canvas instanceof HTMLCanvasElement)) {
-        setHeld(false);
         return;
       }
-      const center = Number(canvas.dataset.nextGapCenter ?? 220);
-      const targetY = center - 38;
-      const nextHeld = state.y + state.velocityY * 0.18 > targetY;
-      setHeld(nextHeld);
+      if (!state.finished && !window.__house.active?.resolving) {
+        const safeLane = Number(canvas.dataset.nextSafeLane ?? state.targetLane);
+        if (safeLane !== state.targetLane) {
+          const key = safeLane < state.targetLane ? "ArrowUp" : "ArrowDown";
+          if (inputAt === 0) {
+            beforeSequence = Number(canvas.dataset.renderSequence ?? 0);
+            inputAt = performance.now();
+          }
+          document.body.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true, repeat: false }));
+          document.body.dispatchEvent(new KeyboardEvent("keyup", { key, bubbles: true }));
+        }
+      }
       globalThis.__runnerAutopilotTimer = requestAnimationFrame(control);
     };
     globalThis.__runnerAutopilotTimer = requestAnimationFrame(control);
@@ -149,15 +144,14 @@ async function sampleFrames(page, count) {
 try {
   const throttled = await openRunner({ width: 375, height: 812 }, 4);
   await throttled.page.waitForFunction(() => (
-    (globalThis.__runnerAutopilotLatencies?.length ?? 0) >= 6
-    && (window.__house.runner?.worldX ?? 0) > 700
+    (globalThis.__runnerAutopilotLatencies?.length ?? 0) >= 3
     && window.__house.runner?.failed === false
   ));
-  const actionSamples = { pulse: await throttled.page.evaluate(() => globalThis.__runnerAutopilotLatencies.slice(0, 6)) };
+  const actionSamples = { laneMove: await throttled.page.evaluate(() => globalThis.__runnerAutopilotLatencies.slice(0, 3)) };
   const throttledFrames = await sampleFrames(throttled.page, 120);
   const throttledQuality = await throttled.page.locator("#runnerCanvas").getAttribute("data-quality");
-  const actionP95 = Object.fromEntries(Object.entries(actionSamples).map(([name, values]) => [name, percentile(values, 0.95)]));
-  for (const [name, value] of Object.entries(actionP95)) assert.ok(value < 150, `${name} p95 ${value.toFixed(1)}ms must remain below 150ms under 4x CPU`);
+  const actionMax = Object.fromEntries(Object.entries(actionSamples).map(([name, values]) => [name, Math.max(...values)]));
+  for (const [name, value] of Object.entries(actionMax)) assert.ok(value < 150, `${name} maximum ${value.toFixed(1)}ms across three observed moves must remain below 150ms under 4x CPU`);
   assert.ok(percentile(throttledFrames, 0.95) <= 50, `375x812 4x CPU ${throttledQuality} p95 frame interval ${percentile(throttledFrames, 0.95).toFixed(1)}ms must remain <= 50ms`);
   await throttled.context.close();
 
@@ -169,8 +163,8 @@ try {
 
   assert.deepEqual(errors, []);
   console.log(JSON.stringify({
-    profile: "Chromium · dense sandstone corridor · 375x812 at 4x CPU · 6 pulse samples · 120 frame samples",
-    actionP95Ms: Object.fromEntries(Object.entries(actionP95).map(([name, value]) => [name, Number(value.toFixed(2))])),
+    profile: "Chromium · progressively faster lane route · 375x812 at 4x CPU · 3 lane-move samples · 120 frame samples",
+    actionMaxMs: Object.fromEntries(Object.entries(actionMax).map(([name, value]) => [name, Number(value.toFixed(2))])),
     throttledFrameP95Ms: Number(percentile(throttledFrames, 0.95).toFixed(2)),
     desktopFrameP95Ms: Number(percentile(desktopFrames, 0.95).toFixed(2)),
   }));

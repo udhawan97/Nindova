@@ -33,6 +33,7 @@ import {
   createRunnerState,
   drawRunnerFrame,
   runnerRenderQualityForIntervals,
+  runnerUpcomingInstruction,
   stepRunner,
   type RunnerInput,
   type RunnerPalette,
@@ -101,9 +102,8 @@ let runnerFrame = 0;
 let runnerLastTimestamp = 0;
 let runnerSessionElapsedMs = 0;
 let runnerInput: RunnerInput = {};
-let runnerThrustHeld = false;
 let runnerActivePointerId: number | null = null;
-let runnerActivePointerAction: "thrust" | "dash" | "tool" | null = null;
+let runnerActivePointerAction: "up" | "down" | "tool" | null = null;
 let runnerAccumulatorMs = 0;
 let runnerRenderQuality: RunnerRenderQuality = "high";
 let runnerFrameIntervals: number[] = [];
@@ -129,6 +129,7 @@ function ensureRunnerCharacterSheet() {
   sheet.addEventListener("load", () => drawCurrentRunnerFrame());
   sheet.src = runnerCharacterSheetUrl;
   runnerCharacterSheet = sheet;
+  void sheet.decode().then(() => drawCurrentRunnerFrame(), () => undefined);
 }
 
 if (active) view = "game";
@@ -248,6 +249,7 @@ function startGame(gameId: GameId) {
   lastStackMove = null;
   restoreDecisionPending = false;
   if (game.kind === "runner" && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    ensureRunnerCharacterSheet();
     active = null;
     pendingRunnerChoice = true;
     view = "game";
@@ -296,7 +298,7 @@ function beginRunnerRoute(routeChoice: "action" | "narrated") {
     ensureRunnerCharacterSheet();
     runnerRenderQuality = matchMedia("(max-width: 480px)").matches ? "balanced" : "high";
   }
-  statusMessage = routeChoice === "narrated" ? "The narrated city route is ready." : "The jetpack corridor begins. One contact wipes this Action attempt.";
+  statusMessage = routeChoice === "narrated" ? "The narrated city route is ready." : "The lane route begins gently. One architectural contact pauses this Action attempt.";
   saveActiveGame();
   render();
   focusFirstGameControl();
@@ -327,7 +329,7 @@ function focusFirstGameControl() {
   if (game.kind === "runner") focusElement(
     runnerState?.failed
       ? runnerRetryAvailable() ? "[data-runner-retry]" : "[data-runner-story]"
-      : active.storyBeat === null ? '[data-runner-action="thrust"]' : "[data-story-advance]",
+      : active.storyBeat === null ? '[data-runner-action="up"]' : "[data-story-advance]",
   );
   else if (game.kind === "stack") focusElement('[data-peg="0"]');
   else if (game.kind === "memory" && !active.memoryCovered) focusElement("[data-cover-memory]");
@@ -473,10 +475,10 @@ function renderRunnerPrelude(): string {
       <div class="route-miniature" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><span></span></div>
       <p class="kicker">Choose how the city moves</p>
       <h2 id="runnerPreludeTitle">One route. Two ways through.</h2>
-      <p>Action starts a one-hit jetpack corridor: pulse to rise, release to descend, and clear five authored Acts. Narrated follows the same city with text controls and no precision requirement. Both remain inside the same fixed table boundary.</p>
+      <p>Action starts a progressively faster three-lane route. Follow each marker: Hold lane, Move up, or Move down. Every gate requires at most one adjacent move across five authored Acts. Narrated follows the same city with text controls and no precision requirement. Both remain inside the same fixed table boundary.</p>
       <div class="route-choices">
         <button class="route-choice route-choice-action" type="button" data-runner-route="action">
-          <span>Action route</span><strong>Enter the gauntlet</strong><small>Keyboard or touch · one contact wipes the route</small>
+          <span>Action route</span><strong>Enter the lane route</strong><small>Keyboard or touch · follow each lane marker</small>
         </button>
         <button class="route-choice" type="button" data-runner-route="narrated">
           <span>Narrated route</span><strong>Read the city</strong><small>No motion, precision, sight, or sound required</small>
@@ -530,7 +532,7 @@ function renderRunner(): string {
         <div><span>Act ${active.chapter + 1} scene · ${escape(act.location)}</span><h2 id="runnerActTitle">${escape(act.title)}</h2></div>
       </header>
       <figure class="runner-stage-frame">
-        <div class="runner-canvas-window" ${failed ? 'data-runner-failed="true"' : "data-runner-thrust-zone"}><canvas id="runnerCanvas" width="${RUNNER_WIDTH}" height="${RUNNER_HEIGHT}" aria-label="${escape(act.title)}. An original jetpack corridor through Chandigarh. Hold the movement area to thrust, release to descend, and avoid the architectural faces. One contact ends this Action attempt." aria-describedby="runnerInstructions runnerApproach runnerLive runnerToolLine"></canvas>${failed ? "" : '<span class="runner-thrust-prompt" aria-hidden="true">Hold stage to thrust</span>'}</div>
+        <div class="runner-canvas-window" ${failed ? 'data-runner-failed="true"' : ""}><canvas id="runnerCanvas" width="${RUNNER_WIDTH}" height="${RUNNER_HEIGHT}" aria-label="${escape(act.title)}. An original three-lane route through Chandigarh. Follow the next marker: Hold lane, Move up, or Move down. Each gate requires at most one adjacent move. One architectural contact ends this Action attempt." aria-describedby="runnerInstructions runnerApproach runnerLive runnerToolLine"></canvas></div>
         <div class="runner-action-hud" aria-label="Current action set"><span>Act-local tool</span><strong id="runnerToolLabel">${escape(act.toolLabel)}</strong><span id="runnerPowerLabel">${escape(activePowerLabel)}</span></div>
         <figcaption><span>${escape(act.sign)}</span><span>Original illustrated action theatre · fixed authored route</span></figcaption>
       </figure>
@@ -540,7 +542,7 @@ function renderRunner(): string {
       </div>
       ${failed ? `
         <section class="runner-recovery" aria-labelledby="runnerRecoveryTitle" aria-describedby="runnerInstructions runnerRecoveryBoundary">
-          <div><p class="kicker">Action route wiped</p><h3 id="runnerRecoveryTitle">The jetpack sputters. The city holds.</h3></div>
+          <div><p class="kicker">Action route paused</p><h3 id="runnerRecoveryTitle">The lane closed. The city holds.</h3></div>
           <p id="runnerInstructions">This attempt ended on one contact. No life, score, checkpoint, or failure history is kept.</p>
           <div class="runner-recovery-actions">
             <button class="primary-action" type="button" data-runner-retry ${retryAvailable ? "" : "disabled"}>Retry Action from Act I</button>
@@ -548,18 +550,19 @@ function renderRunner(): string {
             <button class="text-action" type="button" data-runner-abandon>Return to the Grand Salon</button>
           </div>
           <p id="runnerRecoveryBoundary" class="runner-route-note">${retryAvailable ? "Retry uses the same foreground boundary; it does not restart the table." : "The boundary is too near for a complete five-Act Action retry."} Narrated beats remain available from this Act while the same boundary remains, and may close before the final curtain.</p>
-          <p id="runnerToolLine" class="runner-recovery-detail"><strong>${escape(act.toolLabel)}</strong> remains harmless choreography; only the lit architectural faces, road, and ceiling end an attempt.</p>
+          <p id="runnerToolLine" class="runner-recovery-detail"><strong>${escape(act.toolLabel)}</strong> remains harmless choreography; only a lit architectural face ends an attempt.</p>
         </section>
       ` : `
         <div class="runner-controls" aria-label="Sector Sprint controls">
-          <button class="runner-control-primary runner-control-thrust" type="button" data-runner-action="thrust"><i class="runner-control-mark runner-control-mark-jump" aria-hidden="true"></i><span>Pulse / Glide</span><small>Hold ↑ · W · Space</small></button>
+          <button class="runner-control-primary" type="button" data-runner-action="up"><i class="runner-control-mark runner-control-mark-up" aria-hidden="true"></i><span>Move up</span><small>↑ · W · one press</small></button>
+          <button class="runner-control-primary" type="button" data-runner-action="down"><i class="runner-control-mark runner-control-mark-down" aria-hidden="true"></i><span>Move down</span><small>↓ · S · one press</small></button>
           <button class="runner-control-primary" type="button" data-runner-action="tool"><i class="runner-control-mark runner-control-mark-spark" aria-hidden="true"></i><span>${escape(act.toolLabel)}</span><small>J · K · X</small></button>
           <button class="runner-control-quiet" type="button" data-runner-pause aria-pressed="${runnerPaused}"><i class="runner-control-mark runner-control-mark-pause" aria-hidden="true"></i><span>${runnerPaused ? "Resume city" : "Pause city"}</span><small>Movement and sound</small></button>
           <button class="runner-control-quiet" type="button" data-runner-story><i class="runner-control-mark runner-control-mark-story" aria-hidden="true"></i><span>Narrated route</span><small>No precision needed</small></button>
         </div>
         <div class="runner-copy-deck">
           <p id="runnerToolLine"><strong>${escape(act.toolLabel)}</strong> · ${escape(act.toolLine)}</p>
-          <p id="runnerInstructions" class="runner-instructions">Hold the stage or Pulse control for thrust; release early and let inertia carry the line. One touch on a lit architectural face, the ceiling, or the road ends this Action attempt. Comic targets and tools are harmless.</p>
+          <p id="runnerInstructions" class="runner-instructions">Follow the marker: Hold lane, Move up, or Move down. Each gate requires at most one adjacent move. The route begins gently and gains speed across the five Acts. One touch on a lit architectural face ends this Action attempt. Comic targets and tools are harmless.</p>
           <p class="runner-house-call">${escape(act.houseCall)}</p>
         </div>
       `}
@@ -734,8 +737,8 @@ function stopRunnerLoop() {
   runnerActivePointerId = null;
   runnerActivePointerAction = null;
   runnerInput = {};
-  runnerThrustHeld = false;
-  document.querySelectorAll<HTMLElement>('[data-runner-action][data-pressed="true"], [data-runner-thrust-zone][data-pressed="true"]').forEach((control) => {
+  if (runnerState) runnerState = { ...runnerState, pendingLaneDelta: null };
+  document.querySelectorAll<HTMLElement>('[data-runner-action][data-pressed="true"]').forEach((control) => {
     delete control.dataset.pressed;
   });
   pauseChapterTransition();
@@ -798,10 +801,14 @@ function drawCurrentRunnerFrame() {
     canvas.dataset.nextGapCenter = String(nextObstacle.gapY + nextObstacle.gapHeight / 2);
     canvas.dataset.nextGapHeight = String(nextObstacle.gapHeight);
     canvas.dataset.nextMaterial = nextObstacle.material;
+    canvas.dataset.nextSafeLane = String(nextObstacle.safeLane);
+    canvas.dataset.nextContactMs = String(nextObstacle.contactMs);
   } else {
     delete canvas.dataset.nextGapCenter;
     delete canvas.dataset.nextGapHeight;
     delete canvas.dataset.nextMaterial;
+    delete canvas.dataset.nextSafeLane;
+    delete canvas.dataset.nextContactMs;
   }
 }
 
@@ -813,6 +820,7 @@ function updateRunnerLive(message: string) {
 function updateRunnerApproach() {
   if (!runnerState) return;
   const act = RUNNER_ACTS[runnerState.actIndex];
+  const instruction = runnerUpcomingInstruction(runnerState);
   const next = [
     ...act.obstacles
       .map((obstacle) => ({ x: obstacle.x + obstacle.width, label: obstacle.label })),
@@ -824,7 +832,7 @@ function updateRunnerApproach() {
       .map((candidate) => ({ x: candidate.x, label: candidate.label })),
   ].filter((candidate) => candidate.x >= runnerState!.worldX + RUNNER_PLAYER_SCREEN_X).sort((left, right) => left.x - right.x)[0];
   const label = document.querySelector<HTMLElement>("#runnerApproach strong");
-  if (label) label.textContent = next?.label ?? "The Act curtain";
+  if (label) label.textContent = instruction?.label ?? next?.label ?? "The Act curtain";
 }
 
 function updateRunnerActionHud() {
@@ -863,7 +871,7 @@ function runRunnerFrame(timestamp: number) {
 
   if (active.storyBeat === null && runnerState) {
     const previousState = runnerState;
-    const frameInput: RunnerInput = { ...runnerInput, thrustHeld: runnerThrustHeld };
+    const frameInput: RunnerInput = { ...runnerInput };
     runnerAccumulatorMs = Math.min(
       runnerAccumulatorMs + activeDelta,
       RUNNER_FIXED_STEP_MS * RUNNER_MAX_CATCH_UP_STEPS,
@@ -871,7 +879,7 @@ function runRunnerFrame(timestamp: number) {
     let firstStep = true;
     let catchUpSteps = 0;
     while (runnerAccumulatorMs + 0.001 >= RUNNER_FIXED_STEP_MS && catchUpSteps < RUNNER_MAX_CATCH_UP_STEPS) {
-      runnerState = stepRunner(runnerState, firstStep ? frameInput : { thrustHeld: runnerThrustHeld }, RUNNER_FIXED_STEP_MS);
+      runnerState = stepRunner(runnerState, firstStep ? frameInput : {}, RUNNER_FIXED_STEP_MS);
       runnerInput = {};
       firstStep = false;
       catchUpSteps += 1;
@@ -917,19 +925,13 @@ function mountRunner() {
   }
 }
 
-function queueRunnerAction(action: "thrust" | "dash" | "tool") {
+function queueRunnerAction(action: "up" | "down" | "tool") {
   if (!active || getGame(active.gameId).kind !== "runner" || active.storyBeat !== null || runnerState?.failed || runnerIsSuspended()) return;
-  if (action === "thrust") runnerInput = { ...runnerInput, thrustPressed: true };
-  else if (action === "dash") runnerInput = { ...runnerInput, dashPressed: true };
+  if (action === "up") runnerInput = { ...runnerInput, laneDelta: -1 };
+  else if (action === "down") runnerInput = { ...runnerInput, laneDelta: 1 };
   else runnerInput = { ...runnerInput, toolPressed: true };
   const act = RUNNER_ACTS[active.chapter];
-  updateRunnerLive(action === "thrust" ? "Jetpack pulse engaged. Release early and ride the inertia." : action === "dash" ? "Flight trim queued." : `${act.toolLabel} queued.`);
-}
-
-function releaseRunnerThrust() {
-  if (!runnerThrustHeld) return;
-  runnerThrustHeld = false;
-  runnerInput = { ...runnerInput, thrustReleased: true };
+  updateRunnerLive(action === "up" ? "Move up queued." : action === "down" ? "Move down queued." : `${act.toolLabel} queued.`);
 }
 
 function setRunnerPaused(paused: boolean) {
@@ -940,7 +942,7 @@ function setRunnerPaused(paused: boolean) {
   }
   runnerPaused = paused;
   runnerLastTimestamp = 0;
-  if (runnerState) runnerState = { ...runnerState, paused };
+  if (runnerState) runnerState = { ...runnerState, paused, pendingLaneDelta: null };
   document.querySelectorAll<HTMLButtonElement>("[data-runner-pause]").forEach((button) => {
     button.ariaPressed = String(paused);
     const label = button.querySelector("span");
@@ -990,7 +992,7 @@ function retryRunnerAction() {
   statusMessage = "A fresh Action attempt begins inside the same table boundary.";
   saveActiveGame();
   render();
-  focusElement('[data-runner-action="thrust"]');
+  focusElement('[data-runner-action="up"]');
 }
 
 function abandonRunnerAttempt() {
@@ -1285,24 +1287,18 @@ function playRunnerStateCue(previous: RunnerState, next: RunnerState, input: Run
     playToneSequence([196, 392, 523, 659], "sine", 0.036, 0.04);
   } else if (next.impactMs > previous.impactMs) {
     playToneSequence([110, 147, 98], "sawtooth", 0.025, 0.028);
-  } else if (next.landingMs > previous.landingMs) {
-    playToneSequence(next.lastAction === "stomp" ? [98, 147, 196] : [164, 196], "triangle", 0.023, 0.028);
   } else if (next.encounteredComplicationIds.length > previous.encounteredComplicationIds.length) {
     playToneSequence(next.activeComplication === "sabzi-load" ? [196, 174, 147] : [330, 294, 247], "triangle", 0.024, 0.06);
   } else if (previous.activeComplication && !next.activeComplication) {
     playToneSequence([220, 330, 440], "sine", 0.022, 0.05);
-  } else if (input.thrustPressed && !next.grounded) {
-    playToneSequence([196, 294, 440], "sine", 0.022, 0.04);
-  } else if (input.jumpPressed && !next.grounded) {
-    playToneSequence(next.lastAction === "air-step" ? [330, 494, 659] : [220, 330], "sine", 0.021, 0.038);
-  } else if (input.dashPressed) {
-    playToneSequence(next.lastAction === "stomp" ? [174, 116] : [196, 294, 392], "triangle", 0.021, 0.032);
+  } else if (input.laneDelta) {
+    playToneSequence(input.laneDelta < 0 ? [247, 330] : [330, 247], "sine", 0.018, 0.04);
   } else if (input.toolPressed) {
     const toolNotes = [[440, 587], [196, 247, 330], [294, 440, 587], [220, 330, 440], [262, 392, 523]] as const;
     playToneSequence(toolNotes[active.chapter], active.chapter === 2 ? "triangle" : "sine", 0.024, 0.035);
   } else if (Math.floor(next.elapsedMs / 1_600) > Math.floor(previous.elapsedMs / 1_600)) {
-    const pulse = [82, 98, 110, 73, 92][active.chapter];
-    playToneSequence([pulse, pulse * 1.5], "triangle", 0.009, 0.12);
+    const tone = [82, 98, 110, 73, 92][active.chapter];
+    playToneSequence([tone, tone * 1.5], "triangle", 0.009, 0.12);
   }
 }
 
@@ -1357,7 +1353,7 @@ document.addEventListener("click", (event) => {
   if (runnerAction) {
     if (event.detail > 0) return;
     resumeHouseAudioFromGesture();
-    queueRunnerAction(runnerAction.dataset.runnerAction as "thrust" | "dash" | "tool");
+    queueRunnerAction(runnerAction.dataset.runnerAction as "up" | "down" | "tool");
     return;
   }
   if (target.closest("[data-runner-pause]")) {
@@ -1414,28 +1410,26 @@ document.addEventListener("click", (event) => {
 document.addEventListener("pointerdown", (event) => {
   const target = event.target as Element;
   const control = target.closest<HTMLElement>("[data-runner-action]");
-  const thrustZone = target.closest<HTMLElement>("[data-runner-thrust-zone]");
-  if (!control && !thrustZone) return;
+  if (!control) return;
   if (runnerActivePointerId !== null) return;
   runnerActivePointerId = event.pointerId;
-  const action = control?.dataset.runnerAction as "thrust" | "dash" | "tool" | undefined;
-  const inputSurface = control ?? thrustZone!;
-  const resolvedAction = action ?? "thrust";
+  const resolvedAction = control.dataset.runnerAction as "up" | "down" | "tool";
   runnerActivePointerAction = resolvedAction;
   resumeHouseAudioFromGesture();
-  inputSurface.dataset.pressed = "true";
-  if (resolvedAction === "thrust") runnerThrustHeld = true;
+  control.dataset.pressed = "true";
   queueRunnerAction(resolvedAction);
 });
 
 for (const eventName of ["pointerup", "pointercancel"] as const) {
   document.addEventListener(eventName, (event) => {
     if (runnerActivePointerId === null || event.pointerId !== runnerActivePointerId) return;
-    const completedAction = runnerActivePointerAction;
     runnerActivePointerId = null;
     runnerActivePointerAction = null;
-    if (completedAction === "thrust") releaseRunnerThrust();
-    document.querySelectorAll<HTMLElement>('[data-runner-action][data-pressed="true"], [data-runner-thrust-zone][data-pressed="true"]').forEach((control) => {
+    if (eventName === "pointercancel") {
+      runnerInput = {};
+      if (runnerState) runnerState = { ...runnerState, pendingLaneDelta: null };
+    }
+    document.querySelectorAll<HTMLElement>('[data-runner-action][data-pressed="true"]').forEach((control) => {
       delete control.dataset.pressed;
     });
   });
@@ -1447,29 +1441,28 @@ document.addEventListener("keydown", (event) => {
   const key = event.key.toLowerCase();
   const isEditable = target.matches("input, textarea, select") || target.isContentEditable;
   const isButtonOrLink = target.matches("button, a");
-  const isFocusedThrust = target.matches('[data-runner-action="thrust"]');
-  if (isEditable || (isButtonOrLink && (key === "enter" || (key === " " && !isFocusedThrust)))) return;
-  if (["arrowup", "w", " "].includes(key)) {
+  const runnerButton = target.closest<HTMLElement>("[data-runner-action]");
+  if (runnerButton && (key === "enter" || key === " ")) {
+    event.preventDefault();
+    if (!event.repeat) {
+      resumeHouseAudioFromGesture();
+      queueRunnerAction(runnerButton.dataset.runnerAction as "up" | "down" | "tool");
+    }
+    return;
+  }
+  if (isEditable || (isButtonOrLink && (key === "enter" || key === " "))) return;
+  if (["arrowup", "w"].includes(key)) {
     event.preventDefault();
     resumeHouseAudioFromGesture();
-    if (!event.repeat) queueRunnerAction("thrust");
-    runnerThrustHeld = true;
-  } else if (["arrowdown", "s", "d"].includes(key)) {
+    if (!event.repeat) queueRunnerAction("up");
+  } else if (["arrowdown", "s"].includes(key)) {
     event.preventDefault();
     resumeHouseAudioFromGesture();
-    if (!event.repeat) queueRunnerAction("dash");
+    if (!event.repeat) queueRunnerAction("down");
   } else if (["j", "k", "x"].includes(key)) {
     event.preventDefault();
     resumeHouseAudioFromGesture();
     if (!event.repeat) queueRunnerAction("tool");
-  }
-});
-
-document.addEventListener("keyup", (event) => {
-  if (!active || getGame(active.gameId).kind !== "runner" || active.storyBeat !== null) return;
-  if (["arrowup", "w", " "].includes(event.key.toLowerCase())) {
-    event.preventDefault();
-    releaseRunnerThrust();
   }
 });
 
@@ -1506,8 +1499,9 @@ window.addEventListener("resize", () => drawCurrentRunnerFrame());
 window.addEventListener("orientationchange", () => {
   runnerActivePointerId = null;
   runnerActivePointerAction = null;
-  releaseRunnerThrust();
-  document.querySelectorAll<HTMLElement>('[data-runner-action][data-pressed="true"], [data-runner-thrust-zone][data-pressed="true"]').forEach((control) => {
+  runnerInput = {};
+  if (runnerState) runnerState = { ...runnerState, pendingLaneDelta: null };
+  document.querySelectorAll<HTMLElement>('[data-runner-action][data-pressed="true"]').forEach((control) => {
     delete control.dataset.pressed;
   });
   drawCurrentRunnerFrame();
