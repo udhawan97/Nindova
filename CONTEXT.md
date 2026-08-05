@@ -16,8 +16,8 @@ _Avoid_: test center, leaderboard, daily challenge
 
 **Sector Sprint**
 
-The original, fixed five-Act Chandigarh route in the Grand Salon, led by Gurpreet and his mother Harjit. The street advances on its own; one-pointer hold-to-lift and release-to-glide movement, optional keyboard dash/vault/stomp expression, five Act-local harmless tools, three deterministic temporary effects, and one brief authored comic complication per Act change choreography around inanimate abstractions, while collisions only create presentation feedback. Every route closes, and the complete narrated route requires no timed response, sound, sight, or precision. Reaching the absolute boundary before all five Acts closes the table without recording a completion.
-_Avoid_: endless runner, shooter, score attack, Contra clone, sleep inducer
+The original, fixed five-Act Chandigarh route in the Grand Salon, led by Gurpreet and his mother Harjit. After a brief ignition hover, one-pointer pulse thrust and release-driven inertia carry the lead through deterministic paired architectural faces. One touch on a lit face, road, or ceiling wipes the Action attempt; comic targets, tools, pickups, and complications remain harmless choreography. Recovery may retry Act I only inside the same remaining table boundary, continue Narrated from the current Act, or return to the Salon. Failure, timing, and input history never persist. The complete Narrated route requires no timed response, sound, sight, or precision, and the absolute foreground boundary still closes the table without recording an unfinished completion.
+_Avoid_: endless runner, shooter, score attack, lives, health, Flappy Bird clone, sleep inducer
 
 **Gallery**
 

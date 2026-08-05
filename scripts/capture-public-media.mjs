@@ -98,6 +98,10 @@ try {
   await housePage.evaluate(() => window.__house.start("sector-sprint"));
   await housePage.locator('[data-runner-route="action"]').click();
   await housePage.locator("#runnerCanvas").waitFor({ state: "visible" });
+  await housePage.waitForFunction(() => {
+    const canvas = document.querySelector("#runnerCanvas");
+    return Number(canvas?.dataset.renderSequence ?? 0) > 8 && canvas?.dataset.nextMaterial === "sandstone";
+  });
   await housePage.locator(".runner-stage-frame").screenshot({
     path: resolve("apps/site/public/media/sector-sprint.png"),
     animations: "disabled",
