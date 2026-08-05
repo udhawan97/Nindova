@@ -15,5 +15,5 @@ description: Honest evidence and product limits for the current Nindova House an
 These are visible limits, not shipped claims hidden in a backlog.
 - Grand Salon games are authored entertainment. They have not been normed on a representative adult sample and do not produce a validated population-normed, percentile, diagnostic, or cognitive-trait result.
 - The assessment-readiness module is a fail-closed evidence inventory, not validation evidence. It authorizes neither research collection nor public output.
-- Sector Sprint is an authored entertainment route. No human evidence establishes that it feels culturally authentic, produces a particular challenge curve, makes people tired, or helps them sleep.
+- Sector Sprint is an authored entertainment route. Automation establishes deterministic mechanics, bounded effects, Chromium input latency, and frame pacing; no human evidence establishes AAA quality, representative adult enjoyment, cultural authenticity, a particular challenge curve, tiredness, or a sleep effect. Native Mobile Safari performance remains unverified.
 - Automated browser coverage completes all five games, exercises Sector Sprint controls and narration, and verifies keyboard focus and semantic Stack state. It does not establish equivalent task meaning for alternative sensory presentations or replace real-device assistive-technology testing.

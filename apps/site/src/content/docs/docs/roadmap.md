@@ -7,7 +7,7 @@ description: What exists in the current source and what remains deliberately unc
 
 - Nindova House for adults 18 and over, with a spatial Grand Salon and separate Night Room.
 - Pattern Court, Mirror Forge, Stack Architect, and Lantern Ledger, each with five authored entertainment chapters and deterministic celebration.
-- Sector Sprint, an original code-drawn Chandigarh route led by Gurpreet and Harjit, with five fixed Acts, progressively denser comic objects, distinct city scenery, automatic forward motion, optional jumps and harmless message sparks, a complete narrated route, no score or failure state, an honest no-completion safety exit, and a deterministic curtain call.
+- Sector Sprint, an original cinematic code-drawn Chandigarh route led by Gurpreet and Harjit, with five fixed Acts, smooth vector figures, layered city depth, automatic forward motion, variable leap/air-step/dash/vault/stomp movement, five mechanically distinct Act-local harmless tools, three deterministic temporary effects, a complete narrated route, no score or failure state, an honest no-completion safety exit, and a deterministic curtain call.
 - Versioned `mode: "entertainment"` completion provenance, one replaceable local result per game, strict active-state recovery, and a visible Gallery clear action.
 - Independently scoped House and Night PWAs with cold-offline and base-path browser evidence.
 

@@ -1,5 +1,15 @@
 # Public-surface evidence ledger
 
+## Verified locally on 2026-08-04 — Sector Sprint cinematic action overhaul
+
+- Sector Sprint now uses a layered, simulated-depth Canvas stage with Act-specific lighting, architecture, weather, vector figures, target staging, camera response, impact particles, and an updated 1280×619 source-rendered public capture. The scope is premium browser action presentation, not a claim of native AAA production parity.
+- The deterministic 240-second route keeps five ordered 32-second Acts and the original House closure boundary. Its action vocabulary now includes a buffered, variable-height leap with coyote time; one air step; a ground dash or contextual vault; an aerial stomp; five Act-local tools; and three deterministic temporary effects.
+- Tools are harmless and route-specific: Phone Pulse, Bargain Burst, Dhaaga Arc, Umbrella Wave, and Ghar Flare only affect their documented presentation targets. Collisions produce presentation-only stumbles, and Phulkari Guard converts one stumble into a flourish; neither changes world position, route time, input access, or Session outcome.
+- The runner still has no score, health, lives, streaks, countdown, missed-night language, random reward, fail state, collection, or persistent upgrade. All added pickups, tools, particles, camera effects, and audio are Act-local or Session-local; Narrated route remains a complete non-action equivalent and optional sound remains local Web Audio.
+- `npm run check` passes with 78 unit tests, zero Astro diagnostics, and the composed production build. `npm run test:house`, `npm run test:public`, and `npm run test:pwa` pass across the standalone House, composed PWA, responsive layouts, narration, keyboard/nonvisual route, offline closure, same-origin privacy, and Night isolation gates.
+- The dedicated Chromium game-feel gate passed at 375×812 under 4× CPU slowdown with six samples per action and 120 frame samples: p95 Leap 15.9 ms, Dash 3.3 ms, Tool 4.1 ms, and frame interval 33.5 ms. The 1440×900 desktop p95 frame interval was 18.5 ms. Enforced ceilings are 150 ms action response, 50 ms throttled-phone frame interval, and 25 ms desktop frame interval.
+- Desktop and 375×812 source-rendered checks cover all five Acts, the five-control layout, reduced motion, and the refreshed public capture. Native Mobile Safari, physical-device thermals/battery, real assistive-technology use, human cultural-authenticity review, and human judgments of fun, polish, or AAA parity remain unverified.
+
 ## Verified locally on 2026-08-04 — House-first public-surface refresh
 
 - The local README, Astro landing page, Starlight docs, download guide, social card, and source-rendered product captures tell one House-first story while keeping the Night Room as a deliberately separate bounded loop.

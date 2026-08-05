@@ -1,0 +1,133 @@
+import assert from "node:assert/strict";
+import { spawn } from "node:child_process";
+import { cp, mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import { chromium } from "@playwright/test";
+
+const root = resolve(import.meta.dirname, "../..");
+const port = 4207;
+const previewRoot = await mkdtemp(join(tmpdir(), "nindova-sector-feel-"));
+await cp(resolve(root, "dist"), previewRoot, { recursive: true });
+
+const server = spawn(process.execPath, [resolve(root, "scripts/serve.mjs"), previewRoot], {
+  cwd: root,
+  env: { ...process.env, NINDOVA_PREVIEW_PORT: String(port) },
+  stdio: ["ignore", "pipe", "pipe"],
+});
+
+await new Promise((resolveReady, reject) => {
+  const timer = setTimeout(() => reject(new Error("Sector Sprint preview did not start")), 5_000);
+  server.once("error", reject);
+  server.stdout.on("data", (chunk) => {
+    if (chunk.toString().includes("Nindova preview")) {
+      clearTimeout(timer);
+      resolveReady();
+    }
+  });
+});
+
+const percentile = (values, amount) => {
+  const ordered = [...values].sort((left, right) => left - right);
+  return ordered[Math.max(0, Math.ceil(ordered.length * amount) - 1)];
+};
+
+const browser = await chromium.launch({ headless: true });
+const errors = [];
+
+async function openRunner(viewport, cpuRate = 1) {
+  const context = await browser.newContext({ viewport });
+  await context.addInitScript(() => localStorage.setItem("nindova:house:adult-audience:v1", "acknowledged"));
+  const page = await context.newPage();
+  page.on("console", (message) => { if (message.type() === "error") errors.push(`console: ${message.text()}`); });
+  page.on("pageerror", (error) => errors.push(`page: ${error.message}`));
+  if (cpuRate > 1) {
+    const cdp = await context.newCDPSession(page);
+    await cdp.send("Emulation.setCPUThrottlingRate", { rate: cpuRate });
+  }
+  await page.goto(`http://127.0.0.1:${port}/house/`, { waitUntil: "networkidle" });
+  await page.click('[data-game="sector-sprint"]');
+  await page.waitForSelector("#runnerCanvas");
+  await page.waitForFunction(() => Number(document.querySelector("#runnerCanvas")?.dataset.renderSequence ?? 0) > 1);
+  return { context, page };
+}
+
+async function measureAction(page, selector, allowedActions) {
+  return page.evaluate(({ selector: actionSelector, allowed }) => new Promise((resolveMeasure, rejectMeasure) => {
+    const button = document.querySelector(actionSelector);
+    const canvas = document.querySelector("#runnerCanvas");
+    if (!(button instanceof HTMLElement) || !(canvas instanceof HTMLCanvasElement)) {
+      rejectMeasure(new Error(`Missing action surface: ${actionSelector}`));
+      return;
+    }
+    const beforeSequence = Number(canvas.dataset.renderSequence ?? 0);
+    let inputAt = 0;
+    const timeout = setTimeout(() => {
+      observer.disconnect();
+      rejectMeasure(new Error(`No visibly changed action frame for ${actionSelector}`));
+    }, 1_000);
+    const observer = new MutationObserver(() => {
+      const sequence = Number(canvas.dataset.renderSequence ?? 0);
+      if (inputAt > 0 && sequence > beforeSequence && allowed.includes(canvas.dataset.lastAction ?? "")) {
+        clearTimeout(timeout);
+        observer.disconnect();
+        resolveMeasure(performance.now() - inputAt);
+      }
+    });
+    observer.observe(canvas, { attributes: true, attributeFilter: ["data-render-sequence", "data-last-action"] });
+    button.addEventListener("pointerdown", () => { inputAt = performance.now(); }, { once: true });
+    button.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, pointerId: 41, pointerType: "touch", isPrimary: true }));
+    setTimeout(() => button.dispatchEvent(new PointerEvent("pointerup", { bubbles: true, pointerId: 41, pointerType: "touch", isPrimary: true })), 34);
+  }), { selector, allowed: allowedActions });
+}
+
+async function sampleFrames(page, count) {
+  return page.evaluate((sampleCount) => new Promise((resolveFrames) => {
+    const intervals = [];
+    let previous = 0;
+    let warmup = 20;
+    const frame = (timestamp) => {
+      if (previous && warmup <= 0) intervals.push(timestamp - previous);
+      else if (warmup > 0) warmup -= 1;
+      previous = timestamp;
+      if (intervals.length >= sampleCount) resolveFrames(intervals);
+      else requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }), count);
+}
+
+try {
+  const throttled = await openRunner({ width: 375, height: 812 }, 4);
+  const actionSamples = { leap: [], dash: [], tool: [] };
+  for (let sample = 0; sample < 6; sample += 1) {
+    await throttled.page.waitForFunction(() => window.__house.runner?.grounded === true);
+    actionSamples.leap.push(await measureAction(throttled.page, '[data-runner-action="jump"]', ["leap", "air-step"]));
+    await throttled.page.waitForFunction(() => window.__house.runner?.grounded === true);
+    actionSamples.dash.push(await measureAction(throttled.page, '[data-runner-action="dash"]', ["dash", "vault", "stomp"]));
+    actionSamples.tool.push(await measureAction(throttled.page, '[data-runner-action="tool"]', ["tool"]));
+    await throttled.page.waitForTimeout(300);
+  }
+  const throttledFrames = await sampleFrames(throttled.page, 120);
+  const actionP95 = Object.fromEntries(Object.entries(actionSamples).map(([name, values]) => [name, percentile(values, 0.95)]));
+  for (const [name, value] of Object.entries(actionP95)) assert.ok(value < 150, `${name} p95 ${value.toFixed(1)}ms must remain below 150ms under 4x CPU`);
+  assert.ok(percentile(throttledFrames, 0.95) <= 50, `375x812 4x CPU p95 frame interval ${percentile(throttledFrames, 0.95).toFixed(1)}ms must remain <= 50ms`);
+  await throttled.context.close();
+
+  const desktop = await openRunner({ width: 1440, height: 900 });
+  const desktopFrames = await sampleFrames(desktop.page, 120);
+  assert.ok(percentile(desktopFrames, 0.95) <= 25, `1440x900 p95 frame interval ${percentile(desktopFrames, 0.95).toFixed(1)}ms must remain <= 25ms`);
+  await desktop.context.close();
+
+  assert.deepEqual(errors, []);
+  console.log(JSON.stringify({
+    profile: "Chromium · 375x812 · 4x CPU · 6 input samples per action · 120 frame samples",
+    actionP95Ms: Object.fromEntries(Object.entries(actionP95).map(([name, value]) => [name, Number(value.toFixed(2))])),
+    throttledFrameP95Ms: Number(percentile(throttledFrames, 0.95).toFixed(2)),
+    desktopFrameP95Ms: Number(percentile(desktopFrames, 0.95).toFixed(2)),
+  }));
+} finally {
+  await browser.close();
+  server.kill("SIGTERM");
+  await rm(previewRoot, { recursive: true, force: true });
+}

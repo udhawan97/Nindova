@@ -38,7 +38,7 @@ All assets original to this project. License: [CC0 1.0 Universal](https://creati
 | File | Dimensions | Purpose |
 |---|---|---|
 | nindova-house.png | 1440×937 | Source-rendered House floor plan used by the README and landing hero |
-| sector-sprint.png | 1224×594 | Source-rendered Sector Sprint route proof used by the landing page |
+| sector-sprint.png | 1280×619 | Source-rendered cinematic Sector Sprint route proof used by the landing page |
 | rasoi-board.png | 840×476 | Source-rendered Deeper Masala Mound board proof |
 | rasoi-pairs-phone.png | 375×812 | Source-rendered Night Room phone proof |
 | rasoi-dawn.png | 1200×750 | Source-rendered Dawn canvas proof |

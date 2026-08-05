@@ -543,7 +543,7 @@ function prepareRunnerCanvas(canvas: HTMLCanvasElement): CanvasRenderingContext2
 function drawCurrentRunnerFrame() {
   const canvas = document.querySelector<HTMLCanvasElement>("#runnerCanvas");
   const context = canvas ? prepareRunnerCanvas(canvas) : null;
-  if (!context || !runnerState) return;
+  if (!canvas || !context || !runnerState) return;
   drawRunnerFrame(
     context,
     { ...runnerState, paused: runnerIsSuspended() },
