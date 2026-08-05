@@ -92,7 +92,7 @@ export const GAMES: readonly GameDefinition[] = [
   },
   {
     id: "sector-sprint", number: "V", title: "Sector Sprint", houseLine: "Run Chandigarh’s long way home.",
-    description: "Five authored city acts with automatic forward motion, optional jumps, harmless sparks, and a clean curtain call.",
+    description: "Five cinematic city acts with expressive movement, Act-local tools, temporary effects, automatic forward motion, and a clean curtain call.",
     kind: "runner", version: "1.0.0", chapters: [],
     chapterTitles: ["Ghar Wapsi", "Sabzi Command", "Baraat Detour", "Monsoon Protocol", "Roti Relay"],
   },

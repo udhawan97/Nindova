@@ -21,6 +21,7 @@ test("Sector Sprint has five fixed original Acts and only allowlisted comic-obje
   assert.ok(Runner.RUNNER_ACTS.length * Runner.RUNNER_ACT_SECONDS < Runner.RUNNER_SESSION_SECONDS, "the authored action route closes before its absolute backstop");
   assert.deepEqual(Runner.RUNNER_ACTS.map((act) => act.sign), ["SECTOR 22", "SECTOR 26", "SECTOR 17", "MADHYA MARG", "GHAR THIS WAY"]);
   const allowlist = new Set(Runner.RUNNER_TARGET_KINDS);
+  for (const forbidden of ["human", "animal", "vehicle", "building"]) assert.equal(allowlist.has(forbidden), false, `${forbidden} can never enter the target collision set`);
   const tools = new Set();
   const powers = new Set();
   const targetIds = [];

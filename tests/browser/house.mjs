@@ -363,11 +363,11 @@ try {
     assert.ok(box && box.width >= 44 && box.height >= 44, "runner controls remain operable by touch");
   }
   await runner.page.screenshot({ path: resolve(output, "sector-sprint-375x812.png"), fullPage: true, animations: "disabled" });
-  await runner.page.click('[data-runner-action="spark"]');
+  await runner.page.click('[data-runner-action="tool"]');
   await runner.page.waitForFunction(() => /Message delivered|number 12 has left/i.test(document.querySelector("#runnerLive")?.textContent ?? ""), null, { timeout: 4_000 });
   await runner.page.evaluate(() => document.querySelector("#houseMain")?.focus());
   await runner.page.keyboard.press("Space");
-  await runner.page.waitForFunction(() => /jump/i.test(document.querySelector("#runnerLive")?.textContent ?? ""));
+  await runner.page.waitForFunction(() => /leap|air step/i.test(document.querySelector("#runnerLive")?.textContent ?? ""));
   await runner.page.click("[data-runner-pause]");
   assert.equal(await runner.page.locator("[data-runner-pause]").getAttribute("aria-pressed"), "true");
   const pausedFrame = await runner.page.locator("#runnerCanvas").evaluate((canvas) => canvas.toDataURL());

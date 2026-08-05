@@ -51,6 +51,7 @@ type DebugHouse = {
   readonly view: View;
   readonly active: ActiveGame | null;
   readonly memory: HouseState;
+  readonly runner: RunnerState | null;
   start: (gameId: GameId) => void;
   answer: (choiceIndex: number) => void;
 };
@@ -85,6 +86,7 @@ let runnerFrame = 0;
 let runnerLastTimestamp = 0;
 let runnerSessionElapsedMs = 0;
 let runnerInput: RunnerInput = {};
+let runnerJumpHeld = false;
 let runnerPaused = false;
 let runnerInterrupted = false;
 let runnerBoundaryTimer = 0;
@@ -94,6 +96,7 @@ let runnerTransitionTimer = 0;
 let runnerTransitionRemainingMs = 0;
 let runnerTransitionStartedAt: number | null = null;
 let runnerTransitionCallback: (() => void) | null = null;
+let runnerRenderSequence = 0;
 let houseAudioContext: AudioContext | null = null;
 const houseAudioVoices = new Set<OscillatorNode>();
 
@@ -314,6 +317,9 @@ function renderRunner(): string {
   if (!active) return "";
   const act = RUNNER_ACTS[active.chapter];
   if (!act) return "";
+  const activePowerLabel = runnerState?.activePower
+    ? runnerState.activePower.replaceAll("-", " ")
+    : "No temporary effect";
   if (active.storyBeat !== null) {
     const beat = act.storyBeats[active.storyBeat] ?? act.storyBeats[0];
     return `
@@ -341,22 +347,25 @@ function renderRunner(): string {
         <div><span>Act ${active.chapter + 1} scene · ${escape(act.location)}</span><h2 id="runnerActTitle">${escape(act.title)}</h2></div>
       </header>
       <figure class="runner-stage-frame">
-        <div class="runner-canvas-window"><canvas id="runnerCanvas" width="${RUNNER_WIDTH}" height="${RUNNER_HEIGHT}" aria-label="${escape(act.title)}. An original auto-running Chandigarh city scene. Use Jump or ${escape(act.sparkLabel)} for optional comic interactions." aria-describedby="runnerInstructions runnerApproach runnerLive"></canvas></div>
-        <figcaption><span>${escape(act.sign)}</span><span>Original code-drawn miniature · fixed authored city route</span></figcaption>
+        <div class="runner-canvas-window"><canvas id="runnerCanvas" width="${RUNNER_WIDTH}" height="${RUNNER_HEIGHT}" aria-label="${escape(act.title)}. An original auto-running Chandigarh action scene. Leap, air step, dash, vault, stomp, and ${escape(act.toolLabel)} are optional expressive actions." aria-describedby="runnerInstructions runnerApproach runnerLive runnerToolLine"></canvas></div>
+        <div class="runner-action-hud" aria-label="Current action set"><span>Act-local tool</span><strong id="runnerToolLabel">${escape(act.toolLabel)}</strong><span id="runnerPowerLabel">${escape(activePowerLabel)}</span></div>
+        <figcaption><span>${escape(act.sign)}</span><span>Original code-drawn action theatre · fixed authored route</span></figcaption>
       </figure>
       <div class="runner-status-deck">
-        <p id="runnerApproach" class="runner-approach"><span>Approaching</span><strong>${escape(act.targets[0]?.label ?? act.closing)}</strong></p>
+        <p id="runnerApproach" class="runner-approach"><span>Next interference</span><strong>${escape(act.targets[0]?.label ?? act.closing)}</strong></p>
         <p id="runnerLive" class="runner-live" role="status" aria-live="polite">${escape(runnerState?.message ?? act.opening)}</p>
       </div>
       <div class="runner-controls" aria-label="Sector Sprint controls">
-        <button class="runner-control-primary" type="button" data-runner-action="jump"><i class="runner-control-mark runner-control-mark-jump" aria-hidden="true"></i><span>Jump</span><small>↑ · W · Space</small></button>
-        <button class="runner-control-primary" type="button" data-runner-action="spark"><i class="runner-control-mark runner-control-mark-spark" aria-hidden="true"></i><span>${escape(act.sparkLabel)}</span><small>J · K · X</small></button>
+        <button class="runner-control-primary" type="button" data-runner-action="jump"><i class="runner-control-mark runner-control-mark-jump" aria-hidden="true"></i><span>Leap / Air step</span><small>↑ · W · Space · hold for height</small></button>
+        <button class="runner-control-primary" type="button" data-runner-action="dash"><i class="runner-control-mark runner-control-mark-dash" aria-hidden="true"></i><span>Dash / Stomp</span><small>↓ · S · D</small></button>
+        <button class="runner-control-primary" type="button" data-runner-action="tool"><i class="runner-control-mark runner-control-mark-spark" aria-hidden="true"></i><span>${escape(act.toolLabel)}</span><small>J · K · X</small></button>
         <button class="runner-control-quiet" type="button" data-runner-pause aria-pressed="${runnerPaused}"><i class="runner-control-mark runner-control-mark-pause" aria-hidden="true"></i><span>${runnerPaused ? "Resume city" : "Pause city"}</span><small>Movement and sound</small></button>
         <button class="runner-control-quiet" type="button" data-runner-story><i class="runner-control-mark runner-control-mark-story" aria-hidden="true"></i><span>Narrated route</span><small>No precision needed</small></button>
       </div>
       <div class="runner-copy-deck">
-        <p>${escape(act.houseCall)}</p>
-        <p id="runnerInstructions" class="runner-instructions">The street moves forward on its own and closes this Act automatically. Jump and sparks change the comic choreography; collisions never stop or reset the run.</p>
+        <p id="runnerToolLine"><strong>${escape(act.toolLabel)}</strong> · ${escape(act.toolLine)}</p>
+        <p id="runnerInstructions" class="runner-instructions">Leap again in the air for one Air step. Dash on the road to vault nearby low interference; Dash in the air to stomp. Every action changes the choreography, never success: the Act advances and closes with no input.</p>
+        <p class="runner-house-call">${escape(act.houseCall)}</p>
       </div>
     </section>
   `;
@@ -495,6 +504,7 @@ function stopRunnerLoop() {
   }
   runnerLastTimestamp = 0;
   runnerInput = {};
+  runnerJumpHeld = false;
   pauseRunnerTransition();
 }
 
@@ -540,6 +550,9 @@ function drawCurrentRunnerFrame() {
     runnerPalette(),
     matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
+  runnerRenderSequence += 1;
+  canvas.dataset.renderSequence = String(runnerRenderSequence);
+  canvas.dataset.lastAction = runnerState.lastAction ?? "idle";
 }
 
 function updateRunnerLive(message: string) {
@@ -557,6 +570,12 @@ function updateRunnerApproach() {
   ));
   const label = document.querySelector<HTMLElement>("#runnerApproach strong");
   if (label) label.textContent = next?.label ?? "The Act curtain";
+}
+
+function updateRunnerActionHud() {
+  if (!runnerState) return;
+  const power = document.querySelector<HTMLElement>("#runnerPowerLabel");
+  if (power) power.textContent = runnerState.activePower?.replaceAll("-", " ") ?? "No temporary effect";
 }
 
 function runRunnerFrame(timestamp: number) {
@@ -579,12 +598,12 @@ function runRunnerFrame(timestamp: number) {
 
   if (active.storyBeat === null && runnerState) {
     const previousState = runnerState;
-    const frameInput = runnerInput;
+    const frameInput: RunnerInput = { ...runnerInput, jumpHeld: runnerJumpHeld };
     let remaining = activeDelta;
     let firstStep = true;
     while (remaining > 0) {
       const step = Math.min(remaining, 50);
-      runnerState = stepRunner(runnerState, firstStep ? runnerInput : {}, step);
+      runnerState = stepRunner(runnerState, firstStep ? frameInput : { jumpHeld: runnerJumpHeld }, step);
       runnerInput = {};
       firstStep = false;
       remaining -= step;
@@ -592,6 +611,7 @@ function runRunnerFrame(timestamp: number) {
     playRunnerStateCue(previousState, runnerState, frameInput);
     drawCurrentRunnerFrame();
     updateRunnerApproach();
+    updateRunnerActionHud();
     updateRunnerLive(runnerState.message);
     if (runnerState.finished) {
       stopRunnerLoop();
@@ -619,10 +639,19 @@ function mountRunner() {
   }
 }
 
-function queueRunnerAction(action: "jump" | "spark") {
+function queueRunnerAction(action: "jump" | "dash" | "tool") {
   if (!active || getGame(active.gameId).kind !== "runner" || active.storyBeat !== null || runnerIsSuspended()) return;
-  runnerInput = { ...runnerInput, [action]: true };
-  updateRunnerLive(action === "jump" ? "Jump queued." : `${RUNNER_ACTS[active.chapter].sparkLabel} queued.`);
+  if (action === "jump") runnerInput = { ...runnerInput, jumpPressed: true };
+  else if (action === "dash") runnerInput = { ...runnerInput, dashPressed: true };
+  else runnerInput = { ...runnerInput, toolPressed: true };
+  const act = RUNNER_ACTS[active.chapter];
+  updateRunnerLive(action === "jump" ? "Leap queued." : action === "dash" ? "Dash or stomp queued." : `${act.toolLabel} queued.`);
+}
+
+function releaseRunnerJump() {
+  if (!runnerJumpHeld) return;
+  runnerJumpHeld = false;
+  runnerInput = { ...runnerInput, jumpReleased: true };
 }
 
 function setRunnerPaused(paused: boolean) {
@@ -647,6 +676,7 @@ function setRunnerPaused(paused: boolean) {
 
 function chooseNarratedRoute() {
   if (!active || getGame(active.gameId).kind !== "runner") return;
+  stopRunnerLoop();
   closeHouseAudio();
   active.storyBeat = 0;
   runnerState = null;
@@ -870,16 +900,24 @@ function playToneSequence(notes: readonly number[], type: OscillatorType, volume
 
 function playRunnerStateCue(previous: RunnerState, next: RunnerState, input: RunnerInput) {
   if (!active || active.storyBeat !== null || runnerIsSuspended()) return;
-  if (next.transformedTargetIds.length > previous.transformedTargetIds.length) {
-    playToneSequence([392, 523, 659], "sine", 0.032);
+  if (next.collectedPickupIds.length > previous.collectedPickupIds.length) {
+    playToneSequence([294, 392, 523, 698], "sine", 0.034, 0.045);
+  } else if (next.transformedTargetIds.length > previous.transformedTargetIds.length) {
+    playToneSequence([196, 392, 523, 659], "sine", 0.036, 0.04);
   } else if (next.impactMs > previous.impactMs) {
-    playToneSequence([147, 131], "triangle", 0.025, 0.035);
+    playToneSequence([110, 147, 98], "sawtooth", 0.025, 0.028);
   } else if (next.landingMs > previous.landingMs) {
-    playToneSequence([196], "triangle", 0.018);
-  } else if (input.jump && !next.grounded) {
-    playToneSequence([262, 330], "sine", 0.018, 0.045);
-  } else if (input.spark) {
-    playToneSequence([440, 587], "sine", 0.02, 0.04);
+    playToneSequence(next.lastAction === "stomp" ? [98, 147, 196] : [164, 196], "triangle", 0.023, 0.028);
+  } else if (input.jumpPressed && !next.grounded) {
+    playToneSequence(next.lastAction === "air-step" ? [330, 494, 659] : [220, 330], "sine", 0.021, 0.038);
+  } else if (input.dashPressed) {
+    playToneSequence(next.lastAction === "stomp" ? [174, 116] : [196, 294, 392], "triangle", 0.021, 0.032);
+  } else if (input.toolPressed) {
+    const toolNotes = [[440, 587], [196, 247, 330], [294, 440, 587], [220, 330, 440], [262, 392, 523]] as const;
+    playToneSequence(toolNotes[active.chapter], active.chapter === 2 ? "triangle" : "sine", 0.024, 0.035);
+  } else if (Math.floor(next.elapsedMs / 1_600) > Math.floor(previous.elapsedMs / 1_600)) {
+    const pulse = [82, 98, 110, 73, 92][active.chapter];
+    playToneSequence([pulse, pulse * 1.5], "triangle", 0.009, 0.12);
   }
 }
 
@@ -901,7 +939,11 @@ document.addEventListener("click", (event) => {
   }
   const runnerAction = target.closest<HTMLElement>("[data-runner-action]");
   if (runnerAction) {
-    queueRunnerAction(runnerAction.dataset.runnerAction as "jump" | "spark");
+    if (runnerAction.dataset.pointerActionQueued === "true") {
+      delete runnerAction.dataset.pointerActionQueued;
+      return;
+    }
+    queueRunnerAction(runnerAction.dataset.runnerAction as "jump" | "dash" | "tool");
     return;
   }
   if (target.closest("[data-runner-pause]")) {
@@ -942,11 +984,17 @@ document.addEventListener("click", (event) => {
 
 document.addEventListener("pointerdown", (event) => {
   const control = (event.target as Element).closest<HTMLElement>("[data-runner-action]");
-  if (control) control.dataset.pressed = "true";
+  if (!control) return;
+  const action = control.dataset.runnerAction as "jump" | "dash" | "tool";
+  control.dataset.pressed = "true";
+  control.dataset.pointerActionQueued = "true";
+  if (action === "jump") runnerJumpHeld = true;
+  queueRunnerAction(action);
 });
 
 for (const eventName of ["pointerup", "pointercancel"] as const) {
   document.addEventListener(eventName, () => {
+    releaseRunnerJump();
     document.querySelectorAll<HTMLElement>('[data-runner-action][data-pressed="true"]').forEach((control) => {
       delete control.dataset.pressed;
     });
@@ -960,11 +1008,19 @@ document.addEventListener("keydown", (event) => {
   const key = event.key.toLowerCase();
   if (["arrowup", "w", " "].includes(key)) {
     event.preventDefault();
-    queueRunnerAction("jump");
+    if (!event.repeat) queueRunnerAction("jump");
+    runnerJumpHeld = true;
+  } else if (["arrowdown", "s", "d"].includes(key)) {
+    event.preventDefault();
+    if (!event.repeat) queueRunnerAction("dash");
   } else if (["j", "k", "x"].includes(key)) {
     event.preventDefault();
-    queueRunnerAction("spark");
+    if (!event.repeat) queueRunnerAction("tool");
   }
+});
+
+document.addEventListener("keyup", (event) => {
+  if (["arrowup", "w", " "].includes(event.key.toLowerCase())) releaseRunnerJump();
 });
 
 document.addEventListener("visibilitychange", () => {
@@ -1021,6 +1077,7 @@ window.__house = {
   get view() { return view; },
   get active() { return active ? structuredClone(active) : null; },
   get memory() { return structuredClone(memory); },
+  get runner() { return runnerState ? structuredClone(runnerState) : null; },
   start: startGame,
   answer: answerChoice,
 };

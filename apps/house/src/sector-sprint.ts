@@ -212,9 +212,9 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     praise: "Shabaash — apology delivered with the groceries intact.",
     closing: "The front gate appears. Gurpreet arrives with dignity, groceries, and a revised estimate of ‘five minutes.’",
     storyBeats: [
-      "Gurpreet leaves Sector 22 with one careful apology and no heroic shortcut.",
-      "A missed-call bubble becomes a tidy ‘On my way’ note; the puddle keeps only his reflection, not his shoe.",
-      "At the gate, Harjit checks the grocery bag first and the explanation second. Affection wins on a technicality.",
+      "Gurpreet cuts through Sector 22 beneath long amber lamps, using a street dash and a high air step to keep the grocery bag clear.",
+      "A Phone Pulse turns the missed-call wall into one calm ‘On my way’ note; Phulkari Guard folds a puddle splash into the road pattern.",
+      "At the gate, Harjit checks the grocery bag first and the explanation second. The last home flare lands, and affection wins on a technicality.",
     ],
     targets: [
       target("gw-call-1", "missed-call", 760, 230, 86, 52, "12 missed calls", "On my way", "Message delivered. The number 12 has left the building.", "Oho. The missed calls have formed a committee."),
@@ -240,8 +240,8 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     praise: "Kamaal — Harjit has balanced the bag and the budget.",
     closing: "The sabzi bag is balanced, the bill is legible, and the coriander has arrived free of unnecessary suspense.",
     storyBeats: [
-      "Harjit enters the mandi with a cloth bag, a written list, and no interest in theatrical pricing.",
-      "A giant price tag folds into a fair receipt. Runaway tomatoes return to their basket without a chase scene.",
+      "Harjit enters the mandi with a cloth bag, a written list, and a low vault through the opening aisle.",
+      "Her Bargain Burst settles a whole cone of theatrical price tags; Chaa Overdrive returns runaway tomatoes to formation.",
       "She leaves with every item, exact change, and enough coriander to make the fridge smell optimistic.",
     ],
     targets: [
@@ -269,9 +269,9 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     praise: "Wah ji wah — full celebration, zero lane argument.",
     closing: "The celebration keeps dancing, the family keeps moving, and nobody has attempted to overtake a dhol.",
     storyBeats: [
-      "The road fills with streamers and a cheerful ‘just two minutes’ bubble of uncertain legal meaning.",
-      "Harjit finds the side lane; Gurpreet sends a polite path note. Even the ribbon agrees to make room.",
-      "They pass without interrupting one dance step. This counts as excellent city diplomacy.",
+      "The road fills with layered streamers and a cheerful ‘just two minutes’ bubble of uncertain legal meaning.",
+      "Harjit finds the side lane while Gurpreet sends a piercing Dhaaga Arc through only the loose ribbons; Monsoon Lift holds their air step above the tangle.",
+      "They pass without touching the celebration or interrupting one dance step. This counts as excellent city diplomacy.",
     ],
     targets: [
       target("bd-stream-1", "streamer", 720, 180, 90, 146, "Ribbon curtain", "Ribbon parted", "The ribbon performs one elegant side-step.", "Festive ribbon: beautiful, committed, exactly at face height."),
@@ -299,9 +299,9 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     praise: "Balle — the umbrella coalition survives another crossing.",
     closing: "The clouds keep their dignity. So do the groceries. The umbrella is promoted without a ceremony.",
     storyBeats: [
-      "A puddle spreads across the lane like it has received planning permission.",
-      "The umbrella signal turns a splash into a brass ripple and a detour bubble into a useful arrow.",
-      "Harjit and Gurpreet reach the dry side together. Neither mentions who forgot to check the forecast.",
+      "Rain cuts across Madhya Marg in lit sheets while a puddle spreads as if it received planning permission.",
+      "An Umbrella Wave rises through water, paper, and one uncertain route bubble, turning each into a brass-edged clear line.",
+      "Harjit and Gurpreet stomp into the dry-side glow together. Neither mentions who forgot to check the forecast.",
     ],
     targets: [
       target("mp-puddle-1", "puddle-splash", 650, 320, 132, 32, "Wide puddle", "Quiet ripple", "Rainwater accepts a smaller footprint.", "This puddle has applied for sector status."),
@@ -330,9 +330,9 @@ export const RUNNER_ACTS: readonly RunnerAct[] = [
     praise: "Kya baat — sabzi home, story ready, dinner resumed.",
     closing: "Door open. Sabzi accounted for. Roti reheated. The city keeps the punchline and lets the family eat.",
     storyBeats: [
-      "The home lane gathers every loose reminder: grocery list, rain splash, festive ribbon, missed-call bubble.",
-      "Mother and son divide the work without debate: she carries the sabzi; he carries the explanation.",
-      "They enter together. Dinner resumes, and the great household emergency becomes tomorrow’s best story.",
+      "The home lane gathers every loose reminder into three clear lines: grocery list, rain splash, festive ribbon, missed-call bubble.",
+      "Mother and son divide the work without debate, then send the synchronized Ghar Flare around each other and only through the loose abstractions.",
+      "They cross the final pool of lamplight together. Dinner resumes, and the great household emergency becomes tomorrow’s best story.",
     ],
     targets: [
       target("rr-call-1", "missed-call", 690, 220, 104, 66, "Roti report", "Reheat ready", "Dinner logistics become manageable.", "The roti status desk is highly responsive."),
@@ -657,21 +657,41 @@ function drawDiamond(context: CanvasRenderingContext2D, x: number, y: number, si
   context.restore();
 }
 
+const ACT_GRADES = [
+  { sky: "#06111f", horizon: "#14345a", glow: "#f4b32b", energy: "#55d6e8" },
+  { sky: "#101628", horizon: "#4a2634", glow: "#ffc857", energy: "#87d37c" },
+  { sky: "#140d24", horizon: "#4a1748", glow: "#ffcc62", energy: "#e7495e" },
+  { sky: "#071421", horizon: "#174f67", glow: "#7ce8f2", energy: "#55d6e8" },
+  { sky: "#060d19", horizon: "#52283b", glow: "#ffbd52", energy: "#f7e8c6" },
+] as const;
+
 function drawTarget(context: CanvasRenderingContext2D, candidate: RunnerTarget, screenX: number, transformed: boolean, palette: RunnerPalette) {
   const x = Math.round(screenX);
   const y = candidate.y;
-  const ink = transformed ? palette.jade : palette.accent;
+  const grade = ACT_GRADES[Math.max(0, Math.min(4, RUNNER_ACTS.findIndex((act) => act.targets.includes(candidate))))];
+  const ink = transformed ? palette.jade : grade.energy;
   context.save();
   context.translate(x, y);
-  context.fillStyle = transformed ? palette.paper3 : palette.paper2;
+  context.shadowColor = transformed ? palette.jade : grade.glow;
+  context.shadowBlur = transformed ? 20 : 12;
+  const surface = context.createLinearGradient(0, 0, candidate.width, candidate.height);
+  surface.addColorStop(0, transformed ? "#173e39" : "#101f36");
+  surface.addColorStop(1, transformed ? "#0b2525" : "#07111f");
+  context.fillStyle = surface;
   context.strokeStyle = ink;
-  context.lineWidth = transformed ? 4 : 3;
+  context.lineWidth = transformed ? 3 : 2;
 
   if (candidate.kind === "puddle-splash") {
     context.beginPath();
     context.ellipse(candidate.width / 2, candidate.height / 2, candidate.width / 2, candidate.height / 2, 0, 0, Math.PI * 2);
     context.fill();
     context.stroke();
+    context.globalAlpha = 0.28;
+    context.fillStyle = transformed ? palette.jade : grade.energy;
+    context.beginPath();
+    context.ellipse(candidate.width * 0.62, candidate.height * 0.38, candidate.width * 0.28, candidate.height * 0.24, 0, 0, Math.PI * 2);
+    context.fill();
+    context.globalAlpha = 1;
     if (transformed) {
       context.beginPath();
       context.ellipse(candidate.width / 2, candidate.height / 2, candidate.width / 4, candidate.height / 4, 0, 0, Math.PI * 2);
@@ -681,7 +701,8 @@ function drawTarget(context: CanvasRenderingContext2D, candidate: RunnerTarget, 
     for (let strip = 0; strip < 4; strip += 1) {
       const sway = transformed ? strip * 15 : (strip % 2) * 10;
       context.strokeStyle = strip % 2 ? palette.ruby : ink;
-      context.lineWidth = 7;
+      context.lineWidth = 5;
+      context.lineCap = "round";
       context.beginPath();
       context.moveTo(strip * 22 + 6, 0);
       context.bezierCurveTo(strip * 22 + 24, candidate.height * 0.3, strip * 22 - 8, candidate.height * 0.66, strip * 22 + 9 + sway, candidate.height);
@@ -693,10 +714,13 @@ function drawTarget(context: CanvasRenderingContext2D, candidate: RunnerTarget, 
     context.beginPath();
     context.arc(candidate.width / 2, 26, candidate.width * 0.33, Math.PI, 0);
     context.stroke();
-    pixelRect(context, 0, 20, candidate.width, candidate.height - 20, palette.accentSoft);
+    context.fillStyle = transformed ? "#173e39" : "#5d3527";
+    context.beginPath();
+    context.roundRect(0, 20, candidate.width, candidate.height - 20, 5);
+    context.fill();
     for (let rail = 1; rail < 4; rail += 1) pixelRect(context, rail * candidate.width / 4 - 2, 24, 4, candidate.height - 28, palette.rule);
     for (let item = 0; item < 5; item += 1) {
-      context.fillStyle = item % 2 ? palette.ruby : transformed ? palette.jade : palette.accent;
+      context.fillStyle = item % 2 ? "#e7495e" : transformed ? "#78d7a7" : "#f4b32b";
       context.beginPath();
       context.arc(14 + item * 19, transformed ? 20 : 11 + (item % 2) * 9, 9, 0, Math.PI * 2);
       context.fill();
@@ -716,7 +740,9 @@ function drawTarget(context: CanvasRenderingContext2D, candidate: RunnerTarget, 
     context.arc(candidate.width * 0.78, candidate.height / 2, 4, 0, Math.PI * 2);
     context.fill();
   } else if (candidate.kind === "grocery-list") {
-    context.fillRect(0, 0, candidate.width, candidate.height);
+    context.beginPath();
+    context.roundRect(0, 0, candidate.width, candidate.height, 6);
+    context.fill();
     context.strokeRect(0, 0, candidate.width, candidate.height);
     pixelRect(context, candidate.width * 0.25, -6, candidate.width * 0.5, 12, ink);
     for (let line = 0; line < 3; line += 1) pixelRect(context, 13, 42 + line * 13, candidate.width - 26, 2, line === 2 && transformed ? palette.jade : palette.rule);
@@ -734,9 +760,19 @@ function drawTarget(context: CanvasRenderingContext2D, candidate: RunnerTarget, 
     context.stroke();
   }
 
+  context.shadowBlur = 0;
+  context.globalAlpha = 0.5;
+  context.strokeStyle = "#ffffff";
+  context.lineWidth = 1;
+  context.beginPath();
+  context.moveTo(8, 8);
+  context.lineTo(Math.max(8, candidate.width - 15), 8);
+  context.stroke();
+  context.globalAlpha = 1;
+
   if (candidate.kind !== "streamer" && candidate.kind !== "puddle-splash") {
-    context.fillStyle = transformed ? palette.ink : palette.inkSoft;
-    context.font = `700 13px ${palette.fontMono}`;
+    context.fillStyle = transformed ? "#f7e8c6" : palette.ink;
+    context.font = `700 12px ${palette.fontMono}`;
     context.textAlign = "center";
     context.textBaseline = "middle";
     const label = transformed ? candidate.transformedLabel : candidate.label;
@@ -757,52 +793,113 @@ function drawLeadSprite(
   scale = 1.22,
 ) {
   const runFrame = Math.floor(state.elapsedMs / 95) % 4;
-  const stride = state.grounded ? [-7, 0, 7, 0][runFrame] : 3;
-  const bounce = state.grounded && state.landingMs === 0 ? [0, -2, 0, -1][runFrame] : 0;
-  const squash = state.landingMs > 0 ? 1 - state.landingMs / 1_600 : 1;
-  const stretch = state.grounded ? 1 : 1.06;
-  const cloth = role === "mother" ? palette.ruby : palette.sapphire;
+  const stride = state.grounded ? [-9, 1, 9, -1][runFrame] : state.stompMs > 0 ? 1 : 5;
+  const bounce = state.grounded && state.landingMs === 0 ? [0, -2.5, 0, -1.5][runFrame] : 0;
+  const squash = state.landingMs > 0 ? 0.9 : 1;
+  const stretch = state.grounded ? 1 : 1.07;
+  const cloth = role === "mother" ? "#9d304f" : "#244e8e";
+  const skin = "#d3a06f";
+  const recoil = state.stumbleMs > 0 ? Math.sin(state.stumbleMs * 0.08) * 4 : 0;
+  const lean = state.dashMs > 0 ? 0.12 : state.stompMs > 0 ? -0.06 : 0;
   context.save();
-  context.translate(Math.round(x + PLAYER_WIDTH / 2), Math.round(y + PLAYER_HEIGHT));
+  context.translate(Math.round(x + PLAYER_WIDTH / 2 + recoil), Math.round(y + PLAYER_HEIGHT));
+  context.rotate(lean);
   context.scale(scale * squash, scale * stretch);
   context.translate(-PLAYER_WIDTH / 2, -PLAYER_HEIGHT + bounce);
 
-  pixelRect(context, 17, 0, 25, 20, palette.inkSoft);
-  pixelRect(context, 13, 17, 33, 8, role === "mother" ? palette.accent : palette.ink);
-  pixelRect(context, 10, 24, 38, 32, cloth);
-  pixelRect(context, 14, 30, 30, 5, role === "mother" ? palette.accent : palette.jade);
-  pixelRect(context, 7, 29, 8, 27, role === "mother" ? palette.accent : cloth);
-  pixelRect(context, 46, 29, 9, 25, palette.inkSoft);
-  pixelRect(context, 12, 55, 11, 20 + Math.min(0, stride), palette.accent);
-  pixelRect(context, 35, 55, 11, 20 - Math.max(0, stride), palette.accent);
-  pixelRect(context, 8 + Math.max(0, stride), 71, 18, 5, palette.ink);
-  pixelRect(context, 32 + Math.min(0, stride), 71, 18, 5, palette.ink);
+  context.globalAlpha = 0.32;
+  context.fillStyle = "#000000";
+  context.beginPath();
+  context.ellipse(29, 78, state.dashMs > 0 ? 34 : 24, 5, 0, 0, Math.PI * 2);
+  context.fill();
+  context.globalAlpha = 1;
 
+  context.lineCap = "round";
+  context.lineJoin = "round";
+  context.strokeStyle = palette.ink;
+  context.lineWidth = 8;
+  context.beginPath();
+  context.moveTo(22, 53);
+  context.lineTo(18 + stride, 72);
+  context.lineTo(8 + Math.max(0, stride), 75);
+  context.moveTo(36, 53);
+  context.lineTo(40 - stride, 72);
+  context.lineTo(51 + Math.min(0, stride), 75);
+  context.stroke();
+
+  const coat = context.createLinearGradient(7, 21, 48, 58);
+  coat.addColorStop(0, role === "mother" ? "#cf4962" : "#3774c5");
+  coat.addColorStop(1, cloth);
+  context.fillStyle = coat;
+  context.beginPath();
+  context.moveTo(17, 21);
+  context.quadraticCurveTo(29, 15, 42, 22);
+  context.lineTo(47, 57);
+  context.quadraticCurveTo(29, 64, 8, 56);
+  context.closePath();
+  context.fill();
+  context.strokeStyle = role === "mother" ? "#f4b32b" : "#55d6e8";
+  context.lineWidth = 2.5;
+  context.stroke();
+
+  context.strokeStyle = skin;
+  context.lineWidth = 7;
+  context.beginPath();
+  context.moveTo(14, 29);
+  context.lineTo(4 - stride * 0.45, 48);
+  context.moveTo(41, 29);
+  context.lineTo(54 + stride * 0.45, 44);
+  context.stroke();
+
+  context.fillStyle = skin;
+  context.beginPath();
+  context.arc(29, 12, 11, 0, Math.PI * 2);
+  context.fill();
+  context.fillStyle = "#111827";
+  context.beginPath();
+  context.arc(28, 9, 11, Math.PI, Math.PI * 2);
+  context.fill();
   if (role === "mother") {
-    pixelRect(context, 6, 5, 8, 45, palette.accent);
-    pixelRect(context, 3, 42, 13, 8, palette.ruby);
-    context.strokeStyle = palette.accent;
-    context.lineWidth = 3;
-    context.strokeRect(46, 43, 13, 19);
+    context.strokeStyle = "#f4b32b";
+    context.lineWidth = 4;
+    context.beginPath();
+    context.moveTo(18, 15);
+    context.quadraticCurveTo(6, 31, 9, 52);
+    context.stroke();
+    context.fillStyle = "#f4b32b";
+    context.beginPath();
+    context.roundRect(49, 43, 13, 18, 3);
+    context.fill();
   } else {
-    pixelRect(context, 22, 3, 21, 5, palette.ink);
-    pixelRect(context, 14, 39, 7, 17, palette.jade);
+    context.fillStyle = "#55d6e8";
+    context.beginPath();
+    context.roundRect(8, 38, 8, 18, 3);
+    context.fill();
   }
   context.restore();
 }
 
 function drawPerson(context: CanvasRenderingContext2D, state: RunnerState, lead: RunnerLead, palette: RunnerPalette) {
   const x = RUNNER_PLAYER_SCREEN_X;
-  if (lead === "duo") drawLeadSprite(context, x - 48, state.y + 9, "mother", state, palette, 1.02);
-  drawLeadSprite(context, x, state.y, lead === "mother" ? "mother" : "son", state, palette);
+  if (lead === "duo") drawLeadSprite(context, x - 46, state.y + 8, "mother", state, palette, 1.08);
+  drawLeadSprite(context, x, state.y, lead === "mother" ? "mother" : "son", state, palette, 1.28);
 }
 
 function drawSky(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette, reducedMotion: boolean) {
+  const grade = ACT_GRADES[state.actIndex];
   const gradient = context.createLinearGradient(0, 0, 0, FLOOR_Y);
-  gradient.addColorStop(0, state.actIndex === 1 ? palette.paper3 : palette.paper);
-  gradient.addColorStop(1, state.actIndex === 3 ? palette.sapphire : palette.paper2);
+  gradient.addColorStop(0, grade.sky);
+  gradient.addColorStop(0.64, grade.horizon);
+  gradient.addColorStop(1, "#09121f");
   context.fillStyle = gradient;
   context.fillRect(0, 0, RUNNER_WIDTH, FLOOR_Y);
+
+  const horizonGlow = context.createRadialGradient(690, 215, 0, 690, 215, 360);
+  horizonGlow.addColorStop(0, `${grade.glow}52`);
+  horizonGlow.addColorStop(0.45, `${grade.energy}18`);
+  horizonGlow.addColorStop(1, "#00000000");
+  context.fillStyle = horizonGlow;
+  context.fillRect(250, 0, 710, FLOOR_Y);
 
   if ([0, 2, 4].includes(state.actIndex)) {
     context.globalAlpha = 0.68;
@@ -811,22 +908,25 @@ function drawSky(context: CanvasRenderingContext2D, state: RunnerState, palette:
       const drift = reducedMotion ? 0 : (state.worldX * (0.018 + (star % 3) * 0.006)) % RUNNER_WIDTH;
       const starX = (seed % RUNNER_WIDTH - drift + RUNNER_WIDTH) % RUNNER_WIDTH;
       const starY = 28 + ((seed >>> 9) % 116);
-      drawDiamond(context, starX, starY, star % 5 === 0 ? 4 : 2, star % 4 === 0 ? palette.accent : palette.inkSoft);
+      drawDiamond(context, starX, starY, star % 5 === 0 ? 3.5 : 1.6, star % 4 === 0 ? grade.glow : palette.inkSoft);
     }
     context.globalAlpha = 1;
   }
 
   if (state.actIndex === 0 || state.actIndex === 4) {
     context.globalAlpha = 0.76;
-    context.fillStyle = palette.accentSoft;
+    context.fillStyle = grade.glow;
+    context.shadowColor = grade.glow;
+    context.shadowBlur = 36;
     context.beginPath();
     context.arc(820, 72, state.actIndex === 4 ? 38 : 28, 0, Math.PI * 2);
     context.fill();
+    context.shadowBlur = 0;
     context.globalAlpha = 1;
   }
 
   const hillDrift = reducedMotion ? 0 : (state.worldX * 0.12) % 180;
-  context.fillStyle = palette.sapphire;
+  context.fillStyle = "#081426";
   context.globalAlpha = state.actIndex === 1 ? 0.32 : 0.58;
   context.beginPath();
   context.moveTo(0, 190);
@@ -843,9 +943,11 @@ function drawSky(context: CanvasRenderingContext2D, state: RunnerState, palette:
 }
 
 function drawCityLayers(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette, reducedMotion: boolean) {
+  const grade = ACT_GRADES[state.actIndex];
   const layers = [
-    { speed: 0.2, spacing: 142, y: 176, color: palette.paper3, alpha: 0.62 },
-    { speed: 0.38, spacing: 188, y: 205, color: palette.paper2, alpha: 0.9 },
+    { speed: 0.08, spacing: 118, y: 172, color: "#10243d", alpha: 0.42 },
+    { speed: 0.19, spacing: 152, y: 204, color: "#0b1c31", alpha: 0.72 },
+    { speed: 0.36, spacing: 196, y: 236, color: "#071523", alpha: 0.94 },
   ];
   layers.forEach((layer, layerIndex) => {
     const offset = reducedMotion ? 0 : (state.worldX * layer.speed) % layer.spacing;
@@ -853,15 +955,36 @@ function drawCityLayers(context: CanvasRenderingContext2D, state: RunnerState, p
     for (let index = -1; index < Math.ceil(RUNNER_WIDTH / layer.spacing) + 2; index += 1) {
       const x = index * layer.spacing - offset;
       const seed = hashText(`${state.actIndex}-${layerIndex}-${index}`);
-      const height = 74 + (seed % 68);
-      pixelRect(context, x, layer.y - height, layer.spacing - 24, height + FLOOR_Y - layer.y, layer.color);
-      for (let windowIndex = 0; windowIndex < 4; windowIndex += 1) {
+      const height = 70 + (seed % (62 + layerIndex * 18));
+      const buildingWidth = layer.spacing - 20 - (seed % 22);
+      context.fillStyle = layer.color;
+      context.beginPath();
+      context.roundRect(x, layer.y - height, buildingWidth, height + FLOOR_Y - layer.y, layerIndex === 2 ? 3 : 1);
+      context.fill();
+      context.fillStyle = `${grade.glow}${layerIndex === 2 ? "33" : "20"}`;
+      context.fillRect(x + 8, layer.y - height + 7, buildingWidth - 16, 2);
+      for (let windowIndex = 0; windowIndex < 5; windowIndex += 1) {
         const lit = (windowIndex + index + state.actIndex) % 3 === 0;
-        pixelRect(context, x + 16 + windowIndex * 25, layer.y - height + 25, 9, Math.max(24, height - 42), lit ? palette.accentSoft : palette.rule);
+        const windowX = x + 15 + windowIndex * Math.max(18, buildingWidth / 6);
+        pixelRect(context, windowX, layer.y - height + 24, 7, Math.max(18, height - 48), lit ? `${grade.glow}70` : "#17283a");
       }
     }
     context.globalAlpha = 1;
   });
+
+  context.save();
+  context.globalAlpha = state.actIndex === 3 ? 0.08 : 0.13;
+  context.fillStyle = grade.glow;
+  for (let beam = 0; beam < 4; beam += 1) {
+    const beamX = 80 + beam * 270 - (reducedMotion ? 0 : (state.worldX * 0.17) % 270);
+    context.beginPath();
+    context.moveTo(beamX, 140);
+    context.lineTo(beamX + 96, FLOOR_Y);
+    context.lineTo(beamX - 28, FLOOR_Y);
+    context.closePath();
+    context.fill();
+  }
+  context.restore();
 }
 
 function drawActSetting(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette, reducedMotion: boolean) {
@@ -940,19 +1063,140 @@ function drawActSetting(context: CanvasRenderingContext2D, state: RunnerState, p
 }
 
 function drawForeground(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette, reducedMotion: boolean) {
-  pixelRect(context, 0, FLOOR_Y, RUNNER_WIDTH, RUNNER_HEIGHT - FLOOR_Y, palette.paper2);
-  pixelRect(context, 0, FLOOR_Y, RUNNER_WIDTH, 5, palette.accent);
-  for (let road = -80; road < RUNNER_WIDTH + 80; road += 150) {
+  const grade = ACT_GRADES[state.actIndex];
+  const road = context.createLinearGradient(0, FLOOR_Y, 0, RUNNER_HEIGHT);
+  road.addColorStop(0, "#17283a");
+  road.addColorStop(1, "#03070d");
+  context.fillStyle = road;
+  context.fillRect(0, FLOOR_Y, RUNNER_WIDTH, RUNNER_HEIGHT - FLOOR_Y);
+  context.fillStyle = grade.glow;
+  context.shadowColor = grade.glow;
+  context.shadowBlur = 18;
+  context.fillRect(0, FLOOR_Y, RUNNER_WIDTH, 3);
+  context.shadowBlur = 0;
+  for (let mark = -80; mark < RUNNER_WIDTH + 80; mark += 150) {
     const roadOffset = reducedMotion ? 0 : (state.worldX * 0.92) % 150;
-    pixelRect(context, road - roadOffset, FLOOR_Y + 45, 72, 5, palette.rule);
+    const x = mark - roadOffset;
+    context.fillStyle = "#7d6b50";
+    context.beginPath();
+    context.moveTo(x, FLOOR_Y + 43);
+    context.lineTo(x + 72, FLOOR_Y + 43);
+    context.lineTo(x + 80, FLOOR_Y + 50);
+    context.lineTo(x - 5, FLOOR_Y + 50);
+    context.closePath();
+    context.fill();
   }
-  context.globalAlpha = 0.34;
+  context.globalAlpha = 0.42;
   const nearOffset = reducedMotion ? 0 : (state.worldX * 1.04) % 260;
   for (let x = -260; x < RUNNER_WIDTH + 260; x += 260) {
-    pixelRect(context, x - nearOffset, FLOOR_Y + 10, 5, 52, palette.ink);
-    pixelRect(context, x - nearOffset - 20, FLOOR_Y + 9, 45, 4, palette.rule);
+    const postX = x - nearOffset;
+    pixelRect(context, postX, FLOOR_Y + 8, 4, 58, "#26384a");
+    pixelRect(context, postX - 24, FLOOR_Y + 8, 52, 3, grade.energy);
   }
   context.globalAlpha = 1;
+
+  const reflection = context.createLinearGradient(0, FLOOR_Y, 0, RUNNER_HEIGHT);
+  reflection.addColorStop(0, `${grade.energy}20`);
+  reflection.addColorStop(1, "#00000000");
+  context.fillStyle = reflection;
+  context.fillRect(0, FLOOR_Y, RUNNER_WIDTH, RUNNER_HEIGHT - FLOOR_Y);
+}
+
+function drawPickup(context: CanvasRenderingContext2D, power: RunnerPickup, screenX: number, state: RunnerState, palette: RunnerPalette, reducedMotion: boolean) {
+  const grade = ACT_GRADES[state.actIndex];
+  const pulse = reducedMotion ? 0 : Math.sin(state.elapsedMs * 0.006) * 5;
+  const label = power.kind === "phulkari-guard" ? "GUARD" : power.kind === "chaa-overdrive" ? "OVERDRIVE" : "LIFT";
+  context.save();
+  context.translate(screenX, power.y);
+  context.shadowColor = power.kind === "phulkari-guard" ? "#e7495e" : power.kind === "chaa-overdrive" ? grade.glow : grade.energy;
+  context.shadowBlur = 24;
+  context.strokeStyle = context.shadowColor;
+  context.lineWidth = 2;
+  context.globalAlpha = 0.78;
+  context.beginPath();
+  context.arc(0, 0, 24 + pulse, 0, Math.PI * 2);
+  context.stroke();
+  context.globalAlpha = 1;
+  context.rotate(Math.PI / 4 + (reducedMotion ? 0 : state.elapsedMs * 0.00045));
+  context.fillStyle = "#091728";
+  context.fillRect(-16, -16, 32, 32);
+  context.strokeRect(-16, -16, 32, 32);
+  context.rotate(-Math.PI / 4 - (reducedMotion ? 0 : state.elapsedMs * 0.00045));
+  context.shadowBlur = 0;
+  context.fillStyle = palette.ink;
+  context.font = `800 10px ${palette.fontMono}`;
+  context.textAlign = "center";
+  context.fillText(label, 0, 48);
+  context.restore();
+}
+
+function drawPowerAura(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette, reducedMotion: boolean) {
+  if (!state.activePower) return;
+  const color = state.activePower === "phulkari-guard" ? "#e7495e" : state.activePower === "chaa-overdrive" ? "#f4b32b" : "#55d6e8";
+  const pulse = reducedMotion ? 0 : Math.sin(state.elapsedMs * 0.012) * 4;
+  context.save();
+  context.globalAlpha = 0.58;
+  context.strokeStyle = color;
+  context.lineWidth = 3;
+  context.shadowColor = color;
+  context.shadowBlur = 18;
+  context.beginPath();
+  context.ellipse(RUNNER_PLAYER_SCREEN_X + 27, state.y + 40, 42 + pulse, 58 + pulse, 0, 0, Math.PI * 2);
+  context.stroke();
+  context.shadowBlur = 0;
+  context.restore();
+}
+
+function drawMovementFx(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette, reducedMotion: boolean) {
+  if (reducedMotion) return;
+  const grade = ACT_GRADES[state.actIndex];
+  context.save();
+  if (state.dashMs > 0) {
+    const progress = 1 - state.dashMs / 420;
+    for (let trail = 1; trail <= 4; trail += 1) {
+      context.globalAlpha = (0.24 - trail * 0.035) * (1 - progress * 0.6);
+      context.strokeStyle = trail % 2 ? grade.energy : grade.glow;
+      context.lineWidth = 7 - trail;
+      context.beginPath();
+      context.moveTo(RUNNER_PLAYER_SCREEN_X - trail * 18, state.y + 35 + trail * 4);
+      context.lineTo(RUNNER_PLAYER_SCREEN_X - 72 - trail * 28, state.y + 35 + trail * 4);
+      context.stroke();
+    }
+  }
+  if (state.airStepMs > 0) {
+    const progress = 1 - state.airStepMs / 340;
+    context.globalAlpha = 1 - progress;
+    context.strokeStyle = grade.energy;
+    context.lineWidth = 4;
+    context.beginPath();
+    context.ellipse(RUNNER_PLAYER_SCREEN_X + 25, state.y + 68, 18 + progress * 40, 7 + progress * 14, 0, 0, Math.PI * 2);
+    context.stroke();
+  }
+  if (state.stompMs > 0 && !state.grounded) {
+    context.globalAlpha = 0.48;
+    context.fillStyle = grade.glow;
+    context.beginPath();
+    context.moveTo(RUNNER_PLAYER_SCREEN_X + 16, state.y - 54);
+    context.lineTo(RUNNER_PLAYER_SCREEN_X + 40, state.y - 54);
+    context.lineTo(RUNNER_PLAYER_SCREEN_X + 30, state.y + 60);
+    context.closePath();
+    context.fill();
+  }
+  context.restore();
+}
+
+function drawCinematicGrade(context: CanvasRenderingContext2D, state: RunnerState) {
+  const grade = ACT_GRADES[state.actIndex];
+  const vignette = context.createRadialGradient(RUNNER_WIDTH * 0.55, RUNNER_HEIGHT * 0.48, 90, RUNNER_WIDTH * 0.55, RUNNER_HEIGHT * 0.48, 620);
+  vignette.addColorStop(0, "#00000000");
+  vignette.addColorStop(0.68, `${grade.energy}08`);
+  vignette.addColorStop(1, "#000000a8");
+  context.fillStyle = vignette;
+  context.fillRect(0, 0, RUNNER_WIDTH, RUNNER_HEIGHT);
+  const bars = 7;
+  context.fillStyle = "#02050a";
+  context.fillRect(0, 0, RUNNER_WIDTH, bars);
+  context.fillRect(0, RUNNER_HEIGHT - bars, RUNNER_WIDTH, bars);
 }
 
 function drawFlourish(context: CanvasRenderingContext2D, state: RunnerState, act: RunnerAct, palette: RunnerPalette) {
@@ -1028,23 +1272,80 @@ function drawLandingDust(context: CanvasRenderingContext2D, state: RunnerState, 
 
 function drawSpark(context: CanvasRenderingContext2D, projectile: RunnerProjectile, state: RunnerState, palette: RunnerPalette) {
   const screenX = runnerWorldToScreen(projectile.x, state.worldX);
-  const pulse = Math.floor(projectile.ageMs / 70) % 2;
-  context.globalAlpha = 0.36;
-  for (let trail = 3; trail > 0; trail -= 1) drawDiamond(context, screenX - trail * 10, projectile.y + 5, 4, palette.accentSoft);
-  context.globalAlpha = 1;
-  drawDiamond(context, screenX, projectile.y + 5, pulse ? 13 : 11, palette.accent);
-  drawDiamond(context, screenX, projectile.y + 5, 5, palette.ink);
+  const grade = ACT_GRADES[state.actIndex];
+  const pulse = Math.floor(projectile.ageMs / 60) % 2;
+  const color = projectile.tool === "dhaaga-arc" ? "#e7495e" : projectile.tool === "umbrella-wave" ? "#55d6e8" : grade.glow;
+  context.save();
+  context.shadowColor = color;
+  context.shadowBlur = 18;
+  if (projectile.tool === "phone-pulse") {
+    context.strokeStyle = color;
+    context.lineWidth = 3;
+    context.beginPath();
+    context.moveTo(screenX - 48, projectile.y);
+    context.lineTo(screenX, projectile.y);
+    context.stroke();
+    drawDiamond(context, screenX, projectile.y, pulse ? 15 : 12, color);
+    drawDiamond(context, screenX, projectile.y, 5, palette.ink);
+  } else if (projectile.tool === "bargain-burst") {
+    const spread = projectile.radius + projectile.ageMs * 0.035;
+    context.globalAlpha = Math.max(0.15, 1 - projectile.ageMs / projectile.ttlMs);
+    context.fillStyle = `${color}66`;
+    context.beginPath();
+    context.moveTo(screenX - spread, projectile.y - spread * 0.45);
+    context.lineTo(screenX + spread, projectile.y);
+    context.lineTo(screenX - spread, projectile.y + spread * 0.45);
+    context.closePath();
+    context.fill();
+    context.strokeStyle = color;
+    context.stroke();
+  } else if (projectile.tool === "dhaaga-arc") {
+    context.strokeStyle = color;
+    context.lineWidth = projectile.pierce ? 7 : 5;
+    context.lineCap = "round";
+    context.beginPath();
+    context.moveTo(screenX - 42, projectile.y + 18);
+    context.bezierCurveTo(screenX - 16, projectile.y - 34, screenX + 22, projectile.y - 34, screenX + 44, projectile.y + 8);
+    context.stroke();
+    drawDiamond(context, screenX + 40, projectile.y + 8, 9, grade.glow, false);
+  } else if (projectile.tool === "umbrella-wave") {
+    context.strokeStyle = color;
+    context.lineWidth = 7;
+    context.beginPath();
+    context.arc(screenX, projectile.y + 22, projectile.radius, Math.PI, Math.PI * 2);
+    context.stroke();
+    context.globalAlpha = 0.22;
+    context.fillStyle = color;
+    context.beginPath();
+    context.arc(screenX, projectile.y + 22, projectile.radius, Math.PI, Math.PI * 2);
+    context.fill();
+  } else {
+    context.strokeStyle = color;
+    context.lineWidth = 4;
+    context.beginPath();
+    context.moveTo(screenX - 54, projectile.y);
+    context.lineTo(screenX + 14, projectile.y);
+    context.stroke();
+    context.fillStyle = color;
+    context.beginPath();
+    context.arc(screenX + 16, projectile.y, projectile.radius * 0.42, 0, Math.PI * 2);
+    context.fill();
+  }
+  context.shadowBlur = 0;
+  context.restore();
 }
 
 export function drawRunnerFrame(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette, reducedMotion = false) {
   const act = RUNNER_ACTS[state.actIndex];
   context.save();
-  context.imageSmoothingEnabled = false;
+  context.imageSmoothingEnabled = true;
   context.clearRect(0, 0, RUNNER_WIDTH, RUNNER_HEIGHT);
   context.fillStyle = palette.paper;
   context.fillRect(0, 0, RUNNER_WIDTH, RUNNER_HEIGHT);
-  const cameraKick = !reducedMotion && state.impactMs > 0 ? Math.round(Math.sin(state.impactMs * 0.09) * 2) : 0;
-  context.translate(cameraKick, 0);
+  const impactKick = state.impactMs > 0 ? Math.sin(state.impactMs * 0.09) * RUNNER_CAMERA_SHAKE_CAP : 0;
+  const stompKick = state.landingMs > 0 && state.lastAction === "stomp" ? Math.sin(state.landingMs * 0.11) * 4 : 0;
+  const cameraKick = reducedMotion ? 0 : Math.round(Math.max(-RUNNER_CAMERA_SHAKE_CAP, Math.min(RUNNER_CAMERA_SHAKE_CAP, impactKick + stompKick)));
+  context.translate(cameraKick, Math.abs(cameraKick) * 0.28);
   drawSky(context, state, palette, reducedMotion);
   drawCityLayers(context, state, palette, reducedMotion);
   drawActSetting(context, state, palette, reducedMotion);
@@ -1060,21 +1361,37 @@ export function drawRunnerFrame(context: CanvasRenderingContext2D, state: Runner
   context.textAlign = "start";
   context.fillText(act.sign, 68, 58);
 
+  context.fillStyle = ACT_GRADES[state.actIndex].energy;
+  context.font = `800 11px ${palette.fontMono}`;
+  context.textAlign = "right";
+  context.fillText(act.toolLabel.toUpperCase(), RUNNER_WIDTH - 30, 42);
+  context.fillStyle = palette.inkSoft;
+  context.font = `600 10px ${palette.fontMono}`;
+  context.fillText(state.activePower ? state.activePower.replaceAll("-", " ").toUpperCase() : "ACTION READY", RUNNER_WIDTH - 30, 58);
+
   for (const candidate of act.targets) {
     const screenX = runnerWorldToScreen(candidate.x, state.worldX);
     if (screenX > -candidate.width - 20 && screenX < RUNNER_WIDTH + 20) {
       drawTarget(context, candidate, screenX, state.transformedTargetIds.includes(candidate.id), palette);
     }
   }
+  for (const power of act.pickups) {
+    if (state.collectedPickupIds.includes(power.id)) continue;
+    const screenX = runnerWorldToScreen(power.x, state.worldX);
+    if (screenX > -100 && screenX < RUNNER_WIDTH + 100) drawPickup(context, power, screenX, state, palette, reducedMotion);
+  }
   for (const projectile of state.projectiles) {
     drawSpark(context, projectile, state, palette);
   }
+  drawMovementFx(context, state, palette, reducedMotion);
+  drawPowerAura(context, state, palette, reducedMotion);
   if (!reducedMotion) {
     drawFlourish(context, state, act, palette);
     drawImpact(context, state, act, palette);
     drawLandingDust(context, state, palette);
   }
   drawPerson(context, state, act.lead, palette);
+  drawCinematicGrade(context, state);
 
   if (state.paused) {
     context.globalAlpha = 0.66;
