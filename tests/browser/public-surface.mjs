@@ -62,6 +62,10 @@ try {
       await page.locator(".table-directory a.table-action").evaluateAll((links) => links.map((link) => new URL(link.href).pathname)),
       Array(5).fill(`${prefix}house/`.replace(/\/+/g, "/")),
     );
+    assert.deepEqual(
+      await page.locator(".table-directory a.table-action").evaluateAll((links) => links.map((link) => new URL(link.href).hash)),
+      ["#door/pattern-line", "#door/turn-trap", "#door/count-carry", "#door/memory-sequence", "#door/motion-route"],
+    );
     assert.equal(await page.locator(".download-ledger a").count(), 6);
     for (const selector of [".house-proof img", ".sector-proof img", ".board-proof img", ".dawn-proof img"]) {
       await page.locator(selector).scrollIntoViewIfNeeded();

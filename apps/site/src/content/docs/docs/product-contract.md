@@ -5,7 +5,7 @@ description: The promises Rasoi Pairs must keep for the person using it tonight.
 
 ## Two deliberately separate loops
 
-Nindova House is for adults 18 and over. The Grand Salon is an entertainment room with five authored games. The Night Room is the original bounded wind-down Session.
+Nindova House is for adults 18 and over. Five Grand Salon category doors hold eight authored games. The Night Room is the original bounded wind-down Session.
 
 The Two-Loop Law applies without exception inside the Night Room: Nindova may be satisfying during the current Session and inviting when a person returns another night, but it must never use satisfaction to make the current Session harder to leave.
 
@@ -13,7 +13,8 @@ Anything that makes tonight harder to leave is a bug.
 
 ## Grand Salon contract
 
-- Five games, each with five authored chapters or Acts and a deterministic curtain call.
+- Five category doors group eight games, each with five authored chapters, tactical studies, or Acts and a deterministic curtain call.
+- Navakankari, Aadu Puli Aattam, and Pallanguzhi remain visibly labeled sourced authored rule studies. Their documented scopes, included mechanics, and omitted full-match rules must remain available from the play surface. They are not complete matches or claims of one definitive pan-Indian ruleset.
 - Chapter position is allowed inside the chosen entertainment game. There is no leaderboard, streak, randomized reward, social comparison, or attention-pressure language.
 - Sector Sprint is a fixed-route lane table, not an endless runner. Its Action route uses automatic forward motion, three discrete lanes, five progressively faster deterministic gate sequences, five Act-local harmless tools, and one neutral pause when the shared collision hull touches a lit architectural face. Each warning gives position, shape, and text; every safe lane is at most one move from the last. A contact stores no failure history and creates no score, high score, visible timer, health, lives, checkpoint, progress reward, randomized reward, persistent inventory, or claimed sleep effect. People, animals, vehicles, and buildings can never be targets. Retry uses the same foreground-only table boundary; the complete narrated route has the same entertainment provenance and curtain call. If the boundary arrives before every Act closes, it outranks transition or recovery input and exits without a Gallery completion.
 - Completion is recorded only as a versioned entertainment result. The Gallery keeps at most one replaceable result per game.

@@ -12,11 +12,11 @@ const {
 } = publicFacts;
 const socialImageUrl = new URL("brand/nindova-og.png", canonicalSiteUrl).href;
 const tables = [
-  ["I", "Pattern Court", "Read the order beneath the ornament."],
-  ["II", "Mirror Forge", "Turn forms without losing their bearing."],
-  ["III", "Stack Architect", "Move the tower by law, one disc at a time."],
-  ["IV", "Lantern Ledger", "Hold an ordered procession of light."],
-  ["V", "Sector Sprint", "Follow Gurpreet and Harjit through five fixed Chandigarh Acts."],
+  ["I", "Pattern & Line", "Pattern Court · Navakankari", "pattern-line"],
+  ["II", "Turn & Trap", "Mirror Forge · Aadu Puli Aattam", "turn-trap"],
+  ["III", "Count & Carry", "Stack Architect · Pallanguzhi", "count-carry"],
+  ["IV", "Memory & Sequence", "Lantern Ledger", "memory-sequence"],
+  ["V", "Motion & Route", "Sector Sprint", "motion-route"],
 ];
 ---
 
@@ -29,7 +29,7 @@ const tables = [
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; base-uri 'self'; object-src 'none'; connect-src 'self'; img-src 'self' data:; media-src 'self' blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
     />
-    <meta name="description" content="Nindova is a private house of five authored games for adults, with a separate self-ending Night Room." />
+    <meta name="description" content="Nindova is a private house with five category doors and eight authored games for adults, plus a separate self-ending Night Room." />
     <meta property="og:title" content="Nindova — A house of authored games" />
     <meta property="og:description" content="Choose a room. Stay for the pleasure of solving. No account, public ranking, or telemetry." />
     <meta property="og:type" content="website" />
@@ -68,7 +68,7 @@ const tables = [
           <p class="eyebrow">A private house of authored games · adults 18+</p>
           <h1 id="hero-title">Choose a room.<br /><em>Stay for the pleasure of solving.</em></h1>
           <p class="hero-lede">
-            Five finite games live in the Grand Salon. A separate Night Room holds Masala Mound,
+            Five category doors hold eight finite games in the Grand Salon. A separate Night Room holds Masala Mound,
             a calm Session with an ending it cannot bargain away.
           </p>
           <div class="hero-actions">
@@ -93,7 +93,7 @@ const tables = [
             </span>
             <span class="app-icon-copy">
               <strong>The House, in one mark</strong>
-              <span>Begin with the five-game Grand Salon <span aria-hidden="true">↓</span></span>
+              <span>Begin with five doors and eight finite games <span aria-hidden="true">↓</span></span>
             </span>
           </a>
 
@@ -103,7 +103,7 @@ const tables = [
                 src={href("/media/nindova-house.png")}
                 width="1440"
                 height="937"
-                alt="The real Nindova House floor plan, with the Night Room, five Grand Salon tables, and local Gallery."
+                alt="The real Nindova House floor plan, with the Night Room, five Grand Salon category doors, and local Gallery."
               />
             </div>
             <figcaption>Current House floor plan · rendered from source</figcaption>
@@ -117,7 +117,7 @@ const tables = [
           <li>
             <a href="#inside">
               <img src={href("/brand/favicon.svg")} width="34" height="34" alt="" />
-              <span><small>01 · Grand Salon</small><strong>Meet all five authored games</strong></span>
+              <span><small>01 · Grand Salon</small><strong>Open five doors to eight games</strong></span>
             </a>
           </li>
           <li>
@@ -145,7 +145,7 @@ const tables = [
         <header class="section-heading">
           <div>
             <p class="eyebrow">The centre of the House</p>
-            <h2 id="salon-title">Five tables.<br />Five clean endings.</h2>
+            <h2 id="salon-title">Five doors.<br />Eight clean endings.</h2>
           </div>
           <p>
             Each game unfolds across five fixed chapters or Acts. Challenge can deepen inside the table;
@@ -154,17 +154,22 @@ const tables = [
         </header>
 
         <ol class="table-directory">
-          {tables.map(([number, title, line]) => (
+          {tables.map(([number, title, line, categoryId]) => (
             <li>
               <span class="table-number">{number}</span>
               <h3>{title}</h3>
               <p>{line}</p>
-              <a class="table-action" href={href("/house/")} aria-label={`Open ${title} in Nindova House`}>
-                Open in the House
+              <a class="table-action" href={`${href("/house/")}#door/${categoryId}`} aria-label={`Open ${title} in Nindova House`}>
+                Open this door
               </a>
             </li>
           ))}
         </ol>
+
+        <p class="salon-study-note">
+          Navakankari, Aadu Puli Aattam, and Pallanguzhi are clearly labeled authored tactical rule studies.
+          Each table names its source and documented scope, then discloses the full-match rules it intentionally omits.
+        </p>
 
         <article class="sector-proof">
           <figure>
@@ -256,7 +261,7 @@ const tables = [
           </div>
           <p>
             The current House is live from <code>main</code>. The latest tagged release is {latestRelease.tag} — {latestRelease.name}{" "}
-            and packages the earlier Night Room, not the later Grand Salon.
+            and packages the synchronized House, Night Room, landing page, documentation, and standalone Night file.
           </p>
         </header>
 
@@ -283,7 +288,7 @@ const tables = [
           </a>
           <a href={latestRelease.webBundleUrl}>
             <img src={href("/brand/motifs/tiffin.svg")} width="40" height="40" alt="" />
-            <span><strong>Download static {latestRelease.tag} archive</strong><small>Earlier landing, docs, Night PWA, and standalone file</small></span>
+            <span><strong>Download static {latestRelease.tag} archive</strong><small>Landing, docs, House PWA, Night PWA, and standalone file</small></span>
             <em>ZIP</em>
           </a>
           <a href={sourceUrl}>

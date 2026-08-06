@@ -39,7 +39,7 @@ try {
   await page.goto(prefix);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 375);
   const publicCopy = await page.locator("body").innerText();
-  assert.match(publicCopy, /Five tables\.\s+Five clean endings\./);
+  assert.match(publicCopy, /Five doors\.\s+Eight clean endings\./);
   assert.ok(publicCopy.includes("no account · no comparison · no app telemetry"));
   const rootPath = mountPath ? `/${mountPath}/` : "/";
   const landingLinks = {
@@ -101,11 +101,11 @@ try {
   const houseRegistration = await housePage.evaluate(async () => {
     const ready = await navigator.serviceWorker.ready;
     const keys = await caches.keys();
-    const cache = await caches.open("nindova-house-v6");
+    const cache = await caches.open("nindova-house-v7");
     return { scope: ready.scope, keys, entries: (await cache.keys()).map((request) => request.url) };
   });
   assert.equal(houseRegistration.scope, houseBase);
-  assert.ok(houseRegistration.keys.includes("nindova-house-v6"));
+  assert.ok(houseRegistration.keys.includes("nindova-house-v7"));
   assert.equal(houseRegistration.keys.includes("nindova-house-v3"), false);
   assert.ok(houseRegistration.entries.length > 0);
   const cachedRunnerSheet = houseRegistration.entries.find((url) => /sector-sprint-characters-.*\.png$/.test(url));
@@ -130,7 +130,7 @@ try {
     image.src = source;
   }), cachedRunnerSheet);
   assert.deepEqual(offlineRunnerSheet, { width: 1_536, height: 1_024 }, "the illustrated character sheet decodes while fully offline");
-  await coldHouse.click('[data-game="sector-sprint"]');
+  await coldHouse.evaluate(() => window.__house.start("sector-sprint"));
   await coldHouse.click('[data-runner-route="action"]');
   await coldHouse.waitForSelector("#runnerCanvas");
   await coldHouse.waitForFunction(() => document.querySelector("#runnerCanvas")?.dataset.art === "illustrated");

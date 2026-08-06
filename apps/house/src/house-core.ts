@@ -1,9 +1,13 @@
-export const HOUSE_STORAGE_KEY = "nindova:house:v1";
+import { getClassicStudy, type ClassicStudyId } from "./classic-studies.js";
+
+export const HOUSE_STORAGE_KEY = "nindova:house:v2";
+export const HOUSE_LEGACY_STORAGE_KEY = "nindova:house:v1";
 export const HOUSE_AUDIENCE_KEY = "nindova:house:adult-audience:v1";
-export const HOUSE_SCHEMA_VERSION = 1 as const;
+export const HOUSE_SCHEMA_VERSION = 2 as const;
 export const HOUSE_RULESET_VERSION = "entertainment-1" as const;
 
-export type GameId = "pattern-court" | "mirror-forge" | "stack-architect" | "lantern-ledger" | "sector-sprint";
+export type GameId = "pattern-court" | "navakankari" | "mirror-forge" | "aadu-puli-attam" | "stack-architect" | "pallanguzhi" | "lantern-ledger" | "sector-sprint";
+export type DoorCategoryId = "pattern-line" | "turn-trap" | "count-carry" | "memory-sequence" | "motion-route";
 
 export type ChoiceChapter = {
   title: string;
@@ -15,11 +19,14 @@ export type ChoiceChapter = {
 
 export type GameDefinition = {
   id: GameId;
+  categoryId: DoorCategoryId;
   number: string;
   title: string;
   houseLine: string;
   description: string;
-  kind: "choice" | "memory" | "stack" | "runner";
+  kind: "choice" | "memory" | "stack" | "runner" | "classic";
+  format: "house-original" | "authored-rule-study";
+  classicStudyId?: ClassicStudyId;
   version: "1.0.0";
   chapters: readonly ChoiceChapter[];
   diskCounts?: readonly number[];
@@ -27,7 +34,7 @@ export type GameDefinition = {
 };
 
 export type EntertainmentResult = {
-  schemaVersion: typeof HOUSE_SCHEMA_VERSION;
+  schemaVersion: 1 | typeof HOUSE_SCHEMA_VERSION;
   mode: "entertainment";
   gameId: GameId;
   gameVersion: "1.0.0";
@@ -44,6 +51,23 @@ export type HouseState = {
   schemaVersion: typeof HOUSE_SCHEMA_VERSION;
   latestByGame: Partial<Record<GameId, EntertainmentResult>>;
 };
+
+export type DoorCategory = {
+  readonly id: DoorCategoryId;
+  readonly number: string;
+  readonly title: string;
+  readonly houseLine: string;
+  readonly description: string;
+  readonly gameIds: readonly GameId[];
+};
+
+export const DOOR_CATEGORIES: readonly DoorCategory[] = [
+  { id: "pattern-line", number: "I", title: "Pattern & Line", houseLine: "Read order, alignment, and the line that closes.", description: "Pattern Court and a placement-only Navakankari rule study.", gameIds: ["pattern-court", "navakankari"] },
+  { id: "turn-trap", number: "II", title: "Turn & Trap", houseLine: "Change a bearing, then read a board's safe passage.", description: "Mirror Forge and an Aadu Puli Aattam movement study.", gameIds: ["mirror-forge", "aadu-puli-attam"] },
+  { id: "count-carry", number: "III", title: "Count & Carry", houseLine: "Move by a fixed law and leave every piece accountable.", description: "Stack Architect and a one-turn Pallanguzhi sowing study.", gameIds: ["stack-architect", "pallanguzhi"] },
+  { id: "memory-sequence", number: "IV", title: "Memory & Sequence", houseLine: "Hold a procession without haste or judgment.", description: "Lantern Ledger's five visible, replayable sequences.", gameIds: ["lantern-ledger"] },
+  { id: "motion-route", number: "V", title: "Motion & Route", houseLine: "Follow a route through Chandigarh's changing street theatre.", description: "Sector Sprint in Action or narrated form.", gameIds: ["sector-sprint"] },
+] as const;
 
 const PATTERN_CHAPTERS: readonly ChoiceChapter[] = [
   { title: "Alternating inlay", prompt: "Which mark completes the line?", display: "◇  ◆  ◇  ◆  ?", choices: ["◇", "◆", "○", "✦"], answerIndex: 0 },
@@ -71,29 +95,44 @@ const LANTERN_CHAPTERS: readonly ChoiceChapter[] = [
 
 export const GAMES: readonly GameDefinition[] = [
   {
-    id: "pattern-court", number: "I", title: "Pattern Court", houseLine: "Read the order beneath the ornament.",
+    id: "pattern-court", categoryId: "pattern-line", number: "I.A", title: "Pattern Court", houseLine: "Read the order beneath the ornament.",
     description: "Five authored visual sequences, from a simple alternation to a full court lattice.",
-    kind: "choice", version: "1.0.0", chapters: PATTERN_CHAPTERS,
+    kind: "choice", format: "house-original", version: "1.0.0", chapters: PATTERN_CHAPTERS,
   },
   {
-    id: "mirror-forge", number: "II", title: "Mirror Forge", houseLine: "Turn forms without losing their bearing.",
+    id: "navakankari", categoryId: "pattern-line", number: "I.B", title: "Navakankari", houseLine: "Place the third piece and close the line.",
+    description: "Five authored placement studies on the documented 24-point board—not a complete traditional match.",
+    kind: "classic", format: "authored-rule-study", classicStudyId: "navakankari", version: "1.0.0", chapters: [],
+  },
+  {
+    id: "mirror-forge", categoryId: "turn-trap", number: "II.A", title: "Mirror Forge", houseLine: "Turn forms without losing their bearing.",
     description: "Five spatial turns that build from one compass mark to a forged sequence.",
-    kind: "choice", version: "1.0.0", chapters: MIRROR_CHAPTERS,
+    kind: "choice", format: "house-original", version: "1.0.0", chapters: MIRROR_CHAPTERS,
   },
   {
-    id: "stack-architect", number: "III", title: "Stack Architect", houseLine: "Move the tower by law, one disc at a time.",
+    id: "aadu-puli-attam", categoryId: "turn-trap", number: "II.B", title: "Aadu Puli Aattam", houseLine: "Read one movement or tiger leap along a drawn line.",
+    description: "Five authored goat-and-tiger movement studies—not setup, an opponent, or a complete match.",
+    kind: "classic", format: "authored-rule-study", classicStudyId: "aadu-puli-attam", version: "1.0.0", chapters: [],
+  },
+  {
+    id: "stack-architect", categoryId: "count-carry", number: "III.A", title: "Stack Architect", houseLine: "Move the tower by law, one disc at a time.",
     description: "Five handcrafted towers. Never place a larger disc on a smaller one.",
-    kind: "stack", version: "1.0.0", chapters: [], diskCounts: [2, 3, 4, 5, 6],
+    kind: "stack", format: "house-original", version: "1.0.0", chapters: [], diskCounts: [2, 3, 4, 5, 6],
   },
   {
-    id: "lantern-ledger", number: "IV", title: "Lantern Ledger", houseLine: "Hold an ordered procession of light.",
+    id: "pallanguzhi", categoryId: "count-carry", number: "III.B", title: "Pallanguzhi", houseLine: "Lift, sow, relay, and gather through one bounded turn.",
+    description: "Five authored turns on a two-by-seven pit board—not a full multi-round traditional match.",
+    kind: "classic", format: "authored-rule-study", classicStudyId: "pallanguzhi", version: "1.0.0", chapters: [],
+  },
+  {
+    id: "lantern-ledger", categoryId: "memory-sequence", number: "IV", title: "Lantern Ledger", houseLine: "Hold an ordered procession of light.",
     description: "Five visible sequences. Close the screen when ready, then choose the line you held.",
-    kind: "memory", version: "1.0.0", chapters: LANTERN_CHAPTERS,
+    kind: "memory", format: "house-original", version: "1.0.0", chapters: LANTERN_CHAPTERS,
   },
   {
-    id: "sector-sprint", number: "V", title: "Sector Sprint", houseLine: "Run Chandigarh’s long way home.",
+    id: "sector-sprint", categoryId: "motion-route", number: "V", title: "Sector Sprint", houseLine: "Run Chandigarh’s long way home.",
     description: "Five progressively faster lane routes with expressive riders, textured architecture, one-contact Action pauses, harmless Act tools, and a clean narrated route.",
-    kind: "runner", version: "1.0.0", chapters: [],
+    kind: "runner", format: "house-original", version: "1.0.0", chapters: [],
     chapterTitles: ["Ghar Wapsi", "Sabzi Command", "Baraat Detour", "Monsoon Protocol", "Roti Relay"],
   },
 ] as const;
@@ -109,7 +148,7 @@ function isGameId(value: unknown): value is GameId {
 function isResult(value: unknown): value is EntertainmentResult {
   if (!value || typeof value !== "object") return false;
   const result = value as Partial<EntertainmentResult>;
-  return result.schemaVersion === HOUSE_SCHEMA_VERSION
+  return (result.schemaVersion === 1 || result.schemaVersion === HOUSE_SCHEMA_VERSION)
     && result.mode === "entertainment"
     && isGameId(result.gameId)
     && result.gameVersion === "1.0.0"
@@ -120,22 +159,52 @@ function isResult(value: unknown): value is EntertainmentResult {
     && typeof result.completionFacts.finalChapter === "string";
 }
 
-export function readHouseState(storage: Pick<Storage, "getItem">): { state: HouseState; reason: "empty" | "restored" | "invalid" | "unavailable" } {
+type HouseReadResult = { state: HouseState; reason: "empty" | "restored" | "invalid" | "unavailable" };
+
+function parseHouseState(value: string): HouseReadResult {
   try {
-    const value = storage.getItem(HOUSE_STORAGE_KEY);
-    if (!value) return { state: emptyHouseState(), reason: "empty" };
-    const parsed = JSON.parse(value) as Partial<HouseState>;
-    if (parsed.schemaVersion !== HOUSE_SCHEMA_VERSION || !parsed.latestByGame || typeof parsed.latestByGame !== "object") {
+    const parsed = JSON.parse(value) as { schemaVersion?: unknown; latestByGame?: unknown };
+    if ((parsed.schemaVersion !== 1 && parsed.schemaVersion !== HOUSE_SCHEMA_VERSION) || !parsed.latestByGame || typeof parsed.latestByGame !== "object") {
       return { state: emptyHouseState(), reason: "invalid" };
     }
     const latestByGame: Partial<Record<GameId, EntertainmentResult>> = {};
-    for (const [gameId, result] of Object.entries(parsed.latestByGame)) {
+    for (const [gameId, result] of Object.entries(parsed.latestByGame as Record<string, unknown>)) {
       if (isGameId(gameId) && isResult(result) && result.gameId === gameId) latestByGame[gameId] = result;
     }
     return { state: { schemaVersion: HOUSE_SCHEMA_VERSION, latestByGame }, reason: "restored" };
   } catch {
     return { state: emptyHouseState(), reason: "unavailable" };
   }
+}
+
+export function readHouseState(storage: Pick<Storage, "getItem">): HouseReadResult {
+  let primaryValue: string | null = null;
+  let legacyValue: string | null = null;
+  let primaryFailure: HouseReadResult["reason"] | null = null;
+
+  try {
+    primaryValue = storage.getItem(HOUSE_STORAGE_KEY);
+  } catch {
+    primaryFailure = "unavailable";
+  }
+  if (primaryValue !== null) {
+    const primary = parseHouseState(primaryValue);
+    if (primary.reason === "restored") return primary;
+    primaryFailure = primary.reason;
+  }
+
+  try {
+    legacyValue = storage.getItem(HOUSE_LEGACY_STORAGE_KEY);
+  } catch {
+    return { state: emptyHouseState(), reason: "unavailable" };
+  }
+  if (legacyValue !== null) {
+    const legacy = parseHouseState(legacyValue);
+    if (legacy.reason === "restored") return legacy;
+    return { state: emptyHouseState(), reason: primaryFailure === "unavailable" || legacy.reason === "unavailable" ? "unavailable" : "invalid" };
+  }
+
+  return { state: emptyHouseState(), reason: primaryFailure ?? "empty" };
 }
 
 export function writeHouseState(storage: Pick<Storage, "setItem">, state: HouseState): boolean {
@@ -158,7 +227,9 @@ export function completeEntertainmentGame(state: HouseState, game: GameDefinitio
     completedAt,
     completionFacts: {
       authoredChapters: 5,
-      finalChapter: game.kind === "stack"
+      finalChapter: game.kind === "classic"
+        ? getClassicStudy(game.classicStudyId!).chapters[4]?.title ?? "Fifth study"
+        : game.kind === "stack"
         ? "Six-disc tower"
         : game.kind === "runner"
           ? (game.chapterTitles?.[4] ?? "Fifth chapter")
@@ -178,6 +249,12 @@ export function getGame(gameId: GameId): GameDefinition {
   const game = GAMES.find((entry) => entry.id === gameId);
   if (!game) throw new Error(`Unknown game: ${gameId}`);
   return game;
+}
+
+export function getDoorCategory(categoryId: DoorCategoryId): DoorCategory {
+  const category = DOOR_CATEGORIES.find((entry) => entry.id === categoryId);
+  if (!category) throw new Error(`Unknown category: ${categoryId}`);
+  return category;
 }
 
 export function isLegalStackMove(pegs: readonly (readonly number[])[], from: number, to: number): boolean {

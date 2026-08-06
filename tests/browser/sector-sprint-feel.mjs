@@ -46,7 +46,7 @@ async function openRunner(viewport, cpuRate = 1) {
     await cdp.send("Emulation.setCPUThrottlingRate", { rate: cpuRate });
   }
   await page.goto(`http://127.0.0.1:${port}/house/`, { waitUntil: "networkidle" });
-  await page.click('[data-game="sector-sprint"]');
+  await page.evaluate(() => window.__house.start("sector-sprint"));
   await page.click('[data-runner-route="action"]');
   await page.waitForSelector("#runnerCanvas");
   await startAutopilot(page);

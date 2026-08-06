@@ -4,9 +4,13 @@ import "../../../tokens.css";
 import "./house.css";
 import runnerCharacterSheetUrl from "./assets/sector-sprint-characters.png?url";
 import {
+  DOOR_CATEGORIES,
   GAMES,
   HOUSE_AUDIENCE_KEY,
+  HOUSE_LEGACY_STORAGE_KEY,
+  HOUSE_STORAGE_KEY,
   completeEntertainmentGame,
+  getDoorCategory,
   getGame,
   initialPegs,
   isLegalStackMove,
@@ -18,7 +22,25 @@ import {
   type GameDefinition,
   type GameId,
   type HouseState,
+  type DoorCategoryId,
 } from "./house-core";
+import {
+  AADU_LINES,
+  AADU_POINTS,
+  NAVAKANKARI_MILLS,
+  NAVAKANKARI_POINTS,
+  PALLANGUZHI_TRAVERSAL,
+  describeAaduChapter,
+  describeAaduOption,
+  describeNavakankariChapter,
+  describeNavakankariOption,
+  describePallanguzhiChapter,
+  describePallanguzhiOption,
+  getClassicStudy,
+  type AaduChapter,
+  type NavakankariChapter,
+  type PallanguzhiChapter,
+} from "./classic-studies";
 import {
   RUNNER_ACTS,
   RUNNER_ACTION_ROUTE_MINIMUM_MS,
@@ -41,7 +63,7 @@ import {
   type RunnerState,
 } from "./sector-sprint";
 
-type View = "home" | "gallery" | "game";
+type View = "home" | "category" | "gallery" | "game";
 
 type ActiveGame = {
   gameId: GameId;
@@ -61,6 +83,7 @@ type DebugHouse = {
   readonly memory: HouseState;
   readonly runner: RunnerState | null;
   start: (gameId: GameId) => void;
+  openCategory: (categoryId: DoorCategoryId) => void;
   answer: (choiceIndex: number) => void;
 };
 
@@ -88,6 +111,7 @@ const runnerReviewMode = new URLSearchParams(location.search).get("review") === 
 const PRAISE = ["Well seen.", "Exact.", "Beautifully read.", "The order holds.", "A complete reading."] as const;
 let memory = readHouseState(localStorage).state;
 let view: View = "home";
+let selectedCategory: DoorCategoryId | null = null;
 let runnerRestoreWasDiscarded = false;
 let active: ActiveGame | null = restoreActiveGame();
 let restoreDecisionPending = Boolean(active);
@@ -132,7 +156,10 @@ function ensureRunnerCharacterSheet() {
   void sheet.decode().then(() => drawCurrentRunnerFrame(), () => undefined);
 }
 
-if (active) view = "game";
+if (active) {
+  view = "game";
+  selectedCategory = getGame(active.gameId).categoryId;
+}
 
 function restoreActiveGame(): ActiveGame | null {
   try {
@@ -184,11 +211,27 @@ function saveActiveGame() {
   }
 }
 
+function hashForView(next: View): string {
+  if (next === "category" && selectedCategory) return `#door/${selectedCategory}`;
+  if (next === "game" && (active || pendingRunnerChoice)) return `#game/${active?.gameId ?? "sector-sprint"}`;
+  if (next === "gallery") return "#gallery";
+  return "";
+}
+
+function writeRouteHash(next: View, replace = false) {
+  const hash = hashForView(next);
+  if (location.hash === hash) return;
+  const url = `${location.pathname}${location.search}${hash}`;
+  history[replace ? "replaceState" : "pushState"]({ nindovaHouse: true }, "", url);
+}
+
 function route(next: View) {
+  const leavingGame = view === "game" && next !== "game";
   stopRunnerLoop();
   closeHouseAudio();
   if (next !== "game") clearChapterTransition();
   view = next;
+  if (next === "home") selectedCategory = null;
   if (next !== "game") {
     active = null;
     pendingRunnerChoice = false;
@@ -197,6 +240,7 @@ function route(next: View) {
     saveActiveGame();
   }
   statusMessage = "";
+  writeRouteHash(next, leavingGame);
   render();
   main.focus({ preventScroll: true });
 }
@@ -211,7 +255,7 @@ function hasMeaningfulProgress(candidate: ActiveGame): boolean {
 }
 
 function requestRoute(next: View, invoker: HTMLElement | null = null) {
-  if (next === "home" && view === "game" && active && !restoreDecisionPending && hasMeaningfulProgress(active)) {
+  if (next !== "game" && view === "game" && active && !restoreDecisionPending && hasMeaningfulProgress(active)) {
     exitReturnFocus = invoker ?? document.activeElement as HTMLElement | null;
     exitConfirmationPending = true;
     stopRunnerLoop();
@@ -231,11 +275,18 @@ function discardActiveGame() {
   restoreDecisionPending = false;
   pendingRunnerChoice = false;
   saveActiveGame();
-  route("home");
+  route(selectedCategory ? "category" : "home");
+}
+
+function openCategory(categoryId: DoorCategoryId) {
+  getDoorCategory(categoryId);
+  selectedCategory = categoryId;
+  route("category");
 }
 
 function startGame(gameId: GameId) {
   const game = getGame(gameId);
+  selectedCategory = game.categoryId;
   stopRunnerLoop();
   closeHouseAudio();
   clearChapterTransition();
@@ -255,6 +306,7 @@ function startGame(gameId: GameId) {
     view = "game";
     statusMessage = "";
     saveActiveGame();
+    writeRouteHash("game");
     render();
     focusElement('[data-runner-route="action"]');
     return;
@@ -274,6 +326,7 @@ function startGame(gameId: GameId) {
   view = "game";
   statusMessage = "";
   saveActiveGame();
+  writeRouteHash("game");
   render();
   main.focus({ preventScroll: true });
 }
@@ -313,8 +366,13 @@ function gameSigil(gameId: GameId): string {
   return `<span class="game-sigil game-sigil-${gameId}" aria-hidden="true">${Array.from({ length: pieces }, (_, index) => `<i style="--sigil-index:${index}"></i>`).join("")}</span>`;
 }
 
+function categorySigil(categoryId: DoorCategoryId): string {
+  return `<span class="category-sigil category-sigil-${categoryId}" aria-hidden="true">${Array.from({ length: 5 }, (_, index) => `<i style="--sigil-index:${index}"></i>`).join("")}</span>`;
+}
+
 function render() {
   if (view === "home") renderHome();
+  else if (view === "category") renderCategory();
   else if (view === "gallery") renderGallery();
   else renderGame();
 }
@@ -341,7 +399,7 @@ function renderHome() {
     <section class="house-intro" aria-labelledby="houseTitle">
       <p class="kicker">A private house of authored games</p>
       <h1 id="houseTitle">Choose a room.<br><em>Stay for the pleasure of solving.</em></h1>
-      <p class="house-lede">Five games, each arranged in five deliberate chapters. Nothing is ranked, broadcast, or compared with other people.</p>
+      <p class="house-lede">Five doors hold eight games, each arranged in five deliberate chapters or studies. Nothing is ranked, broadcast, or compared with other people.</p>
       ${runnerRestoreWasDiscarded ? '<p class="runner-restore-note" role="status">A previous Sector Sprint page closed on reload so its authored boundary could not be extended. No completion was recorded.</p>' : ""}
     </section>
     <section class="floor-plan" aria-label="Nindova House rooms">
@@ -357,13 +415,13 @@ function renderHome() {
           <p>Entertainment first. Every table is authored, finite, and replayable by choice.</p>
         </header>
         <div class="salon-plan">
-          ${GAMES.map((game) => `
-            <button class="game-door game-door-${escape(game.id)}" type="button" data-game="${escape(game.id)}">
-              ${gameSigil(game.id)}
-              <span class="game-number">${game.number}</span>
-              <span class="game-title">${escape(game.title)}</span>
-              <span class="game-line">${escape(game.houseLine)}</span>
-              <span class="game-enter">Open table</span>
+          ${DOOR_CATEGORIES.map((category) => `
+            <button class="game-door category-door category-door-${escape(category.id)}" type="button" data-category="${escape(category.id)}">
+              ${categorySigil(category.id)}
+              <span class="game-number">${category.number}</span>
+              <span class="game-title">${escape(category.title)}</span>
+              <span class="game-line">${escape(category.houseLine)}</span>
+              <span class="game-enter">Open door · ${category.gameIds.length} ${category.gameIds.length === 1 ? "table" : "tables"}</span>
             </button>
           `).join("")}
           <div class="salon-compass" aria-hidden="true"><span>N</span><i></i></div>
@@ -388,6 +446,39 @@ function renderHome() {
   `;
 }
 
+function renderCategory() {
+  if (!selectedCategory) return route("home");
+  const category = getDoorCategory(selectedCategory);
+  const games = category.gameIds.map(getGame);
+  main.innerHTML = `
+    <section class="category-view category-view-${category.id}" aria-labelledby="categoryTitle">
+      <header class="game-masthead">
+        <button class="back-link" type="button" data-route="home"><span aria-hidden="true">←</span> Grand Salon</button>
+        <span class="category-door-mark">Door ${category.number}</span>
+      </header>
+      <div class="category-aperture" aria-hidden="true"><i></i><i></i><i></i><i></i><span></span></div>
+      <div class="category-heading">
+        <p class="kicker">Door ${category.number}</p>
+        <h1 id="categoryTitle">${escape(category.title)}</h1>
+        <p class="house-lede">${escape(category.description)}</p>
+      </div>
+      <div class="category-tables">
+        ${games.map((game) => `
+          <article class="category-table category-table-${game.id}">
+            ${gameSigil(game.id)}
+            <p class="game-number">Table ${game.number}</p>
+            <h2>${escape(game.title)}</h2>
+            <p>${escape(game.description)}</p>
+            ${game.format === "authored-rule-study" ? '<p class="study-mark">Authored tactical rule study</p>' : '<p class="study-mark">Nindova House original</p>'}
+            <button class="primary-action" type="button" data-game="${game.id}">Open table</button>
+          </article>
+        `).join("")}
+      </div>
+      ${games.some((game) => game.format === "authored-rule-study") ? '<p class="category-note">Rule studies use named documented sources and disclose what they omit. They are not presented as definitive or complete traditional matches.</p>' : ""}
+    </section>
+  `;
+}
+
 function renderGallery() {
   const entries = GAMES.map((game) => ({ game, result: memory.latestByGame[game.id] }));
   main.innerHTML = `
@@ -400,7 +491,7 @@ function renderGallery() {
         ${entries.map(({ game, result }) => `
           <article>
             <span class="game-number">${game.number}</span>
-            <div><h2>${escape(game.title)}</h2><p>${result ? `${result.completionFacts.authoredChapters} authored chapters completed · ${escape(result.completionFacts.finalChapter)}` : "No completed reading is kept."}</p></div>
+            <div><h2>${escape(game.title)}</h2><p>${result ? `${result.completionFacts.authoredChapters} authored ${game.kind === "runner" ? "Acts" : game.kind === "classic" ? "studies" : "chapters"} completed · ${escape(result.completionFacts.finalChapter)}` : "No completed reading is kept."}</p></div>
             <button type="button" data-game="${game.id}">${result ? "Visit again" : "Open table"}</button>
           </article>
         `).join("")}
@@ -417,19 +508,22 @@ function renderGame() {
   const chapter = active?.chapter ?? 0;
   const chapterTitle = pendingRunnerChoice
     ? "Choose your route"
-    : game.kind === "stack"
+    : game.kind === "classic"
+      ? getClassicStudy(game.classicStudyId!).chapters[chapter]?.title
+      : game.kind === "stack"
       ? `${game.diskCounts?.[chapter]}-disc tower`
       : game.kind === "runner"
         ? RUNNER_ACTS[chapter]?.title
         : game.chapters[chapter]?.title;
+  const authoredUnit = game.kind === "runner" ? "Act" : game.kind === "classic" ? "Study" : "Chapter";
   main.innerHTML = `
     <section class="game-view game-view-${game.id}" aria-labelledby="gameTitle">
       <header class="game-masthead">
-        <button class="back-link" type="button" data-route="home"><span aria-hidden="true">←</span> Grand Salon</button>
-        <div class="chapter-mark"><span>${pendingRunnerChoice ? "Before Act I" : `${game.kind === "runner" ? "Act" : "Chapter"} ${chapter + 1}`}</span><i aria-hidden="true"></i><span>${pendingRunnerChoice ? "Route choice" : "of 5"}</span></div>
+        <button class="back-link" type="button" data-route="category"><span aria-hidden="true">←</span> ${escape(getDoorCategory(game.categoryId).title)}</button>
+        <div class="chapter-mark"><span>${pendingRunnerChoice ? "Before Act I" : `${authoredUnit} ${chapter + 1}`}</span><i aria-hidden="true"></i><span>${pendingRunnerChoice ? "Route choice" : "of 5"}</span></div>
       </header>
       <div class="game-title-block ${game.kind === "runner" ? "game-title-block-runner" : ""}">
-        <p class="kicker">Table ${game.number} · ${escape(chapterTitle ?? (game.kind === "runner" ? "Act" : "Chapter"))}</p>
+        <p class="kicker">Table ${game.number} · ${escape(chapterTitle ?? authoredUnit)}</p>
         <h1 id="gameTitle">${escape(game.title)}</h1>
         <p>${escape(game.description)}</p>
       </div>
@@ -442,7 +536,9 @@ function renderGame() {
               ? renderRunner()
               : game.kind === "stack"
                 ? renderStack(game)
-                : renderChoice(game)}
+                : game.kind === "classic"
+                  ? renderClassicStudy(game)
+                  : renderChoice(game)}
       </div>
       <p id="gameStatus" class="game-status" role="status" aria-live="polite">${escape(statusMessage)}</p>
     </section>
@@ -452,13 +548,13 @@ function renderGame() {
 
 function renderRestoreGate(game: GameDefinition): string {
   if (!active) return "";
-  const unit = game.kind === "runner" ? "Act" : "Chapter";
+  const unit = game.kind === "runner" ? "Act" : game.kind === "classic" ? "Study" : "Chapter";
   return `
     <section class="table-gate restore-gate" aria-labelledby="restoreTitle">
       <div class="gate-sigil" aria-hidden="true"><i></i><span></span><i></i></div>
       <p class="kicker">Unfinished table found</p>
       <h2 id="restoreTitle">Continue ${escape(game.title)}?</h2>
-      <p>${unit} ${active.chapter + 1} is still held in this tab. Continuing keeps that exact chapter; starting over creates a fresh five-${unit.toLowerCase()} reading.</p>
+      <p>${unit} ${active.chapter + 1} is still held in this tab. Continuing keeps that exact ${unit.toLowerCase()}; starting over creates a fresh five-${unit.toLowerCase()} reading.</p>
       <div class="gate-actions">
         <button class="primary-action" type="button" data-restore="continue">Continue ${unit.toLowerCase()}</button>
         <button class="quiet-action" type="button" data-restore="restart">Start over</button>
@@ -612,6 +708,99 @@ function renderChoiceVisual(game: GameDefinition, display: string, covered: bool
     tokenIndex += 1;
     return `<span class="${token === "?" ? "is-missing" : ""}" style="--glyph-index:${index}">${escape(token)}</span>`;
   }).join("")}</div>`).join("")}</div>`;
+}
+
+function renderBoardLines(points: readonly { id: number; x: number; y: number }[], lines: readonly (readonly number[])[]): string {
+  const byId = new Map(points.map((point) => [point.id, point]));
+  return lines.map((line) => {
+    const coordinates = line.map((id) => byId.get(id)).filter((point): point is { id: number; x: number; y: number } => Boolean(point));
+    return `<polyline points="${coordinates.map((point) => `${point.x},${point.y}`).join(" ")}" />`;
+  }).join("");
+}
+
+function renderClassicStudy(game: GameDefinition): string {
+  if (!active || !game.classicStudyId) return "";
+  const study = getClassicStudy(game.classicStudyId);
+  const chapter = study.chapters[active.chapter];
+  let studyBoard = "";
+  if (study.id === "navakankari") studyBoard = renderNavakankariStudy(chapter as NavakankariChapter);
+  if (study.id === "aadu-puli-attam") studyBoard = renderAaduStudy(chapter as AaduChapter);
+  if (study.id === "pallanguzhi") studyBoard = renderPallanguzhiStudy(chapter as PallanguzhiChapter);
+  return `
+    <div class="classic-study">
+      <div class="classic-study-board">
+        <p class="prompt-label">Authored tactical rule study</p>
+        ${studyBoard}
+      </div>
+      <div class="classic-study-copy">
+        <p>${escape(chapter.prompt)}</p>
+        <p class="study-instruction">Choose one marked destination or starting pit. Every position and outcome is fixed.</p>
+        <details class="study-provenance">
+          <summary>Source and scope</summary>
+          <dl>
+            <div><dt>Documented scope</dt><dd>${escape(study.documentedScope)}</dd></div>
+            <div><dt>Included</dt><dd>${escape(study.included)}</dd></div>
+            <div><dt>Omitted</dt><dd>${escape(study.omitted)}</dd></div>
+          </dl>
+          <a href="${escape(study.sourceUrl)}" target="_blank" rel="noreferrer">${escape(study.sourceLabel)} <span aria-hidden="true">↗</span></a>
+        </details>
+      </div>
+    </div>
+  `;
+}
+
+function renderNavakankariStudy(chapter: NavakankariChapter): string {
+  const optionIndex = new Map(chapter.options.map((point, index) => [point, index]));
+  return `
+    <div class="line-board navakankari-board" role="group" aria-label="Navakankari placement study" aria-describedby="classicStudyDescription">
+      <p id="classicStudyDescription" class="sr-only classic-study-description">${escape(describeNavakankariChapter(chapter))}</p>
+      <svg viewBox="-4 -4 108 108" aria-hidden="true"><g>${renderBoardLines(NAVAKANKARI_POINTS, NAVAKANKARI_MILLS)}</g></svg>
+      ${NAVAKANKARI_POINTS.map((point) => {
+        const choice = optionIndex.get(point.id);
+        const state = chapter.own.includes(point.id) ? "own" : chapter.occupied.includes(point.id) ? "occupied" : "empty";
+        if (choice !== undefined) return `<button class="board-point is-option" type="button" data-answer="${choice}" style="--point-x:${point.x}%;--point-y:${point.y}%" aria-label="${escape(describeNavakankariOption(chapter, choice))}"><span>${String.fromCharCode(65 + choice)}</span></button>`;
+        return `<i class="board-point is-${state}" style="--point-x:${point.x}%;--point-y:${point.y}%" aria-hidden="true"></i>`;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderAaduStudy(chapter: AaduChapter): string {
+  const optionIndex = new Map(chapter.options.map((point, index) => [point, index]));
+  return `
+    <div class="line-board aadu-board" role="group" aria-label="Aadu Puli Aattam movement study" aria-describedby="classicStudyDescription">
+      <p id="classicStudyDescription" class="sr-only classic-study-description">${escape(describeAaduChapter(chapter))}</p>
+      <svg viewBox="-4 0 108 100" aria-hidden="true"><g>${renderBoardLines(AADU_POINTS, AADU_LINES)}</g></svg>
+      ${AADU_POINTS.map((point) => {
+        const choice = optionIndex.get(point.id);
+        if (choice !== undefined) return `<button class="board-point is-option" type="button" data-answer="${choice}" style="--point-x:${point.x}%;--point-y:${point.y}%" aria-label="${escape(describeAaduOption(chapter, choice))}"><span>${String.fromCharCode(65 + choice)}</span></button>`;
+        const isTiger = chapter.tigers.includes(point.id);
+        const isGoat = chapter.goats.includes(point.id);
+        const selected = point.id === chapter.source;
+        const state = isTiger ? "tiger" : isGoat ? "goat" : "empty";
+        return `<i class="board-point is-${state} ${selected ? "is-selected-piece" : ""}" style="--point-x:${point.x}%;--point-y:${point.y}%" aria-hidden="true"></i>`;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderPallanguzhiStudy(chapter: PallanguzhiChapter): string {
+  const optionIndex = new Map(chapter.options.map((pit, index) => [pit, index]));
+  const renderPit = (pit: number) => {
+    const choice = optionIndex.get(pit);
+    const seeds = chapter.board[pit];
+    const seedDots = Array.from({ length: Math.min(seeds, 8) }, () => "<i></i>").join("");
+    if (choice === undefined) return `<span class="pallanguzhi-pit" aria-label="Pit with ${seeds} seeds"><span class="seed-cup" aria-hidden="true">${seedDots}</span><small>${seeds}</small></span>`;
+    return `<button class="pallanguzhi-pit is-option" type="button" data-answer="${choice}" aria-label="${escape(describePallanguzhiOption(chapter, choice))}"><span class="seed-cup" aria-hidden="true">${seedDots}</span><small>${String.fromCharCode(65 + choice)} · ${seeds}</small></button>`;
+  };
+  return `
+    <div class="pallanguzhi-board" role="group" aria-label="Pallanguzhi one-turn sowing study" aria-describedby="classicStudyDescription">
+      <p id="classicStudyDescription" class="sr-only classic-study-description">${escape(describePallanguzhiChapter(chapter))}</p>
+      <span class="sowing-arrow" aria-hidden="true">Anti-clockwise sowing <i>→</i></span>
+      <div class="pit-row pit-row-top">${[...PALLANGUZHI_TRAVERSAL].slice(7).map(renderPit).join("")}</div>
+      <div class="pit-row pit-row-bottom">${[...PALLANGUZHI_TRAVERSAL].slice(0, 7).map(renderPit).join("")}</div>
+    </div>
+  `;
 }
 
 function renderStack(game: GameDefinition): string {
@@ -1024,7 +1213,10 @@ function answerChoice(choiceIndex: number) {
   if (!active || active.resolving) return;
   const game = getGame(active.gameId);
   if (game.kind === "stack") return;
-  const chapter = game.chapters[active.chapter];
+  const chapter = game.kind === "classic"
+    ? getClassicStudy(game.classicStudyId!).chapters[active.chapter]
+    : game.chapters[active.chapter];
+  if (!chapter) return;
   if (game.kind === "memory" && !active.memoryCovered) {
     statusMessage = "Cover the procession before choosing.";
     const status = document.querySelector<HTMLElement>("#gameStatus");
@@ -1034,7 +1226,7 @@ function answerChoice(choiceIndex: number) {
   active.touched = true;
   const choice = document.querySelector<HTMLElement>(`[data-answer="${choiceIndex}"]`);
   if (choiceIndex !== chapter.answerIndex) {
-    statusMessage = "Not this inscription. Read the order once more.";
+    statusMessage = game.kind === "classic" ? "That move does not satisfy this authored position. Read the drawn lines and rule once more." : "Not this inscription. Read the order once more.";
     choice?.classList.remove("is-wrong");
     void choice?.offsetWidth;
     choice?.classList.add("is-wrong");
@@ -1106,7 +1298,7 @@ function finishGame() {
   runnerPaused = false;
   celebration.hidden = true;
   const game = getGame(active.gameId);
-  const authoredUnit = game.kind === "runner" ? "Acts" : "chapters";
+  const authoredUnit = game.kind === "runner" ? "Acts" : game.kind === "classic" ? "studies" : "chapters";
   const completed = completeEntertainmentGame(memory, game, active.runId, new Date().toISOString());
   memory = completed.state;
   writeHouseState(localStorage, memory);
@@ -1119,13 +1311,14 @@ function finishGame() {
       <p>You completed all five authored ${authoredUnit}, ending with ${escape(completed.result.completionFacts.finalChapter)}.</p>
       <p class="result-boundary">Entertainment result · ruleset ${escape(completed.result.rulesetVersion)} · stored only on this device</p>
       <div class="curtain-actions">
-        <button class="primary-action" type="button" data-route="home">Return to the Grand Salon</button>
+        <button class="primary-action" type="button" data-route="category">Return to ${escape(getDoorCategory(game.categoryId).title)}</button>
+        <button class="quiet-action" type="button" data-route="home">Grand Salon</button>
         <button class="quiet-action" type="button" data-route="gallery">Visit the Gallery</button>
       </div>
     </section>
   `;
   active = null;
-  focusElement('[data-route="home"]');
+  focusElement('[data-route="category"]');
 }
 
 function closeRunnerAtBoundary() {
@@ -1313,6 +1506,11 @@ document.addEventListener("click", (event) => {
     requestRoute(routeButton.dataset.route as View, routeButton);
     return;
   }
+  const categoryButton = target.closest<HTMLElement>("[data-category]");
+  if (categoryButton) {
+    openCategory(categoryButton.dataset.category as DoorCategoryId);
+    return;
+  }
   const gameButton = target.closest<HTMLElement>("[data-game]");
   if (gameButton) {
     startGame(gameButton.dataset.game as GameId);
@@ -1323,7 +1521,9 @@ document.addEventListener("click", (event) => {
     const choice = restoreButton.dataset.restore;
     if (choice === "continue") {
       restoreDecisionPending = false;
-      statusMessage = `Chapter ${active.chapter + 1} restored in this tab.`;
+      const game = getGame(active.gameId);
+      const unit = game.kind === "runner" ? "Act" : game.kind === "classic" ? "Study" : "Chapter";
+      statusMessage = `${unit} ${active.chapter + 1} restored in this tab.`;
       render();
       focusFirstGameControl();
     } else if (choice === "restart") {
@@ -1398,7 +1598,10 @@ document.addEventListener("click", (event) => {
   }
   if (target.closest("[data-clear-gallery]")) {
     memory = readHouseState({ getItem: () => null }).state;
-    try { localStorage.removeItem("nindova:house:v1"); } catch { /* The in-memory Gallery is still cleared. */ }
+    try {
+      localStorage.removeItem(HOUSE_STORAGE_KEY);
+      localStorage.removeItem(HOUSE_LEGACY_STORAGE_KEY);
+    } catch { /* The in-memory Gallery is still cleared. */ }
     renderGallery();
     focusElement("[data-clear-gallery]");
     return;
@@ -1565,11 +1768,50 @@ window.__house = {
   get memory() { return structuredClone(memory); },
   get runner() { return runnerState ? structuredClone(runnerState) : null; },
   start: startGame,
+  openCategory,
   answer: answerChoice,
 };
+
+function applyLocationHash(initial = false) {
+  const [kind, rawId] = location.hash.slice(1).split("/");
+  const categoryId = DOOR_CATEGORIES.some((category) => category.id === rawId) ? rawId as DoorCategoryId : null;
+  const gameId = GAMES.some((game) => game.id === rawId) ? rawId as GameId : null;
+  if (initial && runnerRestoreWasDiscarded) {
+    history.replaceState({ nindovaHouse: true }, "", `${location.pathname}${location.search}`);
+    route("home");
+    return;
+  }
+  if (initial && active) {
+    writeRouteHash("game", true);
+    return;
+  }
+  if (!initial && view === "game" && active && hasMeaningfulProgress(active)) {
+    writeRouteHash("game", true);
+    requestRoute(kind === "gallery" ? "gallery" : kind === "door" ? "category" : "home");
+    return;
+  }
+  if (kind === "door" && categoryId) {
+    selectedCategory = categoryId;
+    route("category");
+    return;
+  }
+  if (kind === "game" && gameId) {
+    startGame(gameId);
+    return;
+  }
+  if (kind === "gallery") {
+    route("gallery");
+    return;
+  }
+  if (location.hash) history.replaceState({ nindovaHouse: true }, "", `${location.pathname}${location.search}`);
+  route("home");
+}
+
+addEventListener("popstate", () => applyLocationHash());
 
 if ("serviceWorker" in navigator) {
   addEventListener("load", () => { navigator.serviceWorker.register("./sw.js"); });
 }
 
+applyLocationHash(true);
 render();

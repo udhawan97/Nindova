@@ -3,14 +3,16 @@ title: Nindova documentation
 description: Product contract and implementation notes for Nindova House, the Grand Salon, and the bounded Night Room.
 ---
 
-Nindova House is private, offline-ready authored entertainment for adults 18 and over. The **Grand Salon** contains Pattern Court, Mirror Forge, Stack Architect, Lantern Ledger, and Sector Sprint, each arranged in five fixed chapters or Acts. The separate **Night Room** preserves Masala Mound: match two identical kitchen tiles when nothing covers them and one side is open; the board grows lighter and then the bounded Session closes.
+Nindova House is private, offline-ready authored entertainment for adults 18 and over. Five Grand Salon doors group eight games: Pattern Court with Navakankari, Mirror Forge with Aadu Puli Aattam, Stack Architect with Pallanguzhi, Lantern Ledger, and Sector Sprint. Each has five fixed chapters, tactical studies, or Acts. The separate **Night Room** preserves Masala Mound: match two identical kitchen tiles when nothing covers them and one side is open; the board grows lighter and then the bounded Session closes.
+
+Navakankari, Aadu Puli Aattam, and Pallanguzhi are presented as sourced authored tactical rule studies—not complete traditional matches. Each play surface names its source and documented scope and discloses the full-match rules it omits.
 
 > Nothing to win. Nothing tracked. Nothing you can do wrong.
 
 ## Start here
 
 - [Getting started](./getting-started/) covers the House, Night standalone file, local workspace, and composed PWA build.
-- [Downloads](./downloads/) separates the current live House, live Night PWA, tagged v0.3.0 Night files, checksums, and source build.
+- [Downloads](./downloads/) separates the current live House, live Night PWA, tagged v0.4.0 files, checksums, and source build.
 - [Product contract](./product-contract/) records the promises every implementation must keep.
 - [Rasoi Pairs Session](./nightly-arc/) defines free tiles, pairing, help, settlement, and closure.
 - [Night and local state](./night-and-local-state/) explains deterministic boards and safe v1/v2 migration.
@@ -23,4 +25,4 @@ Nindova House is private, offline-ready authored entertainment for adults 18 and
 - [Research receipts](./research-receipts/) states the behavioral evidence and its limits.
 - [Roadmap](./roadmap/), [Known limitations](./known-limitations/), and [Deferred iOS Wall](./ios-wall/) distinguish the release from future work.
 
-The current House is live from `main`; the latest tagged download remains the earlier v0.3.0 Night Room release. The iOS Wall remains deferred. “Not now” in the browser demonstrates voluntary re-entry; it is not proof of native Screen Time interception.
+The current House is live from `main`; v0.4.0 packages the synchronized House, Night Room, site, docs, and standalone Night file. The iOS Wall remains deferred. “Not now” in the browser demonstrates voluntary re-entry; it is not proof of native Screen Time interception.

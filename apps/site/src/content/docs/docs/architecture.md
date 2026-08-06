@@ -5,14 +5,14 @@ description: Browser-first boundaries for the House registry, Salon games, Rasoi
 
 ## Workspace
 
-- **House** — Vite-compiled TypeScript for the typed entertainment registry, five game renderers, same-tab active state, replaceable result provenance, adult acknowledgement, and its scoped worker.
+- **House** — Vite-compiled TypeScript for five typed category doors, eight game definitions, pure classic-study rules, renderers, same-tab active state, replaceable result provenance, adult acknowledgement, and its scoped worker.
 - **Session** — Vite-compiled TypeScript for the pure Rasoi kernel, native tile interface, boundary clock, optional audio, Night state, and Dawn export.
 - **Site** — Astro landing page and Starlight documentation built from verified product facts and rendered release media.
 - **Composition** — one static root artifact containing the landing page, `/docs/`, `/house/`, `/play/`, and portable `nindova.html`.
 
 ## House boundary
 
-`house-core.ts` owns the compile-time game registry, five authored chapters or Acts per game, Stack legality, entertainment-result schema, and strict local-state validation. `sector-sprint.ts` owns the five authored city Acts, escalating target density, deterministic fixed-step runner state, shared world-to-screen projection, inanimate-target allowlist, distinct Act scenery, and code-drawn Canvas renderer. `house.ts` owns spatial navigation, semantic controls, deterministic celebration, optional sound, focus restoration, same-tab recovery, the runner action loop, suspended one-shot story boundary, pauseable inter-Act transitions, and the Gallery. A safety-boundary exit or runner document reload cannot create completion provenance. Every actual completion is permanently labeled `mode: "entertainment"`; no assessment scoring or population comparison is present.
+`house-core.ts` owns the five-door/eight-game registry, five authored parts per game, Stack legality, entertainment-result schema, strict local-state validation, and the copy-on-write v1→v2 Gallery migration. `classic-studies.ts` owns the canonical Navakankari and Aadu board graphs, Pallanguzhi traversal, five authored fixtures per study, complete nonvisual descriptions, and pure mill, movement, relay, capture, and post-capture continuation rules shared by rendering and tests. `sector-sprint.ts` owns the five authored city Acts, escalating target density, deterministic fixed-step runner state, shared world-to-screen projection, inanimate-target allowlist, distinct Act scenery, and code-drawn Canvas renderer. `house.ts` owns hash-addressable category/table navigation, semantic controls, visible study provenance, deterministic celebration, optional sound, focus restoration, same-tab recovery, the runner action loop, suspended one-shot story boundary, pauseable inter-Act transitions, and the Gallery. A safety-boundary exit or runner document reload cannot create completion provenance. Every actual completion is permanently labeled `mode: "entertainment"`; no assessment scoring or population comparison is present.
 
 `assessment-readiness.ts` is a source-only, fail-closed evidence contract. It is not imported by the House runtime and introduces no route, UI, storage, request, or scoring path. It rejects entertainment results as assessment inputs and keeps research collection and public cognitive output disabled.
 

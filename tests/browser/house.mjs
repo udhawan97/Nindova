@@ -163,7 +163,7 @@ async function openHouse(viewport, options = {}, {
 }
 
 async function completeChoiceGame(page, gameId, answers, { memory = false } = {}) {
-  await page.locator(`[data-game="${gameId}"]`).first().click();
+  await page.evaluate((id) => window.__house.start(id), gameId);
   for (let chapter = 0; chapter < answers.length; chapter += 1) {
     if (memory) await page.click("[data-cover-memory]");
     await page.click(`[data-answer="${answers[chapter]}"]`);
@@ -184,7 +184,7 @@ function hanoiMoves(discCount, from = 0, to = 2, spare = 1, moves = []) {
 }
 
 async function completeStackGame(page) {
-  await page.locator('[data-game="stack-architect"]').first().click();
+  await page.evaluate(() => window.__house.start("stack-architect"));
   for (let chapter = 0; chapter < 5; chapter += 1) {
     for (const [from, to] of hanoiMoves(chapter + 2)) {
       await page.click(`[data-peg="${from}"]`);
@@ -196,7 +196,7 @@ async function completeStackGame(page) {
 }
 
 async function enterRunnerAction(page) {
-  await page.locator('[data-game="sector-sprint"]').first().click();
+  await page.evaluate(() => window.__house.start("sector-sprint"));
   await page.click('[data-runner-route="action"]');
   await page.waitForSelector("#runnerCanvas");
 }
@@ -228,7 +228,7 @@ async function startRunnerAutopilot(page) {
 }
 
 async function enterRunnerNarrated(page) {
-  await page.locator('[data-game="sector-sprint"]').first().click();
+  await page.evaluate(() => window.__house.start("sector-sprint"));
   const routeChoice = page.locator('[data-runner-route="narrated"]');
   if (await routeChoice.count()) await routeChoice.click();
   else {
@@ -309,8 +309,51 @@ try {
     await context.close();
   }
 
+  const classicDoors = await openHouse({ width: 414, height: 896 }, { reducedMotion: "reduce" });
+  await classicDoors.page.click('[data-category="turn-trap"]');
+  assert.equal(await classicDoors.page.locator(".category-table").count(), 2);
+  assert.match(await classicDoors.page.locator(".category-view").innerText(), /Authored tactical rule study/i);
+  await classicDoors.page.click('[data-game="aadu-puli-attam"]');
+  assert.equal(await classicDoors.page.locator(".aadu-board .board-point").count(), 23);
+  assert.match(await classicDoors.page.locator(".classic-study-description").textContent(), /selected tiger is at point 1.*Goats occupy point 4, point 2, point 7/);
+  assert.match(await classicDoors.page.locator('.aadu-board [data-answer="0"]').getAttribute("aria-label"), /Choice A, point 10.*a goat at point 4 between/);
+  for (const option of await classicDoors.page.locator(".aadu-board button").all()) {
+    const box = await option.boundingBox();
+    assert.ok(box && box.width >= 44 && box.height >= 44, "Aadu destination remains a 44px target");
+  }
+  assert.match(await classicDoors.page.locator(".study-provenance").innerText(), /Source and scope/);
+  assert.equal(await classicDoors.page.evaluate(() => document.documentElement.scrollWidth), 414);
+  await classicDoors.page.screenshot({ path: resolve(output, "aadu-puli-study-414x896.png"), fullPage: true, animations: "disabled" });
+  await classicDoors.page.click('[data-route="category"]');
+  await classicDoors.page.click('[data-route="home"]');
+  await classicDoors.page.click('[data-category="pattern-line"]');
+  await classicDoors.page.click('[data-game="navakankari"]');
+  assert.equal(await classicDoors.page.locator(".navakankari-board .board-point").count(), 24);
+  assert.match(await classicDoors.page.locator(".classic-study-description").textContent(), /Your brass pieces are at point 1, point 2/);
+  assert.match(await classicDoors.page.locator('.navakankari-board [data-answer="0"]').getAttribute("aria-label"), /Choice A, point 3.*containing 2 of your existing pieces/);
+  await classicDoors.page.click('[data-route="category"]');
+  await classicDoors.page.click('[data-route="home"]');
+  await classicDoors.page.click('[data-category="count-carry"]');
+  await classicDoors.page.click('[data-game="pallanguzhi"]');
+  assert.equal(await classicDoors.page.locator(".pallanguzhi-pit").count(), 14);
+  assert.match(await classicDoors.page.locator(".classic-study-description").textContent(), /Lower row left to right: pit 1: 2.*Top row left to right: pit 14: 0/);
+  assert.match(await classicDoors.page.locator('button.pallanguzhi-pit[data-answer="0"]').getAttribute("aria-label"), /Choice A, lower pit 1.*2 deposits.*final deposit at pit 3/);
+  for (const option of await classicDoors.page.locator("button.pallanguzhi-pit").all()) {
+    const box = await option.boundingBox();
+    assert.ok(box && box.width >= 44 && box.height >= 44, "Pallanguzhi starting pit remains a 44px target");
+  }
+  assert.equal(await classicDoors.page.evaluate(() => document.documentElement.scrollWidth), 414);
+  await classicDoors.page.click('[data-route="category"]');
+  await classicDoors.page.click('[data-route="home"]');
+  await classicDoors.page.click('[data-category="memory-sequence"]');
+  assert.equal(await classicDoors.page.locator('[data-game="lantern-ledger"]').count(), 1, "Memory & Sequence opens through Door IV");
+  await classicDoors.page.click('[data-route="home"]');
+  await classicDoors.page.click('[data-category="motion-route"]');
+  assert.equal(await classicDoors.page.locator('[data-game="sector-sprint"]').count(), 1, "Motion & Route opens through Door V");
+  await classicDoors.context.close();
+
   const narrow = await openHouse({ width: 320, height: 568 }, { reducedMotion: "reduce" });
-  await narrow.page.click('[data-game="lantern-ledger"]');
+  await narrow.page.evaluate(() => window.__house.start("lantern-ledger"));
   for (const [chapter, answer] of [0, 1, 0, 1].entries()) {
     await narrow.page.click("[data-cover-memory]");
     await narrow.page.click(`[data-answer="${answer}"]`);
@@ -325,7 +368,7 @@ try {
   await narrow.page.click('[data-answer="2"]');
   await narrow.page.waitForSelector(".curtain-call");
   await narrow.page.click('[data-route="home"]');
-  await narrow.page.click('[data-game="stack-architect"]');
+  await narrow.page.evaluate(() => window.__house.start("stack-architect"));
   for (let chapter = 0; chapter < 4; chapter += 1) {
     for (const [from, to] of hanoiMoves(chapter + 2)) {
       await narrow.page.click(`[data-peg="${from}"]`);
@@ -351,32 +394,35 @@ try {
   await narrow.context.close();
 
   const recovery = await openHouse({ width: 375, height: 812 });
-  await recovery.page.click('[data-game="pattern-court"]');
+  await recovery.page.evaluate(() => window.__house.start("pattern-court"));
   await recovery.page.click('[data-answer="1"]');
-  await recovery.page.click('[data-route="home"]');
+  await recovery.page.click('[data-route="category"]');
   assert.equal(await recovery.page.locator("#leaveDialog").getAttribute("open"), "", "unfinished progress asks before leaving");
   await recovery.page.click("#keepPlayingButton");
   assert.equal(await recovery.page.evaluate(() => window.__house.active?.gameId), "pattern-court", "Keep playing preserves the active table");
-  assert.equal(await recovery.page.evaluate(() => document.activeElement?.matches('[data-route="home"]')), true, "cancel returns focus to the exit control");
-  await recovery.page.click('[data-route="home"]');
+  assert.equal(await recovery.page.evaluate(() => document.activeElement?.matches('[data-route="category"]')), true, "cancel returns focus to the exit control");
+  await recovery.page.click('[data-route="category"]');
   await recovery.page.click("#leaveTableButton");
   assert.equal(await recovery.page.evaluate(() => window.__house.active), null, "confirmed exit clears unfinished state");
   assert.equal(await recovery.page.evaluate(() => sessionStorage.getItem("nindova:house:active:v1")), null);
   assert.equal(await recovery.page.evaluate(() => window.__house.memory.latestByGame["pattern-court"]), undefined, "exit records no completion");
-  await recovery.page.click('[data-game="pattern-court"]');
-  await recovery.page.click('[data-route="home"]');
+  await recovery.page.goBack();
+  await recovery.page.waitForFunction(() => window.__house.active === null);
+  assert.doesNotMatch(new URL(recovery.page.url()).hash, /#game\//, "Back after confirmed leave cannot restart the abandoned game");
+  await recovery.page.evaluate(() => window.__house.start("pattern-court"));
+  await recovery.page.click('[data-route="category"]');
   assert.equal(await recovery.page.locator("#leaveDialog").getAttribute("open"), null, "an untouched first chapter exits without interruption");
   await recovery.context.close();
 
   const finalChoiceExit = await openHouse({ width: 375, height: 812 });
-  await finalChoiceExit.page.click('[data-game="pattern-court"]');
+  await finalChoiceExit.page.evaluate(() => window.__house.start("pattern-court"));
   for (const [chapter, answer] of [0, 1, 2, 1].entries()) {
     await finalChoiceExit.page.click(`[data-answer="${answer}"]`);
     await finalChoiceExit.page.waitForFunction((next) => window.__house.active?.chapter === next, chapter + 1);
   }
   await finalChoiceExit.page.click('[data-answer="2"]');
   await finalChoiceExit.page.waitForFunction(() => window.__house.active?.chapter === 4 && window.__house.active?.resolving);
-  await finalChoiceExit.page.click('[data-route="home"]');
+  await finalChoiceExit.page.click('[data-route="category"]');
   await finalChoiceExit.page.waitForTimeout(900);
   assert.equal(await finalChoiceExit.page.locator("#leaveDialog").getAttribute("open"), "", "the final-chapter confirmation remains open past the completion delay");
   assert.deepEqual(await finalChoiceExit.page.evaluate(() => ({ chapter: window.__house.active?.chapter, resolving: window.__house.active?.resolving })), { chapter: 4, resolving: true }, "the final chapter cannot complete behind its exit confirmation");
@@ -388,7 +434,7 @@ try {
   await finalChoiceExit.context.close();
 
   const pattern = await openHouse({ width: 375, height: 812 });
-  await pattern.page.click('[data-game="pattern-court"]');
+  await pattern.page.evaluate(() => window.__house.start("pattern-court"));
   assert.equal(await pattern.page.evaluate(() => window.__house.active?.chapter), 0);
   assert.notEqual(await pattern.page.locator(".pattern-row span").first().evaluate((element) => getComputedStyle(element).animationName), "none", "Pattern Court has an enabled-motion inlay entrance");
   await pattern.page.screenshot({ path: resolve(output, "pattern-court-375x812.png"), fullPage: true, animations: "disabled" });
@@ -412,7 +458,7 @@ try {
   await pattern.context.close();
 
   const mirror = await openHouse({ width: 414, height: 896 });
-  await mirror.page.click('[data-game="mirror-forge"]');
+  await mirror.page.evaluate(() => window.__house.start("mirror-forge"));
   assert.notEqual(await mirror.page.locator(".mirror-ring-outer").evaluate((element) => getComputedStyle(element).animationName), "none", "Mirror Forge has an enabled-motion compass entrance");
   await mirror.page.click('[data-answer="0"]');
   assert.match(await mirror.page.locator("#gameStatus").innerText(), /Not this inscription/);
@@ -421,7 +467,7 @@ try {
   await mirror.context.close();
 
   const memory = await openHouse({ width: 768, height: 1024 });
-  await memory.page.click('[data-game="lantern-ledger"]');
+  await memory.page.evaluate(() => window.__house.start("lantern-ledger"));
   assert.equal(await memory.page.locator(".answer-list button").first().isDisabled(), true);
   const processionLabel = await memory.page.locator(".inscription").getAttribute("aria-label");
   assert.notEqual(await memory.page.locator(".lantern").first().evaluate((element) => getComputedStyle(element).animationName), "none", "Lantern Ledger has an enabled-motion light procession");
@@ -455,7 +501,7 @@ try {
   await memory.context.close();
 
   const stack = await openHouse({ width: 414, height: 896 });
-  await stack.page.click('[data-game="stack-architect"]');
+  await stack.page.evaluate(() => window.__house.start("stack-architect"));
   await stack.page.screenshot({ path: resolve(output, "stack-architect-414x896.png"), fullPage: true, animations: "disabled" });
   const renderedDiscs = await stack.page.locator('[data-peg="0"] .disc').evaluateAll((discs) => discs.map((disc) => {
     const box = disc.getBoundingClientRect();
@@ -487,7 +533,7 @@ try {
   await stack.context.close();
 
   const runner = await openHouse({ width: 375, height: 812 }, {}, { manualRaf: true });
-  await runner.page.click('[data-game="sector-sprint"]');
+  await runner.page.evaluate(() => window.__house.start("sector-sprint"));
   assert.equal(await runner.page.evaluate(() => window.__house.active), null, "route choice creates no run before consent");
   assert.equal(await runner.page.evaluate(() => sessionStorage.getItem("nindova:house:active:v1")), null, "route choice starts no persisted boundary");
   assert.equal(await runner.page.locator("#runnerCanvas").count(), 0, "route choice mounts no moving Canvas before consent");
@@ -767,6 +813,7 @@ try {
 
   const keyboard = await openHouse({ width: 768, height: 1024 }, { reducedMotion: "reduce" });
   await keyboard.page.evaluate(() => document.querySelector("#houseMain")?.focus());
+  await keyboardActivate(keyboard.page, '[data-category="pattern-line"]');
   await keyboardActivate(keyboard.page, '[data-game="pattern-court"]');
   await keyboardActivate(keyboard.page, '[data-answer="1"]');
   await keyboard.page.waitForFunction(() => document.activeElement?.matches('[data-answer="1"]'));
@@ -775,8 +822,10 @@ try {
     if (chapter < 4) await keyboard.page.waitForFunction((next) => window.__house.active?.chapter === next, chapter + 1);
     else await keyboard.page.waitForSelector(".curtain-call");
   }
-  await keyboard.page.waitForFunction(() => document.activeElement?.matches('[data-route="home"]'));
+  await keyboard.page.waitForFunction(() => document.activeElement?.matches('[data-route="category"]'));
+  await keyboardActivate(keyboard.page, '[data-route="category"]');
   await keyboardActivate(keyboard.page, '[data-route="home"]');
+  await keyboardActivate(keyboard.page, '[data-category="memory-sequence"]');
   await keyboardActivate(keyboard.page, '[data-game="lantern-ledger"]');
   for (const [chapter, answer] of [0, 1, 0, 1, 2].entries()) {
     await keyboardActivate(keyboard.page, "[data-cover-memory]");
@@ -785,7 +834,9 @@ try {
     if (chapter < 4) await keyboard.page.waitForFunction((next) => window.__house.active?.chapter === next, chapter + 1);
     else await keyboard.page.waitForSelector(".curtain-call");
   }
+  await keyboardActivate(keyboard.page, '[data-route="category"]');
   await keyboardActivate(keyboard.page, '[data-route="home"]');
+  await keyboardActivate(keyboard.page, '[data-category="count-carry"]');
   await keyboardActivate(keyboard.page, '[data-game="stack-architect"]');
   await keyboard.page.waitForFunction(() => document.activeElement?.id === "houseMain");
   const keyboardMoves = hanoiMoves(2);
@@ -804,7 +855,10 @@ try {
   const catalog = await openHouse({ width: 768, height: 1024 }, { reducedMotion: "reduce" });
   const definitions = [
     ["pattern-court", [0, 1, 2, 1, 2], false],
+    ["navakankari", [0, 1, 2, 0, 1], false],
     ["mirror-forge", [1, 0, 0, 0, 0], false],
+    ["aadu-puli-attam", [0, 1, 2, 0, 1], false],
+    ["pallanguzhi", [0, 1, 2, 0, 1], false],
     ["lantern-ledger", [0, 1, 0, 1, 2], true],
   ];
   for (const [gameId, answers, isMemory] of definitions) {
@@ -818,19 +872,21 @@ try {
   await completeRunnerStory(catalog.page);
   assert.equal(await catalog.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]?.completionFacts.finalChapter), "Roti Relay");
   await catalog.page.click('[data-route="gallery"]');
-  assert.equal(await catalog.page.locator(".gallery-ledger article").filter({ hasText: "authored chapters completed" }).count(), 5);
+  assert.equal(await catalog.page.locator(".gallery-ledger article").filter({ hasText: "authored chapters completed" }).count(), 4);
+  assert.equal(await catalog.page.locator(".gallery-ledger article").filter({ hasText: "authored studies completed" }).count(), 3);
+  assert.equal(await catalog.page.locator(".gallery-ledger article").filter({ hasText: "authored Acts completed" }).count(), 1);
   const mirrorRun = await catalog.page.evaluate(() => window.__house.memory.latestByGame["mirror-forge"].runId);
   await completeChoiceGame(catalog.page, "mirror-forge", [1, 0, 0, 0, 0]);
   const replacement = await catalog.page.evaluate(() => ({
     keys: Object.keys(window.__house.memory.latestByGame),
     runId: window.__house.memory.latestByGame["mirror-forge"].runId,
   }));
-  assert.equal(replacement.keys.length, 5);
+  assert.equal(replacement.keys.length, 8);
   assert.notEqual(replacement.runId, mirrorRun);
   await catalog.page.click('[data-route="gallery"]');
   await catalog.page.click("[data-clear-gallery]");
   assert.equal(await catalog.page.evaluate(() => Object.keys(window.__house.memory.latestByGame).length), 0);
-  assert.equal(await catalog.page.locator(".gallery-ledger article").filter({ hasText: "No completed reading is kept." }).count(), 5);
+  assert.equal(await catalog.page.locator(".gallery-ledger article").filter({ hasText: "No completed reading is kept." }).count(), 8);
   await catalog.context.close();
 
   const provenance = await openHouse({ width: 375, height: 812 });
@@ -862,10 +918,9 @@ try {
 
   const reduced = await openHouse({ width: 375, height: 812 }, { reducedMotion: "reduce" });
   assert.match(await reduced.page.locator(".game-door").first().evaluate((element) => getComputedStyle(element).transitionDuration), /0\.00001s|1e-05s|1e-08s|0s/);
-  await reduced.page.click('[data-game="pattern-court"]');
+  await reduced.page.evaluate(() => window.__house.start("pattern-court"));
   assert.equal(await reduced.page.locator(".pattern-row span").first().evaluate((element) => getComputedStyle(element).animationName), "none", "reduced motion removes decorative inlay movement");
-  await reduced.page.click('[data-route="home"]');
-  await reduced.page.click('[data-game="sector-sprint"]');
+  await reduced.page.evaluate(() => window.__house.start("sector-sprint"));
   assert.equal(await reduced.page.locator(".runner-story").isVisible(), true, "reduced motion starts with the complete narrated route");
   assert.equal(await reduced.page.locator("#runnerCanvas").count(), 0);
   await reduced.page.screenshot({ path: resolve(output, "sector-sprint-reduced-motion-narrated.png"), fullPage: true, animations: "disabled" });
@@ -912,7 +967,7 @@ try {
 
   const pausedRunnerSound = await openHouse({ width: 375, height: 812 }, { reducedMotion: "reduce" }, { audioProbe: true });
   await pausedRunnerSound.page.click("#soundButton");
-  await pausedRunnerSound.page.click('[data-game="sector-sprint"]');
+  await pausedRunnerSound.page.evaluate(() => window.__house.start("sector-sprint"));
   await pausedRunnerSound.page.click("[data-runner-pause]");
   for (let beat = 0; beat < 3; beat += 1) await pausedRunnerSound.page.click("[data-story-advance]");
   await pausedRunnerSound.page.waitForFunction(() => window.__house.active?.chapter === 1);
@@ -920,7 +975,7 @@ try {
   await pausedRunnerSound.context.close();
 
   const sound = await openHouse({ width: 375, height: 812 }, { reducedMotion: "reduce" }, { audioProbe: true });
-  await sound.page.click('[data-game="pattern-court"]');
+  await sound.page.evaluate(() => window.__house.start("pattern-court"));
   await sound.page.click('[data-answer="0"]');
   await sound.page.waitForFunction(() => window.__house.active?.chapter === 1);
   assert.equal(await sound.page.evaluate(() => globalThis.__houseAudioContexts), 0);
@@ -937,7 +992,7 @@ try {
 
   const deniedSound = await openHouse({ width: 375, height: 812 }, { reducedMotion: "reduce" }, { audioDenied: true });
   await deniedSound.page.click("#soundButton");
-  await deniedSound.page.click('[data-game="pattern-court"]');
+  await deniedSound.page.evaluate(() => window.__house.start("pattern-court"));
   await deniedSound.page.click('[data-answer="0"]');
   await deniedSound.page.waitForFunction(() => window.__house.active?.chapter === 1);
   assert.equal(await deniedSound.page.evaluate(() => window.__house.active?.resolving), false, "denied audio cannot stall chapter progression");
@@ -970,7 +1025,7 @@ try {
 
   assert.deepEqual(externalRequests, []);
   assert.deepEqual(errors, []);
-  console.log("Nindova House adult boundary, all five five-chapter games, runner controls/narration, keyboard/nonvisual play, replacement provenance, corrupt recovery, responsive layout, Night isolation, and cold-start offline shell passed.");
+  console.log("Nindova House adult boundary, five category doors and all eight five-part games, runner controls/narration, keyboard/nonvisual play, replacement provenance, corrupt recovery, responsive layout, Night isolation, and cold-start offline shell passed.");
 } finally {
   await browser.close();
   server.kill("SIGTERM");

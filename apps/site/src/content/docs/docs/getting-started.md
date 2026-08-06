@@ -5,7 +5,7 @@ description: Run, build, and verify the current Nindova House and Night Room sou
 
 ## Fastest path
 
-Use the [live Nindova House](https://udhawan97.github.io/Nindova/house/) for the current entertainment hub or the [live Night Room](https://udhawan97.github.io/Nindova/play/) for Masala Mound. The [Downloads guide](./downloads/) separates those live surfaces from the tagged v0.3.0 Night Room files and the current source build.
+Use the [live Nindova House](https://udhawan97.github.io/Nindova/house/) for the current five-door/eight-game entertainment hub or the [live Night Room](https://udhawan97.github.io/Nindova/play/) for Masala Mound. The [Downloads guide](./downloads/) separates those live surfaces from the tagged v0.4.0 files and the current source build.
 
 ## Run from source
 

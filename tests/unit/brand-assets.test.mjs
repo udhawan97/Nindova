@@ -71,7 +71,7 @@ test("single-file download instructions isolate the matching checksum row", asyn
   ]);
 
   for (const document of documents) {
-    assert.match(document, /grep ' nindova-v0\.3\.0\.html\$' SHA256SUMS\.txt \| shasum -a 256 -c -/);
-    assert.match(document, /grep ' nindova-web-v0\.3\.0\.zip\$' SHA256SUMS\.txt \| shasum -a 256 -c -/);
+    assert.match(document, /grep ' nindova-v0\.4\.0\.html\$' SHA256SUMS\.txt \| shasum -a 256 -c -/);
+    assert.match(document, /grep ' nindova-web-v0\.4\.0\.zip\$' SHA256SUMS\.txt \| shasum -a 256 -c -/);
   }
 });

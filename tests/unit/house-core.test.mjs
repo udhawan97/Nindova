@@ -4,17 +4,23 @@ import test from "node:test";
 
 const root = resolve(import.meta.dirname, "../..");
 const House = await import(resolve(root, "apps/house/dist/house-core.js"));
+const Studies = await import(resolve(root, "apps/house/dist/classic-studies.js"));
 
-test("the Grand Salon exposes five distinct five-chapter games", () => {
+test("the Grand Salon exposes five category doors containing eight distinct five-part games", () => {
   assert.deepEqual(House.GAMES.map((game) => game.id), [
     "pattern-court",
+    "navakankari",
     "mirror-forge",
+    "aadu-puli-attam",
     "stack-architect",
+    "pallanguzhi",
     "lantern-ledger",
     "sector-sprint",
   ]);
+  assert.equal(House.DOOR_CATEGORIES.length, 5);
+  assert.deepEqual(House.DOOR_CATEGORIES.flatMap((category) => category.gameIds), House.GAMES.map((game) => game.id));
   for (const game of House.GAMES) {
-    const chapterCount = game.kind === "stack" ? game.diskCounts.length : game.kind === "runner" ? game.chapterTitles.length : game.chapters.length;
+    const chapterCount = game.kind === "classic" ? Studies.getClassicStudy(game.classicStudyId).chapters.length : game.kind === "stack" ? game.diskCounts.length : game.kind === "runner" ? game.chapterTitles.length : game.chapters.length;
     assert.equal(chapterCount, 5, `${game.id} chapter count`);
     assert.equal(game.version, "1.0.0");
   }
@@ -25,7 +31,7 @@ test("entertainment results carry immutable provenance and replace per game", ()
   const game = House.getGame("pattern-court");
   const first = House.completeEntertainmentGame(state, game, "run-one", "2026-08-04T10:00:00.000Z");
   assert.equal(first.result.mode, "entertainment");
-  assert.equal(first.result.schemaVersion, 1);
+  assert.equal(first.result.schemaVersion, 2);
   assert.equal(first.result.gameVersion, "1.0.0");
   assert.equal(first.result.rulesetVersion, "entertainment-1");
   assert.equal(first.result.completionFacts.authoredChapters, 5);
@@ -49,7 +55,22 @@ test("House storage recovers safely from absent, corrupt, and partially invalid 
 
   let value = "";
   assert.equal(House.writeHouseState({ setItem: (_key, next) => { value = next; } }, House.emptyHouseState()), true);
-  assert.equal(JSON.parse(value).schemaVersion, 1);
+  assert.equal(JSON.parse(value).schemaVersion, 2);
+
+  const legacyResult = { ...House.completeEntertainmentGame(House.emptyHouseState(), House.getGame("pattern-court"), "legacy", "2026-08-04T11:00:00.000Z").result, schemaVersion: 1 };
+  const legacy = House.readHouseState({ getItem: (key) => key === House.HOUSE_LEGACY_STORAGE_KEY ? JSON.stringify({ schemaVersion: 1, latestByGame: { "pattern-court": legacyResult } }) : null });
+  assert.equal(legacy.reason, "restored");
+  assert.equal(legacy.state.schemaVersion, 2);
+  assert.equal(legacy.state.latestByGame["pattern-court"].runId, "legacy");
+
+  const legacyValue = JSON.stringify({ schemaVersion: 1, latestByGame: { "pattern-court": legacyResult } });
+  for (const invalidPrimary of ["{", JSON.stringify({ schemaVersion: 99, latestByGame: {} })]) {
+    const fallback = House.readHouseState({
+      getItem: (key) => key === House.HOUSE_STORAGE_KEY ? invalidPrimary : key === House.HOUSE_LEGACY_STORAGE_KEY ? legacyValue : null,
+    });
+    assert.equal(fallback.reason, "restored", "an unusable v2 record falls back to a valid v1 record");
+    assert.equal(fallback.state.latestByGame["pattern-court"].runId, "legacy");
+  }
 
   const pattern = House.completeEntertainmentGame(House.emptyHouseState(), House.getGame("pattern-court"), "misfiled", "2026-08-04T12:00:00.000Z").result;
   const mismatched = House.readHouseState({ getItem: () => JSON.stringify({

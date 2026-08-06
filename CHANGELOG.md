@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.4.0 — 2026-08-05
+
+### Added
+
+- Five Grand Salon category doors grouping eight finite games.
+- Three sourced authored tactical rule studies: Navakankari placement, Aadu Puli Aattam movement, and one-turn Pallanguzhi sowing.
+- Visible documented-scope, source, included-rule, and omitted-rule disclosures for every classic study.
+- Canonical door/table URL fragments and safe copy-on-write migration from the v1 Gallery record to v2.
+
+### Changed
+
+- Polished Pattern Court with sandstone inlay, Mirror Forge with smoked mirror and brass, Stack Architect with rosewood pieces, and Lantern Ledger with a richer velvet stage.
+- Synchronized the House, README, website, Starlight docs, source media, cache version, package versions, and release copy.
+- Expanded deterministic and rendered coverage to all eight games, three traditional board geometries, phone layouts, keyboard paths, reduced motion, and cold-offline use.
+
+### Not added
+
+- No claim that the classic studies are complete traditional matches, definitive pan-Indian rules, or culturally representative human validation.
+- No score, streak, rank, visible timer, collection, randomized reward, assessment output, telemetry, or third-party runtime service.
+
 ## 0.3.0 — 2026-08-03
 
 ### Added

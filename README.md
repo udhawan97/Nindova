@@ -11,7 +11,7 @@
 
 <p align="center"><strong>A house of authored games. A separate room for goodnight.</strong></p>
 
-Nindova is private, offline-ready browser entertainment for adults 18 and over. Choose one of five finite games in the Grand Salon, or enter the separate Night Room for a self-ending Masala Mound Session. There is no account, public ranking, advertising, or app telemetry.
+Nindova is private, offline-ready browser entertainment for adults 18 and over. Five category doors now hold eight finite games in the Grand Salon, including three sourced classic Indian tactical rule studies. The separate Night Room remains a self-ending Masala Mound Session. There is no account, public ranking, advertising, or app telemetry.
 
 <p align="center">
   <a href="https://udhawan97.github.io/Nindova/house/"><strong>Enter the House</strong></a>
@@ -20,33 +20,35 @@ Nindova is private, offline-ready browser entertainment for adults 18 and over. 
   ·
   <a href="https://udhawan97.github.io/Nindova/docs/"><strong>Read the docs</strong></a>
   ·
-  <a href="https://github.com/udhawan97/Nindova/releases/tag/v0.3.0"><strong>Tagged downloads</strong></a>
+  <a href="https://github.com/udhawan97/Nindova/releases/tag/v0.4.0"><strong>Tagged downloads</strong></a>
 </p>
 
-![The real Nindova House floor plan, with the Night Room, five Grand Salon tables, and local Gallery](./apps/site/public/media/nindova-house.png)
+![The real Nindova House floor plan, with the Night Room, five category doors, and local Gallery](./apps/site/public/media/nindova-house.png)
 
 ## Choose your door
 
 |  | Start | Best for | What to expect |
 | --- | --- | --- | --- |
-| <img src="./apps/site/public/brand/favicon.svg" width="28" alt=""> | [Nindova House](https://udhawan97.github.io/Nindova/house/) | The current live product | Five authored games, the Gallery, and a separately linked Night Room |
+| <img src="./apps/site/public/brand/favicon.svg" width="28" alt=""> | [Nindova House](https://udhawan97.github.io/Nindova/house/) | The current live product | Five category doors, eight authored games, the Gallery, and a separate Night Room |
 | <img src="./apps/site/public/brand/motifs/chai.svg" width="28" alt=""> | [Night Room](https://udhawan97.github.io/Nindova/play/) | A bounded wind-down Session | Installable Masala Mound PWA with local Dawn |
-| <img src="./apps/site/public/brand/nindova-mark-monochrome.svg" width="28" alt=""> | [Standalone Night HTML](https://github.com/udhawan97/Nindova/releases/download/v0.3.0/nindova-v0.3.0.html) | One portable tagged file | v0.3.0 Night Room only; no service worker |
+| <img src="./apps/site/public/brand/nindova-mark-monochrome.svg" width="28" alt=""> | [Standalone Night HTML](https://github.com/udhawan97/Nindova/releases/download/v0.4.0/nindova-v0.4.0.html) | One portable tagged file | v0.4.0 Night Room only; no service worker |
 | <img src="./apps/site/public/brand/motifs/tiffin.svg" width="28" alt=""> | [Build current source](#run-current-source) | The latest House and Night code | Landing page, docs, both PWAs, and the standalone Night file |
 
-The live site is published from `main`. The latest tagged download is **v0.3.0 — Shahi Mound** and predates the Grand Salon, Gallery, and Sector Sprint. Those later House surfaces are available live and from current source, but not in the v0.3.0 archive.
+The live site is published from `main`. **v0.4.0 — Five Doors** packages the synchronized landing page, documentation, House, Night Room, and standalone Night file.
 
 ## Inside Nindova House
 
 ### Grand Salon
 
-Each table has five fixed chapters or Acts and a designed curtain call. You replay only by choosing the table again.
+Five doors group eight tables. Every table has five fixed chapters, studies, or Acts and a designed curtain call. You replay only by choosing the table again.
 
-- **Pattern Court** — read the order beneath the ornament.
-- **Mirror Forge** — turn forms without losing their bearing.
-- **Stack Architect** — move a tower by law, one disc at a time.
-- **Lantern Ledger** — hold an ordered procession of light.
-- **Sector Sprint** — steer Gurpreet and Harjit through five progressively faster Chandigarh lane routes. Each marked gate takes at most one adjacent move; one architectural contact pauses the Action route, while textured obstacles, harmless Act tools, and a complete narrated route keep the challenge bounded and accessible.
+- **Pattern & Line** — Pattern Court, plus a placement-only **Navakankari** mill study on the documented 24-point board.
+- **Turn & Trap** — Mirror Forge, plus an **Aadu Puli Aattam** goat-and-tiger movement study on the 23-point board documented by the Indian Heritage Centre.
+- **Count & Carry** — Stack Architect, plus one-turn **Pallanguzhi** sowing studies on a two-by-seven pit board.
+- **Memory & Sequence** — Lantern Ledger's ordered procession of light.
+- **Motion & Route** — Sector Sprint's five progressively faster Chandigarh lane routes, harmless Act tools, and complete narrated route.
+
+The classic additions are labeled as authored tactical rule studies. Each shows its named source, documented scope, included mechanics, and omitted full-match rules; Nindova does not present them as definitive or complete traditional matches.
 
 The Salon has no public ranking, streak, randomized prize, social comparison, or assessment result. The local Gallery may keep only the latest completion fact for each game, and you can clear it from the interface.
 
@@ -63,7 +65,7 @@ From 06:00 through 11:59 in the captured Night ID zone, a completed Session can 
 | House | Night Room |
 | --- | --- |
 | Adults-only authored entertainment | A bounded behavioral design study |
-| Five chapters or Acts inside each chosen game | One Session that closes itself |
+| Five chapters, studies, or Acts inside each chosen game | One Session that closes itself |
 | Latest local completion per game may replace the previous one | Only the latest facts needed for Dawn are retained |
 | No assessment, rank, or population comparison | No sleep score, clinical claim, or performance layer |
 
@@ -80,20 +82,20 @@ The Two-Loop Law applies inside the Night Room: satisfaction belongs inside one 
 
 ## Tagged downloads
 
-The [v0.3.0 release](https://github.com/udhawan97/Nindova/releases/tag/v0.3.0) contains:
+The [v0.4.0 release](https://github.com/udhawan97/Nindova/releases/tag/v0.4.0) contains:
 
-- [Standalone Night Room HTML](https://github.com/udhawan97/Nindova/releases/download/v0.3.0/nindova-v0.3.0.html)
-- [Complete v0.3.0 static web archive](https://github.com/udhawan97/Nindova/releases/download/v0.3.0/nindova-web-v0.3.0.zip)
-- [SHA-256 checksums](https://github.com/udhawan97/Nindova/releases/download/v0.3.0/SHA256SUMS.txt)
+- [Standalone Night Room HTML](https://github.com/udhawan97/Nindova/releases/download/v0.4.0/nindova-v0.4.0.html)
+- [Complete v0.4.0 static web archive](https://github.com/udhawan97/Nindova/releases/download/v0.4.0/nindova-web-v0.4.0.zip)
+- [SHA-256 checksums](https://github.com/udhawan97/Nindova/releases/download/v0.4.0/SHA256SUMS.txt)
 
 Verify only the tagged file you downloaded:
 
 ```sh
 # Standalone HTML
-grep ' nindova-v0.3.0.html$' SHA256SUMS.txt | shasum -a 256 -c -
+grep ' nindova-v0.4.0.html$' SHA256SUMS.txt | shasum -a 256 -c -
 
 # Static web archive
-grep ' nindova-web-v0.3.0.zip$' SHA256SUMS.txt | shasum -a 256 -c -
+grep ' nindova-web-v0.4.0.zip$' SHA256SUMS.txt | shasum -a 256 -c -
 ```
 
 These are HTML and ZIP files, not signed or notarized native applications. Nindova has no native background updater. Replace a tagged file manually; live PWAs refresh their static caches after a successful online visit.
@@ -132,7 +134,7 @@ Still open: real-device VoiceOver and TalkBack acceptance, broader installed Saf
 <details>
 <summary><strong>Repository map and verification</strong></summary>
 
-- `apps/house/` — Vite + TypeScript House, five Salon games, Gallery, manifest, and scoped worker.
+- `apps/house/` — Vite + TypeScript House, five category doors, eight Salon games, Gallery, manifest, and scoped worker.
 - `apps/session/` — Vite + TypeScript Rasoi engine, Night/Dawn state, export, manifest, and scoped worker.
 - `apps/site/` — Astro landing page and Starlight documentation.
 - `docs/` — approved plans, ADRs, evidence, research, and release records.
@@ -146,7 +148,7 @@ npm test
 npm run test:wall-clock
 ```
 
-Read [CONTEXT.md](./CONTEXT.md), [ADR 0013](./docs/adr/0013-add-the-adult-nindova-house.md), [ADR 0014](./docs/adr/0014-add-a-fail-closed-assessment-readiness-contract.md), [ADR 0015](./docs/adr/0015-add-the-bounded-sector-sprint.md), and the [Night Room product contract](./apps/site/src/content/docs/docs/product-contract.md) before changing a product boundary.
+Read [CONTEXT.md](./CONTEXT.md), [ADR 0013](./docs/adr/0013-add-the-adult-nindova-house.md), [ADR 0014](./docs/adr/0014-add-a-fail-closed-assessment-readiness-contract.md), [ADR 0015](./docs/adr/0015-add-the-bounded-sector-sprint.md), [ADR 0019](./docs/adr/0019-group-the-grand-salon-and-add-classic-rule-studies.md), and the [Night Room product contract](./apps/site/src/content/docs/docs/product-contract.md) before changing a product boundary.
 
 </details>
 

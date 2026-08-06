@@ -11,7 +11,7 @@ The House and Night Room make same-origin static requests only. They have no acc
 
 `nindova:house:adult-audience:v1` stores only the local acknowledgement that the visitor is 18 or older. It is audience framing, not identity or date-of-birth verification.
 
-`nindova:house:v1` keeps at most one replaceable completion result per Salon game. Each result is fixed to `mode: "entertainment"` and includes schema, game, and ruleset versions, a local run identifier, completion time, and narrow authored-chapter facts. It contains no answers, errors, move history, reaction timing, percentile, cognitive inference, account, or device identifier. The Gallery provides a visible clear action.
+`nindova:house:v2` keeps at most one replaceable completion result per Salon game. Each result is fixed to `mode: "entertainment"` and includes schema, game, and ruleset versions, a local run identifier, completion time, and narrow authored-chapter facts. It contains no answers, errors, move history, reaction timing, percentile, cognitive inference, account, or device identifier. The app prefers a valid v2 record; otherwise it sanitizes valid results from `nindova:house:v1` into memory without deleting that legacy key. A v2 write occurs only after a new completion. The visible Gallery clear action removes both exact House result keys.
 
 The source-only assessment-readiness contract creates no research record and no storage key. Research collection and public cognitive output remain disabled.
 
@@ -29,4 +29,4 @@ Version 1 and version 2 state is copied into the v3 union and sanitized. The sou
 
 ## Offline cache
 
-The `/house/` worker precaches the complete versioned static House asset graph in `nindova-house-v6` so a fresh controlled navigation works with the HTTP cache cleared and the network offline. The `/play/` worker owns the separately scoped Night shell in `nindova-session-v5`. Neither worker can read local storage or cache state keys, Dawn blobs, or share payloads. The standalone `nindova.html` registers no worker.
+The `/house/` worker precaches the complete versioned static House asset graph in `nindova-house-v7` so a fresh controlled navigation works with the HTTP cache cleared and the network offline. The `/play/` worker owns the separately scoped Night shell in `nindova-session-v5`. Neither worker can read local storage or cache state keys, Dawn blobs, or share payloads. The standalone `nindova.html` registers no worker.
