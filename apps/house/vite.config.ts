@@ -25,6 +25,7 @@ function emitHouseArtifacts(): Plugin {
       const assetDirectory = resolve("dist/assets");
       const brandAssetDirectory = resolve("../site/public/brand");
       await mkdir(assetDirectory, { recursive: true });
+      await emitTypedModule(resolve("src/salon-catalog.ts"), resolve("dist/salon-catalog.js"));
       await emitTypedModule(resolve("src/classic-studies.ts"), resolve("dist/classic-studies.js"));
       await emitTypedModule(resolve("src/house-core.ts"), resolve("dist/house-core.js"));
       await Promise.all(["pwa-192.png", "pwa-512.png", "pwa-maskable-512.png"].map((name) => (

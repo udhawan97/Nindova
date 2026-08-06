@@ -4,14 +4,10 @@ import "../../../tokens.css";
 import "./house.css";
 import runnerCharacterSheetUrl from "./assets/sector-sprint-characters.png?url";
 import {
-  DOOR_CATEGORIES,
-  GAMES,
   HOUSE_AUDIENCE_KEY,
   HOUSE_LEGACY_STORAGE_KEY,
   HOUSE_STORAGE_KEY,
   completeEntertainmentGame,
-  getDoorCategory,
-  getGame,
   initialPegs,
   isLegalStackMove,
   isValidStackState,
@@ -19,11 +15,20 @@ import {
   readHouseState,
   stackSolved,
   writeHouseState,
+  type HouseState,
+} from "./house-core";
+import {
+  DOOR_CATEGORIES,
+  GAMES,
+  GRAND_SALON,
+  type ChoiceGameDefinition,
+  type ClassicGameDefinition,
+  type DoorCategoryId,
   type GameDefinition,
   type GameId,
-  type HouseState,
-  type DoorCategoryId,
-} from "./house-core";
+  type MemoryGameDefinition,
+  type StackGameDefinition,
+} from "./salon-catalog";
 import {
   AADU_LINES,
   AADU_POINTS,
@@ -64,6 +69,9 @@ import {
 } from "./sector-sprint";
 
 type View = "home" | "category" | "gallery" | "game";
+
+const getGame = GRAND_SALON.game.bind(GRAND_SALON);
+const getDoorCategory = GRAND_SALON.door.bind(GRAND_SALON);
 
 type ActiveGame = {
   gameId: GameId;
@@ -173,7 +181,7 @@ function restoreActiveGame(): ActiveGame | null {
       runnerRestoreWasDiscarded = true;
       return null;
     }
-    const diskCount = game.diskCounts?.[chapter] ?? 0;
+    const diskCount = game.kind === "stack" ? game.diskCounts[chapter] ?? 0 : 0;
     const pegs = game.kind === "stack" && isValidStackState(parsed.pegs, diskCount)
       ? parsed.pegs.map((peg) => [...peg])
       : initialPegs(diskCount);
@@ -317,7 +325,7 @@ function startGame(gameId: GameId) {
     chapter: 0,
     runId: crypto.randomUUID(),
     memoryCovered: false,
-    pegs: initialPegs(game.diskCounts?.[0] ?? 0),
+    pegs: initialPegs(game.kind === "stack" ? game.diskCounts[0] ?? 0 : 0),
     selectedPeg: null,
     resolving: false,
     storyBeat: game.kind === "runner" && matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : null,
@@ -506,16 +514,9 @@ function renderGame() {
   if (!active && !pendingRunnerChoice) return route("home");
   const game = pendingRunnerChoice ? getGame("sector-sprint") : getGame(active!.gameId);
   const chapter = active?.chapter ?? 0;
-  const chapterTitle = pendingRunnerChoice
-    ? "Choose your route"
-    : game.kind === "classic"
-      ? getClassicStudy(game.classicStudyId!).chapters[chapter]?.title
-      : game.kind === "stack"
-      ? `${game.diskCounts?.[chapter]}-disc tower`
-      : game.kind === "runner"
-        ? RUNNER_ACTS[chapter]?.title
-        : game.chapters[chapter]?.title;
-  const authoredUnit = game.kind === "runner" ? "Act" : game.kind === "classic" ? "Study" : "Chapter";
+  const part = pendingRunnerChoice ? null : GRAND_SALON.part(game.id, chapter);
+  const chapterTitle = pendingRunnerChoice ? "Choose your route" : part!.title;
+  const authoredUnit = part?.unit ?? "Act";
   main.innerHTML = `
     <section class="game-view game-view-${game.id}" aria-labelledby="gameTitle">
       <header class="game-masthead">
@@ -548,7 +549,7 @@ function renderGame() {
 
 function renderRestoreGate(game: GameDefinition): string {
   if (!active) return "";
-  const unit = game.kind === "runner" ? "Act" : game.kind === "classic" ? "Study" : "Chapter";
+  const unit = GRAND_SALON.part(game.id, active.chapter).unit;
   return `
     <section class="table-gate restore-gate" aria-labelledby="restoreTitle">
       <div class="gate-sigil" aria-hidden="true"><i></i><span></span><i></i></div>
@@ -666,7 +667,7 @@ function renderRunner(): string {
   `;
 }
 
-function renderChoice(game: GameDefinition): string {
+function renderChoice(game: ChoiceGameDefinition | MemoryGameDefinition): string {
   if (!active) return "";
   const chapter = game.chapters[active.chapter];
   if (!chapter) return "";
@@ -718,8 +719,8 @@ function renderBoardLines(points: readonly { id: number; x: number; y: number }[
   }).join("");
 }
 
-function renderClassicStudy(game: GameDefinition): string {
-  if (!active || !game.classicStudyId) return "";
+function renderClassicStudy(game: ClassicGameDefinition): string {
+  if (!active) return "";
   const study = getClassicStudy(game.classicStudyId);
   const chapter = study.chapters[active.chapter];
   let studyBoard = "";
@@ -803,9 +804,9 @@ function renderPallanguzhiStudy(chapter: PallanguzhiChapter): string {
   `;
 }
 
-function renderStack(game: GameDefinition): string {
+function renderStack(game: StackGameDefinition): string {
   if (!active) return "";
-  const diskCount = game.diskCounts?.[active.chapter] ?? 2;
+  const diskCount = game.diskCounts[active.chapter] ?? 2;
   return `
     <div class="stack-instruction">
       <div><p>Move every disc from the first plinth to the third.</p><p>Only the top disc may move. A larger disc may never rest on a smaller one.</p></div>
@@ -1212,7 +1213,7 @@ function advanceStoryBeat() {
 function answerChoice(choiceIndex: number) {
   if (!active || active.resolving) return;
   const game = getGame(active.gameId);
-  if (game.kind === "stack") return;
+  if (game.kind === "stack" || game.kind === "runner") return;
   const chapter = game.kind === "classic"
     ? getClassicStudy(game.classicStudyId!).chapters[active.chapter]
     : game.chapters[active.chapter];
@@ -1272,7 +1273,7 @@ function advanceChapter() {
     active.chapter += 1;
     active.memoryCovered = false;
     active.selectedPeg = null;
-    active.pegs = initialPegs(game.diskCounts?.[active.chapter] ?? 0);
+    active.pegs = initialPegs(game.kind === "stack" ? game.diskCounts[active.chapter] ?? 0 : 0);
     if (game.kind === "runner") {
       active.storyBeat = active.storyBeat === null ? null : 0;
       runnerState = null;
@@ -1375,7 +1376,7 @@ function selectPeg(pegIndex: number) {
         window.setTimeout(() => { lastStackMove = null; }, 520);
       }
       statusMessage = "Disc placed.";
-      const diskCount = game.diskCounts?.[active.chapter] ?? 0;
+      const diskCount = game.diskCounts[active.chapter] ?? 0;
       if (stackSolved(active.pegs, diskCount)) {
         render();
         focusElement(`[data-peg="${pegIndex}"]`);
@@ -1393,7 +1394,7 @@ function resetStackChapter() {
   if (!active) return;
   const game = getGame(active.gameId);
   if (game.kind !== "stack" || active.resolving) return;
-  const diskCount = game.diskCounts?.[active.chapter] ?? 0;
+  const diskCount = game.diskCounts[active.chapter] ?? 0;
   active.pegs = initialPegs(diskCount);
   active.selectedPeg = null;
   active.touched = true;

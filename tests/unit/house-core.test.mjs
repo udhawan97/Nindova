@@ -4,10 +4,10 @@ import test from "node:test";
 
 const root = resolve(import.meta.dirname, "../..");
 const House = await import(resolve(root, "apps/house/dist/house-core.js"));
-const Studies = await import(resolve(root, "apps/house/dist/classic-studies.js"));
+const Salon = await import(resolve(root, "apps/house/dist/salon-catalog.js"));
 
 test("the Grand Salon exposes five category doors containing eight distinct five-part games", () => {
-  assert.deepEqual(House.GAMES.map((game) => game.id), [
+  assert.deepEqual(Salon.GRAND_SALON.games.map((game) => game.id), [
     "pattern-court",
     "navakankari",
     "mirror-forge",
@@ -17,13 +17,17 @@ test("the Grand Salon exposes five category doors containing eight distinct five
     "lantern-ledger",
     "sector-sprint",
   ]);
-  assert.equal(House.DOOR_CATEGORIES.length, 5);
-  assert.deepEqual(House.DOOR_CATEGORIES.flatMap((category) => category.gameIds), House.GAMES.map((game) => game.id));
-  for (const game of House.GAMES) {
-    const chapterCount = game.kind === "classic" ? Studies.getClassicStudy(game.classicStudyId).chapters.length : game.kind === "stack" ? game.diskCounts.length : game.kind === "runner" ? game.chapterTitles.length : game.chapters.length;
-    assert.equal(chapterCount, 5, `${game.id} chapter count`);
+  assert.equal(Salon.GRAND_SALON.doors.length, 5);
+  assert.deepEqual(Salon.GRAND_SALON.doors.flatMap((category) => category.gameIds), Salon.GRAND_SALON.games.map((game) => game.id));
+  for (const game of Salon.GRAND_SALON.games) {
+    assert.deepEqual(Array.from({ length: 5 }, (_, index) => Salon.GRAND_SALON.part(game.id, index).number), [1, 2, 3, 4, 5]);
+    assert.ok(Salon.GRAND_SALON.finalPart(game.id).title);
     assert.equal(game.version, "1.0.0");
   }
+  assert.equal(Salon.GRAND_SALON.part("navakankari", 0).unit, "Study");
+  assert.equal(Salon.GRAND_SALON.part("sector-sprint", 4).title, "Roti Relay");
+  assert.equal(Salon.GRAND_SALON.part("stack-architect", 4).title, "6-disc tower");
+  assert.throws(() => Salon.GRAND_SALON.part("pattern-court", 5), /Unknown part/);
 });
 
 test("entertainment results carry immutable provenance and replace per game", () => {
