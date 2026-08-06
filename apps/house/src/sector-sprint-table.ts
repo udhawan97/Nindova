@@ -21,7 +21,7 @@ import {
 } from "./sector-sprint.js";
 import type { ActiveGame } from "./house-state.js";
 
-export { RUNNER_ACTS as SECTOR_SPRINT_ACTS, RUNNER_HEIGHT as SECTOR_SPRINT_HEIGHT, RUNNER_WIDTH as SECTOR_SPRINT_WIDTH };
+export { RUNNER_HEIGHT as SECTOR_SPRINT_HEIGHT, RUNNER_WIDTH as SECTOR_SPRINT_WIDTH };
 export type SectorSprintRunnerSnapshot = RunnerState;
 export type SectorSprintTerminal =
   | { readonly kind: "completed"; readonly runId: string }

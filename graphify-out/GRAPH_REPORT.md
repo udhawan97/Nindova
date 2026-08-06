@@ -1,16 +1,16 @@
 # Graph Report - Nindova  (2026-08-06)
 
 ## Corpus Check
-- 146 files · ~173,722 words
+- 146 files · ~173,796 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1334 nodes · 1801 edges · 133 communities (109 shown, 24 thin omitted)
+- 1334 nodes · 1800 edges · 133 communities (109 shown, 24 thin omitted)
 - Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 132 edges (avg confidence: 0.72)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `b636fd00`
+- Built from commit: `676a6c64`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

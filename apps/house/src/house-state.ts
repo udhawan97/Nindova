@@ -3,7 +3,7 @@ import { GRAND_SALON, type GameId } from "./salon-catalog.js";
 export const HOUSE_STORAGE_KEY = "nindova:house:v2";
 export const HOUSE_LEGACY_STORAGE_KEY = "nindova:house:v1";
 export const HOUSE_ACTIVE_STORAGE_KEY = "nindova:house:active:v1";
-export const HOUSE_AUDIENCE_KEY = "nindova:house:adult-audience:v1";
+const HOUSE_AUDIENCE_KEY = "nindova:house:adult-audience:v1";
 export const HOUSE_SCHEMA_VERSION = 2 as const;
 export const HOUSE_RULESET_VERSION = "entertainment-1" as const;
 
@@ -142,6 +142,21 @@ function cloneHouseState(state: HouseState): HouseState {
 export function createHouseStateStore(options: { readonly galleryStorage: StoragePort; readonly activeStorage: StoragePort; readonly activeCodec: ActiveSessionCodec }) {
   let gallery = readHouseState(options.galleryStorage).state;
   return Object.freeze({
+    audienceAcknowledged(): boolean {
+      try {
+        return options.galleryStorage.getItem(HOUSE_AUDIENCE_KEY) === "acknowledged";
+      } catch {
+        return false;
+      }
+    },
+    acknowledgeAudience(): boolean {
+      try {
+        options.galleryStorage.setItem(HOUSE_AUDIENCE_KEY, "acknowledged");
+        return true;
+      } catch {
+        return false;
+      }
+    },
     gallery(): HouseState {
       return cloneHouseState(gallery);
     },

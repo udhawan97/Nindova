@@ -455,7 +455,7 @@
     "semantic_hash": "d82b998ec66d551fbdb0ae2215ebc8d1"
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1786058214.2750032,
+    "mtime": 1786060399.080522,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": "9557448d4a3c6237efa8fe2648d21fa0"
   },
@@ -790,8 +790,8 @@
     "semantic_hash": ""
   },
   "apps/house/src/house.ts": {
-    "mtime": 1786058005.9377599,
-    "ast_hash": "5c0adbec9a62add8df2b0194f93ad566",
+    "mtime": 1786060387.0856404,
+    "ast_hash": "dda895de0c0c1988d6ebec8f91bd0fcc",
     "semantic_hash": ""
   },
   "apps/house/src/vite-env.d.ts": {
@@ -990,8 +990,8 @@
     "semantic_hash": ""
   },
   "apps/house/src/house-state.ts": {
-    "mtime": 1786056926.2939036,
-    "ast_hash": "852dc77e8f3d7b766d3927c012fe3f3f",
+    "mtime": 1786060387.0844557,
+    "ast_hash": "fccbbd59e3e38cbec4ac3076631b18ea",
     "semantic_hash": ""
   },
   "apps/house/src/salon-catalog.ts": {
@@ -1005,8 +1005,8 @@
     "semantic_hash": ""
   },
   "apps/house/src/sector-sprint-table.ts": {
-    "mtime": 1786058005.9371634,
-    "ast_hash": "715dfd7857309de5e5d0097d37e76b5c",
+    "mtime": 1786060387.086247,
+    "ast_hash": "a8454f5239d235577604443acee57bf8",
     "semantic_hash": ""
   },
   "apps/house/src/stack-architect.ts": {
@@ -1020,8 +1020,8 @@
     "semantic_hash": ""
   },
   "tests/unit/house-state.test.mjs": {
-    "mtime": 1786057041.6789196,
-    "ast_hash": "a4ff4f2bf48dac05a4023808c33b2867",
+    "mtime": 1786060387.086629,
+    "ast_hash": "1d6f9ad94e7384e2c0ede00a4f01c3bc",
     "semantic_hash": ""
   },
   "tests/unit/stack-architect.test.mjs": {

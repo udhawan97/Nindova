@@ -88,3 +88,17 @@ test("active storage failures remain optional", () => {
   const unavailable = State.createHouseStateStore({ galleryStorage: memoryStorage(), activeStorage: memoryStorage({}, { set: true }), activeCodec: Session.HOUSE_ACTIVE_SESSION_CODEC });
   assert.equal(unavailable.saveActive({ gameId: "pattern-court", chapter: 0, runId: "run", memoryCovered: false, pegs: [[], [], []], selectedPeg: null, resolving: false, storyBeat: null, touched: false }), false);
 });
+
+test("adult-audience acknowledgement is owned by the House state store", () => {
+  const gallery = memoryStorage();
+  const store = State.createHouseStateStore({ galleryStorage: gallery, activeStorage: memoryStorage(), activeCodec: Session.HOUSE_ACTIVE_SESSION_CODEC });
+  assert.equal(store.audienceAcknowledged(), false);
+  assert.equal(store.acknowledgeAudience(), true);
+  assert.equal(store.audienceAcknowledged(), true);
+  assert.deepEqual(gallery.calls.at(-1), ["set", "nindova:house:adult-audience:v1"]);
+
+  const unreadable = State.createHouseStateStore({ galleryStorage: memoryStorage({}, { get: true }), activeStorage: memoryStorage(), activeCodec: Session.HOUSE_ACTIVE_SESSION_CODEC });
+  assert.equal(unreadable.audienceAcknowledged(), false);
+  const unwritable = State.createHouseStateStore({ galleryStorage: memoryStorage({}, { set: true }), activeStorage: memoryStorage(), activeCodec: Session.HOUSE_ACTIVE_SESSION_CODEC });
+  assert.equal(unwritable.acknowledgeAudience(), false);
+});

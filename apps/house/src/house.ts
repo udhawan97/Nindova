@@ -3,7 +3,6 @@ import "@fontsource-variable/geist";
 import "../../../tokens.css";
 import "./house.css";
 import {
-  HOUSE_AUDIENCE_KEY,
   createHouseStateStore,
   type ActiveGame,
   type HouseState,
@@ -33,7 +32,6 @@ import {
   type ClassicChapterView,
 } from "./classic-studies";
 import {
-  SECTOR_SPRINT_ACTS,
   createSectorSprintTable,
   type SectorSprintRunnerSnapshot,
   type SectorSprintTerminal,
@@ -1158,7 +1156,7 @@ soundButton.addEventListener("click", () => {
 });
 
 enterHouseButton.addEventListener("click", () => {
-  try { localStorage.setItem(HOUSE_AUDIENCE_KEY, "acknowledged"); } catch { /* The acknowledgement may remain session-only. */ }
+  houseStateStore.acknowledgeAudience();
 });
 
 audienceDialog.addEventListener("cancel", (event) => event.preventDefault());
@@ -1190,11 +1188,7 @@ leaveDialog.addEventListener("cancel", (event) => {
   requestAnimationFrame(() => focusTarget?.focus({ preventScroll: true }));
 });
 
-try {
-  if (localStorage.getItem(HOUSE_AUDIENCE_KEY) !== "acknowledged") audienceDialog.showModal();
-} catch {
-  audienceDialog.showModal();
-}
+if (!houseStateStore.audienceAcknowledged()) audienceDialog.showModal();
 
 window.__house = {
   get view() { return view; },
