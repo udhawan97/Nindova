@@ -5,18 +5,17 @@ import "./house.css";
 import runnerCharacterSheetUrl from "./assets/sector-sprint-characters.png?url";
 import {
   HOUSE_AUDIENCE_KEY,
-  HOUSE_LEGACY_STORAGE_KEY,
-  HOUSE_STORAGE_KEY,
-  completeEntertainmentGame,
+  createHouseStateStore,
+  type ActiveGame,
+  type HouseState,
+} from "./house-state";
+import { HOUSE_ACTIVE_SESSION_CODEC } from "./house-session-codec";
+import {
   initialPegs,
   isLegalStackMove,
-  isValidStackState,
   moveStackDisc,
-  readHouseState,
   stackSolved,
-  writeHouseState,
-  type HouseState,
-} from "./house-core";
+} from "./stack-architect";
 import {
   DOOR_CATEGORIES,
   GAMES,
@@ -61,18 +60,6 @@ type View = "home" | "category" | "gallery" | "game";
 const getGame = GRAND_SALON.game.bind(GRAND_SALON);
 const getDoorCategory = GRAND_SALON.door.bind(GRAND_SALON);
 
-type ActiveGame = {
-  gameId: GameId;
-  chapter: number;
-  runId: string;
-  memoryCovered: boolean;
-  pegs: number[][];
-  selectedPeg: number | null;
-  resolving: boolean;
-  storyBeat: number | null;
-  touched: boolean;
-};
-
 type DebugHouse = {
   readonly view: View;
   readonly active: ActiveGame | null;
@@ -102,14 +89,15 @@ const keepPlayingButton = requiredElement<HTMLButtonElement>("#keepPlayingButton
 const leaveTableButton = requiredElement<HTMLButtonElement>("#leaveTableButton");
 const celebration = requiredElement<HTMLElement>("#celebration");
 
-const ACTIVE_KEY = "nindova:house:active:v1";
 const runnerReviewMode = new URLSearchParams(location.search).get("review") === "1";
 const PRAISE = ["Well seen.", "Exact.", "Beautifully read.", "The order holds.", "A complete reading."] as const;
-let memory = readHouseState(localStorage).state;
+const houseStateStore = createHouseStateStore({ galleryStorage: localStorage, activeStorage: sessionStorage, activeCodec: HOUSE_ACTIVE_SESSION_CODEC });
+const restoredActive = houseStateStore.restoreActive();
+let memory = houseStateStore.gallery();
 let view: View = "home";
 let selectedCategory: DoorCategoryId | null = null;
-let runnerRestoreWasDiscarded = false;
-let active: ActiveGame | null = restoreActiveGame();
+let runnerRestoreWasDiscarded = restoredActive.discardedRunner;
+let active: ActiveGame | null = restoredActive.active;
 let restoreDecisionPending = Boolean(active);
 let pendingRunnerChoice = false;
 let exitReturnFocus: HTMLElement | null = null;
@@ -157,54 +145,8 @@ if (active) {
   selectedCategory = getGame(active.gameId).categoryId;
 }
 
-function restoreActiveGame(): ActiveGame | null {
-  try {
-    const parsed = JSON.parse(sessionStorage.getItem(ACTIVE_KEY) ?? "null") as Partial<ActiveGame> | null;
-    if (!parsed || !GAMES.some((game) => game.id === parsed.gameId)) return null;
-    const game = getGame(parsed.gameId as GameId);
-    const chapter = Number(parsed.chapter);
-    if (!Number.isInteger(chapter) || chapter < 0 || chapter > 4 || typeof parsed.runId !== "string") return null;
-    if (game.kind === "runner") {
-      sessionStorage.removeItem(ACTIVE_KEY);
-      runnerRestoreWasDiscarded = true;
-      return null;
-    }
-    const diskCount = game.kind === "stack" ? game.diskCounts[chapter] ?? 0 : 0;
-    const pegs = game.kind === "stack" && isValidStackState(parsed.pegs, diskCount)
-      ? parsed.pegs.map((peg) => [...peg])
-      : initialPegs(diskCount);
-    return {
-      gameId: game.id,
-      chapter,
-      runId: parsed.runId,
-      memoryCovered: Boolean(parsed.memoryCovered),
-      pegs,
-      selectedPeg: null,
-      resolving: false,
-      storyBeat: null,
-      touched: Boolean(parsed.touched)
-        || chapter > 0
-        || Boolean(parsed.memoryCovered)
-        || (game.kind === "stack" && JSON.stringify(pegs) !== JSON.stringify(initialPegs(diskCount))),
-    };
-  } catch {
-    return null;
-  }
-}
-
 function saveActiveGame() {
-  try {
-    if (active) {
-      const game = getGame(active.gameId);
-      const stored = game.kind === "runner"
-        ? { gameId: active.gameId, chapter: active.chapter, runId: active.runId, storyBeat: active.storyBeat }
-        : active;
-      sessionStorage.setItem(ACTIVE_KEY, JSON.stringify(stored));
-    }
-    else sessionStorage.removeItem(ACTIVE_KEY);
-  } catch {
-    // Same-tab recovery is optional; the games remain fully usable without storage.
-  }
+  houseStateStore.saveActive(active);
 }
 
 function hashForView(next: View): string {
@@ -1297,10 +1239,9 @@ function finishGame() {
   celebration.hidden = true;
   const game = getGame(active.gameId);
   const authoredUnit = game.kind === "runner" ? "Acts" : game.kind === "classic" ? "studies" : "chapters";
-  const completed = completeEntertainmentGame(memory, game, active.runId, new Date().toISOString());
+  const completed = houseStateStore.complete(game.id, active.runId, new Date().toISOString());
   memory = completed.state;
-  writeHouseState(localStorage, memory);
-  sessionStorage.removeItem(ACTIVE_KEY);
+  houseStateStore.saveActive(null);
   main.innerHTML = `
     <section class="curtain-call" aria-labelledby="curtainTitle">
       <p class="kicker">The curtain call</p>
@@ -1328,7 +1269,7 @@ function closeRunnerAtBoundary() {
   runnerState = null;
   runnerPaused = false;
   celebration.hidden = true;
-  sessionStorage.removeItem(ACTIVE_KEY);
+  houseStateStore.saveActive(null);
   main.innerHTML = `
     <section class="curtain-call" aria-labelledby="curtainTitle">
       <p class="kicker">The quiet boundary</p>
@@ -1595,11 +1536,8 @@ document.addEventListener("click", (event) => {
     return;
   }
   if (target.closest("[data-clear-gallery]")) {
-    memory = readHouseState({ getItem: () => null }).state;
-    try {
-      localStorage.removeItem(HOUSE_STORAGE_KEY);
-      localStorage.removeItem(HOUSE_LEGACY_STORAGE_KEY);
-    } catch { /* The in-memory Gallery is still cleared. */ }
+    houseStateStore.clearGallery();
+    memory = houseStateStore.gallery();
     renderGallery();
     focusElement("[data-clear-gallery]");
     return;
