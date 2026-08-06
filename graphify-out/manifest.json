@@ -160,8 +160,8 @@
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/architecture.md": {
-    "mtime": 1785990679.8043082,
-    "ast_hash": "edbf78ac18b5f6998784d07e737d6338",
+    "mtime": 1786058124.3455496,
+    "ast_hash": "f3a5aa68f7b57aee495e0485a3388436",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/dawn.md": {
@@ -455,7 +455,7 @@
     "semantic_hash": "d82b998ec66d551fbdb0ae2215ebc8d1"
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1785990950.522366,
+    "mtime": 1786058214.2750032,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": "9557448d4a3c6237efa8fe2648d21fa0"
   },
@@ -485,9 +485,9 @@
     "semantic_hash": "1738a90899631a6ba5dff435d25a0627"
   },
   "tests/unit/copy-contract.test.mjs": {
-    "mtime": 1785873237.8203764,
-    "ast_hash": "0b517d9d7d0e76e16f8f6c7e562538f2",
-    "semantic_hash": "0b517d9d7d0e76e16f8f6c7e562538f2"
+    "mtime": 1786057081.4332402,
+    "ast_hash": "a3c31efcf58f3dbd26919da7b548dd0d",
+    "semantic_hash": ""
   },
   "docs/QUIET-DEPTH-PLAN.md": {
     "mtime": 1785787384.0363646,
@@ -789,14 +789,9 @@
     "ast_hash": "bff3c069eb33590f71ee6a342c051fc4",
     "semantic_hash": ""
   },
-  "apps/house/src/house-core.ts": {
-    "mtime": 1785990726.488199,
-    "ast_hash": "34eb0d7aff8487b68b6d183e566e9d1b",
-    "semantic_hash": ""
-  },
   "apps/house/src/house.ts": {
-    "mtime": 1785990726.4878073,
-    "ast_hash": "7f3dbdecdb499f03c305a4d7821d79fd",
+    "mtime": 1786058005.9377599,
+    "ast_hash": "5c0adbec9a62add8df2b0194f93ad566",
     "semantic_hash": ""
   },
   "apps/house/src/vite-env.d.ts": {
@@ -810,18 +805,13 @@
     "semantic_hash": "bafa4051d5b5eef2cd592af4df3041a9"
   },
   "apps/house/vite.config.ts": {
-    "mtime": 1785988030.1633995,
-    "ast_hash": "ccae03d8c1f433997fdf96c66b84662c",
+    "mtime": 1786057740.3477404,
+    "ast_hash": "f7a4383611895f999a5b754c5d60e4e0",
     "semantic_hash": ""
   },
   "tests/browser/house.mjs": {
     "mtime": 1785990572.9982839,
     "ast_hash": "8bcbf8a0f8ad480e20a0daa6ac2f5a63",
-    "semantic_hash": ""
-  },
-  "tests/unit/house-core.test.mjs": {
-    "mtime": 1785990160.9923036,
-    "ast_hash": "3c7ed0acc3577e5295ab15f09895dff2",
     "semantic_hash": ""
   },
   "apps/house/index.html": {
@@ -975,13 +965,13 @@
     "semantic_hash": ""
   },
   "apps/house/src/classic-studies.ts": {
-    "mtime": 1785990726.4873073,
-    "ast_hash": "0aed632ae372420b81969dcf47646312",
+    "mtime": 1786056609.605562,
+    "ast_hash": "52cdb6f83ee23ba43e2acf899c2e1b89",
     "semantic_hash": ""
   },
   "tests/unit/classic-studies.test.mjs": {
-    "mtime": 1785990777.3839014,
-    "ast_hash": "6f2d43a411b490ac3a217f0b36e0fe26",
+    "mtime": 1786056687.7855392,
+    "ast_hash": "e326c31abe718be96290b3a9d0690b34",
     "semantic_hash": ""
   },
   "docs/adr/0019-group-the-grand-salon-and-add-classic-rule-studies.md": {
@@ -992,6 +982,51 @@
   "docs/releases/v0.4.0.md": {
     "mtime": 1785990726.4890459,
     "ast_hash": "ab2c526094283189a7ea6b1cdeeb62f6",
+    "semantic_hash": ""
+  },
+  "apps/house/src/house-session-codec.ts": {
+    "mtime": 1786057740.3474712,
+    "ast_hash": "f051c5a36526e42b77efe8b3119cc094",
+    "semantic_hash": ""
+  },
+  "apps/house/src/house-state.ts": {
+    "mtime": 1786056926.2939036,
+    "ast_hash": "852dc77e8f3d7b766d3927c012fe3f3f",
+    "semantic_hash": ""
+  },
+  "apps/house/src/salon-catalog.ts": {
+    "mtime": 1786056464.6062243,
+    "ast_hash": "ebd725d1ae546f203c829be8c2ad9b89",
+    "semantic_hash": ""
+  },
+  "apps/house/src/sector-sprint-session.ts": {
+    "mtime": 1786057740.3467345,
+    "ast_hash": "9267e46e490001aa6b469546c75b61fd",
+    "semantic_hash": ""
+  },
+  "apps/house/src/sector-sprint-table.ts": {
+    "mtime": 1786058005.9371634,
+    "ast_hash": "715dfd7857309de5e5d0097d37e76b5c",
+    "semantic_hash": ""
+  },
+  "apps/house/src/stack-architect.ts": {
+    "mtime": 1786056884.285423,
+    "ast_hash": "ae711c17ae7c26b5c745f62abfde47a7",
+    "semantic_hash": ""
+  },
+  "tests/unit/house-architecture.test.mjs": {
+    "mtime": 1786058124.3452003,
+    "ast_hash": "6cabbdb7c44eaec26e8c5862f927fbd3",
+    "semantic_hash": ""
+  },
+  "tests/unit/house-state.test.mjs": {
+    "mtime": 1786057041.6789196,
+    "ast_hash": "a4ff4f2bf48dac05a4023808c33b2867",
+    "semantic_hash": ""
+  },
+  "tests/unit/stack-architect.test.mjs": {
+    "mtime": 1786057041.679166,
+    "ast_hash": "950c7b886cafd2f30d4dce25831a9e0e",
     "semantic_hash": ""
   }
 }
