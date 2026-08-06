@@ -1,6 +1,7 @@
 import { restoreStackPegs, initialPegs } from "./stack-architect.js";
 import { GRAND_SALON, type GameId } from "./salon-catalog.js";
 import type { ActiveGame, ActiveSessionCodec } from "./house-state.js";
+import { decodeSectorSprintActive, encodeSectorSprintActive } from "./sector-sprint-session.js";
 
 function validBase(value: unknown): { record: Partial<ActiveGame>; gameId: GameId; chapter: number } | null {
   if (!value || typeof value !== "object") return null;
@@ -13,10 +14,11 @@ function validBase(value: unknown): { record: Partial<ActiveGame>; gameId: GameI
 
 export const HOUSE_ACTIVE_SESSION_CODEC: ActiveSessionCodec = Object.freeze({
   decode(value) {
+    const sector = decodeSectorSprintActive(value);
+    if (sector) return sector;
     const base = validBase(value);
     if (!base) return { active: null, discardedRunner: false };
     const game = GRAND_SALON.game(base.gameId);
-    if (game.kind === "runner") return { active: null, discardedRunner: true };
     const diskCount = game.kind === "stack" ? game.diskCounts[base.chapter] ?? 0 : 0;
     const pegs = game.kind === "stack" ? restoreStackPegs(base.record.pegs, diskCount) : initialPegs(0);
     const stackChanged = game.kind === "stack" && JSON.stringify(pegs) !== JSON.stringify(initialPegs(diskCount));
@@ -36,8 +38,8 @@ export const HOUSE_ACTIVE_SESSION_CODEC: ActiveSessionCodec = Object.freeze({
     };
   },
   encode(active) {
-    const game = GRAND_SALON.game(active.gameId);
-    if (game.kind === "runner") return { gameId: active.gameId, chapter: active.chapter, runId: active.runId, storyBeat: active.storyBeat };
+    const sector = encodeSectorSprintActive(active);
+    if (sector) return sector;
     return {
       gameId: active.gameId,
       chapter: active.chapter,

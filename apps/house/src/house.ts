@@ -2,7 +2,6 @@ import "@fontsource-variable/newsreader";
 import "@fontsource-variable/geist";
 import "../../../tokens.css";
 import "./house.css";
-import runnerCharacterSheetUrl from "./assets/sector-sprint-characters.png?url";
 import {
   HOUSE_AUDIENCE_KEY,
   createHouseStateStore,
@@ -34,26 +33,12 @@ import {
   type ClassicChapterView,
 } from "./classic-studies";
 import {
-  RUNNER_ACTS,
-  RUNNER_ACTION_ROUTE_MINIMUM_MS,
-  RUNNER_ACT_SECONDS,
-  RUNNER_DPR_CAP,
-  RUNNER_FIXED_STEP_MS,
-  RUNNER_HEIGHT,
-  RUNNER_MAX_CATCH_UP_STEPS,
-  RUNNER_PLAYER_SCREEN_X,
-  RUNNER_SESSION_SECONDS,
-  RUNNER_WIDTH,
-  createRunnerState,
-  drawRunnerFrame,
-  runnerRenderQualityForIntervals,
-  runnerUpcomingInstruction,
-  stepRunner,
-  type RunnerInput,
-  type RunnerPalette,
-  type RunnerRenderQuality,
-  type RunnerState,
-} from "./sector-sprint";
+  SECTOR_SPRINT_ACTS,
+  createSectorSprintTable,
+  type SectorSprintRunnerSnapshot,
+  type SectorSprintTerminal,
+  type SectorSprintTone,
+} from "./sector-sprint-table";
 
 type View = "home" | "category" | "gallery" | "game";
 
@@ -64,7 +49,7 @@ type DebugHouse = {
   readonly view: View;
   readonly active: ActiveGame | null;
   readonly memory: HouseState;
-  readonly runner: RunnerState | null;
+  readonly runner: SectorSprintRunnerSnapshot | null;
   start: (gameId: GameId) => void;
   openCategory: (categoryId: DoorCategoryId) => void;
   answer: (choiceIndex: number) => void;
@@ -105,40 +90,31 @@ let exitConfirmationPending = false;
 let soundOn = false;
 let statusMessage = "";
 let celebrationTimer = 0;
-let runnerState: RunnerState | null = null;
-let runnerFrame = 0;
-let runnerLastTimestamp = 0;
-let runnerSessionElapsedMs = 0;
-let runnerInput: RunnerInput = {};
-let runnerActivePointerId: number | null = null;
-let runnerActivePointerAction: "up" | "down" | "tool" | null = null;
-let runnerAccumulatorMs = 0;
-let runnerRenderQuality: RunnerRenderQuality = "high";
-let runnerFrameIntervals: number[] = [];
-let runnerPaused = false;
-let runnerInterrupted = false;
-let runnerBoundaryTimer = 0;
-let runnerBoundaryStartedAt: number | null = null;
-let runnerPaletteCache: RunnerPalette | null = null;
 let chapterTransitionTimer = 0;
 let chapterTransitionRemainingMs = 0;
 let chapterTransitionStartedAt: number | null = null;
 let chapterTransitionCallback: (() => void) | null = null;
-let runnerRenderSequence = 0;
 let houseAudioContext: AudioContext | null = null;
 const houseAudioVoices = new Set<OscillatorNode>();
 let lastStackMove: { peg: number; disk: number } | null = null;
-let runnerCharacterSheet: HTMLImageElement | null = null;
 
-function ensureRunnerCharacterSheet() {
-  if (runnerCharacterSheet) return;
-  const sheet = new Image();
-  sheet.decoding = "async";
-  sheet.addEventListener("load", () => drawCurrentRunnerFrame());
-  sheet.src = runnerCharacterSheetUrl;
-  runnerCharacterSheet = sheet;
-  void sheet.decode().then(() => drawCurrentRunnerFrame(), () => undefined);
-}
+const sectorTable = createSectorSprintTable({
+  reviewMode: runnerReviewMode,
+  audio: {
+    resumeFromGesture: resumeHouseAudioFromGesture,
+    suspend: suspendHouseAudio,
+    close: closeHouseAudio,
+    tone: playSectorTone,
+  },
+  persist(next) {
+    active = next;
+    houseStateStore.saveActive(next);
+  },
+  renderShell: render,
+  celebrate: showCelebration,
+  terminal: handleSectorTerminal,
+  focus: focusElement,
+});
 
 if (active) {
   view = "game";
@@ -165,7 +141,7 @@ function writeRouteHash(next: View, replace = false) {
 
 function route(next: View) {
   const leavingGame = view === "game" && next !== "game";
-  stopRunnerLoop();
+  if (leavingGame) sectorTable.destroy();
   closeHouseAudio();
   if (next !== "game") clearChapterTransition();
   view = next;
@@ -196,7 +172,7 @@ function requestRoute(next: View, invoker: HTMLElement | null = null) {
   if (next !== "game" && view === "game" && active && !restoreDecisionPending && hasMeaningfulProgress(active)) {
     exitReturnFocus = invoker ?? document.activeElement as HTMLElement | null;
     exitConfirmationPending = true;
-    stopRunnerLoop();
+    sectorTable.suspend("exit");
     pauseChapterTransition();
     suspendHouseAudio();
     leaveDialog.showModal();
@@ -225,28 +201,23 @@ function openCategory(categoryId: DoorCategoryId) {
 function startGame(gameId: GameId) {
   const game = getGame(gameId);
   selectedCategory = game.categoryId;
-  stopRunnerLoop();
+  sectorTable.destroy();
   closeHouseAudio();
   clearChapterTransition();
-  runnerState = null;
-  runnerSessionElapsedMs = 0;
-  runnerPaused = false;
-  runnerPaletteCache = null;
-  runnerAccumulatorMs = 0;
-  runnerRenderQuality = "high";
-  runnerFrameIntervals = [];
   lastStackMove = null;
   restoreDecisionPending = false;
-  if (game.kind === "runner" && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    ensureRunnerCharacterSheet();
+  if (game.kind === "runner") {
     active = null;
-    pendingRunnerChoice = true;
+    pendingRunnerChoice = !matchMedia("(prefers-reduced-motion: reduce)").matches;
     view = "game";
     statusMessage = "";
-    saveActiveGame();
     writeRouteHash("game");
-    render();
-    focusElement('[data-runner-route="action"]');
+    if (pendingRunnerChoice) {
+      sectorTable.prepare();
+      saveActiveGame();
+      render();
+      focusElement('[data-runner-route="action"]');
+    } else sectorTable.start("narrated", crypto.randomUUID());
     return;
   }
   pendingRunnerChoice = false;
@@ -258,7 +229,7 @@ function startGame(gameId: GameId) {
     pegs: initialPegs(game.kind === "stack" ? game.diskCounts[0] ?? 0 : 0),
     selectedPeg: null,
     resolving: false,
-    storyBeat: game.kind === "runner" && matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : null,
+    storyBeat: null,
     touched: false,
   };
   view = "game";
@@ -271,28 +242,9 @@ function startGame(gameId: GameId) {
 
 function beginRunnerRoute(routeChoice: "action" | "narrated") {
   if (!pendingRunnerChoice && active) return;
-  const game = getGame("sector-sprint");
   pendingRunnerChoice = false;
-  active = {
-    gameId: game.id,
-    chapter: 0,
-    runId: crypto.randomUUID(),
-    memoryCovered: false,
-    pegs: [],
-    selectedPeg: null,
-    resolving: false,
-    storyBeat: routeChoice === "narrated" ? 0 : null,
-    touched: false,
-  };
   view = "game";
-  if (routeChoice === "action") {
-    ensureRunnerCharacterSheet();
-    runnerRenderQuality = matchMedia("(max-width: 480px)").matches ? "balanced" : "high";
-  }
-  statusMessage = routeChoice === "narrated" ? "The narrated city route is ready." : "The lane route begins gently. One architectural contact pauses this Action attempt.";
-  saveActiveGame();
-  render();
-  focusFirstGameControl();
+  sectorTable.start(routeChoice, crypto.randomUUID());
 }
 
 function escape(value: string): string {
@@ -319,12 +271,55 @@ function focusElement(selector: string) {
   requestAnimationFrame(() => document.querySelector<HTMLElement>(selector)?.focus({ preventScroll: true }));
 }
 
+function clearChapterTransition() {
+  if (chapterTransitionTimer) window.clearTimeout(chapterTransitionTimer);
+  chapterTransitionTimer = 0;
+  chapterTransitionRemainingMs = 0;
+  chapterTransitionStartedAt = null;
+  chapterTransitionCallback = null;
+}
+
+function pauseChapterTransition() {
+  if (!chapterTransitionCallback || chapterTransitionStartedAt === null) return;
+  if (chapterTransitionTimer) window.clearTimeout(chapterTransitionTimer);
+  chapterTransitionTimer = 0;
+  chapterTransitionRemainingMs = Math.max(0, chapterTransitionRemainingMs - (performance.now() - chapterTransitionStartedAt));
+  chapterTransitionStartedAt = null;
+}
+
+function resumeChapterTransition() {
+  if (!chapterTransitionCallback || chapterTransitionTimer || document.hidden || exitConfirmationPending) return;
+  if (chapterTransitionRemainingMs <= 0) {
+    const callback = chapterTransitionCallback;
+    clearChapterTransition();
+    callback();
+    return;
+  }
+  chapterTransitionStartedAt = performance.now();
+  chapterTransitionTimer = window.setTimeout(() => {
+    const callback = chapterTransitionCallback;
+    clearChapterTransition();
+    callback?.();
+  }, chapterTransitionRemainingMs);
+}
+
+function scheduleChapterTransition(delay: number, callback: () => void) {
+  clearChapterTransition();
+  if (delay <= 0) {
+    callback();
+    return;
+  }
+  chapterTransitionRemainingMs = delay;
+  chapterTransitionCallback = callback;
+  resumeChapterTransition();
+}
+
 function focusFirstGameControl() {
   if (!active) return;
   const game = getGame(active.gameId);
   if (game.kind === "runner") focusElement(
-    runnerState?.failed
-      ? runnerRetryAvailable() ? "[data-runner-retry]" : "[data-runner-story]"
+    sectorTable.runner()?.failed
+      ? sectorTable.canRetry() ? "[data-runner-retry]" : "[data-runner-story]"
       : active.storyBeat === null ? '[data-runner-action="up"]' : "[data-story-advance]",
   );
   else if (game.kind === "stack") focusElement('[data-peg="0"]');
@@ -447,6 +442,7 @@ function renderGame() {
   const part = pendingRunnerChoice ? null : GRAND_SALON.part(game.id, chapter);
   const chapterTitle = pendingRunnerChoice ? "Choose your route" : part!.title;
   const authoredUnit = part?.unit ?? "Act";
+  const displayedStatus = game.kind === "runner" ? sectorTable.status() : statusMessage;
   main.innerHTML = `
     <section class="game-view game-view-${game.id}" aria-labelledby="gameTitle">
       <header class="game-masthead">
@@ -471,10 +467,10 @@ function renderGame() {
                   ? renderClassicStudy(game)
                   : renderChoice(game)}
       </div>
-      <p id="gameStatus" class="game-status" role="status" aria-live="polite">${escape(statusMessage)}</p>
+      <p id="gameStatus" class="game-status" role="status" aria-live="polite">${escape(displayedStatus)}</p>
     </section>
   `;
-  if (game.kind === "runner" && active && !restoreDecisionPending) mountRunner();
+  if (game.kind === "runner" && active && !restoreDecisionPending) sectorTable.mount();
 }
 
 function renderRestoreGate(game: GameDefinition): string {
@@ -516,85 +512,8 @@ function renderRunnerPrelude(): string {
   `;
 }
 
-function runnerEffectLabel(state: RunnerState | null, act: (typeof RUNNER_ACTS)[number]): string {
-  if (!state) return "No temporary effect";
-  if (state.activeComplicationId) {
-    return act.complications.find((candidate) => candidate.id === state.activeComplicationId)?.label ?? "Comic complication";
-  }
-  if (state.activePower) return act.pickups.find((candidate) => candidate.kind === state.activePower)?.label ?? "Temporary effect";
-  return "No temporary effect";
-}
-
 function renderRunner(): string {
-  if (!active) return "";
-  const act = RUNNER_ACTS[active.chapter];
-  if (!act) return "";
-  const activePowerLabel = runnerEffectLabel(runnerState, act);
-  const failed = Boolean(runnerState?.failed);
-  const retryAvailable = failed && runnerRetryAvailable();
-  if (active.storyBeat !== null) {
-    const beat = act.storyBeats[active.storyBeat] ?? act.storyBeats[0];
-    return `
-      <section class="runner-story" aria-labelledby="runnerStoryTitle">
-        <div class="runner-story-heading">
-          <span>${escape(act.location)}</span>
-          <h2 id="runnerStoryTitle">The narrated route</h2>
-          <p>${escape(act.houseCall)}</p>
-        </div>
-        <article class="runner-story-beat">
-          <span>City beat ${active.storyBeat + 1} of ${act.storyBeats.length}</span>
-          <p>${escape(beat)}</p>
-        </article>
-        <div class="runner-story-actions">
-          <button class="primary-action" type="button" data-story-advance>${active.storyBeat === act.storyBeats.length - 1 ? "Finish this Act" : "Next city beat"}</button>
-          <button class="quiet-action" type="button" data-runner-pause aria-pressed="${runnerPaused}">${runnerPaused ? "Resume city" : "Pause city"}</button>
-        </div>
-        <p class="runner-route-note">Same story, same curtain call, and the same private entertainment provenance. No timed response, precision, sound, or visual interpretation is required. The table still closes at its authored boundary; Pause city holds time while narrated beats remain available.</p>
-      </section>
-    `;
-  }
-  return `
-    <section class="runner-shell" aria-labelledby="runnerActTitle">
-      <header class="runner-brief">
-        <div><span>Act ${active.chapter + 1} scene · ${escape(act.location)}</span><h2 id="runnerActTitle">${escape(act.title)}</h2></div>
-      </header>
-      <figure class="runner-stage-frame">
-        <div class="runner-canvas-window" ${failed ? 'data-runner-failed="true"' : ""}><canvas id="runnerCanvas" width="${RUNNER_WIDTH}" height="${RUNNER_HEIGHT}" aria-label="${escape(act.title)}. An original three-lane route through Chandigarh. Follow the next marker: Hold lane, Move up, or Move down. Each gate requires at most one adjacent move. One architectural contact ends this Action attempt." aria-describedby="runnerInstructions runnerApproach runnerLive runnerToolLine"></canvas></div>
-        <div class="runner-action-hud" aria-label="Current action set"><span>Act-local tool</span><strong id="runnerToolLabel">${escape(act.toolLabel)}</strong><span id="runnerPowerLabel">${escape(activePowerLabel)}</span></div>
-        <figcaption><span>${escape(act.sign)}</span><span>Original illustrated action theatre · fixed authored route</span></figcaption>
-      </figure>
-      <div class="runner-status-deck">
-        <p id="runnerApproach" class="runner-approach"><span>${failed ? "Route state" : "Next passage"}</span><strong>${failed ? "One-hit wipeout" : escape(act.obstacles[0]?.label ?? act.closing)}</strong></p>
-        <p id="runnerLive" class="runner-live" role="status" aria-live="polite">${escape(runnerState?.message ?? act.opening)}</p>
-      </div>
-      ${failed ? `
-        <section class="runner-recovery" aria-labelledby="runnerRecoveryTitle" aria-describedby="runnerInstructions runnerRecoveryBoundary">
-          <div><p class="kicker">Action route paused</p><h3 id="runnerRecoveryTitle">The lane closed. The city holds.</h3></div>
-          <p id="runnerInstructions">This attempt ended on one contact. No life, score, checkpoint, or failure history is kept.</p>
-          <div class="runner-recovery-actions">
-            <button class="primary-action" type="button" data-runner-retry ${retryAvailable ? "" : "disabled"}>Retry Action from Act I</button>
-            <button class="quiet-action" type="button" data-runner-story>Continue narrated</button>
-            <button class="text-action" type="button" data-runner-abandon>Return to the Grand Salon</button>
-          </div>
-          <p id="runnerRecoveryBoundary" class="runner-route-note">${retryAvailable ? "Retry uses the same foreground boundary; it does not restart the table." : "The boundary is too near for a complete five-Act Action retry."} Narrated beats remain available from this Act while the same boundary remains, and may close before the final curtain.</p>
-          <p id="runnerToolLine" class="runner-recovery-detail"><strong>${escape(act.toolLabel)}</strong> remains harmless choreography; only a lit architectural face ends an attempt.</p>
-        </section>
-      ` : `
-        <div class="runner-controls" aria-label="Sector Sprint controls">
-          <button class="runner-control-primary" type="button" data-runner-action="up"><i class="runner-control-mark runner-control-mark-up" aria-hidden="true"></i><span>Move up</span><small>↑ · W · one press</small></button>
-          <button class="runner-control-primary" type="button" data-runner-action="down"><i class="runner-control-mark runner-control-mark-down" aria-hidden="true"></i><span>Move down</span><small>↓ · S · one press</small></button>
-          <button class="runner-control-primary" type="button" data-runner-action="tool"><i class="runner-control-mark runner-control-mark-spark" aria-hidden="true"></i><span>${escape(act.toolLabel)}</span><small>J · K · X</small></button>
-          <button class="runner-control-quiet" type="button" data-runner-pause aria-pressed="${runnerPaused}"><i class="runner-control-mark runner-control-mark-pause" aria-hidden="true"></i><span>${runnerPaused ? "Resume city" : "Pause city"}</span><small>Movement and sound</small></button>
-          <button class="runner-control-quiet" type="button" data-runner-story><i class="runner-control-mark runner-control-mark-story" aria-hidden="true"></i><span>Narrated route</span><small>No precision needed</small></button>
-        </div>
-        <div class="runner-copy-deck">
-          <p id="runnerToolLine"><strong>${escape(act.toolLabel)}</strong> · ${escape(act.toolLine)}</p>
-          <p id="runnerInstructions" class="runner-instructions">Follow the marker: Hold lane, Move up, or Move down. Each gate requires at most one adjacent move. The route begins gently and gains speed across the five Acts. One touch on a lit architectural face ends this Action attempt. Comic targets and tools are harmless.</p>
-          <p class="runner-house-call">${escape(act.houseCall)}</p>
-        </div>
-      `}
-    </section>
-  `;
+  return sectorTable.render();
 }
 
 function renderChoice(game: ChoiceGameDefinition | MemoryGameDefinition): string {
@@ -768,384 +687,6 @@ function describePeg(peg: readonly number[], pegIndex: number): string {
   return `${name} plinth. Discs from bottom to top: ${peg.join(", ")}. Top disc: ${peg.at(-1)}.`;
 }
 
-function runnerPalette(): RunnerPalette {
-  if (runnerPaletteCache) return runnerPaletteCache;
-  const styles = getComputedStyle(document.documentElement);
-  const token = (name: string) => styles.getPropertyValue(name).trim();
-  runnerPaletteCache = {
-    paper: token("--color-paper"),
-    paper2: token("--color-paper-2"),
-    paper3: token("--color-paper-3"),
-    rule: token("--color-rule-strong"),
-    neutral: token("--color-neutral"),
-    muted: token("--color-muted"),
-    ink: token("--color-ink"),
-    inkSoft: token("--color-ink-soft"),
-    accent: token("--color-accent"),
-    accentSoft: token("--color-accent-soft"),
-    ruby: token("--color-jewel-ruby"),
-    sapphire: token("--color-jewel-sapphire"),
-    jade: token("--color-jewel-jade"),
-    fontDisplay: token("--font-display"),
-    fontBody: token("--font-body"),
-    fontMono: token("--font-mono"),
-  };
-  return runnerPaletteCache;
-}
-
-function runnerIsSuspended(): boolean {
-  return runnerPaused || runnerInterrupted || exitConfirmationPending || document.hidden;
-}
-
-function runnerRemainingMs(): number {
-  const activeBoundaryTime = runnerBoundaryStartedAt !== null ? Math.max(0, performance.now() - runnerBoundaryStartedAt) : 0;
-  return Math.max(0, RUNNER_SESSION_SECONDS * 1_000 - runnerSessionElapsedMs - activeBoundaryTime);
-}
-
-function runnerRetryAvailable(): boolean {
-  return runnerRemainingMs() >= RUNNER_ACTION_ROUTE_MINIMUM_MS;
-}
-
-function clearChapterTransition() {
-  if (chapterTransitionTimer) window.clearTimeout(chapterTransitionTimer);
-  chapterTransitionTimer = 0;
-  chapterTransitionRemainingMs = 0;
-  chapterTransitionStartedAt = null;
-  chapterTransitionCallback = null;
-}
-
-function pauseChapterTransition() {
-  if (!chapterTransitionCallback || chapterTransitionStartedAt === null) return;
-  if (chapterTransitionTimer) window.clearTimeout(chapterTransitionTimer);
-  chapterTransitionTimer = 0;
-  chapterTransitionRemainingMs = Math.max(0, chapterTransitionRemainingMs - (performance.now() - chapterTransitionStartedAt));
-  chapterTransitionStartedAt = null;
-}
-
-function resumeChapterTransition() {
-  if (!chapterTransitionCallback || chapterTransitionTimer || runnerIsSuspended()) return;
-  if (chapterTransitionRemainingMs <= 0) {
-    const callback = chapterTransitionCallback;
-    clearChapterTransition();
-    callback();
-    return;
-  }
-  chapterTransitionStartedAt = performance.now();
-  chapterTransitionTimer = window.setTimeout(() => {
-    const callback = chapterTransitionCallback;
-    clearChapterTransition();
-    callback?.();
-  }, chapterTransitionRemainingMs);
-}
-
-function scheduleChapterTransition(delay: number, callback: () => void) {
-  clearChapterTransition();
-  if (delay <= 0) {
-    callback();
-    return;
-  }
-  chapterTransitionRemainingMs = delay;
-  chapterTransitionCallback = callback;
-  resumeChapterTransition();
-}
-
-function stopRunnerLoop() {
-  if (runnerFrame) cancelAnimationFrame(runnerFrame);
-  runnerFrame = 0;
-  if (runnerBoundaryTimer) window.clearTimeout(runnerBoundaryTimer);
-  runnerBoundaryTimer = 0;
-  if (runnerBoundaryStartedAt !== null) {
-    runnerSessionElapsedMs += Math.max(0, performance.now() - runnerBoundaryStartedAt);
-    runnerBoundaryStartedAt = null;
-  }
-  runnerLastTimestamp = 0;
-  runnerAccumulatorMs = 0;
-  runnerActivePointerId = null;
-  runnerActivePointerAction = null;
-  runnerInput = {};
-  if (runnerState) runnerState = { ...runnerState, pendingLaneDelta: null };
-  document.querySelectorAll<HTMLElement>('[data-runner-action][data-pressed="true"]').forEach((control) => {
-    delete control.dataset.pressed;
-  });
-  pauseChapterTransition();
-}
-
-function startRunnerStoryBoundary() {
-  if (!active || (active.storyBeat === null && !runnerState?.failed && !active.resolving) || runnerIsSuspended() || view !== "game") return;
-  const remaining = runnerRemainingMs();
-  if (remaining === 0) {
-    closeRunnerAtBoundary();
-    return;
-  }
-  runnerBoundaryStartedAt = performance.now();
-  runnerBoundaryTimer = window.setTimeout(() => {
-    runnerBoundaryTimer = 0;
-    runnerBoundaryStartedAt = null;
-    runnerSessionElapsedMs = RUNNER_SESSION_SECONDS * 1_000;
-    closeRunnerAtBoundary();
-  }, remaining);
-}
-
-function prepareRunnerCanvas(canvas: HTMLCanvasElement): CanvasRenderingContext2D | null {
-  const ratio = Math.min(RUNNER_DPR_CAP, Math.max(1, window.devicePixelRatio || 1));
-  const pixelWidth = Math.round(RUNNER_WIDTH * ratio);
-  const pixelHeight = Math.round(RUNNER_HEIGHT * ratio);
-  if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
-    canvas.width = pixelWidth;
-    canvas.height = pixelHeight;
-  }
-  canvas.dataset.logicalWidth = String(RUNNER_WIDTH);
-  canvas.dataset.logicalHeight = String(RUNNER_HEIGHT);
-  canvas.dataset.pixelRatio = String(ratio);
-  const context = canvas.getContext("2d");
-  context?.setTransform(ratio, 0, 0, ratio, 0, 0);
-  return context;
-}
-
-function drawCurrentRunnerFrame() {
-  const canvas = document.querySelector<HTMLCanvasElement>("#runnerCanvas");
-  const context = canvas ? prepareRunnerCanvas(canvas) : null;
-  if (!canvas || !context || !runnerState) return;
-  const illustratedLeadReady = Boolean(runnerCharacterSheet?.complete && runnerCharacterSheet.naturalWidth > 0);
-  drawRunnerFrame(
-    context,
-    { ...runnerState, paused: runnerIsSuspended() },
-    runnerPalette(),
-    matchMedia("(prefers-reduced-motion: reduce)").matches,
-    illustratedLeadReady ? runnerCharacterSheet : null,
-    runnerRenderQuality,
-  );
-  runnerRenderSequence += 1;
-  canvas.dataset.renderSequence = String(runnerRenderSequence);
-  canvas.dataset.lastAction = runnerState.lastAction ?? "idle";
-  canvas.dataset.art = illustratedLeadReady ? "illustrated" : "vector-fallback";
-  canvas.dataset.quality = runnerRenderQuality;
-  canvas.dataset.camera = matchMedia("(max-width: 480px) and (orientation: portrait)").matches ? "portrait-close" : "full-stage";
-  const playerWorldX = runnerState.worldX + RUNNER_PLAYER_SCREEN_X;
-  const nextObstacle = RUNNER_ACTS[runnerState.actIndex].obstacles.find((obstacle) => obstacle.x + obstacle.width >= playerWorldX);
-  if (nextObstacle) {
-    canvas.dataset.nextGapCenter = String(nextObstacle.gapY + nextObstacle.gapHeight / 2);
-    canvas.dataset.nextGapHeight = String(nextObstacle.gapHeight);
-    canvas.dataset.nextMaterial = nextObstacle.material;
-    canvas.dataset.nextSafeLane = String(nextObstacle.safeLane);
-    canvas.dataset.nextContactMs = String(nextObstacle.contactMs);
-  } else {
-    delete canvas.dataset.nextGapCenter;
-    delete canvas.dataset.nextGapHeight;
-    delete canvas.dataset.nextMaterial;
-    delete canvas.dataset.nextSafeLane;
-    delete canvas.dataset.nextContactMs;
-  }
-}
-
-function updateRunnerLive(message: string) {
-  const live = document.querySelector<HTMLElement>("#runnerLive");
-  if (live && live.textContent !== message) live.textContent = message;
-}
-
-function updateRunnerApproach() {
-  if (!runnerState) return;
-  const act = RUNNER_ACTS[runnerState.actIndex];
-  const instruction = runnerUpcomingInstruction(runnerState);
-  const next = [
-    ...act.obstacles
-      .map((obstacle) => ({ x: obstacle.x + obstacle.width, label: obstacle.label })),
-    ...act.targets
-      .filter((target) => !runnerState!.transformedTargetIds.includes(target.id) && !runnerState!.encounteredTargetIds.includes(target.id))
-      .map((target) => ({ x: target.x + target.width, label: target.label })),
-    ...act.complications
-      .filter((candidate) => !runnerState!.encounteredComplicationIds.includes(candidate.id))
-      .map((candidate) => ({ x: candidate.x, label: candidate.label })),
-  ].filter((candidate) => candidate.x >= runnerState!.worldX + RUNNER_PLAYER_SCREEN_X).sort((left, right) => left.x - right.x)[0];
-  const label = document.querySelector<HTMLElement>("#runnerApproach strong");
-  if (label) label.textContent = instruction?.label ?? next?.label ?? "The Act curtain";
-}
-
-function updateRunnerActionHud() {
-  if (!runnerState) return;
-  const power = document.querySelector<HTMLElement>("#runnerPowerLabel");
-  if (power) power.textContent = runnerEffectLabel(runnerState, RUNNER_ACTS[runnerState.actIndex]);
-}
-
-function sampleRunnerQuality(frameInterval: number) {
-  if (runnerReviewMode) return;
-  if (frameInterval <= 0 || frameInterval > 250) return;
-  runnerFrameIntervals.push(frameInterval);
-  if (runnerFrameIntervals.length < 90) return;
-  runnerRenderQuality = runnerRenderQualityForIntervals(runnerFrameIntervals);
-  runnerFrameIntervals = runnerFrameIntervals.slice(-30);
-}
-
-function runRunnerFrame(timestamp: number) {
-  if (!active || getGame(active.gameId).kind !== "runner" || view !== "game") return stopRunnerLoop();
-  if (!runnerLastTimestamp) runnerLastTimestamp = timestamp;
-  const rawDelta = Math.max(0, timestamp - runnerLastTimestamp);
-  runnerLastTimestamp = timestamp;
-  if (runnerIsSuspended()) {
-    drawCurrentRunnerFrame();
-    stopRunnerLoop();
-    return;
-  }
-
-  const activeDelta = Math.min(rawDelta, 2_000);
-  sampleRunnerQuality(rawDelta);
-  runnerSessionElapsedMs += activeDelta;
-  if (runnerSessionElapsedMs >= RUNNER_SESSION_SECONDS * 1_000) {
-    closeRunnerAtBoundary();
-    return;
-  }
-
-  if (active.storyBeat === null && runnerState) {
-    const previousState = runnerState;
-    const frameInput: RunnerInput = { ...runnerInput };
-    runnerAccumulatorMs = Math.min(
-      runnerAccumulatorMs + activeDelta,
-      RUNNER_FIXED_STEP_MS * RUNNER_MAX_CATCH_UP_STEPS,
-    );
-    let firstStep = true;
-    let catchUpSteps = 0;
-    while (runnerAccumulatorMs + 0.001 >= RUNNER_FIXED_STEP_MS && catchUpSteps < RUNNER_MAX_CATCH_UP_STEPS) {
-      runnerState = stepRunner(runnerState, firstStep ? frameInput : {}, RUNNER_FIXED_STEP_MS);
-      runnerInput = {};
-      firstStep = false;
-      catchUpSteps += 1;
-      runnerAccumulatorMs -= RUNNER_FIXED_STEP_MS;
-    }
-    playRunnerStateCue(previousState, runnerState, frameInput);
-    drawCurrentRunnerFrame();
-    updateRunnerApproach();
-    updateRunnerActionHud();
-    updateRunnerLive(runnerState.message);
-    if (runnerState.failed) {
-      stopRunnerLoop();
-      suspendHouseAudio();
-      render();
-      focusFirstGameControl();
-      return;
-    }
-    if (runnerState.finished) {
-      stopRunnerLoop();
-      advanceChapter();
-      return;
-    }
-  }
-  runnerFrame = requestAnimationFrame(runRunnerFrame);
-}
-
-function mountRunner() {
-  if (!active || getGame(active.gameId).kind !== "runner" || view !== "game") return;
-  if (active.resolving) {
-    resumeChapterTransition();
-    startRunnerStoryBoundary();
-    return;
-  }
-  stopRunnerLoop();
-  if (active.storyBeat === null) {
-    if (!runnerState || runnerState.actIndex !== active.chapter) runnerState = createRunnerState(active.chapter);
-    runnerLastTimestamp = 0;
-    drawCurrentRunnerFrame();
-    if (runnerState.failed) startRunnerStoryBoundary();
-    else if (!runnerIsSuspended()) runnerFrame = requestAnimationFrame(runRunnerFrame);
-  } else {
-    startRunnerStoryBoundary();
-  }
-}
-
-function queueRunnerAction(action: "up" | "down" | "tool") {
-  if (!active || getGame(active.gameId).kind !== "runner" || active.storyBeat !== null || runnerState?.failed || runnerIsSuspended()) return;
-  if (action === "up") runnerInput = { ...runnerInput, laneDelta: -1 };
-  else if (action === "down") runnerInput = { ...runnerInput, laneDelta: 1 };
-  else runnerInput = { ...runnerInput, toolPressed: true };
-  const act = RUNNER_ACTS[active.chapter];
-  updateRunnerLive(action === "up" ? "Move up queued." : action === "down" ? "Move down queued." : `${act.toolLabel} queued.`);
-}
-
-function setRunnerPaused(paused: boolean) {
-  if (!active || getGame(active.gameId).kind !== "runner") return;
-  if (paused) {
-    stopRunnerLoop();
-    suspendHouseAudio();
-  }
-  runnerPaused = paused;
-  runnerLastTimestamp = 0;
-  if (runnerState) runnerState = { ...runnerState, paused, pendingLaneDelta: null };
-  document.querySelectorAll<HTMLButtonElement>("[data-runner-pause]").forEach((button) => {
-    button.ariaPressed = String(paused);
-    const label = button.querySelector("span");
-    if (label) label.textContent = paused ? "Resume city" : "Pause city";
-    else button.textContent = paused ? "Resume city" : "Pause city";
-  });
-  updateRunnerLive(paused ? "The city is paused. Progress and optional sound are still." : "The city resumes from the same place.");
-  drawCurrentRunnerFrame();
-  if (!paused) mountRunner();
-}
-
-function chooseNarratedRoute() {
-  if (!active || getGame(active.gameId).kind !== "runner") return;
-  stopRunnerLoop();
-  if (runnerSessionElapsedMs >= RUNNER_SESSION_SECONDS * 1_000) {
-    closeRunnerAtBoundary();
-    return;
-  }
-  closeHouseAudio();
-  active.storyBeat = 0;
-  runnerState = null;
-  runnerPaused = false;
-  saveActiveGame();
-  render();
-  focusElement("[data-story-advance]");
-}
-
-function retryRunnerAction() {
-  if (!active || getGame(active.gameId).kind !== "runner" || !runnerState?.failed) return;
-  stopRunnerLoop();
-  if (runnerSessionElapsedMs >= RUNNER_SESSION_SECONDS * 1_000) {
-    closeRunnerAtBoundary();
-    return;
-  }
-  if (!runnerRetryAvailable()) {
-    render();
-    document.querySelector<HTMLElement>("[data-runner-story]")?.focus({ preventScroll: true });
-    return;
-  }
-  closeHouseAudio();
-  active.chapter = 0;
-  active.storyBeat = null;
-  active.resolving = false;
-  active.touched = true;
-  runnerState = createRunnerState(0);
-  runnerPaused = false;
-  statusMessage = "A fresh Action attempt begins inside the same table boundary.";
-  saveActiveGame();
-  render();
-  focusElement('[data-runner-action="up"]');
-}
-
-function abandonRunnerAttempt() {
-  if (!active || getGame(active.gameId).kind !== "runner") return;
-  stopRunnerLoop();
-  closeHouseAudio();
-  active = null;
-  pendingRunnerChoice = false;
-  saveActiveGame();
-  route("home");
-}
-
-function advanceStoryBeat() {
-  if (!active || active.storyBeat === null) return;
-  active.touched = true;
-  const act = RUNNER_ACTS[active.chapter];
-  if (active.storyBeat >= act.storyBeats.length - 1) {
-    advanceChapter();
-    return;
-  }
-  active.storyBeat += 1;
-  statusMessage = "The narrated route moves to its next city beat.";
-  saveActiveGame();
-  render();
-  focusElement("[data-story-advance]");
-}
-
 function answerChoice(choiceIndex: number) {
   if (!active || active.resolving) return;
   const game = getGame(active.gameId);
@@ -1183,27 +724,21 @@ function answerChoice(choiceIndex: number) {
 function advanceChapter() {
   if (!active || active.resolving) return;
   const currentGame = getGame(active.gameId);
-  if (currentGame.kind === "runner") stopRunnerLoop();
+  if (currentGame.kind === "runner") {
+    sectorTable.completeAct();
+    return;
+  }
   active.resolving = true;
   statusMessage = "";
   const status = document.querySelector<HTMLElement>("#gameStatus");
   if (status) status.textContent = "";
   const completedChapter = active.chapter;
-  const keepStoryPaused = currentGame.kind === "runner" && active.storyBeat !== null && runnerPaused;
-  showCelebration(currentGame.kind === "runner" ? RUNNER_ACTS[completedChapter].praise : PRAISE[completedChapter]);
-  if (!(currentGame.kind === "runner" && runnerPaused)) playChime(completedChapter);
+  showCelebration(PRAISE[completedChapter]);
+  playChime(completedChapter);
   saveActiveGame();
   const baseDelay = matchMedia("(prefers-reduced-motion: reduce)").matches ? 20 : 720;
-  const delay = currentGame.kind === "runner" && keepStoryPaused ? 0 : baseDelay;
   const finishTransition = () => {
     if (!active) return;
-    if (currentGame.kind === "runner") {
-      stopRunnerLoop();
-      if (runnerSessionElapsedMs >= RUNNER_SESSION_SECONDS * 1_000) {
-        closeRunnerAtBoundary();
-        return;
-      }
-    }
     if (completedChapter === 4) {
       finishGame();
       return;
@@ -1213,33 +748,28 @@ function advanceChapter() {
     active.memoryCovered = false;
     active.selectedPeg = null;
     active.pegs = initialPegs(game.kind === "stack" ? game.diskCounts[active.chapter] ?? 0 : 0);
-    if (game.kind === "runner") {
-      active.storyBeat = active.storyBeat === null ? null : 0;
-      runnerState = null;
-      runnerPaused = keepStoryPaused;
-    }
     active.resolving = false;
     statusMessage = "";
     saveActiveGame();
     render();
     focusFirstGameControl();
   };
-  scheduleChapterTransition(delay, finishTransition);
-  if (currentGame.kind === "runner") startRunnerStoryBoundary();
+  scheduleChapterTransition(baseDelay, finishTransition);
 }
 
 function finishGame() {
   if (!active) return;
-  stopRunnerLoop();
+  finishCompletedGame(active.gameId, active.runId);
+}
+
+function finishCompletedGame(gameId: GameId, runId: string) {
   closeHouseAudio();
   clearChapterTransition();
   exitConfirmationPending = false;
-  runnerState = null;
-  runnerPaused = false;
   celebration.hidden = true;
-  const game = getGame(active.gameId);
+  const game = getGame(gameId);
   const authoredUnit = game.kind === "runner" ? "Acts" : game.kind === "classic" ? "studies" : "chapters";
-  const completed = houseStateStore.complete(game.id, active.runId, new Date().toISOString());
+  const completed = houseStateStore.complete(game.id, runId, new Date().toISOString());
   memory = completed.state;
   houseStateStore.saveActive(null);
   main.innerHTML = `
@@ -1260,16 +790,11 @@ function finishGame() {
   focusElement('[data-route="category"]');
 }
 
-function closeRunnerAtBoundary() {
-  if (!active || getGame(active.gameId).kind !== "runner") return;
-  stopRunnerLoop();
+function renderRunnerBoundary() {
   closeHouseAudio();
   clearChapterTransition();
   exitConfirmationPending = false;
-  runnerState = null;
-  runnerPaused = false;
   celebration.hidden = true;
-  houseStateStore.saveActive(null);
   main.innerHTML = `
     <section class="curtain-call" aria-labelledby="curtainTitle">
       <p class="kicker">The quiet boundary</p>
@@ -1285,6 +810,13 @@ function closeRunnerAtBoundary() {
   `;
   active = null;
   focusElement('[data-route="home"]');
+}
+
+function handleSectorTerminal(outcome: SectorSprintTerminal) {
+  pendingRunnerChoice = false;
+  if (outcome.kind === "completed") finishCompletedGame("sector-sprint", outcome.runId);
+  else if (outcome.kind === "boundary-closed") renderRunnerBoundary();
+  else route("home");
 }
 
 function selectPeg(pegIndex: number) {
@@ -1411,27 +943,21 @@ function playToneSequence(notes: readonly number[], type: OscillatorType, volume
   }
 }
 
-function playRunnerStateCue(previous: RunnerState, next: RunnerState, input: RunnerInput) {
-  if (!active || active.storyBeat !== null || runnerIsSuspended()) return;
-  if (next.collectedPickupIds.length > previous.collectedPickupIds.length) {
-    playToneSequence([294, 392, 523, 698], "sine", 0.034, 0.045);
-  } else if (next.transformedTargetIds.length > previous.transformedTargetIds.length) {
-    playToneSequence([196, 392, 523, 659], "sine", 0.036, 0.04);
-  } else if (next.impactMs > previous.impactMs) {
-    playToneSequence([110, 147, 98], "sawtooth", 0.025, 0.028);
-  } else if (next.encounteredComplicationIds.length > previous.encounteredComplicationIds.length) {
-    playToneSequence(next.activeComplication === "sabzi-load" ? [196, 174, 147] : [330, 294, 247], "triangle", 0.024, 0.06);
-  } else if (previous.activeComplication && !next.activeComplication) {
-    playToneSequence([220, 330, 440], "sine", 0.022, 0.05);
-  } else if (input.laneDelta) {
-    playToneSequence(input.laneDelta < 0 ? [247, 330] : [330, 247], "sine", 0.018, 0.04);
-  } else if (input.toolPressed) {
+function playSectorTone(tone: SectorSprintTone, actIndex: number, complication?: string | null) {
+  if (tone === "pickup") playToneSequence([294, 392, 523, 698], "sine", 0.034, 0.045);
+  else if (tone === "transform") playToneSequence([196, 392, 523, 659], "sine", 0.036, 0.04);
+  else if (tone === "impact") playToneSequence([110, 147, 98], "sawtooth", 0.025, 0.028);
+  else if (tone === "complication") playToneSequence(complication === "sabzi-load" ? [196, 174, 147] : [330, 294, 247], "triangle", 0.024, 0.06);
+  else if (tone === "release") playToneSequence([220, 330, 440], "sine", 0.022, 0.05);
+  else if (tone === "lane-up") playToneSequence([247, 330], "sine", 0.018, 0.04);
+  else if (tone === "lane-down") playToneSequence([330, 247], "sine", 0.018, 0.04);
+  else if (tone === "tool") {
     const toolNotes = [[440, 587], [196, 247, 330], [294, 440, 587], [220, 330, 440], [262, 392, 523]] as const;
-    playToneSequence(toolNotes[active.chapter], active.chapter === 2 ? "triangle" : "sine", 0.024, 0.035);
-  } else if (Math.floor(next.elapsedMs / 1_600) > Math.floor(previous.elapsedMs / 1_600)) {
-    const tone = [82, 98, 110, 73, 92][active.chapter];
-    playToneSequence([tone, tone * 1.5], "triangle", 0.009, 0.12);
-  }
+    playToneSequence(toolNotes[actIndex], actIndex === 2 ? "triangle" : "sine", 0.024, 0.035);
+  } else if (tone === "cadence") {
+    const frequency = [82, 98, 110, 73, 92][actIndex];
+    playToneSequence([frequency, frequency * 1.5], "triangle", 0.009, 0.12);
+  } else playChime(actIndex);
 }
 
 function playChime(chapter: number) {
@@ -1481,31 +1007,31 @@ document.addEventListener("click", (event) => {
     return;
   }
   if (target.closest("[data-runner-retry]")) {
-    retryRunnerAction();
+    sectorTable.retry();
     return;
   }
   if (target.closest("[data-runner-abandon]")) {
-    abandonRunnerAttempt();
+    sectorTable.abandon();
     return;
   }
   const runnerAction = target.closest<HTMLElement>("[data-runner-action]");
   if (runnerAction) {
     if (event.detail > 0) return;
-    resumeHouseAudioFromGesture();
-    queueRunnerAction(runnerAction.dataset.runnerAction as "up" | "down" | "tool");
+    sectorTable.audioGesture();
+    sectorTable.queueAction(runnerAction.dataset.runnerAction as "up" | "down" | "tool");
     return;
   }
   if (target.closest("[data-runner-pause]")) {
-    if (runnerPaused) resumeHouseAudioFromGesture();
-    setRunnerPaused(!runnerPaused);
+    if (sectorTable.isPaused()) sectorTable.audioGesture();
+    sectorTable.setPaused(!sectorTable.isPaused());
     return;
   }
   if (target.closest("[data-runner-story]")) {
-    chooseNarratedRoute();
+    sectorTable.chooseNarrated();
     return;
   }
   if (target.closest("[data-story-advance]")) {
-    advanceStoryBeat();
+    sectorTable.advanceStory();
     return;
   }
   const answerButton = target.closest<HTMLElement>("[data-answer]");
@@ -1550,27 +1076,13 @@ document.addEventListener("pointerdown", (event) => {
   const target = event.target as Element;
   const control = target.closest<HTMLElement>("[data-runner-action]");
   if (!control) return;
-  if (runnerActivePointerId !== null) return;
-  runnerActivePointerId = event.pointerId;
   const resolvedAction = control.dataset.runnerAction as "up" | "down" | "tool";
-  runnerActivePointerAction = resolvedAction;
-  resumeHouseAudioFromGesture();
-  control.dataset.pressed = "true";
-  queueRunnerAction(resolvedAction);
+  sectorTable.pointerDown(event.pointerId, resolvedAction, control);
 });
 
 for (const eventName of ["pointerup", "pointercancel"] as const) {
   document.addEventListener(eventName, (event) => {
-    if (runnerActivePointerId === null || event.pointerId !== runnerActivePointerId) return;
-    runnerActivePointerId = null;
-    runnerActivePointerAction = null;
-    if (eventName === "pointercancel") {
-      runnerInput = {};
-      if (runnerState) runnerState = { ...runnerState, pendingLaneDelta: null };
-    }
-    document.querySelectorAll<HTMLElement>('[data-runner-action][data-pressed="true"]').forEach((control) => {
-      delete control.dataset.pressed;
-    });
+    sectorTable.pointerEnd(event.pointerId, eventName === "pointercancel");
   });
 }
 
@@ -1584,72 +1096,58 @@ document.addEventListener("keydown", (event) => {
   if (runnerButton && (key === "enter" || key === " ")) {
     event.preventDefault();
     if (!event.repeat) {
-      resumeHouseAudioFromGesture();
-      queueRunnerAction(runnerButton.dataset.runnerAction as "up" | "down" | "tool");
+      sectorTable.audioGesture();
+      sectorTable.queueAction(runnerButton.dataset.runnerAction as "up" | "down" | "tool");
     }
     return;
   }
   if (isEditable || (isButtonOrLink && (key === "enter" || key === " "))) return;
   if (["arrowup", "w"].includes(key)) {
     event.preventDefault();
-    resumeHouseAudioFromGesture();
-    if (!event.repeat) queueRunnerAction("up");
+    sectorTable.audioGesture();
+    if (!event.repeat) sectorTable.queueAction("up");
   } else if (["arrowdown", "s"].includes(key)) {
     event.preventDefault();
-    resumeHouseAudioFromGesture();
-    if (!event.repeat) queueRunnerAction("down");
+    sectorTable.audioGesture();
+    if (!event.repeat) sectorTable.queueAction("down");
   } else if (["j", "k", "x"].includes(key)) {
     event.preventDefault();
-    resumeHouseAudioFromGesture();
-    if (!event.repeat) queueRunnerAction("tool");
+    sectorTable.audioGesture();
+    if (!event.repeat) sectorTable.queueAction("tool");
   }
 });
 
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
-    stopRunnerLoop();
-    suspendHouseAudio();
+    pauseChapterTransition();
+    sectorTable.suspend("visibility");
   }
   else {
     resumeChapterTransition();
-    mountRunner();
+    sectorTable.resume("visibility");
   }
-  drawCurrentRunnerFrame();
+  sectorTable.draw();
 });
 
 window.addEventListener("blur", () => {
-  runnerInterrupted = true;
-  stopRunnerLoop();
-  suspendHouseAudio();
-  document.querySelectorAll<HTMLElement>('[data-runner-action][data-pressed="true"]').forEach((control) => {
-    delete control.dataset.pressed;
-  });
-  drawCurrentRunnerFrame();
+  pauseChapterTransition();
+  sectorTable.suspend("blur");
 });
 
 window.addEventListener("focus", () => {
-  runnerInterrupted = false;
   resumeChapterTransition();
-  mountRunner();
-  drawCurrentRunnerFrame();
+  sectorTable.resume("focus");
 });
 
-window.addEventListener("resize", () => drawCurrentRunnerFrame());
+window.addEventListener("resize", () => sectorTable.draw());
 window.addEventListener("orientationchange", () => {
-  runnerActivePointerId = null;
-  runnerActivePointerAction = null;
-  runnerInput = {};
-  if (runnerState) runnerState = { ...runnerState, pendingLaneDelta: null };
-  document.querySelectorAll<HTMLElement>('[data-runner-action][data-pressed="true"]').forEach((control) => {
-    delete control.dataset.pressed;
-  });
-  drawCurrentRunnerFrame();
+  sectorTable.orientationChanged();
 });
 
 matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", (event) => {
   if (!event.matches) return;
   if (pendingRunnerChoice) beginRunnerRoute("narrated");
-  else if (active && getGame(active.gameId).kind === "runner" && active.storyBeat === null) chooseNarratedRoute();
+  else if (active && getGame(active.gameId).kind === "runner" && active.storyBeat === null) sectorTable.chooseNarrated();
 });
 
 soundButton.addEventListener("click", () => {
@@ -1671,8 +1169,8 @@ keepPlayingButton.addEventListener("click", () => {
   const focusTarget = exitReturnFocus;
   exitReturnFocus = null;
   resumeChapterTransition();
-  resumeHouseAudioFromGesture();
-  mountRunner();
+  sectorTable.audioGesture();
+  sectorTable.resume("exit");
   requestAnimationFrame(() => focusTarget?.focus({ preventScroll: true }));
 });
 
@@ -1688,7 +1186,7 @@ leaveDialog.addEventListener("cancel", (event) => {
   const focusTarget = exitReturnFocus;
   exitReturnFocus = null;
   resumeChapterTransition();
-  mountRunner();
+  sectorTable.resume("exit");
   requestAnimationFrame(() => focusTarget?.focus({ preventScroll: true }));
 });
 
@@ -1702,7 +1200,7 @@ window.__house = {
   get view() { return view; },
   get active() { return active ? structuredClone(active) : null; },
   get memory() { return structuredClone(memory); },
-  get runner() { return runnerState ? structuredClone(runnerState) : null; },
+  get runner() { return sectorTable.runner(); },
   start: startGame,
   openCategory,
   answer: answerChoice,
