@@ -1,8 +1,8 @@
 export type ClassicStudyId = "navakankari" | "aadu-puli-attam" | "pallanguzhi";
 
-export type BoardPoint = { readonly id: number; readonly x: number; readonly y: number };
+type BoardPoint = { readonly id: number; readonly x: number; readonly y: number };
 
-export type NavakankariChapter = {
+type NavakankariChapter = {
   readonly title: string;
   readonly prompt: string;
   readonly own: readonly number[];
@@ -11,7 +11,7 @@ export type NavakankariChapter = {
   readonly answerIndex: number;
 };
 
-export type AaduChapter = {
+type AaduChapter = {
   readonly title: string;
   readonly prompt: string;
   readonly role: "tiger" | "goat";
@@ -22,7 +22,7 @@ export type AaduChapter = {
   readonly answerIndex: number;
 };
 
-export type PallanguzhiChapter = {
+type PallanguzhiChapter = {
   readonly title: string;
   readonly prompt: string;
   readonly board: readonly number[];
@@ -30,7 +30,7 @@ export type PallanguzhiChapter = {
   readonly answerIndex: number;
 };
 
-export type ClassicStudy = {
+type ClassicStudyDefinition = {
   readonly id: ClassicStudyId;
   readonly documentedScope: string;
   readonly sourceLabel: string;
@@ -40,7 +40,56 @@ export type ClassicStudy = {
   readonly chapters: readonly (NavakankariChapter | AaduChapter | PallanguzhiChapter)[];
 };
 
-export const NAVAKANKARI_POINTS: readonly BoardPoint[] = [
+export type ClassicOptionView = {
+  readonly index: number;
+  readonly label: string;
+  readonly target: number;
+  readonly description: string;
+};
+
+export type NavakankariBoardView = {
+  readonly kind: "navakankari";
+  readonly points: readonly BoardPoint[];
+  readonly lines: readonly (readonly number[])[];
+  readonly own: readonly number[];
+  readonly occupied: readonly number[];
+};
+
+export type AaduBoardView = {
+  readonly kind: "aadu-puli-attam";
+  readonly points: readonly BoardPoint[];
+  readonly lines: readonly (readonly number[])[];
+  readonly role: "tiger" | "goat";
+  readonly tigers: readonly number[];
+  readonly goats: readonly number[];
+  readonly source: number;
+};
+
+export type PallanguzhiBoardView = {
+  readonly kind: "pallanguzhi";
+  readonly pits: readonly number[];
+  readonly traversal: readonly number[];
+};
+
+export type ClassicChapterView = {
+  readonly title: string;
+  readonly prompt: string;
+  readonly description: string;
+  readonly options: readonly ClassicOptionView[];
+  readonly board: NavakankariBoardView | AaduBoardView | PallanguzhiBoardView;
+};
+
+export type ClassicStudy = {
+  readonly id: ClassicStudyId;
+  readonly documentedScope: string;
+  readonly sourceLabel: string;
+  readonly sourceUrl: string;
+  readonly included: string;
+  readonly omitted: string;
+  readonly chapters: readonly ClassicChapterView[];
+};
+
+const NAVAKANKARI_POINTS: readonly BoardPoint[] = [
   { id: 0, x: 0, y: 0 }, { id: 1, x: 50, y: 0 }, { id: 2, x: 100, y: 0 },
   { id: 3, x: 16.7, y: 16.7 }, { id: 4, x: 50, y: 16.7 }, { id: 5, x: 83.3, y: 16.7 },
   { id: 6, x: 33.3, y: 33.3 }, { id: 7, x: 50, y: 33.3 }, { id: 8, x: 66.7, y: 33.3 },
@@ -51,12 +100,12 @@ export const NAVAKANKARI_POINTS: readonly BoardPoint[] = [
   { id: 21, x: 0, y: 100 }, { id: 22, x: 50, y: 100 }, { id: 23, x: 100, y: 100 },
 ] as const;
 
-export const NAVAKANKARI_MILLS: readonly (readonly [number, number, number])[] = [
+const NAVAKANKARI_MILLS: readonly (readonly [number, number, number])[] = [
   [0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10, 11], [12, 13, 14], [15, 16, 17], [18, 19, 20], [21, 22, 23],
   [0, 9, 21], [3, 10, 18], [6, 11, 15], [1, 4, 7], [16, 19, 22], [8, 12, 17], [5, 13, 20], [2, 14, 23],
 ] as const;
 
-export const AADU_POINTS: readonly BoardPoint[] = [
+const AADU_POINTS: readonly BoardPoint[] = [
   { id: 0, x: 50, y: 4 },
   { id: 1, x: 4, y: 34 }, { id: 2, x: 34, y: 34 }, { id: 3, x: 44, y: 34 }, { id: 4, x: 56, y: 34 }, { id: 5, x: 66, y: 34 }, { id: 6, x: 96, y: 34 },
   { id: 7, x: 4, y: 51 }, { id: 8, x: 28, y: 51 }, { id: 9, x: 41, y: 51 }, { id: 10, x: 59, y: 51 }, { id: 11, x: 72, y: 51 }, { id: 12, x: 96, y: 51 },
@@ -64,12 +113,12 @@ export const AADU_POINTS: readonly BoardPoint[] = [
   { id: 19, x: 8, y: 94 }, { id: 20, x: 36, y: 94 }, { id: 21, x: 64, y: 94 }, { id: 22, x: 92, y: 94 },
 ] as const;
 
-export const AADU_LINES: readonly (readonly number[])[] = [
+const AADU_LINES: readonly (readonly number[])[] = [
   [1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12], [13, 14, 15, 16, 17, 18], [19, 20, 21, 22],
   [1, 7, 13], [6, 12, 18], [0, 2, 8, 14, 19], [0, 5, 11, 17, 22], [0, 3, 9, 15, 20], [0, 4, 10, 16, 21],
 ] as const;
 
-export const PALLANGUZHI_TRAVERSAL = [0, 1, 2, 3, 4, 5, 6, 13, 12, 11, 10, 9, 8, 7] as const;
+const PALLANGUZHI_TRAVERSAL = [0, 1, 2, 3, 4, 5, 6, 13, 12, 11, 10, 9, 8, 7] as const;
 
 const NAVAKANKARI_CHAPTERS: readonly NavakankariChapter[] = [
   { title: "Outer court", prompt: "Place the brass piece to close a three-point line.", own: [0, 1], occupied: [4, 10], options: [2, 7, 9], answerIndex: 0 },
@@ -95,7 +144,7 @@ const PALLANGUZHI_CHAPTERS: readonly PallanguzhiChapter[] = [
   { title: "Beyond the empty pit", prompt: "Choose the pit that reaches an empty pit, gathers from the following occupied pit, then continues from the next occupied pit.", board: [1, 0, 0, 5, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0], options: [3, 0, 6], answerIndex: 1 },
 ] as const;
 
-export const CLASSIC_STUDIES: readonly ClassicStudy[] = [
+const CLASSIC_STUDIES: readonly ClassicStudyDefinition[] = [
   {
     id: "navakankari", documentedScope: "Navakankari board documented at Vadnagar, Gujarat",
     sourceLabel: "Gotad et al., Gamesmen and Board Game-Designs from Vadnagar, Heritage 12 (2024), pp. 989–990",
@@ -122,13 +171,13 @@ export const CLASSIC_STUDIES: readonly ClassicStudy[] = [
   },
 ] as const;
 
-export function getClassicStudy(id: ClassicStudyId): ClassicStudy {
+function getClassicStudyDefinition(id: ClassicStudyId): ClassicStudyDefinition {
   const study = CLASSIC_STUDIES.find((candidate) => candidate.id === id);
   if (!study) throw new Error(`Unknown classic study: ${id}`);
   return study;
 }
 
-export function formsNavakankariMill(ownPoints: readonly number[], target: number): boolean {
+function formsNavakankariMill(ownPoints: readonly number[], target: number): boolean {
   const occupied = new Set([...ownPoints, target]);
   return NAVAKANKARI_MILLS.some((mill) => mill.every((point) => occupied.has(point)));
 }
@@ -141,7 +190,7 @@ function numberedPoints(points: readonly number[]): string {
   return points.map(numberedPoint).join(", ");
 }
 
-export function describeNavakankariOption(chapter: NavakankariChapter, optionIndex: number): string {
+function describeNavakankariOption(chapter: NavakankariChapter, optionIndex: number): string {
   const target = chapter.options[optionIndex];
   const choice = String.fromCharCode(65 + optionIndex);
   const strongestLine = NAVAKANKARI_MILLS
@@ -154,7 +203,7 @@ export function describeNavakankariOption(chapter: NavakankariChapter, optionInd
   return `Choice ${choice}, ${numberedPoint(target)}. ${relation}`;
 }
 
-export function describeNavakankariChapter(chapter: NavakankariChapter): string {
+function describeNavakankariChapter(chapter: NavakankariChapter): string {
   return `Your brass pieces are at ${numberedPoints(chapter.own)}. Dark occupied points are ${numberedPoints(chapter.occupied)}. ${chapter.options.map((_, index) => describeNavakankariOption(chapter, index)).join(" ")}`;
 }
 
@@ -171,7 +220,7 @@ function aaduStep(source: number, destination: number): { distance: 1 | 2; jumpe
   return null;
 }
 
-export function describeAaduOption(chapter: AaduChapter, optionIndex: number): string {
+function describeAaduOption(chapter: AaduChapter, optionIndex: number): string {
   const destination = chapter.options[optionIndex];
   const choice = String.fromCharCode(65 + optionIndex);
   const step = aaduStep(chapter.source, destination);
@@ -181,11 +230,11 @@ export function describeAaduOption(chapter: AaduChapter, optionIndex: number): s
   return `Choice ${choice}, ${numberedPoint(destination)}. It lies two steps away on one drawn line, with ${occupant} at ${numberedPoint(step.jumped!)} between.`;
 }
 
-export function describeAaduChapter(chapter: AaduChapter): string {
+function describeAaduChapter(chapter: AaduChapter): string {
   return `The selected ${chapter.role} is at ${numberedPoint(chapter.source)}. Tigers occupy ${numberedPoints(chapter.tigers)}. Goats occupy ${numberedPoints(chapter.goats)}. ${chapter.options.map((_, index) => describeAaduOption(chapter, index)).join(" ")}`;
 }
 
-export function isLegalAaduMove(position: AaduPosition, role: "tiger" | "goat", source: number, destination: number): boolean {
+function isLegalAaduMove(position: AaduPosition, role: "tiger" | "goat", source: number, destination: number): boolean {
   const own = role === "tiger" ? position.tigers : position.goats;
   const occupied = new Set([...position.tigers, ...position.goats]);
   if (!own.includes(source) || occupied.has(destination)) return false;
@@ -195,7 +244,7 @@ export function isLegalAaduMove(position: AaduPosition, role: "tiger" | "goat", 
   return role === "tiger" && step.jumped !== undefined && position.goats.includes(step.jumped);
 }
 
-export type PallanguzhiTurn = {
+type PallanguzhiTurn = {
   readonly board: readonly number[];
   readonly captured: number;
   readonly deposits: number;
@@ -204,7 +253,7 @@ export type PallanguzhiTurn = {
   readonly finalPit: number;
 };
 
-export function playPallanguzhiStudyTurn(initialBoard: readonly number[], startPit: number): PallanguzhiTurn {
+function playPallanguzhiStudyTurn(initialBoard: readonly number[], startPit: number): PallanguzhiTurn {
   if (initialBoard.length !== 14 || !initialBoard.every((seeds) => Number.isInteger(seeds) && seeds >= 0)) throw new Error("Pallanguzhi requires fourteen non-negative pit counts");
   if (startPit < 0 || startPit > 6 || initialBoard[startPit] === 0) throw new Error("Choose a non-empty lower-row pit");
   const board = [...initialBoard];
@@ -262,15 +311,77 @@ export function playPallanguzhiStudyTurn(initialBoard: readonly number[], startP
   throw new Error("Pallanguzhi study exceeded its finite turn boundary");
 }
 
-export function describePallanguzhiOption(chapter: PallanguzhiChapter, optionIndex: number): string {
+function describePallanguzhiOption(chapter: PallanguzhiChapter, optionIndex: number): string {
   const pit = chapter.options[optionIndex];
   const outcome = playPallanguzhiStudyTurn(chapter.board, pit);
   const choice = String.fromCharCode(65 + optionIndex);
   return `Choice ${choice}, lower pit ${pit + 1} with ${chapter.board[pit]} seeds. The turn makes ${outcome.deposits} deposits, ${outcome.relays} relays, and ${outcome.continuations} post-capture continuations; it captures ${outcome.captured} seeds and ends its final deposit at pit ${outcome.finalPit + 1}.`;
 }
 
-export function describePallanguzhiChapter(chapter: PallanguzhiChapter): string {
+function describePallanguzhiChapter(chapter: PallanguzhiChapter): string {
   const lower = chapter.board.slice(0, 7).map((seeds, pit) => `pit ${pit + 1}: ${seeds}`).join(", ");
   const upper = [...PALLANGUZHI_TRAVERSAL].slice(7).map((pit) => `pit ${pit + 1}: ${chapter.board[pit]}`).join(", ");
   return `Lower row left to right: ${lower}. Top row left to right: ${upper}. Anti-clockwise order runs through lower pits 1 to 7, then top pits 14 to 8. ${chapter.options.map((_, index) => describePallanguzhiOption(chapter, index)).join(" ")}`;
+}
+
+function deepFreeze<T>(value: T): T {
+  if (!value || typeof value !== "object" || Object.isFrozen(value)) return value;
+  for (const child of Object.values(value as Record<string, unknown>)) deepFreeze(child);
+  return Object.freeze(value);
+}
+
+function chapterView(studyId: ClassicStudyId, chapter: NavakankariChapter | AaduChapter | PallanguzhiChapter): ClassicChapterView {
+  if (studyId === "navakankari") {
+    const position = chapter as NavakankariChapter;
+    return {
+      title: position.title,
+      prompt: position.prompt,
+      description: describeNavakankariChapter(position),
+      options: position.options.map((target, index) => ({ index, label: String.fromCharCode(65 + index), target, description: describeNavakankariOption(position, index) })),
+      board: { kind: "navakankari", points: NAVAKANKARI_POINTS, lines: NAVAKANKARI_MILLS, own: position.own, occupied: position.occupied },
+    };
+  }
+  if (studyId === "aadu-puli-attam") {
+    const position = chapter as AaduChapter;
+    return {
+      title: position.title,
+      prompt: position.prompt,
+      description: describeAaduChapter(position),
+      options: position.options.map((target, index) => ({ index, label: String.fromCharCode(65 + index), target, description: describeAaduOption(position, index) })),
+      board: { kind: "aadu-puli-attam", points: AADU_POINTS, lines: AADU_LINES, role: position.role, tigers: position.tigers, goats: position.goats, source: position.source },
+    };
+  }
+  const position = chapter as PallanguzhiChapter;
+  return {
+    title: position.title,
+    prompt: position.prompt,
+    description: describePallanguzhiChapter(position),
+    options: position.options.map((target, index) => ({ index, label: String.fromCharCode(65 + index), target, description: describePallanguzhiOption(position, index) })),
+    board: { kind: "pallanguzhi", pits: position.board, traversal: PALLANGUZHI_TRAVERSAL },
+  };
+}
+
+const STUDY_VIEWS = deepFreeze(CLASSIC_STUDIES.map((study) => ({
+  id: study.id,
+  documentedScope: study.documentedScope,
+  sourceLabel: study.sourceLabel,
+  sourceUrl: study.sourceUrl,
+  included: study.included,
+  omitted: study.omitted,
+  chapters: study.chapters.map((chapter) => chapterView(study.id, chapter)),
+} satisfies ClassicStudy)));
+
+export const CLASSIC_STUDY_IDS = deepFreeze(STUDY_VIEWS.map((study) => study.id));
+
+export function getClassicStudy(id: ClassicStudyId): ClassicStudy {
+  const study = STUDY_VIEWS.find((candidate) => candidate.id === id);
+  if (!study) throw new Error(`Unknown classic study: ${id}`);
+  return study;
+}
+
+export function evaluateClassicChoice(id: ClassicStudyId, chapterIndex: number, choiceIndex: number): boolean {
+  const study = getClassicStudyDefinition(id);
+  const chapter = study.chapters[chapterIndex];
+  if (!chapter || !Number.isInteger(choiceIndex) || choiceIndex < 0 || choiceIndex >= chapter.options.length) return false;
+  return chapter.answerIndex === choiceIndex;
 }

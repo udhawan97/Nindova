@@ -30,21 +30,9 @@ import {
   type StackGameDefinition,
 } from "./salon-catalog";
 import {
-  AADU_LINES,
-  AADU_POINTS,
-  NAVAKANKARI_MILLS,
-  NAVAKANKARI_POINTS,
-  PALLANGUZHI_TRAVERSAL,
-  describeAaduChapter,
-  describeAaduOption,
-  describeNavakankariChapter,
-  describeNavakankariOption,
-  describePallanguzhiChapter,
-  describePallanguzhiOption,
+  evaluateClassicChoice,
   getClassicStudy,
-  type AaduChapter,
-  type NavakankariChapter,
-  type PallanguzhiChapter,
+  type ClassicChapterView,
 } from "./classic-studies";
 import {
   RUNNER_ACTS,
@@ -724,9 +712,9 @@ function renderClassicStudy(game: ClassicGameDefinition): string {
   const study = getClassicStudy(game.classicStudyId);
   const chapter = study.chapters[active.chapter];
   let studyBoard = "";
-  if (study.id === "navakankari") studyBoard = renderNavakankariStudy(chapter as NavakankariChapter);
-  if (study.id === "aadu-puli-attam") studyBoard = renderAaduStudy(chapter as AaduChapter);
-  if (study.id === "pallanguzhi") studyBoard = renderPallanguzhiStudy(chapter as PallanguzhiChapter);
+  if (chapter.board.kind === "navakankari") studyBoard = renderNavakankariStudy(chapter);
+  if (chapter.board.kind === "aadu-puli-attam") studyBoard = renderAaduStudy(chapter);
+  if (chapter.board.kind === "pallanguzhi") studyBoard = renderPallanguzhiStudy(chapter);
   return `
     <div class="classic-study">
       <div class="classic-study-board">
@@ -750,34 +738,38 @@ function renderClassicStudy(game: ClassicGameDefinition): string {
   `;
 }
 
-function renderNavakankariStudy(chapter: NavakankariChapter): string {
-  const optionIndex = new Map(chapter.options.map((point, index) => [point, index]));
+function renderNavakankariStudy(chapter: ClassicChapterView): string {
+  if (chapter.board.kind !== "navakankari") return "";
+  const board = chapter.board;
+  const optionIndex = new Map(chapter.options.map((option) => [option.target, option.index]));
   return `
     <div class="line-board navakankari-board" role="group" aria-label="Navakankari placement study" aria-describedby="classicStudyDescription">
-      <p id="classicStudyDescription" class="sr-only classic-study-description">${escape(describeNavakankariChapter(chapter))}</p>
-      <svg viewBox="-4 -4 108 108" aria-hidden="true"><g>${renderBoardLines(NAVAKANKARI_POINTS, NAVAKANKARI_MILLS)}</g></svg>
-      ${NAVAKANKARI_POINTS.map((point) => {
+      <p id="classicStudyDescription" class="sr-only classic-study-description">${escape(chapter.description)}</p>
+      <svg viewBox="-4 -4 108 108" aria-hidden="true"><g>${renderBoardLines(board.points, board.lines)}</g></svg>
+      ${board.points.map((point) => {
         const choice = optionIndex.get(point.id);
-        const state = chapter.own.includes(point.id) ? "own" : chapter.occupied.includes(point.id) ? "occupied" : "empty";
-        if (choice !== undefined) return `<button class="board-point is-option" type="button" data-answer="${choice}" style="--point-x:${point.x}%;--point-y:${point.y}%" aria-label="${escape(describeNavakankariOption(chapter, choice))}"><span>${String.fromCharCode(65 + choice)}</span></button>`;
+        const state = board.own.includes(point.id) ? "own" : board.occupied.includes(point.id) ? "occupied" : "empty";
+        if (choice !== undefined) return `<button class="board-point is-option" type="button" data-answer="${choice}" style="--point-x:${point.x}%;--point-y:${point.y}%" aria-label="${escape(chapter.options[choice].description)}"><span>${chapter.options[choice].label}</span></button>`;
         return `<i class="board-point is-${state}" style="--point-x:${point.x}%;--point-y:${point.y}%" aria-hidden="true"></i>`;
       }).join("")}
     </div>
   `;
 }
 
-function renderAaduStudy(chapter: AaduChapter): string {
-  const optionIndex = new Map(chapter.options.map((point, index) => [point, index]));
+function renderAaduStudy(chapter: ClassicChapterView): string {
+  if (chapter.board.kind !== "aadu-puli-attam") return "";
+  const board = chapter.board;
+  const optionIndex = new Map(chapter.options.map((option) => [option.target, option.index]));
   return `
     <div class="line-board aadu-board" role="group" aria-label="Aadu Puli Aattam movement study" aria-describedby="classicStudyDescription">
-      <p id="classicStudyDescription" class="sr-only classic-study-description">${escape(describeAaduChapter(chapter))}</p>
-      <svg viewBox="-4 0 108 100" aria-hidden="true"><g>${renderBoardLines(AADU_POINTS, AADU_LINES)}</g></svg>
-      ${AADU_POINTS.map((point) => {
+      <p id="classicStudyDescription" class="sr-only classic-study-description">${escape(chapter.description)}</p>
+      <svg viewBox="-4 0 108 100" aria-hidden="true"><g>${renderBoardLines(board.points, board.lines)}</g></svg>
+      ${board.points.map((point) => {
         const choice = optionIndex.get(point.id);
-        if (choice !== undefined) return `<button class="board-point is-option" type="button" data-answer="${choice}" style="--point-x:${point.x}%;--point-y:${point.y}%" aria-label="${escape(describeAaduOption(chapter, choice))}"><span>${String.fromCharCode(65 + choice)}</span></button>`;
-        const isTiger = chapter.tigers.includes(point.id);
-        const isGoat = chapter.goats.includes(point.id);
-        const selected = point.id === chapter.source;
+        if (choice !== undefined) return `<button class="board-point is-option" type="button" data-answer="${choice}" style="--point-x:${point.x}%;--point-y:${point.y}%" aria-label="${escape(chapter.options[choice].description)}"><span>${chapter.options[choice].label}</span></button>`;
+        const isTiger = board.tigers.includes(point.id);
+        const isGoat = board.goats.includes(point.id);
+        const selected = point.id === board.source;
         const state = isTiger ? "tiger" : isGoat ? "goat" : "empty";
         return `<i class="board-point is-${state} ${selected ? "is-selected-piece" : ""}" style="--point-x:${point.x}%;--point-y:${point.y}%" aria-hidden="true"></i>`;
       }).join("")}
@@ -785,21 +777,23 @@ function renderAaduStudy(chapter: AaduChapter): string {
   `;
 }
 
-function renderPallanguzhiStudy(chapter: PallanguzhiChapter): string {
-  const optionIndex = new Map(chapter.options.map((pit, index) => [pit, index]));
+function renderPallanguzhiStudy(chapter: ClassicChapterView): string {
+  if (chapter.board.kind !== "pallanguzhi") return "";
+  const board = chapter.board;
+  const optionIndex = new Map(chapter.options.map((option) => [option.target, option.index]));
   const renderPit = (pit: number) => {
     const choice = optionIndex.get(pit);
-    const seeds = chapter.board[pit];
+    const seeds = board.pits[pit];
     const seedDots = Array.from({ length: Math.min(seeds, 8) }, () => "<i></i>").join("");
     if (choice === undefined) return `<span class="pallanguzhi-pit" aria-label="Pit with ${seeds} seeds"><span class="seed-cup" aria-hidden="true">${seedDots}</span><small>${seeds}</small></span>`;
-    return `<button class="pallanguzhi-pit is-option" type="button" data-answer="${choice}" aria-label="${escape(describePallanguzhiOption(chapter, choice))}"><span class="seed-cup" aria-hidden="true">${seedDots}</span><small>${String.fromCharCode(65 + choice)} · ${seeds}</small></button>`;
+    return `<button class="pallanguzhi-pit is-option" type="button" data-answer="${choice}" aria-label="${escape(chapter.options[choice].description)}"><span class="seed-cup" aria-hidden="true">${seedDots}</span><small>${chapter.options[choice].label} · ${seeds}</small></button>`;
   };
   return `
     <div class="pallanguzhi-board" role="group" aria-label="Pallanguzhi one-turn sowing study" aria-describedby="classicStudyDescription">
-      <p id="classicStudyDescription" class="sr-only classic-study-description">${escape(describePallanguzhiChapter(chapter))}</p>
+      <p id="classicStudyDescription" class="sr-only classic-study-description">${escape(chapter.description)}</p>
       <span class="sowing-arrow" aria-hidden="true">Anti-clockwise sowing <i>→</i></span>
-      <div class="pit-row pit-row-top">${[...PALLANGUZHI_TRAVERSAL].slice(7).map(renderPit).join("")}</div>
-      <div class="pit-row pit-row-bottom">${[...PALLANGUZHI_TRAVERSAL].slice(0, 7).map(renderPit).join("")}</div>
+      <div class="pit-row pit-row-top">${board.traversal.slice(7).map(renderPit).join("")}</div>
+      <div class="pit-row pit-row-bottom">${board.traversal.slice(0, 7).map(renderPit).join("")}</div>
     </div>
   `;
 }
@@ -1215,7 +1209,7 @@ function answerChoice(choiceIndex: number) {
   const game = getGame(active.gameId);
   if (game.kind === "stack" || game.kind === "runner") return;
   const chapter = game.kind === "classic"
-    ? getClassicStudy(game.classicStudyId!).chapters[active.chapter]
+    ? getClassicStudy(game.classicStudyId).chapters[active.chapter]
     : game.chapters[active.chapter];
   if (!chapter) return;
   if (game.kind === "memory" && !active.memoryCovered) {
@@ -1226,7 +1220,10 @@ function answerChoice(choiceIndex: number) {
   }
   active.touched = true;
   const choice = document.querySelector<HTMLElement>(`[data-answer="${choiceIndex}"]`);
-  if (choiceIndex !== chapter.answerIndex) {
+  const choiceIsCorrect = game.kind === "classic"
+    ? evaluateClassicChoice(game.classicStudyId, active.chapter, choiceIndex)
+    : choiceIndex === game.chapters[active.chapter]?.answerIndex;
+  if (!choiceIsCorrect) {
     statusMessage = game.kind === "classic" ? "That move does not satisfy this authored position. Read the drawn lines and rule once more." : "Not this inscription. Read the order once more.";
     choice?.classList.remove("is-wrong");
     void choice?.offsetWidth;
