@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.4.1 — 2026-08-09
+
+### Fixed
+
+- Restored the exact House and category scroll position through browser and in-page Back while keeping forward transitions at the new view's top.
+- Made failed Gallery completion writes truthful and retryable with the original run identity and completion time.
+- Added count-scoped Gallery clear confirmation and failure-atomic clearing that preserves a canonical snapshot until both Gallery keys can be removed.
+- Exposed immediate mobile paths to the five doors, including a visible recovery action after Sector Sprint safely closes on reload.
+- Kept both adult-boundary choices operable at 320×568 and returned focus to the actual deep-linked view after acknowledgement.
+
+### Changed
+
+- Refreshed the House static cache, package versions, release downloads, and public documentation for the continuity fixes.
+- Updated the transitive `nanoid` dependency to an audited non-vulnerable version without adding a runtime service or changing game behavior.
+
+### Not added
+
+- No score, streak, rank, visible timer, collection, randomized reward, assessment output, telemetry, or third-party runtime request.
+- No change to the bounded Night Room, the deferred iOS Wall, or the entertainment-only meaning of Gallery completions.
+
 ## 0.4.0 — 2026-08-05
 
 ### Added

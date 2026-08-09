@@ -10,15 +10,15 @@ description: Choose the live House, installable Night Room, tagged standalone fi
 
 Both are static web applications. They have no account, analytics, advertising, or third-party runtime service. A static host may keep ordinary access logs outside Nindova's control.
 
-## Tagged v0.4.0 files
+## Tagged v0.4.1 files
 
-The latest published tagged release is **[v0.4.0 — Five Doors](https://github.com/udhawan97/Nindova/releases/tag/v0.4.0)**. It packages the synchronized House, Night Room, landing page, documentation, and standalone Night file.
+The latest published tagged release is **[v0.4.1 — House Continuity](https://github.com/udhawan97/Nindova/releases/tag/v0.4.1)**. It packages the synchronized House, Night Room, landing page, documentation, and standalone Night file.
 
 | File | Use it when | What is included |
 | --- | --- | --- |
-| [Standalone HTML](https://github.com/udhawan97/Nindova/releases/download/v0.4.0/nindova-v0.4.0.html) | You want one portable file | Night Room only; no service worker or install step |
-| [Static web archive](https://github.com/udhawan97/Nindova/releases/download/v0.4.0/nindova-web-v0.4.0.zip) | You want to host the complete v0.4.0 web surface | Landing page, docs, House PWA, Night PWA, and standalone file from that tag |
-| [SHA-256 checksums](https://github.com/udhawan97/Nindova/releases/download/v0.4.0/SHA256SUMS.txt) | You want to verify either download | Published digests for the HTML and ZIP |
+| [Standalone HTML](https://github.com/udhawan97/Nindova/releases/download/v0.4.1/nindova-v0.4.1.html) | You want one portable file | Night Room only; no service worker or install step |
+| [Static web archive](https://github.com/udhawan97/Nindova/releases/download/v0.4.1/nindova-web-v0.4.1.zip) | You want to host the complete v0.4.1 web surface | Landing page, docs, House PWA, Night PWA, and standalone file from that tag |
+| [SHA-256 checksums](https://github.com/udhawan97/Nindova/releases/download/v0.4.1/SHA256SUMS.txt) | You want to verify either download | Published digests for the HTML and ZIP |
 
 The standalone HTML intentionally contains only the Night Room. Use the static archive for the complete five-door House, Gallery, Night PWA, site, and docs.
 
@@ -28,10 +28,10 @@ Place the downloaded file and `SHA256SUMS.txt` in the same folder, then run the 
 
 ```sh
 # Standalone HTML
-grep ' nindova-v0.4.0.html$' SHA256SUMS.txt | shasum -a 256 -c -
+grep ' nindova-v0.4.1.html$' SHA256SUMS.txt | shasum -a 256 -c -
 
 # Static web archive
-grep ' nindova-web-v0.4.0.zip$' SHA256SUMS.txt | shasum -a 256 -c -
+grep ' nindova-web-v0.4.1.zip$' SHA256SUMS.txt | shasum -a 256 -c -
 ```
 
 The release contains ordinary HTML and ZIP files, not a signed or notarized native application. Your browser may ask you to confirm an HTML download. Nindova has no background native updater: tagged files update only when you replace them, while the live PWAs update their static caches after a successful online visit.

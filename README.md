@@ -20,7 +20,7 @@ Nindova is private, offline-ready browser entertainment for adults 18 and over. 
   ·
   <a href="https://udhawan97.github.io/Nindova/docs/"><strong>Read the docs</strong></a>
   ·
-  <a href="https://github.com/udhawan97/Nindova/releases/tag/v0.4.0"><strong>Tagged downloads</strong></a>
+  <a href="https://github.com/udhawan97/Nindova/releases/tag/v0.4.1"><strong>Tagged downloads</strong></a>
 </p>
 
 ![The real Nindova House floor plan, with the Night Room, five category doors, and local Gallery](./apps/site/public/media/nindova-house.png)
@@ -31,10 +31,10 @@ Nindova is private, offline-ready browser entertainment for adults 18 and over. 
 | --- | --- | --- | --- |
 | <img src="./apps/site/public/brand/favicon.svg" width="28" alt=""> | [Nindova House](https://udhawan97.github.io/Nindova/house/) | The current live product | Five category doors, eight authored games, the Gallery, and a separate Night Room |
 | <img src="./apps/site/public/brand/motifs/chai.svg" width="28" alt=""> | [Night Room](https://udhawan97.github.io/Nindova/play/) | A bounded wind-down Session | Installable Masala Mound PWA with local Dawn |
-| <img src="./apps/site/public/brand/nindova-mark-monochrome.svg" width="28" alt=""> | [Standalone Night HTML](https://github.com/udhawan97/Nindova/releases/download/v0.4.0/nindova-v0.4.0.html) | One portable tagged file | v0.4.0 Night Room only; no service worker |
+| <img src="./apps/site/public/brand/nindova-mark-monochrome.svg" width="28" alt=""> | [Standalone Night HTML](https://github.com/udhawan97/Nindova/releases/download/v0.4.1/nindova-v0.4.1.html) | One portable tagged file | v0.4.1 Night Room only; no service worker |
 | <img src="./apps/site/public/brand/motifs/tiffin.svg" width="28" alt=""> | [Build current source](#run-current-source) | The latest House and Night code | Landing page, docs, both PWAs, and the standalone Night file |
 
-The live site is published from `main`. **v0.4.0 — Five Doors** packages the synchronized landing page, documentation, House, Night Room, and standalone Night file.
+The live site is published from `main`. **v0.4.1 — House Continuity** packages the synchronized landing page, documentation, House, Night Room, and standalone Night file.
 
 ## Inside Nindova House
 
@@ -82,20 +82,20 @@ The Two-Loop Law applies inside the Night Room: satisfaction belongs inside one 
 
 ## Tagged downloads
 
-The [v0.4.0 release](https://github.com/udhawan97/Nindova/releases/tag/v0.4.0) contains:
+The [v0.4.1 release](https://github.com/udhawan97/Nindova/releases/tag/v0.4.1) contains:
 
-- [Standalone Night Room HTML](https://github.com/udhawan97/Nindova/releases/download/v0.4.0/nindova-v0.4.0.html)
-- [Complete v0.4.0 static web archive](https://github.com/udhawan97/Nindova/releases/download/v0.4.0/nindova-web-v0.4.0.zip)
-- [SHA-256 checksums](https://github.com/udhawan97/Nindova/releases/download/v0.4.0/SHA256SUMS.txt)
+- [Standalone Night Room HTML](https://github.com/udhawan97/Nindova/releases/download/v0.4.1/nindova-v0.4.1.html)
+- [Complete v0.4.1 static web archive](https://github.com/udhawan97/Nindova/releases/download/v0.4.1/nindova-web-v0.4.1.zip)
+- [SHA-256 checksums](https://github.com/udhawan97/Nindova/releases/download/v0.4.1/SHA256SUMS.txt)
 
 Verify only the tagged file you downloaded:
 
 ```sh
 # Standalone HTML
-grep ' nindova-v0.4.0.html$' SHA256SUMS.txt | shasum -a 256 -c -
+grep ' nindova-v0.4.1.html$' SHA256SUMS.txt | shasum -a 256 -c -
 
 # Static web archive
-grep ' nindova-web-v0.4.0.zip$' SHA256SUMS.txt | shasum -a 256 -c -
+grep ' nindova-web-v0.4.1.zip$' SHA256SUMS.txt | shasum -a 256 -c -
 ```
 
 These are HTML and ZIP files, not signed or notarized native applications. Nindova has no native background updater. Replace a tagged file manually; live PWAs refresh their static caches after a successful online visit.

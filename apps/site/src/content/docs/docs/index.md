@@ -12,7 +12,7 @@ Navakankari, Aadu Puli Aattam, and Pallanguzhi are presented as sourced authored
 ## Start here
 
 - [Getting started](./getting-started/) covers the House, Night standalone file, local workspace, and composed PWA build.
-- [Downloads](./downloads/) separates the current live House, live Night PWA, tagged v0.4.0 files, checksums, and source build.
+- [Downloads](./downloads/) separates the current live House, live Night PWA, tagged v0.4.1 files, checksums, and source build.
 - [Product contract](./product-contract/) records the promises every implementation must keep.
 - [Rasoi Pairs Session](./nightly-arc/) defines free tiles, pairing, help, settlement, and closure.
 - [Night and local state](./night-and-local-state/) explains deterministic boards and safe v1/v2 migration.
@@ -25,4 +25,4 @@ Navakankari, Aadu Puli Aattam, and Pallanguzhi are presented as sourced authored
 - [Research receipts](./research-receipts/) states the behavioral evidence and its limits.
 - [Roadmap](./roadmap/), [Known limitations](./known-limitations/), and [Deferred iOS Wall](./ios-wall/) distinguish the release from future work.
 
-The current House is live from `main`; v0.4.0 packages the synchronized House, Night Room, site, docs, and standalone Night file. The iOS Wall remains deferred. “Not now” in the browser demonstrates voluntary re-entry; it is not proof of native Screen Time interception.
+The current House is live from `main`; v0.4.1 packages the synchronized House, Night Room, site, docs, and standalone Night file. The iOS Wall remains deferred. “Not now” in the browser demonstrates voluntary re-entry; it is not proof of native Screen Time interception.
