@@ -47,8 +47,21 @@ async function openHouse(viewport, options = {}, {
   fakeClock = false,
   controllableVisibility = false,
   reviewMode = false,
+  galleryWriteDenied = false,
 } = {}) {
   const context = await browser.newContext({ viewport, ...options });
+  if (galleryWriteDenied) {
+    await context.addInitScript(() => {
+      const nativeSetItem = Storage.prototype.setItem;
+      globalThis.__denyHouseGalleryWrite = true;
+      Storage.prototype.setItem = function setItem(key, value) {
+        if (key === "nindova:house:v2" && globalThis.__denyHouseGalleryWrite) {
+          throw new DOMException("Gallery storage denied by test fixture", "QuotaExceededError");
+        }
+        return nativeSetItem.call(this, key, value);
+      };
+    });
+  }
   if (acceleratedRaf) {
     await context.addInitScript((stepMs) => {
       const nativeRequestAnimationFrame = globalThis.requestAnimationFrame.bind(globalThis);
@@ -327,6 +340,23 @@ try {
   await navigation.page.waitForFunction(() => window.scrollY === 0);
   assert.ok((await navigation.page.locator("#gameTitle").boundingBox())?.y >= 0, "a forward table transition shows its task context");
   await navigation.context.close();
+
+  const deniedCompletion = await openHouse(
+    { width: 1280, height: 800 },
+    { reducedMotion: "reduce" },
+    { galleryWriteDenied: true },
+  );
+  await completeChoiceGame(deniedCompletion.page, "pattern-court", [0, 1, 2, 1, 2]);
+  assert.match(await deniedCompletion.page.locator(".result-boundary").innerText(), /could not be stored/i);
+  assert.equal(await deniedCompletion.page.locator("[data-retry-completion]").isVisible(), true);
+  assert.equal(await deniedCompletion.page.locator('[data-route="gallery"]').count(), 0, "an unsaved completion does not offer a misleading Gallery path");
+  assert.equal(await deniedCompletion.page.evaluate(() => localStorage.getItem("nindova:house:v2")), null);
+  assert.equal(await deniedCompletion.page.evaluate(() => window.__house.memory.latestByGame["pattern-court"]), undefined);
+  await deniedCompletion.page.evaluate(() => { globalThis.__denyHouseGalleryWrite = false; });
+  await deniedCompletion.page.click("[data-retry-completion]");
+  assert.match(await deniedCompletion.page.locator(".result-boundary").innerText(), /stored only on this device/i);
+  assert.equal(await deniedCompletion.page.evaluate(() => window.__house.memory.latestByGame["pattern-court"]?.runId), await deniedCompletion.page.evaluate(() => JSON.parse(localStorage.getItem("nindova:house:v2")).latestByGame["pattern-court"].runId));
+  await deniedCompletion.context.close();
 
   const classicDoors = await openHouse({ width: 414, height: 896 }, { reducedMotion: "reduce" });
   await classicDoors.page.click('[data-category="turn-trap"]');

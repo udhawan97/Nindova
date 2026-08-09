@@ -41,6 +41,7 @@ import {
 type View = "home" | "category" | "gallery" | "game";
 type HistoryMode = "push" | "replace" | "none";
 type ViewOptions = { readonly historyMode?: HistoryMode; readonly scrollY?: number; readonly focusSelector?: string };
+type PendingCompletion = { readonly gameId: GameId; readonly runId: string; readonly completedAt: string };
 
 const getGame = GRAND_SALON.game.bind(GRAND_SALON);
 const getDoorCategory = GRAND_SALON.door.bind(GRAND_SALON);
@@ -85,6 +86,7 @@ let runnerRestoreWasDiscarded = restoredActive.discardedRunner;
 let active: ActiveGame | null = restoredActive.active;
 let restoreDecisionPending = Boolean(active);
 let pendingRunnerChoice = false;
+let pendingCompletion: PendingCompletion | null = null;
 let exitReturnFocus: HTMLElement | null = null;
 let exitConfirmationPending = false;
 let soundOn = false;
@@ -169,6 +171,7 @@ function route(next: View, options: ViewOptions = {}) {
     saveActiveGame();
   }
   statusMessage = "";
+  pendingCompletion = null;
   const historyMode = options.historyMode ?? (leavingGame ? "replace" : "push");
   if (historyMode !== "none") writeRouteHash(next, historyMode);
   render();
@@ -780,15 +783,16 @@ function finishGame() {
   finishCompletedGame(active.gameId, active.runId);
 }
 
-function finishCompletedGame(gameId: GameId, runId: string) {
+function finishCompletedGame(gameId: GameId, runId: string, completedAt = new Date().toISOString()) {
   closeHouseAudio();
   clearChapterTransition();
   exitConfirmationPending = false;
   celebration.hidden = true;
   const game = getGame(gameId);
   const authoredUnit = game.kind === "runner" ? "Acts" : game.kind === "classic" ? "studies" : "chapters";
-  const completed = houseStateStore.complete(game.id, runId, new Date().toISOString());
+  const completed = houseStateStore.complete(game.id, runId, completedAt);
   memory = completed.state;
+  pendingCompletion = completed.persisted ? null : { gameId, runId, completedAt };
   houseStateStore.saveActive(null);
   main.innerHTML = `
     <section class="curtain-call" aria-labelledby="curtainTitle">
@@ -796,16 +800,21 @@ function finishCompletedGame(gameId: GameId, runId: string) {
       <div class="curtain-ornament" aria-hidden="true"><span></span><i></i><span></span></div>
       <h1 id="curtainTitle">${escape(game.title)}<br><em>is complete.</em></h1>
       <p>You completed all five authored ${authoredUnit}, ending with ${escape(completed.result.completionFacts.finalChapter)}.</p>
-      <p class="result-boundary">Entertainment result · ruleset ${escape(completed.result.rulesetVersion)} · stored only on this device</p>
+      ${completed.persisted
+        ? `<p class="result-boundary" role="status">Entertainment result · ruleset ${escape(completed.result.rulesetVersion)} · stored only on this device</p>`
+        : `<p class="result-boundary result-boundary-warning" role="status">Completion is safe on this screen, but it could not be stored in the Gallery.</p>`}
       <div class="curtain-actions">
-        <button class="primary-action" type="button" data-route="category">Return to ${escape(getDoorCategory(game.categoryId).title)}</button>
+        ${completed.persisted
+          ? `<button class="primary-action" type="button" data-route="category">Return to ${escape(getDoorCategory(game.categoryId).title)}</button>`
+          : '<button class="primary-action" type="button" data-retry-completion>Try saving again</button>'}
+        ${completed.persisted ? "" : `<button class="quiet-action" type="button" data-route="category">Continue without saving</button>`}
         <button class="quiet-action" type="button" data-route="home">Grand Salon</button>
-        <button class="quiet-action" type="button" data-route="gallery">Visit the Gallery</button>
+        ${completed.persisted ? '<button class="quiet-action" type="button" data-route="gallery">Visit the Gallery</button>' : ""}
       </div>
     </section>
   `;
   active = null;
-  settleView({ focusSelector: '[data-route="category"]' });
+  settleView({ focusSelector: completed.persisted ? '[data-route="category"]' : "[data-retry-completion]" });
 }
 
 function renderRunnerBoundary() {
@@ -1077,6 +1086,11 @@ document.addEventListener("click", (event) => {
   }
   if (target.closest("[data-reset-stack]")) {
     resetStackChapter();
+    return;
+  }
+  if (target.closest("[data-retry-completion]") && pendingCompletion) {
+    const retry = pendingCompletion;
+    finishCompletedGame(retry.gameId, retry.runId, retry.completedAt);
     return;
   }
   if (target.closest("[data-clear-gallery]")) {
