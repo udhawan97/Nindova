@@ -946,9 +946,14 @@ try {
   await catalog.page.click('[data-route="gallery"]');
   await catalog.page.evaluate(() => {
     globalThis.__nativeHouseRemoveItem = Storage.prototype.removeItem;
+    globalThis.__nativeHouseSetItem = Storage.prototype.setItem;
     Storage.prototype.removeItem = function removeItem(key) {
       if (key === "nindova:house:v1") throw new DOMException("Legacy removal denied by test fixture", "SecurityError");
       return globalThis.__nativeHouseRemoveItem.call(this, key);
+    };
+    Storage.prototype.setItem = function setItem(key, value) {
+      if (key === "nindova:house:v2") throw new DOMException("Canonical write denied by test fixture", "QuotaExceededError");
+      return globalThis.__nativeHouseSetItem.call(this, key, value);
     };
   });
   await catalog.page.click("[data-clear-gallery]");
@@ -960,8 +965,10 @@ try {
   await catalog.page.click("#confirmGalleryClearButton");
   assert.equal(await catalog.page.evaluate(() => Object.keys(window.__house.memory.latestByGame).length), 8, "a partial storage failure retains the visible Gallery");
   assert.match(await catalog.page.locator(".gallery-status").innerText(), /could not be fully cleared/i);
-  assert.equal(await catalog.page.evaluate(() => JSON.parse(localStorage.getItem("nindova:house:v2")).latestByGame["pattern-court"]?.mode), "entertainment", "partial clearing restores the canonical v2 record");
-  await catalog.page.evaluate(() => { Storage.prototype.removeItem = globalThis.__nativeHouseRemoveItem; });
+  assert.equal(await catalog.page.evaluate(() => JSON.parse(localStorage.getItem("nindova:house:v2")).latestByGame["pattern-court"]?.mode), "entertainment", "compounded clear failure preserves the canonical v2 record");
+  await catalog.page.reload();
+  await catalog.page.waitForFunction(() => Object.keys(window.__house?.memory.latestByGame ?? {}).length === 8);
+  assert.equal(await catalog.page.locator("[data-clear-gallery]").isVisible(), true, "preserved readings survive a reload after compounded clear failure");
   await catalog.page.click("[data-clear-gallery]");
   await catalog.page.click("#confirmGalleryClearButton");
   assert.equal(await catalog.page.evaluate(() => Object.keys(window.__house.memory.latestByGame).length), 0);

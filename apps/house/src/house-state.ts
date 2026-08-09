@@ -187,13 +187,15 @@ export function createHouseStateStore(options: { readonly galleryStorage: Storag
       return { ...completed, state: cloneHouseState(gallery), persisted };
     },
     clearGallery(): boolean {
-      let cleared = true;
-      for (const key of [HOUSE_STORAGE_KEY, HOUSE_LEGACY_STORAGE_KEY]) {
-        try { options.galleryStorage.removeItem(key); } catch { cleared = false; }
+      if (!writeHouseState(options.galleryStorage, gallery)) return false;
+      try {
+        options.galleryStorage.removeItem(HOUSE_LEGACY_STORAGE_KEY);
+        options.galleryStorage.removeItem(HOUSE_STORAGE_KEY);
+      } catch {
+        return false;
       }
-      if (cleared) gallery = emptyHouseState();
-      else writeHouseState(options.galleryStorage, gallery);
-      return cleared;
+      gallery = emptyHouseState();
+      return true;
     },
   });
 }

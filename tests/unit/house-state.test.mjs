@@ -53,12 +53,12 @@ test("completion is copy-on-write and failed writes do not invent a Gallery read
   assert.deepEqual(unavailable.gallery().latestByGame, {});
 });
 
-test("Gallery clearing targets both exact keys and retains memory when a removal fails", () => {
+test("Gallery clearing preserves a canonical snapshot until both exact keys can be removed", () => {
   const result = State.completeEntertainmentGame(State.emptyHouseState(), "pattern-court", "kept", "2026-08-04T10:00:00.000Z").result;
   const gallery = memoryStorage({ [State.HOUSE_STORAGE_KEY]: JSON.stringify({ schemaVersion: 2, latestByGame: { "pattern-court": result } }), [State.HOUSE_LEGACY_STORAGE_KEY]: "legacy" });
   const store = State.createHouseStateStore({ galleryStorage: gallery, activeStorage: memoryStorage(), activeCodec: Session.HOUSE_ACTIVE_SESSION_CODEC });
   assert.equal(store.clearGallery(), true);
-  assert.deepEqual(gallery.calls.slice(-2), [["remove", State.HOUSE_STORAGE_KEY], ["remove", State.HOUSE_LEGACY_STORAGE_KEY]]);
+  assert.deepEqual(gallery.calls.slice(-2), [["remove", State.HOUSE_LEGACY_STORAGE_KEY], ["remove", State.HOUSE_STORAGE_KEY]]);
   assert.deepEqual(store.gallery().latestByGame, {});
 
   const partial = memoryStorage({ [State.HOUSE_STORAGE_KEY]: JSON.stringify({ schemaVersion: 2, latestByGame: { "pattern-court": result } }) }, { remove: State.HOUSE_LEGACY_STORAGE_KEY });
@@ -66,6 +66,17 @@ test("Gallery clearing targets both exact keys and retains memory when a removal
   assert.equal(partialStore.clearGallery(), false);
   assert.equal(partialStore.gallery().latestByGame["pattern-court"].runId, "kept");
   assert.equal(JSON.parse(partial.values.get(State.HOUSE_STORAGE_KEY)).latestByGame["pattern-court"].runId, "kept", "a partial removal restores the canonical v2 snapshot");
+
+  const compounded = memoryStorage({
+    [State.HOUSE_STORAGE_KEY]: JSON.stringify({ schemaVersion: 2, latestByGame: { "pattern-court": result } }),
+    [State.HOUSE_LEGACY_STORAGE_KEY]: "legacy",
+  }, { set: true, remove: State.HOUSE_LEGACY_STORAGE_KEY });
+  const compoundedStore = State.createHouseStateStore({ galleryStorage: compounded, activeStorage: memoryStorage(), activeCodec: Session.HOUSE_ACTIVE_SESSION_CODEC });
+  assert.equal(compoundedStore.clearGallery(), false);
+  assert.equal(compoundedStore.gallery().latestByGame["pattern-court"].runId, "kept");
+  assert.equal(JSON.parse(compounded.values.get(State.HOUSE_STORAGE_KEY)).latestByGame["pattern-court"].runId, "kept", "a denied canonical write cannot be followed by destructive removal");
+  assert.equal(compounded.values.get(State.HOUSE_LEGACY_STORAGE_KEY), "legacy");
+  assert.equal(compounded.calls.some(([operation]) => operation === "remove"), false);
 });
 
 test("active sessions are compact, Stack repair is semantic, and runner reload fails closed", () => {
