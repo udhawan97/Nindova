@@ -1,7 +1,7 @@
 # Graph Report - Nindova  (2026-08-09)
 
 ## Corpus Check
-- 147 files · ~175,675 words
+- 147 files · ~175,842 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `efd3f2f7`
+- Built from commit: `206fac81`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

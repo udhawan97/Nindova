@@ -455,7 +455,7 @@
     "semantic_hash": "d82b998ec66d551fbdb0ae2215ebc8d1"
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1786269710.1438615,
+    "mtime": 1786270446.4416335,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": "9557448d4a3c6237efa8fe2648d21fa0"
   },
@@ -790,8 +790,8 @@
     "semantic_hash": ""
   },
   "apps/house/src/house.ts": {
-    "mtime": 1786269453.4793632,
-    "ast_hash": "a3e4d0b4a5558bde7d36a2b69a286958",
+    "mtime": 1786270118.026097,
+    "ast_hash": "8e82050797109483c53810f06a3c208f",
     "semantic_hash": ""
   },
   "apps/house/src/vite-env.d.ts": {
@@ -810,8 +810,8 @@
     "semantic_hash": ""
   },
   "tests/browser/house.mjs": {
-    "mtime": 1786269453.4799643,
-    "ast_hash": "72b9bb02850b408d7149a14f5f3aea21",
+    "mtime": 1786270442.4006464,
+    "ast_hash": "5a0c2dc62facf53c1992f7bf65ed3f3d",
     "semantic_hash": ""
   },
   "apps/house/index.html": {
