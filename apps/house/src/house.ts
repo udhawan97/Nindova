@@ -92,6 +92,7 @@ let restoreDecisionPending = Boolean(active);
 let pendingRunnerChoice = false;
 let pendingCompletion: PendingCompletion | null = null;
 let exitReturnFocus: HTMLElement | null = null;
+let pendingExitDestination: { readonly view: View; readonly scrollY: number } | null = null;
 let galleryClearReturnFocus: HTMLElement | null = null;
 let exitConfirmationPending = false;
 let soundOn = false;
@@ -220,9 +221,10 @@ function hasMeaningfulProgress(candidate: ActiveGame): boolean {
   return JSON.stringify(candidate.pegs) !== JSON.stringify(initialPegs(diskCount));
 }
 
-function requestRoute(next: View, invoker: HTMLElement | null = null) {
+function requestRoute(next: View, invoker: HTMLElement | null = null, options: ViewOptions = {}) {
   if (next !== "game" && view === "game" && active && !restoreDecisionPending && hasMeaningfulProgress(active)) {
     exitReturnFocus = invoker ?? document.activeElement as HTMLElement | null;
+    pendingExitDestination = { view: next, scrollY: options.scrollY ?? 0 };
     exitConfirmationPending = true;
     sectorTable.suspend("exit");
     pauseChapterTransition();
@@ -231,17 +233,19 @@ function requestRoute(next: View, invoker: HTMLElement | null = null) {
     focusElement("#keepPlayingButton");
     return;
   }
-  route(next);
+  route(next, options);
 }
 
 function discardActiveGame() {
+  const destination = pendingExitDestination ?? { view: selectedCategory ? "category" as const : "home" as const, scrollY: 0 };
   leaveDialog.close("leave");
   exitConfirmationPending = false;
+  pendingExitDestination = null;
   active = null;
   restoreDecisionPending = false;
   pendingRunnerChoice = false;
   saveActiveGame();
-  route(selectedCategory ? "category" : "home");
+  route(destination.view, { scrollY: destination.scrollY });
 }
 
 function openCategory(categoryId: DoorCategoryId) {
@@ -1279,6 +1283,7 @@ confirmGalleryClearButton.addEventListener("click", () => {
 keepPlayingButton.addEventListener("click", () => {
   leaveDialog.close("keep");
   exitConfirmationPending = false;
+  pendingExitDestination = null;
   const focusTarget = exitReturnFocus;
   exitReturnFocus = null;
   resumeChapterTransition();
@@ -1296,6 +1301,7 @@ leaveDialog.addEventListener("cancel", (event) => {
   event.preventDefault();
   leaveDialog.close("keep");
   exitConfirmationPending = false;
+  pendingExitDestination = null;
   const focusTarget = exitReturnFocus;
   exitReturnFocus = null;
   resumeChapterTransition();
@@ -1330,7 +1336,7 @@ function applyLocationHash(initial = false, restoredScroll = 0) {
   }
   if (!initial && view === "game" && active && hasMeaningfulProgress(active)) {
     writeRouteHash("game", "replace");
-    requestRoute(kind === "gallery" ? "gallery" : kind === "door" ? "category" : "home");
+    requestRoute(kind === "gallery" ? "gallery" : kind === "door" ? "category" : "home", null, { scrollY: restoredScroll });
     return;
   }
   if (kind === "door" && categoryId) {

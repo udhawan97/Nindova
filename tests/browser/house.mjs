@@ -368,6 +368,23 @@ try {
   await navigation.page.waitForFunction((expected) => Math.abs(window.scrollY - expected) <= 2, rememberedHomeScroll);
   await navigation.context.close();
 
+  for (const backMethod of ["browser", "visible"]) {
+    const confirmedBack = await openHouse({ width: 320, height: 568 }, { reducedMotion: "reduce" });
+    await confirmedBack.page.click('[data-category="pattern-line"]');
+    await confirmedBack.page.locator('[data-game="pattern-court"]').scrollIntoViewIfNeeded();
+    const confirmedCategoryScroll = await confirmedBack.page.evaluate(() => window.scrollY);
+    assert.ok(confirmedCategoryScroll > 0, `${backMethod} confirmation starts from a meaningful category position`);
+    await confirmedBack.page.click('[data-game="pattern-court"]');
+    await confirmedBack.page.click('[data-answer="1"]');
+    if (backMethod === "browser") await confirmedBack.page.goBack();
+    else await confirmedBack.page.click('.game-view [data-history-back="category"]');
+    await confirmedBack.page.waitForSelector("#leaveDialog[open]");
+    await confirmedBack.page.click("#leaveTableButton");
+    await confirmedBack.page.waitForSelector("#categoryTitle");
+    await confirmedBack.page.waitForFunction((expected) => Math.abs(window.scrollY - expected) <= 2, confirmedCategoryScroll);
+    await confirmedBack.context.close();
+  }
+
   const deniedCompletion = await openHouse(
     { width: 1280, height: 800 },
     { reducedMotion: "reduce" },
@@ -920,6 +937,7 @@ try {
   await keyboard.page.waitForFunction(() => document.activeElement?.id === "houseMain");
   const keyboardMoves = hanoiMoves(2);
   for (const [moveIndex, [from, to]] of keyboardMoves.entries()) {
+    assert.deepEqual(await keyboard.page.evaluate(() => ({ view: window.__house.view, gameId: window.__house.active?.gameId, pegCount: document.querySelectorAll("[data-peg]").length })), { view: "game", gameId: "stack-architect", pegCount: 3 }, `Stack keyboard move ${moveIndex + 1} remains on its rendered table`);
     await keyboardActivate(keyboard.page, `[data-peg="${from}"]`);
     await keyboard.page.waitForFunction((peg) => document.activeElement?.matches(`[data-peg="${peg}"]`), from);
     await keyboardActivate(keyboard.page, `[data-peg="${to}"]`);
