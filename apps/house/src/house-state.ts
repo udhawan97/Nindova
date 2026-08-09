@@ -192,6 +192,7 @@ export function createHouseStateStore(options: { readonly galleryStorage: Storag
         try { options.galleryStorage.removeItem(key); } catch { cleared = false; }
       }
       if (cleared) gallery = emptyHouseState();
+      else writeHouseState(options.galleryStorage, gallery);
       return cleared;
     },
   });

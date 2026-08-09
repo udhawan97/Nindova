@@ -65,6 +65,7 @@ test("Gallery clearing targets both exact keys and retains memory when a removal
   const partialStore = State.createHouseStateStore({ galleryStorage: partial, activeStorage: memoryStorage(), activeCodec: Session.HOUSE_ACTIVE_SESSION_CODEC });
   assert.equal(partialStore.clearGallery(), false);
   assert.equal(partialStore.gallery().latestByGame["pattern-court"].runId, "kept");
+  assert.equal(JSON.parse(partial.values.get(State.HOUSE_STORAGE_KEY)).latestByGame["pattern-court"].runId, "kept", "a partial removal restores the canonical v2 snapshot");
 });
 
 test("active sessions are compact, Stack repair is semantic, and runner reload fails closed", () => {

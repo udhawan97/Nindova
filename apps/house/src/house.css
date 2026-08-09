@@ -167,6 +167,7 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
 .gallery-ledger button, .quiet-action { min-height: 44px; padding-inline: var(--space-md); border: 1px solid var(--color-rule-strong); background: transparent; cursor: pointer; }
 .privacy-note, .result-boundary { margin-block-start: var(--space-xl); color: var(--color-neutral); font-family: var(--font-mono); font-size: var(--text-xs); }
 .result-boundary-warning { max-width: 52ch; padding: var(--space-md); border: 1px solid var(--color-accent); background: color-mix(in oklch, var(--color-accent) 8%, transparent); color: var(--color-ink-soft); }
+.gallery-status { max-width: 62ch; padding: var(--space-md); border-inline-start: 2px solid var(--color-accent); background: color-mix(in oklch, var(--color-accent) 7%, transparent); color: var(--color-ink-soft); }
 .clear-gallery { min-height: 44px; margin-block-start: var(--space-sm); padding: 0; border: 0; border-block-end: 1px solid var(--color-rule-strong); background: transparent; color: var(--color-muted); cursor: pointer; }
 
 .game-masthead { display: flex; align-items: center; justify-content: space-between; gap: var(--space-lg); }
@@ -402,6 +403,7 @@ button.pallanguzhi-pit:hover, button.pallanguzhi-pit:focus-visible { border-colo
 .leave-dialog h2 { max-width: 12ch; }
 .leave-dialog > p:not(.kicker) { max-width: 52ch; color: var(--color-muted); }
 .quiet-link { display: inline-flex; min-height: 44px; align-items: center; }
+.danger-action { border-color: var(--color-jewel-ruby); color: var(--color-ink-soft); }
 .dialog-inlay { width: 4rem; aspect-ratio: 1; margin-block-end: var(--space-xl); border: 1px solid var(--color-accent); transform: rotate(45deg); }
 .dialog-inlay-small { width: 2.6rem; }
 

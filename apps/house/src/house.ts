@@ -73,6 +73,10 @@ const enterHouseButton = requiredElement<HTMLButtonElement>("#enterHouseButton")
 const leaveDialog = requiredElement<HTMLDialogElement>("#leaveDialog");
 const keepPlayingButton = requiredElement<HTMLButtonElement>("#keepPlayingButton");
 const leaveTableButton = requiredElement<HTMLButtonElement>("#leaveTableButton");
+const galleryClearDialog = requiredElement<HTMLDialogElement>("#galleryClearDialog");
+const galleryClearCount = requiredElement<HTMLElement>("#galleryClearCount");
+const cancelGalleryClearButton = requiredElement<HTMLButtonElement>("#cancelGalleryClearButton");
+const confirmGalleryClearButton = requiredElement<HTMLButtonElement>("#confirmGalleryClearButton");
 const celebration = requiredElement<HTMLElement>("#celebration");
 
 const runnerReviewMode = new URLSearchParams(location.search).get("review") === "1";
@@ -88,6 +92,7 @@ let restoreDecisionPending = Boolean(active);
 let pendingRunnerChoice = false;
 let pendingCompletion: PendingCompletion | null = null;
 let exitReturnFocus: HTMLElement | null = null;
+let galleryClearReturnFocus: HTMLElement | null = null;
 let exitConfirmationPending = false;
 let soundOn = false;
 let statusMessage = "";
@@ -435,12 +440,14 @@ function renderCategory() {
 
 function renderGallery() {
   const entries = GAMES.map((game) => ({ game, result: memory.latestByGame[game.id] }));
+  const completedCount = entries.filter(({ result }) => Boolean(result)).length;
   main.innerHTML = `
     <section class="gallery-view" aria-labelledby="galleryTitle">
       <button class="back-link" type="button" data-route="home"><span aria-hidden="true">←</span> House plan</button>
       <p class="kicker">The west gallery</p>
-      <h1 id="galleryTitle">Recent readings,<br><em>kept without judgment.</em></h1>
+      <h1 id="galleryTitle" tabindex="-1">Recent readings,<br><em>kept without judgment.</em></h1>
       <p class="house-lede">This is a local continuity ledger, not a profile. Each game replaces its own previous entry.</p>
+      ${statusMessage ? `<p class="gallery-status" role="status" aria-live="polite">${escape(statusMessage)}</p>` : ""}
       <div class="gallery-ledger">
         ${entries.map(({ game, result }) => `
           <article>
@@ -451,7 +458,7 @@ function renderGallery() {
         `).join("")}
       </div>
       <p class="privacy-note">Storage scope: this browser only · one replaceable result per game · no account · no telemetry</p>
-      <button class="clear-gallery" type="button" data-clear-gallery>Clear this Gallery</button>
+      ${completedCount > 0 ? '<button class="clear-gallery" type="button" data-clear-gallery>Clear this Gallery</button>' : ""}
     </section>
   `;
 }
@@ -1094,10 +1101,12 @@ document.addEventListener("click", (event) => {
     return;
   }
   if (target.closest("[data-clear-gallery]")) {
-    houseStateStore.clearGallery();
-    memory = houseStateStore.gallery();
-    renderGallery();
-    focusElement("[data-clear-gallery]");
+    const completedCount = Object.keys(memory.latestByGame).length;
+    if (completedCount === 0) return;
+    galleryClearReturnFocus = target.closest<HTMLElement>("[data-clear-gallery]");
+    galleryClearCount.textContent = `${completedCount} saved ${completedCount === 1 ? "reading" : "readings"}`;
+    galleryClearDialog.showModal();
+    requestAnimationFrame(() => cancelGalleryClearButton.focus({ preventScroll: true }));
     return;
   }
   const pegButton = target.closest<HTMLElement>("[data-peg]");
@@ -1194,6 +1203,25 @@ enterHouseButton.addEventListener("click", () => {
 });
 
 audienceDialog.addEventListener("cancel", (event) => event.preventDefault());
+
+galleryClearDialog.addEventListener("close", () => {
+  const focusTarget = galleryClearReturnFocus;
+  galleryClearReturnFocus = null;
+  if (galleryClearDialog.returnValue === "cancel" && focusTarget?.isConnected) {
+    requestAnimationFrame(() => focusTarget.focus({ preventScroll: true }));
+  }
+});
+
+confirmGalleryClearButton.addEventListener("click", () => {
+  const cleared = houseStateStore.clearGallery();
+  memory = houseStateStore.gallery();
+  galleryClearDialog.close("confirmed");
+  statusMessage = cleared
+    ? "Gallery cleared. No completed readings remain in this browser."
+    : "The Gallery could not be fully cleared. Your visible readings were kept.";
+  renderGallery();
+  settleView({ focusSelector: cleared ? "#galleryTitle" : "[data-clear-gallery]" });
+});
 
 keepPlayingButton.addEventListener("click", () => {
   leaveDialog.close("keep");

@@ -59,6 +59,17 @@
       </form>
     </dialog>
 
+    <dialog id="galleryClearDialog" class="leave-dialog gallery-clear-dialog" aria-labelledby="galleryClearTitle" aria-describedby="galleryClearCopy">
+      <div class="dialog-inlay dialog-inlay-small" aria-hidden="true"></div>
+      <p class="kicker">Clear the local ledger?</p>
+      <h2 id="galleryClearTitle">Clear this Gallery?</h2>
+      <p id="galleryClearCopy">This removes <span id="galleryClearCount">every saved reading</span> from this browser. Your games remain available.</p>
+      <form method="dialog">
+        <button id="cancelGalleryClearButton" class="primary-action" value="cancel">Keep readings</button>
+        <button id="confirmGalleryClearButton" class="quiet-action danger-action" type="button">Clear Gallery</button>
+      </form>
+    </dialog>
+
     <div id="celebration" class="celebration" role="status" aria-live="polite" aria-atomic="true" hidden></div>
     <script type="module" src="/src/house.ts"></script>
   </body>

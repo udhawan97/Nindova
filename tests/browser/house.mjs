@@ -933,9 +933,30 @@ try {
   assert.equal(replacement.keys.length, 8);
   assert.notEqual(replacement.runId, mirrorRun);
   await catalog.page.click('[data-route="gallery"]');
+  await catalog.page.evaluate(() => {
+    globalThis.__nativeHouseRemoveItem = Storage.prototype.removeItem;
+    Storage.prototype.removeItem = function removeItem(key) {
+      if (key === "nindova:house:v1") throw new DOMException("Legacy removal denied by test fixture", "SecurityError");
+      return globalThis.__nativeHouseRemoveItem.call(this, key);
+    };
+  });
   await catalog.page.click("[data-clear-gallery]");
+  assert.equal(await catalog.page.locator("#galleryClearDialog").getAttribute("open"), "");
+  assert.equal(await catalog.page.evaluate(() => Object.keys(window.__house.memory.latestByGame).length), 8, "opening confirmation preserves every reading");
+  await catalog.page.click("#cancelGalleryClearButton");
+  assert.equal(await catalog.page.evaluate(() => Object.keys(window.__house.memory.latestByGame).length), 8, "cancel preserves every reading");
+  await catalog.page.click("[data-clear-gallery]");
+  await catalog.page.click("#confirmGalleryClearButton");
+  assert.equal(await catalog.page.evaluate(() => Object.keys(window.__house.memory.latestByGame).length), 8, "a partial storage failure retains the visible Gallery");
+  assert.match(await catalog.page.locator(".gallery-status").innerText(), /could not be fully cleared/i);
+  assert.equal(await catalog.page.evaluate(() => JSON.parse(localStorage.getItem("nindova:house:v2")).latestByGame["pattern-court"]?.mode), "entertainment", "partial clearing restores the canonical v2 record");
+  await catalog.page.evaluate(() => { Storage.prototype.removeItem = globalThis.__nativeHouseRemoveItem; });
+  await catalog.page.click("[data-clear-gallery]");
+  await catalog.page.click("#confirmGalleryClearButton");
   assert.equal(await catalog.page.evaluate(() => Object.keys(window.__house.memory.latestByGame).length), 0);
   assert.equal(await catalog.page.locator(".gallery-ledger article").filter({ hasText: "No completed reading is kept." }).count(), 8);
+  assert.match(await catalog.page.locator(".gallery-status").innerText(), /Gallery cleared/i);
+  assert.equal(await catalog.page.locator("[data-clear-gallery]").count(), 0, "an empty Gallery exposes no destructive action");
   await catalog.context.close();
 
   const provenance = await openHouse({ width: 375, height: 812 });
