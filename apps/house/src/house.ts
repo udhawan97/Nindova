@@ -1212,8 +1212,12 @@ soundButton.addEventListener("click", () => {
   soundButton.textContent = soundOn ? "Sound on" : "Sound off";
 });
 
-enterHouseButton.addEventListener("click", () => {
+enterHouseButton.addEventListener("click", (event) => {
+  event.preventDefault();
   houseStateStore.acknowledgeAudience();
+  audienceDialog.close("enter");
+  window.scrollTo({ left: 0, top: 0, behavior: "auto" });
+  document.querySelector<HTMLElement>("#houseTitle")?.focus({ preventScroll: true });
 });
 
 audienceDialog.addEventListener("cancel", (event) => event.preventDefault());

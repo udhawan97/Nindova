@@ -520,6 +520,16 @@ button.pallanguzhi-pit:hover, button.pallanguzhi-pit:focus-visible { border-colo
   .route-miniature { width: 100%; }
 }
 
+@media (max-width: 430px), (max-height: 650px) {
+  .audience-dialog { width: calc(100vw - 1rem); max-height: calc(100dvh - 1rem); padding: 1rem; overflow: auto; }
+  .audience-dialog .dialog-inlay { width: 2rem; margin-block-end: .75rem; }
+  .audience-dialog .kicker { margin-block-end: .4rem; }
+  .audience-dialog h1 { margin-block-end: .75rem; font-size: clamp(2rem, 10vw, 2.6rem); line-height: .96; }
+  .audience-dialog > p:not(.kicker) { margin-block-end: 0; font-size: var(--text-sm); }
+  .audience-dialog form { display: grid; gap: .5rem; margin-block-start: 1rem; }
+  .audience-dialog form > * { width: 100%; justify-content: center; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .00001ms !important; animation-iteration-count: 1 !important; transition-duration: .00001ms !important; }
   .game-door:hover { transform: none; }

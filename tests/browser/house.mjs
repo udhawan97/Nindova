@@ -172,6 +172,7 @@ async function openHouse(viewport, options = {}, {
   await page.keyboard.press("Escape");
   assert.equal(await page.locator("#audienceDialog").getAttribute("open"), "", "adult boundary requires an explicit choice");
   await page.click("#enterHouseButton");
+  await page.waitForFunction(() => document.activeElement?.id === "houseTitle");
   return { context, page };
 }
 
@@ -285,10 +286,13 @@ async function keyboardActivate(page, selector) {
 }
 
 try {
-  const boundaryContext = await browser.newContext({ viewport: { width: 375, height: 812 } });
+  const boundaryContext = await browser.newContext({ viewport: { width: 320, height: 568 } });
   const boundaryPage = await boundaryContext.newPage();
   await boundaryPage.goto(`http://127.0.0.1:${port}/house/`);
   await boundaryPage.waitForFunction(() => Boolean(window.__house));
+  const audienceDialogBox = await boundaryPage.locator("#audienceDialog").boundingBox();
+  const leaveHouseBox = await boundaryPage.locator(".quiet-link").boundingBox();
+  assert.ok(audienceDialogBox && leaveHouseBox && leaveHouseBox.y + leaveHouseBox.height <= audienceDialogBox.y + audienceDialogBox.height, "both audience-boundary choices are visible at 320×568");
   await boundaryPage.locator(".quiet-link").click();
   await boundaryPage.waitForURL(`http://127.0.0.1:${port}/`);
   assert.equal(await boundaryPage.evaluate(() => localStorage.getItem("nindova:house:adult-audience:v1")), null, "leaving does not acknowledge the adult boundary");
