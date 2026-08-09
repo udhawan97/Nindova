@@ -39,6 +39,8 @@ import {
 } from "./sector-sprint-table";
 
 type View = "home" | "category" | "gallery" | "game";
+type HistoryMode = "push" | "replace" | "none";
+type ViewOptions = { readonly historyMode?: HistoryMode; readonly scrollY?: number; readonly focusSelector?: string };
 
 const getGame = GRAND_SALON.game.bind(GRAND_SALON);
 const getDoorCategory = GRAND_SALON.door.bind(GRAND_SALON);
@@ -130,14 +132,29 @@ function hashForView(next: View): string {
   return "";
 }
 
-function writeRouteHash(next: View, replace = false) {
-  const hash = hashForView(next);
-  if (location.hash === hash) return;
-  const url = `${location.pathname}${location.search}${hash}`;
-  history[replace ? "replaceState" : "pushState"]({ nindovaHouse: true }, "", url);
+function rememberCurrentScroll() {
+  history.replaceState({ ...history.state, nindovaHouse: true, scrollY: window.scrollY }, "", location.href);
 }
 
-function route(next: View) {
+function writeRouteHash(next: View, mode: Exclude<HistoryMode, "none"> = "push") {
+  const hash = hashForView(next);
+  if (location.hash === hash) return;
+  if (mode === "push") rememberCurrentScroll();
+  const url = `${location.pathname}${location.search}${hash}`;
+  history[mode === "replace" ? "replaceState" : "pushState"]({ nindovaHouse: true, scrollY: 0 }, "", url);
+}
+
+function settleView({ scrollY = 0, focusSelector }: Pick<ViewOptions, "scrollY" | "focusSelector"> = {}) {
+  const top = Math.max(0, scrollY);
+  window.scrollTo({ left: 0, top, behavior: "auto" });
+  requestAnimationFrame(() => {
+    window.scrollTo({ left: 0, top, behavior: "auto" });
+    const target = focusSelector ? document.querySelector<HTMLElement>(focusSelector) : main;
+    target?.focus({ preventScroll: true });
+  });
+}
+
+function route(next: View, options: ViewOptions = {}) {
   const leavingGame = view === "game" && next !== "game";
   if (leavingGame) sectorTable.destroy();
   closeHouseAudio();
@@ -152,9 +169,10 @@ function route(next: View) {
     saveActiveGame();
   }
   statusMessage = "";
-  writeRouteHash(next, leavingGame);
+  const historyMode = options.historyMode ?? (leavingGame ? "replace" : "push");
+  if (historyMode !== "none") writeRouteHash(next, historyMode);
   render();
-  main.focus({ preventScroll: true });
+  settleView(options);
 }
 
 function hasMeaningfulProgress(candidate: ActiveGame): boolean {
@@ -196,7 +214,7 @@ function openCategory(categoryId: DoorCategoryId) {
   route("category");
 }
 
-function startGame(gameId: GameId) {
+function startGame(gameId: GameId, options: ViewOptions = {}) {
   const game = getGame(gameId);
   selectedCategory = game.categoryId;
   sectorTable.destroy();
@@ -209,12 +227,12 @@ function startGame(gameId: GameId) {
     pendingRunnerChoice = !matchMedia("(prefers-reduced-motion: reduce)").matches;
     view = "game";
     statusMessage = "";
-    writeRouteHash("game");
+    if (options.historyMode !== "none") writeRouteHash("game", options.historyMode ?? "push");
     if (pendingRunnerChoice) {
       sectorTable.prepare();
       saveActiveGame();
       render();
-      focusElement('[data-runner-route="action"]');
+      settleView({ ...options, focusSelector: '[data-runner-route="action"]' });
     } else sectorTable.start("narrated", crypto.randomUUID());
     return;
   }
@@ -233,9 +251,9 @@ function startGame(gameId: GameId) {
   view = "game";
   statusMessage = "";
   saveActiveGame();
-  writeRouteHash("game");
+  if (options.historyMode !== "none") writeRouteHash("game", options.historyMode ?? "push");
   render();
-  main.focus({ preventScroll: true });
+  settleView(options);
 }
 
 function beginRunnerRoute(routeChoice: "action" | "narrated") {
@@ -243,6 +261,7 @@ function beginRunnerRoute(routeChoice: "action" | "narrated") {
   pendingRunnerChoice = false;
   view = "game";
   sectorTable.start(routeChoice, crypto.randomUUID());
+  settleView({ focusSelector: routeChoice === "action" ? '[data-runner-action="up"]' : "[data-story-advance]" });
 }
 
 function escape(value: string): string {
@@ -315,14 +334,15 @@ function scheduleChapterTransition(delay: number, callback: () => void) {
 function focusFirstGameControl() {
   if (!active) return;
   const game = getGame(active.gameId);
-  if (game.kind === "runner") focusElement(
-    sectorTable.runner()?.failed
+  if (game.kind === "runner") {
+    const focusSelector = sectorTable.runner()?.failed
       ? sectorTable.canRetry() ? "[data-runner-retry]" : "[data-runner-story]"
-      : active.storyBeat === null ? '[data-runner-action="up"]' : "[data-story-advance]",
-  );
-  else if (game.kind === "stack") focusElement('[data-peg="0"]');
-  else if (game.kind === "memory" && !active.memoryCovered) focusElement("[data-cover-memory]");
-  else focusElement('[data-answer="0"]');
+      : active.storyBeat === null ? '[data-runner-action="up"]' : "[data-story-advance]";
+    settleView({ focusSelector });
+  }
+  else if (game.kind === "stack") settleView({ focusSelector: '[data-peg="0"]' });
+  else if (game.kind === "memory" && !active.memoryCovered) settleView({ focusSelector: "[data-cover-memory]" });
+  else settleView({ focusSelector: '[data-answer="0"]' });
 }
 
 function renderHome() {
@@ -785,7 +805,7 @@ function finishCompletedGame(gameId: GameId, runId: string) {
     </section>
   `;
   active = null;
-  focusElement('[data-route="category"]');
+  settleView({ focusSelector: '[data-route="category"]' });
 }
 
 function renderRunnerBoundary() {
@@ -807,7 +827,7 @@ function renderRunnerBoundary() {
     </section>
   `;
   active = null;
-  focusElement('[data-route="home"]');
+  settleView({ focusSelector: '[data-route="home"]' });
 }
 
 function handleSectorTerminal(outcome: SectorSprintTerminal) {
@@ -1200,42 +1220,43 @@ window.__house = {
   answer: answerChoice,
 };
 
-function applyLocationHash(initial = false) {
+function applyLocationHash(initial = false, restoredScroll = 0) {
   const [kind, rawId] = location.hash.slice(1).split("/");
   const categoryId = DOOR_CATEGORIES.some((category) => category.id === rawId) ? rawId as DoorCategoryId : null;
   const gameId = GAMES.some((game) => game.id === rawId) ? rawId as GameId : null;
   if (initial && runnerRestoreWasDiscarded) {
     history.replaceState({ nindovaHouse: true }, "", `${location.pathname}${location.search}`);
-    route("home");
+    route("home", { historyMode: "none" });
     return;
   }
   if (initial && active) {
-    writeRouteHash("game", true);
+    writeRouteHash("game", "replace");
     return;
   }
   if (!initial && view === "game" && active && hasMeaningfulProgress(active)) {
-    writeRouteHash("game", true);
+    writeRouteHash("game", "replace");
     requestRoute(kind === "gallery" ? "gallery" : kind === "door" ? "category" : "home");
     return;
   }
   if (kind === "door" && categoryId) {
     selectedCategory = categoryId;
-    route("category");
+    route("category", { historyMode: "none", scrollY: restoredScroll });
     return;
   }
   if (kind === "game" && gameId) {
-    startGame(gameId);
+    startGame(gameId, { historyMode: "none", scrollY: restoredScroll });
     return;
   }
   if (kind === "gallery") {
-    route("gallery");
+    route("gallery", { historyMode: "none", scrollY: restoredScroll });
     return;
   }
   if (location.hash) history.replaceState({ nindovaHouse: true }, "", `${location.pathname}${location.search}`);
-  route("home");
+  route("home", { historyMode: "none", scrollY: restoredScroll });
 }
 
-addEventListener("popstate", () => applyLocationHash());
+history.scrollRestoration = "manual";
+addEventListener("popstate", (event) => applyLocationHash(false, Number(event.state?.scrollY ?? 0)));
 
 if ("serviceWorker" in navigator) {
   addEventListener("load", () => { navigator.serviceWorker.register("./sw.js"); });

@@ -309,6 +309,25 @@ try {
     await context.close();
   }
 
+  const navigation = await openHouse({ width: 320, height: 568 }, { reducedMotion: "reduce" });
+  await navigation.page.locator('[data-category="pattern-line"]').scrollIntoViewIfNeeded();
+  const rememberedHomeScroll = await navigation.page.evaluate(() => window.scrollY);
+  assert.ok(rememberedHomeScroll > 0, "the mobile House has a meaningful list position to restore");
+  await navigation.page.click('[data-category="pattern-line"]');
+  await navigation.page.waitForSelector("#categoryTitle");
+  await navigation.page.waitForFunction(() => window.scrollY === 0);
+  assert.ok((await navigation.page.locator("#categoryTitle").boundingBox())?.y >= 0, "a forward door transition shows its heading");
+  await navigation.page.goBack();
+  await navigation.page.waitForSelector(".floor-plan");
+  await navigation.page.waitForFunction((expected) => Math.abs(window.scrollY - expected) <= 2, rememberedHomeScroll);
+  await navigation.page.click('[data-category="pattern-line"]');
+  await navigation.page.locator('[data-game="pattern-court"]').scrollIntoViewIfNeeded();
+  await navigation.page.click('[data-game="pattern-court"]');
+  await navigation.page.waitForSelector("#gameTitle");
+  await navigation.page.waitForFunction(() => window.scrollY === 0);
+  assert.ok((await navigation.page.locator("#gameTitle").boundingBox())?.y >= 0, "a forward table transition shows its task context");
+  await navigation.context.close();
+
   const classicDoors = await openHouse({ width: 414, height: 896 }, { reducedMotion: "reduce" });
   await classicDoors.page.click('[data-category="turn-trap"]');
   assert.equal(await classicDoors.page.locator(".category-table").count(), 2);
