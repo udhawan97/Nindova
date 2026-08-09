@@ -140,7 +140,19 @@ function hashForView(next: View): string {
 }
 
 function rememberCurrentScroll() {
-  history.replaceState({ ...history.state, nindovaHouse: true, scrollY: window.scrollY }, "", location.href);
+  history.replaceState({ ...history.state, nindovaHouse: true, nindovaHouseDepth: currentHistoryDepth(), scrollY: window.scrollY }, "", location.href);
+}
+
+function currentHistoryDepth(): number {
+  const depth = Number(history.state?.nindovaHouseDepth ?? 0);
+  return Number.isSafeInteger(depth) && depth >= 0 ? depth : 0;
+}
+
+function viewFromLocationHash(): View {
+  if (location.hash.startsWith("#door/")) return "category";
+  if (location.hash.startsWith("#game/")) return "game";
+  if (location.hash === "#gallery") return "gallery";
+  return "home";
 }
 
 function writeRouteHash(next: View, mode: Exclude<HistoryMode, "none"> = "push") {
@@ -148,7 +160,16 @@ function writeRouteHash(next: View, mode: Exclude<HistoryMode, "none"> = "push")
   if (location.hash === hash) return;
   if (mode === "push") rememberCurrentScroll();
   const url = `${location.pathname}${location.search}${hash}`;
-  history[mode === "replace" ? "replaceState" : "pushState"]({ nindovaHouse: true, scrollY: 0 }, "", url);
+  const depth = currentHistoryDepth() + (mode === "push" ? 1 : 0);
+  const currentStateView = history.state?.nindovaHouseView as View | undefined;
+  const parentView = mode === "push" ? currentStateView ?? viewFromLocationHash() : history.state?.nindovaHouseParentView;
+  history[mode === "replace" ? "replaceState" : "pushState"]({
+    nindovaHouse: true,
+    nindovaHouseDepth: depth,
+    nindovaHouseView: next,
+    nindovaHouseParentView: parentView,
+    scrollY: 0,
+  }, "", url);
 }
 
 function settleView({ scrollY = 0, focusSelector }: Pick<ViewOptions, "scrollY" | "focusSelector"> = {}) {
@@ -427,7 +448,7 @@ function renderCategory() {
   main.innerHTML = `
     <section class="category-view category-view-${category.id}" aria-labelledby="categoryTitle">
       <header class="game-masthead">
-        <button class="back-link" type="button" data-route="home"><span aria-hidden="true">←</span> Grand Salon</button>
+        <button class="back-link" type="button" data-history-back="home"><span aria-hidden="true">←</span> Grand Salon</button>
         <span class="category-door-mark">Door ${category.number}</span>
       </header>
       <div class="category-aperture" aria-hidden="true"><i></i><i></i><i></i><i></i><span></span></div>
@@ -458,7 +479,7 @@ function renderGallery() {
   const completedCount = entries.filter(({ result }) => Boolean(result)).length;
   main.innerHTML = `
     <section class="gallery-view" aria-labelledby="galleryTitle">
-      <button class="back-link" type="button" data-route="home"><span aria-hidden="true">←</span> House plan</button>
+      <button class="back-link" type="button" data-history-back="home"><span aria-hidden="true">←</span> House plan</button>
       <p class="kicker">The west gallery</p>
       <h1 id="galleryTitle" tabindex="-1">Recent readings,<br><em>kept without judgment.</em></h1>
       <p class="house-lede">This is a local continuity ledger, not a profile. Each game replaces its own previous entry.</p>
@@ -489,7 +510,7 @@ function renderGame() {
   main.innerHTML = `
     <section class="game-view game-view-${game.id}" aria-labelledby="gameTitle">
       <header class="game-masthead">
-        <button class="back-link" type="button" data-route="category"><span aria-hidden="true">←</span> ${escape(getDoorCategory(game.categoryId).title)}</button>
+        <button class="back-link" type="button" data-history-back="category"><span aria-hidden="true">←</span> ${escape(getDoorCategory(game.categoryId).title)}</button>
         <div class="chapter-mark"><span>${pendingRunnerChoice ? "Before Act I" : `${authoredUnit} ${chapter + 1}`}</span><i aria-hidden="true"></i><span>${pendingRunnerChoice ? "Route choice" : "of 5"}</span></div>
       </header>
       <div class="game-title-block ${game.kind === "runner" ? "game-title-block-runner" : ""}">
@@ -1015,6 +1036,13 @@ function playChime(chapter: number) {
 
 document.addEventListener("click", (event) => {
   const target = event.target as Element;
+  const backButton = target.closest<HTMLElement>("[data-history-back]");
+  if (backButton) {
+    const fallback = backButton.dataset.historyBack as View;
+    if (currentHistoryDepth() > 0 && history.state?.nindovaHouseParentView === fallback) history.back();
+    else requestRoute(fallback, backButton);
+    return;
+  }
   const routeButton = target.closest<HTMLElement>("[data-route]");
   if (routeButton) {
     requestRoute(routeButton.dataset.route as View, routeButton);
@@ -1292,7 +1320,7 @@ function applyLocationHash(initial = false, restoredScroll = 0) {
   const categoryId = DOOR_CATEGORIES.some((category) => category.id === rawId) ? rawId as DoorCategoryId : null;
   const gameId = GAMES.some((game) => game.id === rawId) ? rawId as GameId : null;
   if (initial && runnerRestoreWasDiscarded) {
-    history.replaceState({ nindovaHouse: true }, "", `${location.pathname}${location.search}`);
+    history.replaceState({ nindovaHouse: true, nindovaHouseDepth: currentHistoryDepth(), nindovaHouseView: "home", nindovaHouseParentView: history.state?.nindovaHouseParentView, scrollY: 0 }, "", `${location.pathname}${location.search}`);
     route("home", { historyMode: "none" });
     return;
   }
@@ -1318,11 +1346,14 @@ function applyLocationHash(initial = false, restoredScroll = 0) {
     route("gallery", { historyMode: "none", scrollY: restoredScroll });
     return;
   }
-  if (location.hash) history.replaceState({ nindovaHouse: true }, "", `${location.pathname}${location.search}`);
+  if (location.hash) history.replaceState({ nindovaHouse: true, nindovaHouseDepth: currentHistoryDepth(), nindovaHouseView: "home", nindovaHouseParentView: history.state?.nindovaHouseParentView, scrollY: 0 }, "", `${location.pathname}${location.search}`);
   route("home", { historyMode: "none", scrollY: restoredScroll });
 }
 
 history.scrollRestoration = "manual";
+if (!history.state?.nindovaHouse) {
+  history.replaceState({ ...history.state, nindovaHouse: true, nindovaHouseDepth: 0, nindovaHouseView: viewFromLocationHash(), scrollY: window.scrollY }, "", location.href);
+}
 addEventListener("popstate", (event) => applyLocationHash(false, Number(event.state?.scrollY ?? 0)));
 
 if ("serviceWorker" in navigator) {

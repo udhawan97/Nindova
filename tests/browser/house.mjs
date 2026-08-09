@@ -354,10 +354,18 @@ try {
   await navigation.page.waitForFunction((expected) => Math.abs(window.scrollY - expected) <= 2, rememberedHomeScroll);
   await navigation.page.click('[data-category="pattern-line"]');
   await navigation.page.locator('[data-game="pattern-court"]').scrollIntoViewIfNeeded();
+  const rememberedCategoryScroll = await navigation.page.evaluate(() => window.scrollY);
+  assert.ok(rememberedCategoryScroll > 0, "the category has a meaningful table position to restore");
   await navigation.page.click('[data-game="pattern-court"]');
   await navigation.page.waitForSelector("#gameTitle");
   await navigation.page.waitForFunction(() => window.scrollY === 0);
   assert.ok((await navigation.page.locator("#gameTitle").boundingBox())?.y >= 0, "a forward table transition shows its task context");
+  await navigation.page.click('.game-view [data-history-back="category"]');
+  await navigation.page.waitForSelector("#categoryTitle");
+  await navigation.page.waitForFunction((expected) => Math.abs(window.scrollY - expected) <= 2, rememberedCategoryScroll);
+  await navigation.page.click('.category-view [data-history-back="home"]');
+  await navigation.page.waitForSelector(".floor-plan");
+  await navigation.page.waitForFunction((expected) => Math.abs(window.scrollY - expected) <= 2, rememberedHomeScroll);
   await navigation.context.close();
 
   const deniedCompletion = await openHouse(
@@ -392,15 +400,15 @@ try {
   assert.match(await classicDoors.page.locator(".study-provenance").innerText(), /Source and scope/);
   assert.equal(await classicDoors.page.evaluate(() => document.documentElement.scrollWidth), 414);
   await classicDoors.page.screenshot({ path: resolve(output, "aadu-puli-study-414x896.png"), fullPage: true, animations: "disabled" });
-  await classicDoors.page.click('[data-route="category"]');
-  await classicDoors.page.click('[data-route="home"]');
+  await classicDoors.page.click('[data-history-back="category"]');
+  await classicDoors.page.click('[data-history-back="home"]');
   await classicDoors.page.click('[data-category="pattern-line"]');
   await classicDoors.page.click('[data-game="navakankari"]');
   assert.equal(await classicDoors.page.locator(".navakankari-board .board-point").count(), 24);
   assert.match(await classicDoors.page.locator(".classic-study-description").textContent(), /Your brass pieces are at point 1, point 2/);
   assert.match(await classicDoors.page.locator('.navakankari-board [data-answer="0"]').getAttribute("aria-label"), /Choice A, point 3.*containing 2 of your existing pieces/);
-  await classicDoors.page.click('[data-route="category"]');
-  await classicDoors.page.click('[data-route="home"]');
+  await classicDoors.page.click('[data-history-back="category"]');
+  await classicDoors.page.click('[data-history-back="home"]');
   await classicDoors.page.click('[data-category="count-carry"]');
   await classicDoors.page.click('[data-game="pallanguzhi"]');
   assert.equal(await classicDoors.page.locator(".pallanguzhi-pit").count(), 14);
@@ -411,11 +419,11 @@ try {
     assert.ok(box && box.width >= 44 && box.height >= 44, "Pallanguzhi starting pit remains a 44px target");
   }
   assert.equal(await classicDoors.page.evaluate(() => document.documentElement.scrollWidth), 414);
-  await classicDoors.page.click('[data-route="category"]');
-  await classicDoors.page.click('[data-route="home"]');
+  await classicDoors.page.click('[data-history-back="category"]');
+  await classicDoors.page.click('[data-history-back="home"]');
   await classicDoors.page.click('[data-category="memory-sequence"]');
   assert.equal(await classicDoors.page.locator('[data-game="lantern-ledger"]').count(), 1, "Memory & Sequence opens through Door IV");
-  await classicDoors.page.click('[data-route="home"]');
+  await classicDoors.page.click('[data-history-back="home"]');
   await classicDoors.page.click('[data-category="motion-route"]');
   assert.equal(await classicDoors.page.locator('[data-game="sector-sprint"]').count(), 1, "Motion & Route opens through Door V");
   await classicDoors.context.close();
@@ -464,12 +472,12 @@ try {
   const recovery = await openHouse({ width: 375, height: 812 });
   await recovery.page.evaluate(() => window.__house.start("pattern-court"));
   await recovery.page.click('[data-answer="1"]');
-  await recovery.page.click('[data-route="category"]');
+  await recovery.page.click('[data-history-back="category"]');
   assert.equal(await recovery.page.locator("#leaveDialog").getAttribute("open"), "", "unfinished progress asks before leaving");
   await recovery.page.click("#keepPlayingButton");
   assert.equal(await recovery.page.evaluate(() => window.__house.active?.gameId), "pattern-court", "Keep playing preserves the active table");
-  assert.equal(await recovery.page.evaluate(() => document.activeElement?.matches('[data-route="category"]')), true, "cancel returns focus to the exit control");
-  await recovery.page.click('[data-route="category"]');
+  assert.equal(await recovery.page.evaluate(() => document.activeElement?.matches('[data-history-back="category"]')), true, "cancel returns focus to the exit control");
+  await recovery.page.click('[data-history-back="category"]');
   await recovery.page.click("#leaveTableButton");
   assert.equal(await recovery.page.evaluate(() => window.__house.active), null, "confirmed exit clears unfinished state");
   assert.equal(await recovery.page.evaluate(() => sessionStorage.getItem("nindova:house:active:v1")), null);
@@ -478,7 +486,7 @@ try {
   await recovery.page.waitForFunction(() => window.__house.active === null);
   assert.doesNotMatch(new URL(recovery.page.url()).hash, /#game\//, "Back after confirmed leave cannot restart the abandoned game");
   await recovery.page.evaluate(() => window.__house.start("pattern-court"));
-  await recovery.page.click('[data-route="category"]');
+  await recovery.page.click('[data-history-back="category"]');
   assert.equal(await recovery.page.locator("#leaveDialog").getAttribute("open"), null, "an untouched first chapter exits without interruption");
   await recovery.context.close();
 
@@ -490,7 +498,7 @@ try {
   }
   await finalChoiceExit.page.click('[data-answer="2"]');
   await finalChoiceExit.page.waitForFunction(() => window.__house.active?.chapter === 4 && window.__house.active?.resolving);
-  await finalChoiceExit.page.click('[data-route="category"]');
+  await finalChoiceExit.page.click('[data-history-back="category"]');
   await finalChoiceExit.page.waitForTimeout(900);
   assert.equal(await finalChoiceExit.page.locator("#leaveDialog").getAttribute("open"), "", "the final-chapter confirmation remains open past the completion delay");
   assert.deepEqual(await finalChoiceExit.page.evaluate(() => ({ chapter: window.__house.active?.chapter, resolving: window.__house.active?.resolving })), { chapter: 4, resolving: true }, "the final chapter cannot complete behind its exit confirmation");
