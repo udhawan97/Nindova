@@ -298,6 +298,17 @@ try {
   assert.equal(await boundaryPage.evaluate(() => localStorage.getItem("nindova:house:adult-audience:v1")), null, "leaving does not acknowledge the adult boundary");
   await boundaryContext.close();
 
+  for (const [hash, heading] of [["#gallery", "galleryTitle"], ["#door/pattern-line", "categoryTitle"]]) {
+    const directContext = await browser.newContext({ viewport: { width: 320, height: 568 } });
+    const directPage = await directContext.newPage();
+    await directPage.goto(`http://127.0.0.1:${port}/house/${hash}`);
+    await directPage.waitForFunction(() => Boolean(window.__house));
+    await directPage.click("#enterHouseButton");
+    await directPage.waitForFunction((id) => document.activeElement?.id === id, heading);
+    assert.equal(await directPage.evaluate(() => window.scrollY), 0, `${hash} acceptance exposes the current view from its top`);
+    await directContext.close();
+  }
+
   for (const viewport of [
     { width: 320, height: 568 },
     { width: 375, height: 812 },

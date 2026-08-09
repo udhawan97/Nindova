@@ -161,6 +161,13 @@ function settleView({ scrollY = 0, focusSelector }: Pick<ViewOptions, "scrollY" 
   });
 }
 
+function currentViewHeadingSelector(): string {
+  if (view === "category") return "#categoryTitle";
+  if (view === "gallery") return "#galleryTitle";
+  if (view === "game") return "#gameTitle";
+  return "#houseTitle";
+}
+
 function route(next: View, options: ViewOptions = {}) {
   const leavingGame = view === "game" && next !== "game";
   if (leavingGame) sectorTable.destroy();
@@ -426,7 +433,7 @@ function renderCategory() {
       <div class="category-aperture" aria-hidden="true"><i></i><i></i><i></i><i></i><span></span></div>
       <div class="category-heading">
         <p class="kicker">Door ${category.number}</p>
-        <h1 id="categoryTitle">${escape(category.title)}</h1>
+        <h1 id="categoryTitle" tabindex="-1">${escape(category.title)}</h1>
         <p class="house-lede">${escape(category.description)}</p>
       </div>
       <div class="category-tables">
@@ -487,7 +494,7 @@ function renderGame() {
       </header>
       <div class="game-title-block ${game.kind === "runner" ? "game-title-block-runner" : ""}">
         <p class="kicker">Table ${game.number} · ${escape(chapterTitle ?? authoredUnit)}</p>
-        <h1 id="gameTitle">${escape(game.title)}</h1>
+        <h1 id="gameTitle" tabindex="-1">${escape(game.title)}</h1>
         <p>${escape(game.description)}</p>
       </div>
       <div class="game-chamber game-chamber-${game.id}">
@@ -1217,7 +1224,7 @@ enterHouseButton.addEventListener("click", (event) => {
   houseStateStore.acknowledgeAudience();
   audienceDialog.close("enter");
   window.scrollTo({ left: 0, top: 0, behavior: "auto" });
-  document.querySelector<HTMLElement>("#houseTitle")?.focus({ preventScroll: true });
+  document.querySelector<HTMLElement>(currentViewHeadingSelector())?.focus({ preventScroll: true });
 });
 
 audienceDialog.addEventListener("cancel", (event) => event.preventDefault());
