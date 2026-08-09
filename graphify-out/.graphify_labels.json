@@ -67,13 +67,13 @@
   "65": "Nindova v0.3.0 — Shahi Mound",
   "66": "classic-studies.ts",
   "67": "advanceChapter",
-  "68": "selectPeg",
+  "68": "route",
   "69": "Layered Rasoi plan",
   "70": "bedtime-game-evidence.md",
   "71": "sector-sprint-table.ts",
   "72": "0015-add-the-bounded-sector-sprint.md",
-  "73": "route",
-  "74": "Visual system",
+  "73": "applyLocationHash",
+  "74": "Conservative product constraints",
   "75": "serve.mjs",
   "76": "seed-asserted.mjs",
   "77": "Nindova Roadmap",
@@ -131,5 +131,10 @@
   "129": "Board profiles",
   "130": "house-state.test.mjs",
   "131": "house-architecture.test.mjs",
-  "132": "stack-architect.test.mjs"
+  "132": "stack-architect.test.mjs",
+  "133": "Nindova v0.4.1 — House Continuity",
+  "134": "2. Evening light, arousal, and media displacement",
+  "135": "Claim language",
+  "136": ".removeItem",
+  "137": ".setItem"
 }

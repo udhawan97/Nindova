@@ -10,8 +10,8 @@
     "semantic_hash": "c08b366e6dbd26101b28ede4695b9cd0"
   },
   "apps/session/package.json": {
-    "mtime": 1785989276.0132084,
-    "ast_hash": "027f849a77b3a08730f738787b7a5518",
+    "mtime": 1786269588.2310605,
+    "ast_hash": "9f420bff6541fd58a457b600087769f4",
     "semantic_hash": ""
   },
   "apps/session/src/contracts.ts": {
@@ -40,8 +40,8 @@
     "semantic_hash": "3f5eee697172ddd1ba3dc4a676017480"
   },
   "apps/site/package.json": {
-    "mtime": 1785989276.013743,
-    "ast_hash": "e1c9e6ae5d85fc982520da9bdc47574d",
+    "mtime": 1786269588.2313664,
+    "ast_hash": "69486124f25886df7558db8e556359da",
     "semantic_hash": ""
   },
   "apps/site/src/content.config.ts": {
@@ -55,8 +55,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1785989276.0124063,
-    "ast_hash": "dd2650fea2f6eda3c84ece61091c260e",
+    "mtime": 1786269588.2287745,
+    "ast_hash": "4ae44cd9117abb77cc62d0dd77b12950",
     "semantic_hash": ""
   },
   "reference/test-demo.mjs": {
@@ -95,8 +95,8 @@
     "semantic_hash": "048d91047bac6fcc917176a987171c2b"
   },
   "tests/browser/pwa-offline.mjs": {
-    "mtime": 1785989494.5731058,
-    "ast_hash": "080a71c1c8af37df63c185554cac8cfb",
+    "mtime": 1786269690.3236394,
+    "ast_hash": "918311fe1e826247dfec2c2ed74fb8bb",
     "semantic_hash": ""
   },
   "tests/browser/seed-asserted.mjs": {
@@ -145,8 +145,8 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1785990726.4883733,
-    "ast_hash": "f78c4a29935bef72e8768096a525276f",
+    "mtime": 1786269645.4588592,
+    "ast_hash": "6d2cc1b6155adfed8db247480ef4ce4b",
     "semantic_hash": ""
   },
   "apps/session/index.html": {
@@ -170,13 +170,13 @@
     "semantic_hash": "63ec946421747cc2e27a8bd06efc96b3"
   },
   "apps/site/src/content/docs/docs/getting-started.md": {
-    "mtime": 1785989410.5950758,
-    "ast_hash": "bf2d362a5fc092bc43224b4b299774c4",
+    "mtime": 1786269645.4604063,
+    "ast_hash": "9144ef52f9eae61505407f4bbbdd4ef9",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/index.md": {
-    "mtime": 1785990845.0681717,
-    "ast_hash": "9a7cb007527e81bf44adaa56d6472be4",
+    "mtime": 1786269645.4606676,
+    "ast_hash": "d4f5ee0a7695223af2384bf240eff66b",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/ios-wall.md": {
@@ -200,8 +200,8 @@
     "semantic_hash": "9251370f0ad526545ecb97bc10a90ad8"
   },
   "apps/site/src/content/docs/docs/privacy-local-state.md": {
-    "mtime": 1785989410.5946825,
-    "ast_hash": "27aaf47ac0c8a7250c3d3983a6b896a9",
+    "mtime": 1786269690.3227608,
+    "ast_hash": "bb0d8aa1f97e02dc8356b58a07ceff2b",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/product-contract.md": {
@@ -215,8 +215,8 @@
     "semantic_hash": "d9652f2265ec6d5a346e085a592e8206"
   },
   "apps/site/src/content/docs/docs/roadmap.md": {
-    "mtime": 1785990845.0684056,
-    "ast_hash": "65e26b6177eb1540a5268d31583f4920",
+    "mtime": 1786269645.4608896,
+    "ast_hash": "a809b7aa3cc3b1014af67ccb96b8cd4e",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/testing.md": {
@@ -375,8 +375,8 @@
     "semantic_hash": "915ffee930dce452514be8e0a9eceedf"
   },
   "CHANGELOG.md": {
-    "mtime": 1785990726.488569,
-    "ast_hash": "e07414ef5085bde5f19fc6e4f6986e19",
+    "mtime": 1786269676.8194363,
+    "ast_hash": "05421a16385fa7e3c6e8d7fcd6c790c2",
     "semantic_hash": ""
   },
   "docs/PUBLIC-SURFACE-EVIDENCE.md": {
@@ -455,13 +455,13 @@
     "semantic_hash": "d82b998ec66d551fbdb0ae2215ebc8d1"
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1786060399.080522,
+    "mtime": 1786269710.1438615,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": "9557448d4a3c6237efa8fe2648d21fa0"
   },
   "public-facts.json": {
-    "mtime": 1785989276.0156038,
-    "ast_hash": "fab9a8e7821bf51e0067152d6febabd8",
+    "mtime": 1786269676.8182886,
+    "ast_hash": "633b4084d7c88ab37a3c79baee157eae",
     "semantic_hash": ""
   },
   "tests/fixtures/recipe-two.mjs": {
@@ -520,8 +520,8 @@
     "semantic_hash": ""
   },
   "tests/unit/brand-assets.test.mjs": {
-    "mtime": 1785989569.7339592,
-    "ast_hash": "a8df54ee14384dba013acc59a90ccd86",
+    "mtime": 1786269676.8189242,
+    "ast_hash": "4c286aee1eef73efe7ae0641e714a461",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/visual-identity.md": {
@@ -780,18 +780,18 @@
     "semantic_hash": "6c19e5773b5dbc9d6ccd9d552b422d71"
   },
   "apps/house/package.json": {
-    "mtime": 1785873237.802991,
-    "ast_hash": "b46e635abc9185ac6f3d4bb28701b80c",
-    "semantic_hash": "b46e635abc9185ac6f3d4bb28701b80c"
+    "mtime": 1786269588.2307374,
+    "ast_hash": "031e8cdd039f867eb2e4c0dca2b4861b",
+    "semantic_hash": ""
   },
   "apps/house/public/sw.js": {
-    "mtime": 1785988729.612874,
-    "ast_hash": "bff3c069eb33590f71ee6a342c051fc4",
+    "mtime": 1786269676.818035,
+    "ast_hash": "96186917e0a8b23103826171c6a67c65",
     "semantic_hash": ""
   },
   "apps/house/src/house.ts": {
-    "mtime": 1786060387.0856404,
-    "ast_hash": "dda895de0c0c1988d6ebec8f91bd0fcc",
+    "mtime": 1786269453.4793632,
+    "ast_hash": "a3e4d0b4a5558bde7d36a2b69a286958",
     "semantic_hash": ""
   },
   "apps/house/src/vite-env.d.ts": {
@@ -810,13 +810,13 @@
     "semantic_hash": ""
   },
   "tests/browser/house.mjs": {
-    "mtime": 1785990572.9982839,
-    "ast_hash": "8bcbf8a0f8ad480e20a0daa6ac2f5a63",
+    "mtime": 1786269453.4799643,
+    "ast_hash": "72b9bb02850b408d7149a14f5f3aea21",
     "semantic_hash": ""
   },
   "apps/house/index.html": {
-    "mtime": 1785895459.1447418,
-    "ast_hash": "bec262bd84f5d4edaf4009d74d0b357e",
+    "mtime": 1786267839.3919325,
+    "ast_hash": "031665959a8ef4b4d6fbbdb3e7f4b294",
     "semantic_hash": ""
   },
   "docs/adr/0013-add-the-adult-nindova-house.md": {
@@ -860,8 +860,8 @@
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/downloads.md": {
-    "mtime": 1785989429.7596054,
-    "ast_hash": "5810ec18f6850a18d4125856c920f529",
+    "mtime": 1786269645.4599514,
+    "ast_hash": "9c6cd076c4d6def86439b349277aa2e2",
     "semantic_hash": ""
   },
   "apps/site/public/media/nindova-house.png": {
@@ -990,8 +990,8 @@
     "semantic_hash": ""
   },
   "apps/house/src/house-state.ts": {
-    "mtime": 1786060387.0844557,
-    "ast_hash": "fccbbd59e3e38cbec4ac3076631b18ea",
+    "mtime": 1786269235.3402956,
+    "ast_hash": "e6f0109a23b4b4aa49aebdb347e67fbd",
     "semantic_hash": ""
   },
   "apps/house/src/salon-catalog.ts": {
@@ -1020,13 +1020,18 @@
     "semantic_hash": ""
   },
   "tests/unit/house-state.test.mjs": {
-    "mtime": 1786060387.086629,
-    "ast_hash": "1d6f9ad94e7384e2c0ede00a4f01c3bc",
+    "mtime": 1786269235.341235,
+    "ast_hash": "5d3078acb95bf419866bbd8c68fa3061",
     "semantic_hash": ""
   },
   "tests/unit/stack-architect.test.mjs": {
     "mtime": 1786057041.679166,
     "ast_hash": "950c7b886cafd2f30d4dce25831a9e0e",
+    "semantic_hash": ""
+  },
+  "docs/releases/v0.4.1.md": {
+    "mtime": 1786269676.819571,
+    "ast_hash": "2206dfab14eb15819bf5266ce7a3640d",
     "semantic_hash": ""
   }
 }
