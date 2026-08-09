@@ -355,11 +355,19 @@ function focusFirstGameControl() {
 
 function renderHome() {
   main.innerHTML = `
+    ${runnerRestoreWasDiscarded ? `
+      <section class="runner-restore-banner" aria-labelledby="runnerRestoreTitle" role="status">
+        <p class="kicker">Route settled safely</p>
+        <h2 id="runnerRestoreTitle">Sector Sprint closed on reload.</h2>
+        <p>Its remaining boundary could not be extended, so no completion was recorded.</p>
+        <button class="primary-action" type="button" data-browse-salon>Browse five doors</button>
+      </section>
+    ` : ""}
     <section class="house-intro" aria-labelledby="houseTitle">
       <p class="kicker">A private house of authored games</p>
-      <h1 id="houseTitle">Choose a room.<br><em>Stay for the pleasure of solving.</em></h1>
+      <h1 id="houseTitle" tabindex="-1">Choose a room.<br><em>Stay for the pleasure of solving.</em></h1>
+      <button class="primary-action house-browse" type="button" data-browse-salon>Browse five doors</button>
       <p class="house-lede">Five doors hold eight games, each arranged in five deliberate chapters or studies. Nothing is ranked, broadcast, or compared with other people.</p>
-      ${runnerRestoreWasDiscarded ? '<p class="runner-restore-note" role="status">A previous Sector Sprint page closed on reload so its authored boundary could not be extended. No completion was recorded.</p>' : ""}
     </section>
     <section class="floor-plan" aria-label="Nindova House rooms">
       <a class="room room-night" href="../play/">
@@ -1008,6 +1016,12 @@ document.addEventListener("click", (event) => {
   const categoryButton = target.closest<HTMLElement>("[data-category]");
   if (categoryButton) {
     openCategory(categoryButton.dataset.category as DoorCategoryId);
+    return;
+  }
+  if (target.closest("[data-browse-salon]")) {
+    const firstDoor = document.querySelector<HTMLElement>(".category-door");
+    firstDoor?.scrollIntoView({ block: "start", behavior: "auto" });
+    requestAnimationFrame(() => firstDoor?.focus({ preventScroll: true }));
     return;
   }
   const gameButton = target.closest<HTMLElement>("[data-game]");

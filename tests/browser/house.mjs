@@ -310,6 +310,10 @@ try {
       const box = await button.boundingBox();
       assert.ok(box && box.width >= 44 && box.height >= 44, `game door target at ${viewport.width}px`);
     }
+    if (viewport.width === 320) {
+      const browseBox = await page.locator(".house-browse").boundingBox();
+      assert.ok(browseBox && browseBox.y + browseBox.height <= viewport.height, "the mobile House exposes a first-viewport path to its five doors");
+    }
     if ([320, 375, 1440].includes(viewport.width)) {
       await page.screenshot({ path: resolve(output, `house-${viewport.width}x${viewport.height}.png`), fullPage: true, animations: "disabled" });
     }
@@ -827,7 +831,10 @@ try {
   assert.equal(await reloadedBoundary.page.evaluate(() => window.__house.active), null, "reload cannot reset and extend the runner boundary");
   assert.equal(await reloadedBoundary.page.evaluate(() => sessionStorage.getItem("nindova:house:active:v1")), null);
   assert.equal(await reloadedBoundary.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]), undefined);
-  assert.match(await reloadedBoundary.page.locator(".runner-restore-note").innerText(), /closed on reload/i);
+  assert.match(await reloadedBoundary.page.locator(".runner-restore-banner").innerText(), /closed on reload/i);
+  const restoreBannerBox = await reloadedBoundary.page.locator(".runner-restore-banner").boundingBox();
+  assert.ok(restoreBannerBox && restoreBannerBox.y < 812, "runner reload settlement is visible before the House hero");
+  assert.equal(await reloadedBoundary.page.locator('.runner-restore-banner [data-browse-salon]').isVisible(), true);
   await reloadedBoundary.context.close();
 
   const boundedStory = await openHouse({ width: 375, height: 812 }, {}, { fakeClock: true });
@@ -1009,7 +1016,7 @@ try {
   await restoredReduced.page.waitForFunction(() => Boolean(window.__house));
   assert.equal(await restoredReduced.page.evaluate(() => window.__house.active), null, "a restored action route fails closed when reduced motion is now preferred");
   assert.equal(await restoredReduced.page.locator("#runnerCanvas").count(), 0);
-  assert.equal(await restoredReduced.page.locator(".runner-restore-note").isVisible(), true);
+  assert.equal(await restoredReduced.page.locator(".runner-restore-banner").isVisible(), true);
   await restoredReduced.context.close();
 
   const activeRunnerSound = await openHouse({ width: 375, height: 812 }, {}, { audioProbe: true });
