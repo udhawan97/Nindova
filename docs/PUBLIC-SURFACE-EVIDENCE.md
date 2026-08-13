@@ -1,5 +1,15 @@
 # Public-surface evidence ledger
 
+## Verified locally on 2026-08-13 — Clean Return release candidate
+
+- The current `main` candidate preserves a cancelled unfinished-table exit's destination scroll and reuses it when the same visible Back control is retried. A 320×568 browser regression begins from a scrolled Pattern & Line category, starts meaningful Navakankari progress, invokes browser Back, cancels with Escape, retries, confirms, and returns within two pixels of the recorded category position without creating a Gallery result.
+- Button and Escape cancellation use one leave path. Browser-Back cancellation restores the rendered table Back control even without a meaningful browser focus invoker. Gallery Escape is normalized to `cancel`, restores **Clear this Gallery**, and preserves all eight local readings. These semantics are checked in Chromium and separately exercised in Playwright WebKit.
+- Sector Sprint remains playable in both promised forms. The deterministic controller clears every one of the five 32-second Acts with four-to-eight fresh lane moves. The rendered Action pilot traverses all five material corridors and reaches the Roti Relay curtain call through production controls; the independently completed Narrated route reaches the same final chapter without motion, timing, sound, precision, or visual interpretation.
+- README, Astro landing page, Starlight navigation and guide content, accessibility/testing pages, downloads, release notes, canonical release facts, package versions, House cache, rendered source media, and the social card are synchronized for v0.4.2. Release URLs are candidate targets until the exact verified commit is tagged and its assets are published.
+- The rendered public matrix covers 320, 375, 414, 768, and 1440 CSS pixels, 200% zoom, keyboard operation, reduced motion, light/dark documentation, local asset loading, direct House/Night/download paths, same-origin runtime requests, and root plus `/Nindova/` builds. Release checksums and live GitHub Pages behavior are a later publication gate, not inferred from local success.
+- `npm run check` passes with zero Astro diagnostics and 93 unit tests. The complete `npm test` matrix passes after the navigation-aware regressions, including the corrected v9 House cache migration and cold-offline entry.
+- No game rules, Gallery meaning, Night contract, local-first boundary, service-worker scope, telemetry policy, native capability, or deferred iOS Wall claim changed. Real-device VoiceOver/TalkBack, installed Safari/Android PWA behavior, physical QR scanning, Punjabi cultural-authenticity review, human enjoyment, and representative difficulty remain unverified.
+
 ## Verified locally on 2026-08-05 — Five Doors and sourced classic rule studies
 
 - The Grand Salon renders five category doors in logical I→V order on phones and architectural placement on wider screens. They contain eight five-part games: Pattern Court, Navakankari, Mirror Forge, Aadu Puli Aattam, Stack Architect, Pallanguzhi, Lantern Ledger, and Sector Sprint.

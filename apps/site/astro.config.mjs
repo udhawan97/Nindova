@@ -34,6 +34,7 @@ export default defineConfig({
             { label: "Getting started", slug: "docs/getting-started" },
             { label: "Downloads", slug: "docs/downloads" },
             { label: "Product contract", slug: "docs/product-contract" },
+            { label: "Sector Sprint", slug: "docs/sector-sprint" },
             { label: "Masala Mound Session", slug: "docs/nightly-arc" },
             { label: "Night and local state", slug: "docs/night-and-local-state" },
             { label: "Privacy and local state", slug: "docs/privacy-local-state" },

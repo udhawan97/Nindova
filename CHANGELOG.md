@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.4.2 — 2026-08-13
+
+### Fixed
+
+- Preserved a cancelled unfinished-table exit's exact category destination and scroll position so a later retry and confirmed leave returns to the same table context.
+- Normalized Escape dismissal for the Gallery clear dialog and restored focus to its invoker in WebKit as well as Chromium.
+- Restored the visible table Back control after browser-Back leave confirmation is cancelled by Escape, even when the browser supplies no useful dialog invoker.
+
+### Verified
+
+- Extended the rendered House gate so Sector Sprint's real Action pilot clears all five Acts and reaches the authored curtain call; the complete Narrated route remains independently covered.
+- Refreshed the README, landing page, Starlight docs, release record, source media, package versions, and House static cache from the same candidate.
+
+### Not added
+
+- No score, streak, rank, visible timer, collection, randomized reward, assessment output, telemetry, or third-party runtime request.
+- No change to Sector Sprint's authored gates, 240-second foreground boundary, the bounded Night Room, or the deferred iOS Wall.
+
 ## 0.4.1 — 2026-08-09
 
 ### Fixed

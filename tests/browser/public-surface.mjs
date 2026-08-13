@@ -66,6 +66,12 @@ try {
       await page.locator(".table-directory a.table-action").evaluateAll((links) => links.map((link) => new URL(link.href).hash)),
       ["#door/pattern-line", "#door/turn-trap", "#door/count-carry", "#door/memory-sequence", "#door/motion-route"],
     );
+    const sectorLink = page.getByRole("link", { name: /^Play Sector Sprint/ });
+    assert.equal(await sectorLink.count(), 1);
+    assert.deepEqual(await sectorLink.evaluate((link) => {
+      const url = new URL(link.href);
+      return { pathname: url.pathname, hash: url.hash };
+    }), { pathname: `${prefix}house/`.replace(/\/+/g, "/"), hash: "#game/sector-sprint" });
     assert.equal(await page.locator(".download-ledger a").count(), 6);
     for (const selector of [".house-proof img", ".sector-proof img", ".board-proof img", ".dawn-proof img"]) {
       await page.locator(selector).scrollIntoViewIfNeeded();
@@ -78,6 +84,29 @@ try {
     const docsResponse = await page.goto(`${previewRoot}docs/visual-identity/`);
     assert.equal(docsResponse?.ok(), true);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), viewport.width);
+    const sectorGuideResponse = await page.goto(`${previewRoot}docs/sector-sprint/`);
+    assert.equal(sectorGuideResponse?.ok(), true);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), viewport.width);
+    const guidePlayLink = page.getByRole("link", { name: "Open Sector Sprint" });
+    assert.deepEqual(await guidePlayLink.evaluate((link) => {
+      const url = new URL(link.href);
+      return { pathname: url.pathname, hash: url.hash };
+    }), { pathname: `${prefix}house/`.replace(/\/+/g, "/"), hash: "#game/sector-sprint" });
+    if (viewport.width === 320) {
+      const gettingStartedResponse = await page.goto(`${previewRoot}docs/getting-started/`);
+      assert.equal(gettingStartedResponse?.ok(), true);
+      for (const label of ["Sector Sprint guide", "Downloads guide"]) {
+        const linkedResponse = await page.request.get(await page.getByRole("link", { name: label }).evaluate((link) => link.href));
+        assert.equal(linkedResponse.ok(), true, `${label} resolves from Getting started at ${prefix}`);
+      }
+      await page.goto(previewRoot);
+      await page.getByRole("link", { name: /^Play Sector Sprint/ }).click();
+      assert.deepEqual({ pathname: new URL(page.url()).pathname, hash: new URL(page.url()).hash }, {
+        pathname: `${prefix}house/`.replace(/\/+/g, "/"),
+        hash: "#game/sector-sprint",
+      });
+      assert.equal(await page.locator("#audienceDialog[open]").count(), 1, `Sector Sprint CTA reaches the House boundary at ${prefix}`);
+    }
     await context.close();
   }
 

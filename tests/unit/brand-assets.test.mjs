@@ -65,13 +65,14 @@ test("the social card is the publication-sized regenerated artifact", async () =
 });
 
 test("single-file download instructions isolate the matching checksum row", async () => {
+  const { latestRelease } = JSON.parse(await readFile(resolve(root, "public-facts.json"), "utf8"));
   const documents = await Promise.all([
     readFile(resolve(root, "README.md"), "utf8"),
     readFile(resolve(root, "apps/site/src/content/docs/docs/downloads.md"), "utf8"),
   ]);
 
   for (const document of documents) {
-    assert.match(document, /grep ' nindova-v0\.4\.1\.html\$' SHA256SUMS\.txt \| shasum -a 256 -c -/);
-    assert.match(document, /grep ' nindova-web-v0\.4\.1\.zip\$' SHA256SUMS\.txt \| shasum -a 256 -c -/);
+    assert.ok(document.includes(`grep ' nindova-${latestRelease.tag}.html$' SHA256SUMS.txt | shasum -a 256 -c -`));
+    assert.ok(document.includes(`grep ' nindova-web-${latestRelease.tag}.zip$' SHA256SUMS.txt | shasum -a 256 -c -`));
   }
 });
