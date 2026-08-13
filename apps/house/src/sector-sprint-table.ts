@@ -28,6 +28,12 @@ export type SectorSprintTerminal =
   | { readonly kind: "boundary-closed"; readonly runId: string }
   | { readonly kind: "abandoned"; readonly runId: string };
 export type SectorSprintTone = "pickup" | "transform" | "impact" | "complication" | "release" | "lane-up" | "lane-down" | "tool" | "cadence" | "chime";
+export type SectorSprintTableView = {
+  readonly markup: string;
+  readonly status: string;
+  readonly focusSelector: string;
+  readonly runner: SectorSprintRunnerSnapshot | null;
+};
 
 type AudioPort = {
   readonly resumeFromGesture: () => void;
@@ -489,6 +495,11 @@ export function createSectorSprintTable(options: TableOptions) {
     generation += 1; stopLoop(); clearTransition(); session = null; runnerState = null; terminalOutcome = null; characterSheet = null;
   }
 
+  function preferredFocusSelector(): string {
+    if (runnerState?.failed) return retryAvailable() ? "[data-runner-retry]" : "[data-runner-story]";
+    return session?.storyBeat === null ? '[data-runner-action="up"]' : "[data-story-advance]";
+  }
+
   function render(): string {
     if (!session) return "";
     const act = RUNNER_ACTS[session.chapter];
@@ -500,17 +511,100 @@ export function createSectorSprintTable(options: TableOptions) {
     return `<section class="runner-shell" aria-labelledby="runnerActTitle"><header class="runner-brief"><div><span>Act ${session.chapter + 1} scene · ${escape(act.location)}</span><h2 id="runnerActTitle">${escape(act.title)}</h2></div></header><figure class="runner-stage-frame"><div class="runner-canvas-window" ${failed ? 'data-runner-failed="true"' : ""}><canvas id="runnerCanvas" width="${RUNNER_WIDTH}" height="${RUNNER_HEIGHT}" aria-label="${escape(act.title)}. An original three-lane route through Chandigarh. Follow the next marker: Hold lane, Move up, or Move down. Each gate requires at most one adjacent move. One architectural contact ends this Action attempt." aria-describedby="runnerInstructions runnerApproach runnerLive runnerToolLine"></canvas></div><div class="runner-action-hud" aria-label="Current action set"><span>Act-local tool</span><strong id="runnerToolLabel">${escape(act.toolLabel)}</strong><span id="runnerPowerLabel">${escape(effectLabel())}</span></div><figcaption><span>${escape(act.sign)}</span><span>Original illustrated action theatre · fixed authored route</span></figcaption></figure><div class="runner-status-deck"><p id="runnerApproach" class="runner-approach"><span>${failed ? "Route state" : "Next passage"}</span><strong>${failed ? "One-hit wipeout" : escape(act.obstacles[0]?.label ?? act.closing)}</strong></p><p id="runnerLive" class="runner-live" role="status" aria-live="polite">${escape(runnerState?.message ?? act.opening)}</p></div>${failed ? `<section class="runner-recovery" aria-labelledby="runnerRecoveryTitle" aria-describedby="runnerInstructions runnerRecoveryBoundary"><div><p class="kicker">Action route paused</p><h3 id="runnerRecoveryTitle">The lane closed. The city holds.</h3></div><p id="runnerInstructions">This attempt ended on one contact. No life, score, checkpoint, or failure history is kept.</p><div class="runner-recovery-actions"><button class="primary-action" type="button" data-runner-retry ${retryAvailable() ? "" : "disabled"}>Retry Action from Act I</button><button class="quiet-action" type="button" data-runner-story>Continue narrated</button><button class="text-action" type="button" data-runner-abandon>Return to the Grand Salon</button></div><p id="runnerRecoveryBoundary" class="runner-route-note">${retryAvailable() ? "Retry uses the same foreground boundary; it does not restart the table." : "The boundary is too near for a complete five-Act Action retry."} Narrated beats remain available from this Act while the same boundary remains, and may close before the final curtain.</p><p id="runnerToolLine" class="runner-recovery-detail"><strong>${escape(act.toolLabel)}</strong> remains harmless choreography; only a lit architectural face ends an attempt.</p></section>` : `<div class="runner-controls" aria-label="Sector Sprint controls"><button class="runner-control-primary" type="button" data-runner-action="up"><i class="runner-control-mark runner-control-mark-up" aria-hidden="true"></i><span>Move up</span><small>↑ · W · one press</small></button><button class="runner-control-primary" type="button" data-runner-action="down"><i class="runner-control-mark runner-control-mark-down" aria-hidden="true"></i><span>Move down</span><small>↓ · S · one press</small></button><button class="runner-control-primary" type="button" data-runner-action="tool"><i class="runner-control-mark runner-control-mark-spark" aria-hidden="true"></i><span>${escape(act.toolLabel)}</span><small>J · K · X</small></button><button class="runner-control-quiet" type="button" data-runner-pause aria-pressed="${paused}"><i class="runner-control-mark runner-control-mark-pause" aria-hidden="true"></i><span>${paused ? "Resume city" : "Pause city"}</span><small>Movement and sound</small></button><button class="runner-control-quiet" type="button" data-runner-story><i class="runner-control-mark runner-control-mark-story" aria-hidden="true"></i><span>Narrated route</span><small>No precision needed</small></button></div><div class="runner-copy-deck"><p id="runnerToolLine"><strong>${escape(act.toolLabel)}</strong> · ${escape(act.toolLine)}</p><p id="runnerInstructions" class="runner-instructions">Follow the marker: Hold lane, Move up, or Move down. Each gate requires at most one adjacent move. The route begins gently and gains speed across the five Acts. One touch on a lit architectural face ends this Action attempt. Comic targets and tools are harmless.</p><p class="runner-house-call">${escape(act.houseCall)}</p></div>`}</section>`;
   }
 
+  document.addEventListener("click", (event) => {
+    const target = event.target as Element;
+    if (target.closest("[data-runner-retry]")) {
+      retry();
+      return;
+    }
+    if (target.closest("[data-runner-abandon]")) {
+      emitTerminal("abandoned");
+      return;
+    }
+    const action = target.closest<HTMLElement>("[data-runner-action]");
+    if (action) {
+      if (event.detail > 0) return;
+      options.audio.resumeFromGesture();
+      queueAction(action.dataset.runnerAction as "up" | "down" | "tool");
+      return;
+    }
+    if (target.closest("[data-runner-pause]")) {
+      if (paused) options.audio.resumeFromGesture();
+      setPaused(!paused);
+      return;
+    }
+    if (target.closest("[data-runner-story]")) {
+      chooseNarrated();
+      return;
+    }
+    if (target.closest("[data-story-advance]")) advanceStory();
+  });
+
+  document.addEventListener("pointerdown", (event) => {
+    const control = (event.target as Element).closest<HTMLElement>("[data-runner-action]");
+    if (!control) return;
+    pointerDown(event.pointerId, control.dataset.runnerAction as "up" | "down" | "tool", control);
+  });
+
+  for (const eventName of ["pointerup", "pointercancel"] as const) {
+    document.addEventListener(eventName, (event) => pointerEnd(event.pointerId, eventName === "pointercancel"));
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (!session || session.storyBeat !== null) return;
+    const target = event.target as HTMLElement;
+    const key = event.key.toLowerCase();
+    const isEditable = target.matches("input, textarea, select") || target.isContentEditable;
+    const isButtonOrLink = target.matches("button, a");
+    const runnerButton = target.closest<HTMLElement>("[data-runner-action]");
+    if (runnerButton && (key === "enter" || key === " ")) {
+      event.preventDefault();
+      if (!event.repeat) {
+        options.audio.resumeFromGesture();
+        queueAction(runnerButton.dataset.runnerAction as "up" | "down" | "tool");
+      }
+      return;
+    }
+    if (isEditable || (isButtonOrLink && (key === "enter" || key === " "))) return;
+    const action = ["arrowup", "w"].includes(key)
+      ? "up"
+      : ["arrowdown", "s"].includes(key)
+        ? "down"
+        : ["j", "k", "x"].includes(key)
+          ? "tool"
+          : null;
+    if (!action) return;
+    event.preventDefault();
+    options.audio.resumeFromGesture();
+    if (!event.repeat) queueAction(action);
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) suspend("visibility");
+    else resume("visibility");
+    drawCurrentFrame();
+  });
+  window.addEventListener("blur", () => suspend("blur"));
+  window.addEventListener("focus", () => resume("focus"));
+  window.addEventListener("resize", drawCurrentFrame);
+  window.addEventListener("orientationchange", orientationChanged);
+  matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", (event) => {
+    if (event.matches && session?.storyBeat === null) chooseNarrated();
+  });
+
   return Object.freeze({
-    start, mount, render, queueAction, setPaused, chooseNarrated, retry, advanceStory, completeAct,
-    suspend, resume, pointerDown, pointerEnd, orientationChanged, draw: drawCurrentFrame, destroy,
-    abandon() { emitTerminal("abandoned"); },
-    prepare() { ensureCharacterSheet(); },
-    audioGesture() { options.audio.resumeFromGesture(); },
-    active: activeSnapshot,
-    runner: snapshotRunner,
-    isPaused: () => paused,
-    canRetry: retryAvailable,
-    status: () => statusMessage,
-    isActive: () => Boolean(session && !terminalOutcome),
+    start,
+    view(): SectorSprintTableView {
+      return { markup: render(), status: statusMessage, focusSelector: preferredFocusSelector(), runner: snapshotRunner() };
+    },
+    afterRender: mount,
+    setExitSuspended(next: boolean, fromGesture = false) {
+      if (next) suspend("exit");
+      else {
+        if (fromGesture) options.audio.resumeFromGesture();
+        resume("exit");
+      }
+    },
+    close: destroy,
   });
 }
