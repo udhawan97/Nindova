@@ -8,12 +8,7 @@ import {
   type HouseState,
 } from "./house-state";
 import { HOUSE_ACTIVE_SESSION_CODEC } from "./house-session-codec";
-import {
-  initialPegs,
-  isLegalStackMove,
-  moveStackDisc,
-  stackSolved,
-} from "./stack-architect";
+import { createSalonTableLifecycle, type SalonTableEffect } from "./salon-table-lifecycle";
 import {
   DOOR_CATEGORIES,
   GAMES,
@@ -27,7 +22,6 @@ import {
   type StackGameDefinition,
 } from "./salon-catalog";
 import {
-  evaluateClassicChoice,
   getClassicStudy,
   type ClassicChapterView,
 } from "./classic-studies";
@@ -108,6 +102,17 @@ let houseAudioContext: AudioContext | null = null;
 const houseAudioVoices = new Set<OscillatorNode>();
 let lastStackMove: { peg: number; disk: number } | null = null;
 
+const tableLifecycle = createSalonTableLifecycle({
+  initial: active,
+  createRunId: () => crypto.randomUUID(),
+  persist: (next) => { houseStateStore.saveActive(next); },
+  changed(next) {
+    active = next.active;
+    restoreDecisionPending = next.restoreDecisionPending;
+    pendingRunnerChoice = next.pendingRunnerChoice;
+  },
+});
+
 const sectorTable = createSectorSprintTable({
   reviewMode: runnerReviewMode,
   audio: {
@@ -117,8 +122,7 @@ const sectorTable = createSectorSprintTable({
     tone: playSectorTone,
   },
   persist(next) {
-    active = next;
-    houseStateStore.saveActive(next);
+    tableLifecycle.syncRunner(next);
   },
   renderShell: render,
   celebrate: showCelebration,
@@ -129,10 +133,6 @@ const sectorTable = createSectorSprintTable({
 if (active) {
   view = "game";
   selectedCategory = getGame(active.gameId).categoryId;
-}
-
-function saveActiveGame() {
-  houseStateStore.saveActive(active);
 }
 
 function hashForView(next: View): string {
@@ -201,11 +201,8 @@ function route(next: View, options: ViewOptions = {}) {
   view = next;
   if (next === "home") selectedCategory = null;
   if (next !== "game") {
-    active = null;
-    pendingRunnerChoice = false;
-    restoreDecisionPending = false;
+    tableLifecycle.clear();
     exitConfirmationPending = false;
-    saveActiveGame();
   }
   statusMessage = "";
   pendingCompletion = null;
@@ -216,12 +213,7 @@ function route(next: View, options: ViewOptions = {}) {
 }
 
 function hasMeaningfulProgress(candidate: ActiveGame): boolean {
-  const game = getGame(candidate.gameId);
-  if (game.kind === "runner") return true;
-  if (candidate.chapter > 0 || candidate.memoryCovered || candidate.touched || candidate.selectedPeg !== null) return true;
-  if (game.kind !== "stack") return false;
-  const diskCount = game.diskCounts?.[candidate.chapter] ?? 0;
-  return JSON.stringify(candidate.pegs) !== JSON.stringify(initialPegs(diskCount));
+  return active?.runId === candidate.runId && tableLifecycle.hasMeaningfulProgress();
 }
 
 function requestRoute(next: View, invoker: HTMLElement | null = null, options: ViewOptions = {}) {
@@ -251,10 +243,7 @@ function discardActiveGame() {
   exitConfirmationPending = false;
   pendingExitDestination = null;
   cancelledExitDestination = null;
-  active = null;
-  restoreDecisionPending = false;
-  pendingRunnerChoice = false;
-  saveActiveGame();
+  tableLifecycle.clear();
   route(destination.view, { scrollY: destination.scrollY });
 }
 
@@ -272,43 +261,25 @@ function startGame(gameId: GameId, options: ViewOptions = {}) {
   closeHouseAudio();
   clearChapterTransition();
   lastStackMove = null;
-  restoreDecisionPending = false;
-  if (game.kind === "runner") {
-    active = null;
-    pendingRunnerChoice = !matchMedia("(prefers-reduced-motion: reduce)").matches;
-    view = "game";
-    statusMessage = "";
-    if (options.historyMode !== "none") writeRouteHash("game", options.historyMode ?? "push");
-    if (pendingRunnerChoice) {
-      saveActiveGame();
-      render();
-      settleView({ ...options, focusSelector: '[data-runner-route="action"]' });
-    } else sectorTable.start("narrated", crypto.randomUUID());
-    return;
-  }
-  pendingRunnerChoice = false;
-  active = {
-    gameId,
-    chapter: 0,
-    runId: crypto.randomUUID(),
-    memoryCovered: false,
-    pegs: initialPegs(game.kind === "stack" ? game.diskCounts[0] ?? 0 : 0),
-    selectedPeg: null,
-    resolving: false,
-    storyBeat: null,
-    touched: false,
-  };
+  const opened = tableLifecycle.open(gameId, matchMedia("(prefers-reduced-motion: reduce)").matches);
   view = "game";
   statusMessage = "";
-  saveActiveGame();
   if (options.historyMode !== "none") writeRouteHash("game", options.historyMode ?? "push");
+  if (game.kind === "runner") {
+    if (opened.runnerRoute) sectorTable.start(opened.runnerRoute, crypto.randomUUID());
+    else {
+      render();
+      settleView({ ...options, focusSelector: '[data-runner-route="action"]' });
+    }
+    return;
+  }
   render();
   settleView(options);
 }
 
 function beginRunnerRoute(routeChoice: "action" | "narrated") {
   if (!pendingRunnerChoice && active) return;
-  pendingRunnerChoice = false;
+  tableLifecycle.chooseRunnerRoute();
   view = "game";
   sectorTable.start(routeChoice, crypto.randomUUID());
   settleView({ focusSelector: routeChoice === "action" ? '[data-runner-action="up"]' : "[data-story-advance]" });
@@ -379,17 +350,6 @@ function scheduleChapterTransition(delay: number, callback: () => void) {
   chapterTransitionRemainingMs = delay;
   chapterTransitionCallback = callback;
   resumeChapterTransition();
-}
-
-function focusFirstGameControl() {
-  if (!active) return;
-  const game = getGame(active.gameId);
-  if (game.kind === "runner") {
-    settleView({ focusSelector: sectorTable.view().focusSelector });
-  }
-  else if (game.kind === "stack") settleView({ focusSelector: '[data-peg="0"]' });
-  else if (game.kind === "memory" && !active.memoryCovered) settleView({ focusSelector: "[data-cover-memory]" });
-  else settleView({ focusSelector: '[data-answer="0"]' });
 }
 
 function renderHome() {
@@ -760,75 +720,46 @@ function describePeg(peg: readonly number[], pegIndex: number): string {
 }
 
 function answerChoice(choiceIndex: number) {
-  if (!active || active.resolving) return;
-  const game = getGame(active.gameId);
-  if (game.kind === "stack" || game.kind === "runner") return;
-  const chapter = game.kind === "classic"
-    ? getClassicStudy(game.classicStudyId).chapters[active.chapter]
-    : game.chapters[active.chapter];
-  if (!chapter) return;
-  if (game.kind === "memory" && !active.memoryCovered) {
-    statusMessage = "Cover the procession before choosing.";
+  const choice = document.querySelector<HTMLElement>(`[data-answer="${choiceIndex}"]`);
+  const effect = tableLifecycle.interact({ type: "answer", choiceIndex });
+  if (effect.message) {
+    statusMessage = effect.message;
     const status = document.querySelector<HTMLElement>("#gameStatus");
     if (status) status.textContent = statusMessage;
-    return;
   }
-  active.touched = true;
-  const choice = document.querySelector<HTMLElement>(`[data-answer="${choiceIndex}"]`);
-  const choiceIsCorrect = game.kind === "classic"
-    ? evaluateClassicChoice(game.classicStudyId, active.chapter, choiceIndex)
-    : choiceIndex === game.chapters[active.chapter]?.answerIndex;
-  if (!choiceIsCorrect) {
-    statusMessage = game.kind === "classic" ? "That move does not satisfy this authored position. Read the drawn lines and rule once more." : "Not this inscription. Read the order once more.";
+  if (effect.kind === "wrong") {
     choice?.classList.remove("is-wrong");
     void choice?.offsetWidth;
     choice?.classList.add("is-wrong");
-    const status = document.querySelector<HTMLElement>("#gameStatus");
-    if (status) status.textContent = statusMessage;
-    saveActiveGame();
     choice?.focus({ preventScroll: true });
     return;
   }
+  if (effect.kind !== "chapter-complete") return;
   choice?.classList.add("is-correct");
-  advanceChapter();
+  completeSalonChapter(effect);
 }
 
-function advanceChapter() {
-  if (!active || active.resolving) return;
-  const currentGame = getGame(active.gameId);
-  if (currentGame.kind === "runner") return;
-  active.resolving = true;
+function completeSalonChapter(effect: SalonTableEffect) {
+  if (effect.kind !== "chapter-complete" || effect.completedChapter === undefined) return;
   statusMessage = "";
   const status = document.querySelector<HTMLElement>("#gameStatus");
   if (status) status.textContent = "";
-  const completedChapter = active.chapter;
+  const completedChapter = effect.completedChapter;
   showCelebration(PRAISE[completedChapter]);
   playChime(completedChapter);
-  saveActiveGame();
   const baseDelay = matchMedia("(prefers-reduced-motion: reduce)").matches ? 20 : 720;
   const finishTransition = () => {
-    if (!active) return;
-    if (completedChapter === 4) {
-      finishGame();
+    const next = tableLifecycle.finishChapter(completedChapter);
+    if (next.kind === "table-complete" && next.gameId && next.runId) {
+      finishCompletedGame(next.gameId, next.runId);
       return;
     }
-    const game = getGame(active.gameId);
-    active.chapter += 1;
-    active.memoryCovered = false;
-    active.selectedPeg = null;
-    active.pegs = initialPegs(game.kind === "stack" ? game.diskCounts[active.chapter] ?? 0 : 0);
-    active.resolving = false;
+    if (next.kind !== "advanced") return;
     statusMessage = "";
-    saveActiveGame();
     render();
-    focusFirstGameControl();
+    settleView({ focusSelector: next.focusSelector });
   };
   scheduleChapterTransition(baseDelay, finishTransition);
-}
-
-function finishGame() {
-  if (!active) return;
-  finishCompletedGame(active.gameId, active.runId);
 }
 
 function finishCompletedGame(gameId: GameId, runId: string, completedAt = new Date().toISOString()) {
@@ -841,7 +772,7 @@ function finishCompletedGame(gameId: GameId, runId: string, completedAt = new Da
   const completed = houseStateStore.complete(game.id, runId, completedAt);
   memory = completed.state;
   pendingCompletion = completed.persisted ? null : { gameId, runId, completedAt };
-  houseStateStore.saveActive(null);
+  tableLifecycle.clear();
   main.innerHTML = `
     <section class="curtain-call" aria-labelledby="curtainTitle">
       <p class="kicker">The curtain call</p>
@@ -861,7 +792,6 @@ function finishCompletedGame(gameId: GameId, runId: string, completedAt = new Da
       </div>
     </section>
   `;
-  active = null;
   settleView({ focusSelector: completed.persisted ? '[data-route="category"]' : "[data-retry-completion]" });
 }
 
@@ -883,71 +813,36 @@ function renderRunnerBoundary() {
       </div>
     </section>
   `;
-  active = null;
+  tableLifecycle.clear();
   settleView({ focusSelector: '[data-route="home"]' });
 }
 
 function handleSectorTerminal(outcome: SectorSprintTerminal) {
-  pendingRunnerChoice = false;
   if (outcome.kind === "completed") finishCompletedGame("sector-sprint", outcome.runId);
   else if (outcome.kind === "boundary-closed") renderRunnerBoundary();
   else route("home");
 }
 
 function selectPeg(pegIndex: number) {
-  if (!active || active.resolving) return;
-  const game = getGame(active.gameId);
-  if (game.kind !== "stack") return;
-  if (active.selectedPeg === null) {
-    if ((active.pegs[pegIndex]?.length ?? 0) === 0) {
-      statusMessage = "That plinth is empty.";
-    } else {
-      active.selectedPeg = pegIndex;
-      active.touched = true;
-      statusMessage = `Disc lifted from the ${["first", "second", "third"][pegIndex]} plinth.`;
-    }
-  } else {
-    const from = active.selectedPeg;
-    if (!isLegalStackMove(active.pegs, from, pegIndex)) {
-      statusMessage = from === pegIndex ? "The disc remains where it is." : "A larger disc cannot rest on a smaller one.";
-      active.selectedPeg = null;
-    } else {
-      const moving = active.pegs[from]?.at(-1);
-      active.pegs = moveStackDisc(active.pegs, from, pegIndex);
-      active.selectedPeg = null;
-      active.touched = true;
-      if (moving !== undefined) {
-        lastStackMove = { peg: pegIndex, disk: moving };
-        window.setTimeout(() => { lastStackMove = null; }, 520);
-      }
-      statusMessage = "Disc placed.";
-      const diskCount = game.diskCounts[active.chapter] ?? 0;
-      if (stackSolved(active.pegs, diskCount)) {
-        render();
-        focusElement(`[data-peg="${pegIndex}"]`);
-        advanceChapter();
-        return;
-      }
-    }
+  const effect = tableLifecycle.interact({ type: "peg", pegIndex });
+  if (effect.kind === "noop") return;
+  statusMessage = effect.message ?? "";
+  if (effect.placedDisk) {
+    lastStackMove = effect.placedDisk;
+    window.setTimeout(() => { lastStackMove = null; }, 520);
   }
-  saveActiveGame();
   render();
-  focusElement(`[data-peg="${pegIndex}"]`);
+  focusElement(effect.focusSelector ?? `[data-peg="${pegIndex}"]`);
+  completeSalonChapter(effect);
 }
 
 function resetStackChapter() {
-  if (!active) return;
-  const game = getGame(active.gameId);
-  if (game.kind !== "stack" || active.resolving) return;
-  const diskCount = game.diskCounts[active.chapter] ?? 0;
-  active.pegs = initialPegs(diskCount);
-  active.selectedPeg = null;
-  active.touched = true;
+  const effect = tableLifecycle.interact({ type: "reset-stack" });
+  if (effect.kind === "noop") return;
   lastStackMove = null;
-  statusMessage = `The ${diskCount}-disc tower is reset to the first plinth.`;
-  saveActiveGame();
+  statusMessage = effect.message ?? "";
   render();
-  focusElement('[data-peg="0"]');
+  focusElement(effect.focusSelector ?? '[data-peg="0"]');
 }
 
 function showCelebration(message: string) {
@@ -1073,17 +968,15 @@ document.addEventListener("click", (event) => {
   if (restoreButton && active) {
     const choice = restoreButton.dataset.restore;
     if (choice === "continue") {
-      restoreDecisionPending = false;
       const game = getGame(active.gameId);
       const unit = game.kind === "runner" ? "Act" : game.kind === "classic" ? "Study" : "Chapter";
+      const restored = tableLifecycle.restore("continue");
       statusMessage = `${unit} ${active.chapter + 1} restored in this tab.`;
       render();
-      focusFirstGameControl();
+      settleView({ focusSelector: restored.focusSelector });
     } else if (choice === "restart") {
       const gameId = active.gameId;
-      active = null;
-      saveActiveGame();
-      startGame(gameId);
+      startGame(gameId, { historyMode: "none" });
     } else if (choice === "exit") {
       discardActiveGame();
     }
@@ -1100,21 +993,17 @@ document.addEventListener("click", (event) => {
     return;
   }
   if (target.closest("[data-cover-memory]") && active) {
-    active.memoryCovered = true;
-    active.touched = true;
-    statusMessage = "The procession is covered. Choose the line you held.";
-    saveActiveGame();
+    const effect = tableLifecycle.interact({ type: "memory", covered: true });
+    statusMessage = effect.message ?? "";
     render();
-    focusElement('[data-answer="0"]');
+    focusElement(effect.focusSelector ?? '[data-answer="0"]');
     return;
   }
   if (target.closest("[data-reveal-memory]") && active) {
-    active.memoryCovered = false;
-    active.touched = true;
-    statusMessage = "The same fixed procession is visible again. Cover it when ready.";
-    saveActiveGame();
+    const effect = tableLifecycle.interact({ type: "memory", covered: false });
+    statusMessage = effect.message ?? "";
     render();
-    focusElement("[data-cover-memory]");
+    focusElement(effect.focusSelector ?? "[data-cover-memory]");
     return;
   }
   if (target.closest("[data-reset-stack]")) {

@@ -21,3 +21,15 @@ test("the House shell composes Sector Sprint without owning its engine lifecycle
   assert.match(table, /document\.addEventListener\("visibilitychange"/);
   assert.match(table, /return Object\.freeze\(\{\s*start,\s*view\(\): SectorSprintTableView[\s\S]*afterRender: mount,[\s\S]*setExitSuspended[\s\S]*close: destroy/);
 });
+
+test("the House shell delegates table-kind state transitions to one Grand Salon lifecycle", async () => {
+  const shell = await readFile(resolve(root, "apps/house/src/house.ts"), "utf8");
+  const lifecycle = await readFile(resolve(root, "apps/house/src/salon-table-lifecycle.ts"), "utf8");
+  assert.match(shell, /createSalonTableLifecycle/);
+  assert.doesNotMatch(shell, /active\.(?:chapter|memoryCovered|pegs|selectedPeg|resolving|storyBeat|touched)\s*=/);
+  assert.match(lifecycle, /function hasMeaningfulProgress/);
+  assert.match(lifecycle, /function interact/);
+  assert.match(lifecycle, /function finishChapter/);
+  assert.match(lifecycle, /game\.kind === "memory"/);
+  assert.match(lifecycle, /game\.kind !== "stack"/);
+});
