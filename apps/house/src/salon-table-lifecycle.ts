@@ -85,7 +85,7 @@ export function createSalonTableLifecycle(options: LifecycleOptions) {
     restoreDecisionPending = false;
     if (game.kind === "runner") {
       active = null;
-      pendingRunnerChoice = !reducedMotion;
+      pendingRunnerChoice = true;
       publish();
       return reducedMotion ? { runnerRoute: "narrated" } : {};
     }

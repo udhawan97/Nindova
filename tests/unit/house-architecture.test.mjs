@@ -33,3 +33,16 @@ test("the House shell delegates table-kind state transitions to one Grand Salon 
   assert.match(lifecycle, /game\.kind === "memory"/);
   assert.match(lifecycle, /game\.kind !== "stack"/);
 });
+
+test("the House shell delegates route, History, exit, scroll, and focus coordination", async () => {
+  const shell = await readFile(resolve(root, "apps/house/src/house.ts"), "utf8");
+  const navigation = await readFile(resolve(root, "apps/house/src/house-navigation.ts"), "utf8");
+  assert.match(shell, /createHouseNavigation/);
+  assert.doesNotMatch(shell, /function (?:writeRouteHash|applyLocationHash|cancelPendingExit|currentHistoryDepth)/);
+  assert.match(navigation, /function writeRouteHash/);
+  assert.match(navigation, /function applyLocation/);
+  assert.match(navigation, /function request/);
+  assert.match(navigation, /function confirmExit/);
+  assert.match(navigation, /function cancelExit/);
+  assert.match(navigation, /function settle/);
+});

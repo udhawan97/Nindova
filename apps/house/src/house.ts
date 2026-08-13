@@ -10,6 +10,12 @@ import {
 import { HOUSE_ACTIVE_SESSION_CODEC } from "./house-session-codec";
 import { createSalonTableLifecycle, type SalonTableEffect } from "./salon-table-lifecycle";
 import {
+  createHouseNavigation,
+  type HouseDestination,
+  type HouseView as View,
+  type HouseViewOptions as ViewOptions,
+} from "./house-navigation";
+import {
   DOOR_CATEGORIES,
   GAMES,
   GRAND_SALON,
@@ -32,9 +38,6 @@ import {
   type SectorSprintTone,
 } from "./sector-sprint-table";
 
-type View = "home" | "category" | "gallery" | "game";
-type HistoryMode = "push" | "replace" | "none";
-type ViewOptions = { readonly historyMode?: HistoryMode; readonly scrollY?: number; readonly focusSelector?: string };
 type PendingCompletion = { readonly gameId: GameId; readonly runId: string; readonly completedAt: string };
 
 const getGame = GRAND_SALON.game.bind(GRAND_SALON);
@@ -85,10 +88,6 @@ let active: ActiveGame | null = restoredActive.active;
 let restoreDecisionPending = Boolean(active);
 let pendingRunnerChoice = false;
 let pendingCompletion: PendingCompletion | null = null;
-let exitReturnFocus: HTMLElement | null = null;
-type ExitDestination = { readonly view: View; readonly scrollY: number };
-let pendingExitDestination: ExitDestination | null = null;
-let cancelledExitDestination: ExitDestination | null = null;
 let galleryClearReturnFocus: HTMLElement | null = null;
 let exitConfirmationPending = false;
 let soundOn = false;
@@ -130,60 +129,45 @@ const sectorTable = createSectorSprintTable({
   focus: focusElement,
 });
 
-if (active) {
-  view = "game";
-  selectedCategory = getGame(active.gameId).categoryId;
-}
+const initialDestination: HouseDestination = active
+  ? { view: "game", gameId: active.gameId, categoryId: getGame(active.gameId).categoryId }
+  : { view: "home" };
 
-function hashForView(next: View): string {
-  if (next === "category" && selectedCategory) return `#door/${selectedCategory}`;
-  if (next === "game" && (active || pendingRunnerChoice)) return `#game/${active?.gameId ?? "sector-sprint"}`;
-  if (next === "gallery") return "#gallery";
-  return "";
-}
-
-function rememberCurrentScroll() {
-  history.replaceState({ ...history.state, nindovaHouse: true, nindovaHouseDepth: currentHistoryDepth(), scrollY: window.scrollY }, "", location.href);
-}
-
-function currentHistoryDepth(): number {
-  const depth = Number(history.state?.nindovaHouseDepth ?? 0);
-  return Number.isSafeInteger(depth) && depth >= 0 ? depth : 0;
-}
-
-function viewFromLocationHash(): View {
-  if (location.hash.startsWith("#door/")) return "category";
-  if (location.hash.startsWith("#game/")) return "game";
-  if (location.hash === "#gallery") return "gallery";
-  return "home";
-}
-
-function writeRouteHash(next: View, mode: Exclude<HistoryMode, "none"> = "push") {
-  const hash = hashForView(next);
-  if (location.hash === hash) return;
-  if (mode === "push") rememberCurrentScroll();
-  const url = `${location.pathname}${location.search}${hash}`;
-  const depth = currentHistoryDepth() + (mode === "push" ? 1 : 0);
-  const currentStateView = history.state?.nindovaHouseView as View | undefined;
-  const parentView = mode === "push" ? currentStateView ?? viewFromLocationHash() : history.state?.nindovaHouseParentView;
-  history[mode === "replace" ? "replaceState" : "pushState"]({
-    nindovaHouse: true,
-    nindovaHouseDepth: depth,
-    nindovaHouseView: next,
-    nindovaHouseParentView: parentView,
-    scrollY: 0,
-  }, "", url);
-}
-
-function settleView({ scrollY = 0, focusSelector }: Pick<ViewOptions, "scrollY" | "focusSelector"> = {}) {
-  const top = Math.max(0, scrollY);
-  window.scrollTo({ left: 0, top, behavior: "auto" });
-  requestAnimationFrame(() => {
-    window.scrollTo({ left: 0, top, behavior: "auto" });
-    const target = focusSelector ? document.querySelector<HTMLElement>(focusSelector) : main;
-    target?.focus({ preventScroll: true });
-  });
-}
+const navigation = createHouseNavigation({
+  initial: initialDestination,
+  discardedRunner: runnerRestoreWasDiscarded,
+  main,
+  leaveDialog,
+  hasActiveTable: () => Boolean(active || pendingRunnerChoice),
+  restoreDecisionPending: () => restoreDecisionPending,
+  hasMeaningfulProgress: () => tableLifecycle.hasMeaningfulProgress(),
+  leaveGame() {
+    sectorTable.close();
+    closeHouseAudio();
+    clearChapterTransition();
+  },
+  clearTable: () => { tableLifecycle.clear(); },
+  suspendForExit() {
+    sectorTable.setExitSuspended(true);
+    pauseChapterTransition();
+    suspendHouseAudio();
+  },
+  resumeFromExit(fromGesture) {
+    resumeChapterTransition();
+    sectorTable.setExitSuspended(false, fromGesture);
+  },
+  resetViewState() {
+    statusMessage = "";
+    pendingCompletion = null;
+  },
+  render,
+  openGame: startGame,
+  changed(next) {
+    view = next.view;
+    selectedCategory = next.selectedCategory;
+    exitConfirmationPending = next.exitConfirmationPending;
+  },
+});
 
 function currentViewHeadingSelector(): string {
   if (view === "category") return "#categoryTitle";
@@ -192,97 +176,61 @@ function currentViewHeadingSelector(): string {
   return "#houseTitle";
 }
 
-function route(next: View, options: ViewOptions = {}) {
-  const leavingGame = view === "game" && next !== "game";
-  cancelledExitDestination = null;
-  if (leavingGame) sectorTable.close();
-  closeHouseAudio();
-  if (next !== "game") clearChapterTransition();
-  view = next;
-  if (next === "home") selectedCategory = null;
-  if (next !== "game") {
-    tableLifecycle.clear();
-    exitConfirmationPending = false;
+function destinationForView(next: View): HouseDestination {
+  if (next === "category" && selectedCategory) return { view: "category", categoryId: selectedCategory };
+  if (next === "game") {
+    const gameId = active?.gameId ?? (pendingRunnerChoice ? "sector-sprint" : null);
+    if (gameId) {
+      const game = getGame(gameId);
+      return { view: "game", gameId, categoryId: game.categoryId };
+    }
   }
-  statusMessage = "";
-  pendingCompletion = null;
-  const historyMode = options.historyMode ?? (leavingGame ? "replace" : "push");
-  if (historyMode !== "none") writeRouteHash(next, historyMode);
-  render();
-  settleView(options);
+  if (next === "gallery") return { view: "gallery" };
+  return { view: "home" };
 }
 
-function hasMeaningfulProgress(candidate: ActiveGame): boolean {
-  return active?.runId === candidate.runId && tableLifecycle.hasMeaningfulProgress();
+function route(next: View, options: ViewOptions = {}) {
+  navigation.commit(destinationForView(next), options);
 }
 
 function requestRoute(next: View, invoker: HTMLElement | null = null, options: ViewOptions = {}) {
-  if (next !== "game" && view === "game" && active && !restoreDecisionPending && hasMeaningfulProgress(active)) {
-    const candidate = invoker ?? document.querySelector<HTMLElement>("[data-history-back]") ?? document.querySelector<HTMLElement>("#gameTitle");
-    exitReturnFocus = candidate?.isConnected && candidate !== main && candidate !== document.body && candidate !== document.documentElement
-      ? candidate
-      : null;
-    const requestedScroll = Math.max(0, options.scrollY ?? 0);
-    const rememberedScroll = cancelledExitDestination?.view === next ? cancelledExitDestination.scrollY : 0;
-    pendingExitDestination = { view: next, scrollY: requestedScroll || rememberedScroll };
-    if (cancelledExitDestination?.view !== next) cancelledExitDestination = null;
-    exitConfirmationPending = true;
-    sectorTable.setExitSuspended(true);
-    pauseChapterTransition();
-    suspendHouseAudio();
-    leaveDialog.showModal();
-    focusElement("#keepPlayingButton");
-    return;
-  }
-  route(next, options);
+  navigation.request(destinationForView(next), invoker, options);
 }
 
 function discardActiveGame() {
-  const destination = pendingExitDestination ?? { view: selectedCategory ? "category" as const : "home" as const, scrollY: 0 };
-  leaveDialog.close("leave");
-  exitConfirmationPending = false;
-  pendingExitDestination = null;
-  cancelledExitDestination = null;
-  tableLifecycle.clear();
-  route(destination.view, { scrollY: destination.scrollY });
+  navigation.confirmExit();
 }
 
 function openCategory(categoryId: DoorCategoryId) {
   getDoorCategory(categoryId);
-  selectedCategory = categoryId;
-  route("category");
+  navigation.commit({ view: "category", categoryId });
 }
 
 function startGame(gameId: GameId, options: ViewOptions = {}) {
   const game = getGame(gameId);
-  cancelledExitDestination = null;
-  selectedCategory = game.categoryId;
   sectorTable.close();
   closeHouseAudio();
   clearChapterTransition();
   lastStackMove = null;
   const opened = tableLifecycle.open(gameId, matchMedia("(prefers-reduced-motion: reduce)").matches);
-  view = "game";
-  statusMessage = "";
-  if (options.historyMode !== "none") writeRouteHash("game", options.historyMode ?? "push");
+  navigation.commit(
+    { view: "game", gameId, categoryId: game.categoryId },
+    game.kind === "runner" ? { ...options, focusSelector: '[data-runner-route="action"]' } : options,
+  );
   if (game.kind === "runner") {
-    if (opened.runnerRoute) sectorTable.start(opened.runnerRoute, crypto.randomUUID());
-    else {
-      render();
-      settleView({ ...options, focusSelector: '[data-runner-route="action"]' });
+    if (opened.runnerRoute) {
+      sectorTable.start(opened.runnerRoute, crypto.randomUUID());
+      navigation.settle({ focusSelector: "[data-story-advance]" });
     }
     return;
   }
-  render();
-  settleView(options);
 }
 
 function beginRunnerRoute(routeChoice: "action" | "narrated") {
   if (!pendingRunnerChoice && active) return;
   tableLifecycle.chooseRunnerRoute();
-  view = "game";
   sectorTable.start(routeChoice, crypto.randomUUID());
-  settleView({ focusSelector: routeChoice === "action" ? '[data-runner-action="up"]' : "[data-story-advance]" });
+  navigation.settle({ focusSelector: routeChoice === "action" ? '[data-runner-action="up"]' : "[data-story-advance]" });
 }
 
 function escape(value: string): string {
@@ -757,7 +705,7 @@ function completeSalonChapter(effect: SalonTableEffect) {
     if (next.kind !== "advanced") return;
     statusMessage = "";
     render();
-    settleView({ focusSelector: next.focusSelector });
+    navigation.settle({ focusSelector: next.focusSelector });
   };
   scheduleChapterTransition(baseDelay, finishTransition);
 }
@@ -792,7 +740,7 @@ function finishCompletedGame(gameId: GameId, runId: string, completedAt = new Da
       </div>
     </section>
   `;
-  settleView({ focusSelector: completed.persisted ? '[data-route="category"]' : "[data-retry-completion]" });
+  navigation.settle({ focusSelector: completed.persisted ? '[data-route="category"]' : "[data-retry-completion]" });
 }
 
 function renderRunnerBoundary() {
@@ -814,7 +762,7 @@ function renderRunnerBoundary() {
     </section>
   `;
   tableLifecycle.clear();
-  settleView({ focusSelector: '[data-route="home"]' });
+  navigation.settle({ focusSelector: '[data-route="home"]' });
 }
 
 function handleSectorTerminal(outcome: SectorSprintTerminal) {
@@ -939,8 +887,7 @@ document.addEventListener("click", (event) => {
   const backButton = target.closest<HTMLElement>("[data-history-back]");
   if (backButton) {
     const fallback = backButton.dataset.historyBack as View;
-    if (currentHistoryDepth() > 0 && history.state?.nindovaHouseParentView === fallback) history.back();
-    else requestRoute(fallback, backButton);
+    navigation.back(destinationForView(fallback), backButton);
     return;
   }
   const routeButton = target.closest<HTMLElement>("[data-route]");
@@ -973,7 +920,7 @@ document.addEventListener("click", (event) => {
       const restored = tableLifecycle.restore("continue");
       statusMessage = `${unit} ${active.chapter + 1} restored in this tab.`;
       render();
-      settleView({ focusSelector: restored.focusSelector });
+      navigation.settle({ focusSelector: restored.focusSelector });
     } else if (choice === "restart") {
       const gameId = active.gameId;
       startGame(gameId, { historyMode: "none" });
@@ -1088,38 +1035,20 @@ confirmGalleryClearButton.addEventListener("click", () => {
     ? "Gallery cleared. No completed readings remain in this browser."
     : "The Gallery could not be fully cleared. Your visible readings were kept.";
   renderGallery();
-  settleView({ focusSelector: cleared ? "#galleryTitle" : "[data-clear-gallery]" });
+  navigation.settle({ focusSelector: cleared ? "#galleryTitle" : "[data-clear-gallery]" });
 });
 
-function cancelPendingExit(fromGesture: boolean) {
-  leaveDialog.close("keep");
-  exitConfirmationPending = false;
-  cancelledExitDestination = pendingExitDestination ?? cancelledExitDestination;
-  pendingExitDestination = null;
-  const focusTarget = exitReturnFocus;
-  exitReturnFocus = null;
-  resumeChapterTransition();
-  sectorTable.setExitSuspended(false, fromGesture);
-  requestAnimationFrame(() => {
-    const target = focusTarget?.isConnected
-      ? focusTarget
-      : document.querySelector<HTMLElement>("[data-history-back]") ?? document.querySelector<HTMLElement>("#gameTitle");
-    target?.focus({ preventScroll: true });
-  });
-}
-
 keepPlayingButton.addEventListener("click", () => {
-  cancelPendingExit(true);
+  navigation.cancelExit(true);
 });
 
 leaveTableButton.addEventListener("click", () => {
-  exitReturnFocus = null;
   discardActiveGame();
 });
 
 leaveDialog.addEventListener("cancel", (event) => {
   event.preventDefault();
-  cancelPendingExit(false);
+  navigation.cancelExit(false);
 });
 
 if (!houseStateStore.audienceAcknowledged()) audienceDialog.showModal();
@@ -1134,50 +1063,8 @@ window.__house = {
   answer: answerChoice,
 };
 
-function applyLocationHash(initial = false, restoredScroll = 0) {
-  const [kind, rawId] = location.hash.slice(1).split("/");
-  const categoryId = DOOR_CATEGORIES.some((category) => category.id === rawId) ? rawId as DoorCategoryId : null;
-  const gameId = GAMES.some((game) => game.id === rawId) ? rawId as GameId : null;
-  if (initial && runnerRestoreWasDiscarded) {
-    history.replaceState({ nindovaHouse: true, nindovaHouseDepth: currentHistoryDepth(), nindovaHouseView: "home", nindovaHouseParentView: history.state?.nindovaHouseParentView, scrollY: 0 }, "", `${location.pathname}${location.search}`);
-    route("home", { historyMode: "none" });
-    return;
-  }
-  if (initial && active) {
-    writeRouteHash("game", "replace");
-    return;
-  }
-  if (!initial && view === "game" && active && hasMeaningfulProgress(active)) {
-    writeRouteHash("game", "replace");
-    requestRoute(kind === "gallery" ? "gallery" : kind === "door" ? "category" : "home", null, { scrollY: restoredScroll });
-    return;
-  }
-  if (kind === "door" && categoryId) {
-    selectedCategory = categoryId;
-    route("category", { historyMode: "none", scrollY: restoredScroll });
-    return;
-  }
-  if (kind === "game" && gameId) {
-    startGame(gameId, { historyMode: "none", scrollY: restoredScroll });
-    return;
-  }
-  if (kind === "gallery") {
-    route("gallery", { historyMode: "none", scrollY: restoredScroll });
-    return;
-  }
-  if (location.hash) history.replaceState({ nindovaHouse: true, nindovaHouseDepth: currentHistoryDepth(), nindovaHouseView: "home", nindovaHouseParentView: history.state?.nindovaHouseParentView, scrollY: 0 }, "", `${location.pathname}${location.search}`);
-  route("home", { historyMode: "none", scrollY: restoredScroll });
-}
-
-history.scrollRestoration = "manual";
-if (!history.state?.nindovaHouse) {
-  history.replaceState({ ...history.state, nindovaHouse: true, nindovaHouseDepth: 0, nindovaHouseView: viewFromLocationHash(), scrollY: window.scrollY }, "", location.href);
-}
-addEventListener("popstate", (event) => applyLocationHash(false, Number(event.state?.scrollY ?? 0)));
-
 if ("serviceWorker" in navigator) {
   addEventListener("load", () => { navigator.serviceWorker.register("./sw.js"); });
 }
 
-applyLocationHash(true);
-render();
+navigation.start();
