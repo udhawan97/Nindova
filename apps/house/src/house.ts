@@ -92,7 +92,9 @@ let restoreDecisionPending = Boolean(active);
 let pendingRunnerChoice = false;
 let pendingCompletion: PendingCompletion | null = null;
 let exitReturnFocus: HTMLElement | null = null;
-let pendingExitDestination: { readonly view: View; readonly scrollY: number } | null = null;
+type ExitDestination = { readonly view: View; readonly scrollY: number };
+let pendingExitDestination: ExitDestination | null = null;
+let cancelledExitDestination: ExitDestination | null = null;
 let galleryClearReturnFocus: HTMLElement | null = null;
 let exitConfirmationPending = false;
 let soundOn = false;
@@ -192,6 +194,7 @@ function currentViewHeadingSelector(): string {
 
 function route(next: View, options: ViewOptions = {}) {
   const leavingGame = view === "game" && next !== "game";
+  cancelledExitDestination = null;
   if (leavingGame) sectorTable.destroy();
   closeHouseAudio();
   if (next !== "game") clearChapterTransition();
@@ -223,8 +226,14 @@ function hasMeaningfulProgress(candidate: ActiveGame): boolean {
 
 function requestRoute(next: View, invoker: HTMLElement | null = null, options: ViewOptions = {}) {
   if (next !== "game" && view === "game" && active && !restoreDecisionPending && hasMeaningfulProgress(active)) {
-    exitReturnFocus = invoker ?? document.activeElement as HTMLElement | null;
-    pendingExitDestination = { view: next, scrollY: options.scrollY ?? 0 };
+    const candidate = invoker ?? document.querySelector<HTMLElement>("[data-history-back]") ?? document.querySelector<HTMLElement>("#gameTitle");
+    exitReturnFocus = candidate?.isConnected && candidate !== main && candidate !== document.body && candidate !== document.documentElement
+      ? candidate
+      : null;
+    const requestedScroll = Math.max(0, options.scrollY ?? 0);
+    const rememberedScroll = cancelledExitDestination?.view === next ? cancelledExitDestination.scrollY : 0;
+    pendingExitDestination = { view: next, scrollY: requestedScroll || rememberedScroll };
+    if (cancelledExitDestination?.view !== next) cancelledExitDestination = null;
     exitConfirmationPending = true;
     sectorTable.suspend("exit");
     pauseChapterTransition();
@@ -241,6 +250,7 @@ function discardActiveGame() {
   leaveDialog.close("leave");
   exitConfirmationPending = false;
   pendingExitDestination = null;
+  cancelledExitDestination = null;
   active = null;
   restoreDecisionPending = false;
   pendingRunnerChoice = false;
@@ -256,6 +266,7 @@ function openCategory(categoryId: DoorCategoryId) {
 
 function startGame(gameId: GameId, options: ViewOptions = {}) {
   const game = getGame(gameId);
+  cancelledExitDestination = null;
   selectedCategory = game.categoryId;
   sectorTable.destroy();
   closeHouseAudio();
@@ -1269,6 +1280,11 @@ galleryClearDialog.addEventListener("close", () => {
   }
 });
 
+galleryClearDialog.addEventListener("cancel", (event) => {
+  event.preventDefault();
+  galleryClearDialog.close("cancel");
+});
+
 confirmGalleryClearButton.addEventListener("click", () => {
   const cleared = houseStateStore.clearGallery();
   memory = houseStateStore.gallery();
@@ -1280,16 +1296,26 @@ confirmGalleryClearButton.addEventListener("click", () => {
   settleView({ focusSelector: cleared ? "#galleryTitle" : "[data-clear-gallery]" });
 });
 
-keepPlayingButton.addEventListener("click", () => {
+function cancelPendingExit(fromGesture: boolean) {
   leaveDialog.close("keep");
   exitConfirmationPending = false;
+  cancelledExitDestination = pendingExitDestination ?? cancelledExitDestination;
   pendingExitDestination = null;
   const focusTarget = exitReturnFocus;
   exitReturnFocus = null;
   resumeChapterTransition();
-  sectorTable.audioGesture();
+  if (fromGesture) sectorTable.audioGesture();
   sectorTable.resume("exit");
-  requestAnimationFrame(() => focusTarget?.focus({ preventScroll: true }));
+  requestAnimationFrame(() => {
+    const target = focusTarget?.isConnected
+      ? focusTarget
+      : document.querySelector<HTMLElement>("[data-history-back]") ?? document.querySelector<HTMLElement>("#gameTitle");
+    target?.focus({ preventScroll: true });
+  });
+}
+
+keepPlayingButton.addEventListener("click", () => {
+  cancelPendingExit(true);
 });
 
 leaveTableButton.addEventListener("click", () => {
@@ -1299,14 +1325,7 @@ leaveTableButton.addEventListener("click", () => {
 
 leaveDialog.addEventListener("cancel", (event) => {
   event.preventDefault();
-  leaveDialog.close("keep");
-  exitConfirmationPending = false;
-  pendingExitDestination = null;
-  const focusTarget = exitReturnFocus;
-  exitReturnFocus = null;
-  resumeChapterTransition();
-  sectorTable.resume("exit");
-  requestAnimationFrame(() => focusTarget?.focus({ preventScroll: true }));
+  cancelPendingExit(false);
 });
 
 if (!houseStateStore.audienceAcknowledged()) audienceDialog.showModal();

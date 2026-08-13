@@ -278,6 +278,7 @@ async function keyboardActivate(page, selector) {
   for (let attempt = 0; attempt < 120; attempt += 1) {
     if (await page.evaluate((candidate) => document.activeElement?.matches(candidate), selector)) {
       await page.keyboard.press("Enter");
+      await page.evaluate(() => new Promise(requestAnimationFrame));
       return;
     }
     await page.keyboard.press("Tab");
@@ -506,6 +507,29 @@ try {
   await recovery.page.click('[data-history-back="category"]');
   assert.equal(await recovery.page.locator("#leaveDialog").getAttribute("open"), null, "an untouched first chapter exits without interruption");
   await recovery.context.close();
+
+  const cancelledBack = await openHouse({ width: 320, height: 568 });
+  await cancelledBack.page.click('[data-category="pattern-line"]');
+  await cancelledBack.page.locator('[data-game="navakankari"]').scrollIntoViewIfNeeded();
+  await cancelledBack.page.evaluate(() => window.scrollBy(0, 180));
+  const categoryScroll = await cancelledBack.page.evaluate(() => window.scrollY);
+  assert.ok(categoryScroll > 0, "the lower category table establishes a meaningful return position");
+  await cancelledBack.page.click('[data-game="navakankari"]');
+  await cancelledBack.page.click('[data-answer="1"]');
+  await cancelledBack.page.goBack();
+  await cancelledBack.page.waitForSelector("#leaveDialog[open]");
+  await cancelledBack.page.keyboard.press("Escape");
+  await cancelledBack.page.waitForFunction(() => !document.querySelector("#leaveDialog")?.hasAttribute("open"));
+  await cancelledBack.page.waitForFunction(() => document.activeElement?.matches('[data-history-back="category"]'));
+  assert.equal(await cancelledBack.page.evaluate(() => document.activeElement?.matches('[data-history-back="category"]')), true, "Escape from a browser-Back leave request restores the visible table exit");
+  await cancelledBack.page.click('[data-history-back="category"]');
+  await cancelledBack.page.waitForSelector("#leaveDialog[open]");
+  await cancelledBack.page.click("#leaveTableButton");
+  await cancelledBack.page.waitForFunction(() => window.__house.view === "category" && window.__house.active === null);
+  const returnedScroll = await cancelledBack.page.evaluate(() => window.scrollY);
+  assert.ok(Math.abs(returnedScroll - categoryScroll) <= 2, `cancel → retry → leave restores category scroll (${returnedScroll} vs ${categoryScroll})`);
+  assert.equal(await cancelledBack.page.evaluate(() => window.__house.memory.latestByGame.navakankari), undefined, "cancelled and confirmed unfinished exits never create a Gallery reading");
+  await cancelledBack.context.close();
 
   const finalChoiceExit = await openHouse({ width: 375, height: 812 });
   await finalChoiceExit.page.evaluate(() => window.__house.start("pattern-court"));
@@ -805,6 +829,8 @@ try {
     });
   }
   assert.equal(await materialRunner.page.evaluate(() => window.__house.runner?.failed), false, "the evidence pilot clears every authored material corridor");
+  await materialRunner.page.waitForSelector(".curtain-call", { timeout: 120_000 });
+  assert.equal(await materialRunner.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]?.completionFacts.finalChapter), "Roti Relay", "the real Action route clears all five Acts and records its authored curtain call");
   await materialRunner.context.close();
 
   const sharpRunner = await openHouse({ width: 414, height: 896 }, { deviceScaleFactor: 3 });
@@ -981,6 +1007,12 @@ try {
   assert.equal(replacement.keys.length, 8);
   assert.notEqual(replacement.runId, mirrorRun);
   await catalog.page.click('[data-route="gallery"]');
+  await catalog.page.click("[data-clear-gallery]");
+  await catalog.page.keyboard.press("Escape");
+  await catalog.page.waitForFunction(() => !document.querySelector("#galleryClearDialog")?.hasAttribute("open"));
+  await catalog.page.waitForFunction(() => document.activeElement?.matches("[data-clear-gallery]"));
+  assert.equal(await catalog.page.evaluate(() => document.activeElement?.matches("[data-clear-gallery]")), true, "Escape from Gallery clear restores the destructive-action invoker");
+  assert.equal(await catalog.page.evaluate(() => Object.keys(window.__house.memory.latestByGame).length), 8, "Escape preserves every Gallery reading");
   await catalog.page.evaluate(() => {
     globalThis.__nativeHouseRemoveItem = Storage.prototype.removeItem;
     globalThis.__nativeHouseSetItem = Storage.prototype.setItem;
