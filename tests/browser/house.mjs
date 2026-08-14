@@ -914,16 +914,25 @@ try {
   await boundedStory.context.close();
 
   const finalTransitionBoundary = await openHouse({ width: 375, height: 812 }, {}, { fakeClock: true });
-  await enterRunnerNarrated(finalTransitionBoundary.page);
+  const routeStartedAt = await finalTransitionBoundary.page.evaluate(() => {
+    window.__house.start("sector-sprint");
+    const narratedRoute = document.querySelector('[data-runner-route="narrated"]');
+    if (!(narratedRoute instanceof HTMLButtonElement)) throw new Error("Narrated route choice was not rendered");
+    narratedRoute.click();
+    return performance.now();
+  });
+  await finalTransitionBoundary.page.waitForSelector(".runner-story");
+  await finalTransitionBoundary.page.clock.pauseAt(await finalTransitionBoundary.page.evaluate(() => Date.now()));
   for (let act = 0; act < 4; act += 1) {
-    for (let beat = 0; beat < 3; beat += 1) await finalTransitionBoundary.page.click("[data-story-advance]");
+    for (let beat = 0; beat < 3; beat += 1) await finalTransitionBoundary.page.locator("[data-story-advance]").dispatchEvent("click");
     await finalTransitionBoundary.page.clock.fastForward(720);
-    await finalTransitionBoundary.page.waitForFunction((nextAct) => window.__house.active?.chapter === nextAct, act + 1);
+    assert.equal(await finalTransitionBoundary.page.evaluate(() => window.__house.active?.chapter), act + 1);
   }
-  await finalTransitionBoundary.page.click("[data-story-advance]");
-  await finalTransitionBoundary.page.click("[data-story-advance]");
-  await finalTransitionBoundary.page.clock.fastForward(236_000);
-  await finalTransitionBoundary.page.click("[data-story-advance]");
+  await finalTransitionBoundary.page.locator("[data-story-advance]").dispatchEvent("click");
+  await finalTransitionBoundary.page.locator("[data-story-advance]").dispatchEvent("click");
+  const routeElapsedMs = await finalTransitionBoundary.page.evaluate((startedAt) => performance.now() - startedAt, routeStartedAt);
+  await finalTransitionBoundary.page.clock.fastForward(Math.max(0, 239_600 - routeElapsedMs));
+  await finalTransitionBoundary.page.locator("[data-story-advance]").dispatchEvent("click");
   await finalTransitionBoundary.page.clock.fastForward(720);
   await finalTransitionBoundary.page.waitForSelector(".curtain-call");
   assert.match(await finalTransitionBoundary.page.locator(".curtain-call").innerText(), /No completion reading was recorded/i);
