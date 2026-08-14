@@ -5,7 +5,7 @@ description: Run, build, and verify the current Nindova House and Night Room sou
 
 ## Fastest path
 
-Use the [live Nindova House](https://udhawan97.github.io/Nindova/house/) for the current five-door/eight-game entertainment hub or the [live Night Room](https://udhawan97.github.io/Nindova/play/) for Masala Mound. The [Sector Sprint guide](../sector-sprint/) explains both complete Table V routes. The [Downloads guide](../downloads/) separates those live surfaces from the tagged v0.4.2 files and the current source build.
+Use the [live Nindova House](https://udhawan97.github.io/Nindova/house/) for the current five-door/eight-game entertainment hub or the [live Night Room](https://udhawan97.github.io/Nindova/play/) for Masala Mound. The [Sector Sprint guide](../sector-sprint/) explains both complete Table V routes. The [Downloads guide](../downloads/) separates those live surfaces from the tagged v0.4.3 files and the current source build.
 
 ## Run from source
 
@@ -38,4 +38,4 @@ npm test
 npm run test:wall-clock
 ```
 
-`test:house` is the Grand Salon browser gate; `test:arc` is the Night Room Rasoi regression gate. `test:seed:observe` preserves the rejected original prototype as historical evidence only; it is not a release pass.
+`test:house` is the Grand Salon browser gate; `test:arc` is the Night Room Rasoi regression gate. All browser journeys use one local evidence harness for preview, Chromium, failure capture, and teardown without mocking product routes. `test:seed:observe` preserves the rejected original prototype as historical evidence only; it is not a release pass.

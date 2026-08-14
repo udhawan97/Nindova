@@ -29,9 +29,9 @@ const tables = [
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; base-uri 'self'; object-src 'none'; connect-src 'self'; img-src 'self' data:; media-src 'self' blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
     />
-    <meta name="description" content="Nindova is a private house with five category doors and eight authored games for adults, plus a separate self-ending Night Room." />
-    <meta property="og:title" content="Nindova — A house of authored games" />
-    <meta property="og:description" content="Choose a room. Stay for the pleasure of solving. No account, public ranking, or telemetry." />
+    <meta name="description" content="Nindova is a private, offline-ready house of eight finite browser games for adults, plus one deliberately separate self-ending Night Room." />
+    <meta property="og:title" content="Nindova — Every room knows when to close" />
+    <meta property="og:description" content="Eight authored endings. One bounded Night Room. No account, public ranking, or telemetry." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalSiteUrl} />
     <meta property="og:image" content={socialImageUrl} />
@@ -42,7 +42,7 @@ const tables = [
     <link rel="icon" href={href("/brand/favicon.svg")} type="image/svg+xml" />
     <link rel="icon" href={href("/brand/favicon-32.png")} sizes="32x32" type="image/png" />
     <link rel="apple-touch-icon" href={href("/brand/apple-touch-icon.png")} />
-    <title>Nindova — A house of authored games</title>
+    <title>Nindova — Every room knows when to close</title>
   </head>
   <body class="landing">
     <a class="skip-link" href="#main">Skip to Nindova</a>
@@ -65,37 +65,25 @@ const tables = [
     <main id="main">
       <section class="house-hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow">A private house of authored games · adults 18+</p>
-          <h1 id="hero-title">Choose a room.<br /><em>Stay for the pleasure of solving.</em></h1>
+          <p class="eyebrow">Private · offline-ready · adults 18+</p>
+          <h1 id="hero-title">Every room<br /><em>knows when to close.</em></h1>
           <p class="hero-lede">
-            Five category doors hold eight finite games in the Grand Salon. A separate Night Room holds Masala Mound,
-            a calm Session with an ending it cannot bargain away.
+            Enter the Grand Salon for eight finite authored games, or cross into the deliberately separate Night Room
+            for one bounded Masala Mound Session. There is no feed waiting on the other side.
           </p>
           <div class="hero-actions">
             <a class="button-primary" href={href("/house/")}>Enter Nindova House</a>
             <a class="button-secondary" href={href("/play/")}>Visit the Night Room</a>
           </div>
-          <p class="source-note">Live web build · no account · no comparison · no app telemetry</p>
+          <p class="source-note">Static same-origin runtime · no account · no comparison · no app telemetry</p>
         </div>
 
         <div class="house-stage">
-          <a class="app-icon-module" href="#inside">
-            <span class="app-icon-shell">
-              <span class="app-icon-depth app-icon-depth--back" aria-hidden="true"></span>
-              <span class="app-icon-depth app-icon-depth--middle" aria-hidden="true"></span>
-              <img
-                class="app-icon-face"
-                src={href("/brand/pwa-512.png")}
-                width="512"
-                height="512"
-                alt="Nindova app icon with nine paired diamonds on a blackened-indigo tile"
-              />
-            </span>
-            <span class="app-icon-copy">
-              <strong>The House, in one mark</strong>
-              <span>Begin with five doors and eight finite games <span aria-hidden="true">↓</span></span>
-            </span>
-          </a>
+          <dl class="proof-census" aria-label="Current House facts">
+            <div><dt>5</dt><dd>category doors</dd></div>
+            <div><dt>8</dt><dd>authored endings</dd></div>
+            <div><dt>0</dt><dd>accounts</dd></div>
+          </dl>
 
           <figure class="house-proof">
             <div class="proof-frame">
@@ -106,13 +94,13 @@ const tables = [
                 alt="The real Nindova House floor plan, with the Night Room, five Grand Salon category doors, and local Gallery."
               />
             </div>
-            <figcaption>Current House floor plan · rendered from source</figcaption>
+            <figcaption>Current House floor plan · source-rendered · not a mockup</figcaption>
           </figure>
         </div>
       </section>
 
       <nav class="house-guide" aria-label="Explore Nindova">
-        <p class="guide-intro"><span>Follow the House</span> Four clear stops. Every door says where it leads.</p>
+        <p class="guide-intro"><span>Read the floor plan</span> Four stops, two separate loops, and no hidden return path.</p>
         <ol>
           <li>
             <a href="#inside">
@@ -145,11 +133,11 @@ const tables = [
         <header class="section-heading">
           <div>
             <p class="eyebrow">The centre of the House</p>
-            <h2 id="salon-title">Five doors.<br />Eight clean endings.</h2>
+            <h2 id="salon-title">Five doors.<br />Eight authored endings.</h2>
           </div>
           <p>
-            Each game unfolds across five fixed chapters or Acts. Challenge can deepen inside the table;
-            nothing becomes a public ranking, streak, randomized prize, or population comparison.
+            Every table unfolds across five fixed chapters, studies, or Acts. Challenge can deepen inside;
+            nothing escapes as a public ranking, streak, randomized prize, or population comparison.
           </p>
         </header>
 
@@ -184,7 +172,7 @@ const tables = [
           </figure>
           <div>
             <p class="eyebrow">Table V · Sector Sprint</p>
-            <h3>A city route that knows when to close.</h3>
+            <h3>The city moves. The boundary does not.</h3>
             <p>
               The street moves forward on its own through five progressively faster Chandigarh lane routes.
               Follow each marker: Hold lane, Move up, or Move down. Every gate requires at most one adjacent
@@ -200,7 +188,7 @@ const tables = [
       <section id="night-room" class="night-section" aria-labelledby="night-title">
         <div class="night-copy">
           <p class="eyebrow">The north wing · a deliberately separate loop</p>
-          <h2 id="night-title">One quiet rule.<br />One Session, then rest.</h2>
+          <h2 id="night-title">A separate room<br />for goodnight.</h2>
           <p>
             Pair matching kitchen Tiles only when nothing covers them and one side is open. Gentle and Deeper
             are equal tonight-only preferences. Every legal choice keeps a path to the ending, and help points
@@ -240,7 +228,7 @@ const tables = [
       <section id="trust" class="trust-section" aria-labelledby="trust-title">
         <header>
           <p class="eyebrow">The House rules</p>
-          <h2 id="trust-title">Pleasure, privacy,<br />and a clean exit.</h2>
+          <h2 id="trust-title">No invisible<br />House business.</h2>
         </header>
         <dl class="trust-ledger">
           <div><dt>Authored</dt><dd>Every chapter, Act, and outcome is fixed by design. There are no random prizes.</dd></div>
@@ -258,7 +246,7 @@ const tables = [
         <header class="section-heading">
           <div>
             <p class="eyebrow">Start your way</p>
-            <h2 id="download-title">Open live.<br />Keep a file. Build the source.</h2>
+            <h2 id="download-title">Open live.<br />Keep a file. Check the proof.</h2>
           </div>
           <p>
             The current House is live from <code>main</code>. The latest tagged release is {latestRelease.tag} — {latestRelease.name}{" "}
@@ -306,7 +294,7 @@ const tables = [
 
       <section class="help-section" aria-labelledby="help-title">
         <p class="eyebrow">Continue with confidence</p>
-        <h2 id="help-title">Read the contract.<br />See the limits.</h2>
+        <h2 id="help-title">The limits are<br />part of the product.</h2>
         <div class="help-links">
           <a href={href("/docs/getting-started/")}><strong>Getting started</strong><span>Run the House, Night Room, docs, and standalone file.</span></a>
           <a href={href("/docs/product-contract/")}><strong>Product contract</strong><span>The promises neither loop may weaken.</span></a>
@@ -326,7 +314,7 @@ const tables = [
         <a href={releaseHistoryUrl}>Release history</a>
         <a href={href("/licenses/geist-OFL-1.1.txt")}>Notices</a>
       </nav>
-      <p>Authored entertainment and behavioral design study · 18+ · Apache-2.0</p>
+      <p>Eight authored endings · one bounded Night Room · 18+ · Apache-2.0</p>
     </footer>
   </body>
 </html>

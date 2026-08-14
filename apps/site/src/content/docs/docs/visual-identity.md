@@ -11,6 +11,8 @@ The drawn wordmark has no font dependency. Do not retype, stretch, rotate, outli
 
 The landing-page and README lockups use one authored seven-second stitch loop: mirrored diamonds arrive in four pairs, saffron closes the center, and a soft glow breathes behind a long completed-mark rest before the sequence repeats. Static lockups remain the default for footers, favicons, product controls, and any context where motion would distract.
 
+The current public promise—**Every room knows when to close**—connects the finite House and bounded Night Room without collapsing their separate loops. The source-generated social card uses that promise beside the real House plan and names eight authored endings plus one bounded Night Room. It is product orientation, not a claim about therapeutic or cognitive outcomes.
+
 ## Shahi Raat palette
 
 - **Raat** `#150D20` — night ground
@@ -30,6 +32,6 @@ The nine 48×48 silhouettes cover belan, chakla, tawa, chimta, katori, tiffin, m
 
 The logo entrance and match bloom are fixed and deterministic. The optional chime is deterministic. Reduced motion shows the completed logo immediately and removes match translation and scale; none of these responses awards, measures, or compares anything.
 
-All identity, ornament, and utensil artwork is original Nindova project work dedicated under [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/). The application code remains Apache-2.0. The repository preserves the editable sources, brand guide, asset manifest, and reproducible social-card capture script.
+All identity, ornament, and utensil artwork is original Nindova project work dedicated under [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/). The application code remains Apache-2.0. The repository preserves the editable sources, brand guide, asset manifest, and reproducible social-card and product-capture scripts.
 
 The direction is Punjabi-inspired. Human Punjabi cultural-authenticity review remains unverified, and no Gurmukhi lettering is used pending that review.

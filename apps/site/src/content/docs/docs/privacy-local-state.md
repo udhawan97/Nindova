@@ -29,4 +29,4 @@ Version 1 and version 2 state is copied into the v3 union and sanitized. The sou
 
 ## Offline cache
 
-The `/house/` worker precaches the complete versioned static House asset graph in `nindova-house-v9` so a fresh controlled navigation works with the HTTP cache cleared and the network offline. The `/play/` worker owns the separately scoped Night shell in `nindova-session-v5`. Neither worker can read local storage or cache state keys, Dawn blobs, or share payloads. The standalone `nindova.html` registers no worker.
+The `/house/` worker precaches the complete versioned static House asset graph in `nindova-house-v10` so a fresh controlled navigation works with the HTTP cache cleared and the network offline. The `/play/` worker owns the separately scoped Night shell in `nindova-session-v5`. Neither worker can read local storage or cache state keys, Dawn blobs, or share payloads. The standalone `nindova.html` registers no worker.

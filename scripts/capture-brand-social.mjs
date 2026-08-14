@@ -25,8 +25,8 @@ try {
       .copy { min-width: 0; }
       .logo { width: 420px; margin-bottom: 54px; }
       .logo svg { display: block; width: 100%; height: auto; }
-      .promise { margin: 0; color: #efe1c4; font-family: Georgia, serif; font-size: 58px; font-weight: 500; letter-spacing: -.045em; line-height: .98; }
-      .description { margin: 28px 0 0; color: #e0a64b; font-size: 18px; font-weight: 720; letter-spacing: .13em; text-transform: uppercase; }
+      .promise { max-width: 650px; margin: 0; color: #efe1c4; font-family: Georgia, serif; font-size: 61px; font-weight: 500; letter-spacing: -.05em; line-height: .92; }
+      .description { margin: 28px 0 0; color: #e0a64b; font-size: 16px; font-weight: 720; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
       .plan { display: grid; grid-template-areas: "night salon" "gallery salon"; grid-template-columns: .72fr 1.28fr; height: 390px; border: 1px solid rgba(224,166,75,.72); box-shadow: 18px 18px 0 rgba(58,74,158,.18); }
       .room { display: grid; align-content: end; padding: 25px; border-color: rgba(224,166,75,.4); background: rgba(33,26,51,.82); color: #efe1c4; font-family: Georgia, serif; font-size: 25px; }
       .room small { display: block; margin-bottom: 7px; color: rgba(239,225,196,.55); font-family: ui-sans-serif, system-ui, sans-serif; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
@@ -42,7 +42,7 @@ try {
     </style></head><body>
       <i class="corner a"></i><i class="corner b"></i><i class="corner c"></i><i class="corner d"></i>
       <main>
-        <div class="copy"><div class="logo">${logo}</div><p class="promise">Choose a room.<br>Stay for the pleasure of solving.</p><p class="description">A house of authored games · adults 18+</p></div>
+        <div class="copy"><div class="logo">${logo}</div><p class="promise">Every room knows<br>when to close.</p><p class="description">Eight authored endings · one bounded Night Room</p></div>
         <div class="plan" aria-hidden="true"><div class="room night"><small>North wing</small>Night Room</div><div class="room gallery"><small>West wing</small>Gallery</div><div class="room salon"><small>The centre</small>Grand Salon<div class="doors"><i></i><i></i><i></i><i></i><i></i></div></div></div>
       </main>
     </body></html>`);

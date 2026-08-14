@@ -97,7 +97,7 @@ img { max-width: 100%; }
 
 .house-hero {
   display: grid;
-  grid-template-columns: minmax(0, .83fr) minmax(28rem, 1.17fr);
+  grid-template-columns: minmax(0, .88fr) minmax(28rem, 1.12fr);
   align-items: center;
   min-height: min(58rem, calc(100dvh - 5.2rem));
   gap: clamp(2.5rem, 5vw, 6rem);
@@ -146,94 +146,34 @@ img { max-width: 100%; }
 .house-stage {
   position: relative;
   min-width: 0;
-  padding-block-start: clamp(4.5rem, 7vw, 7rem);
-  padding-inline-start: clamp(4.5rem, 7vw, 7rem);
+  padding-block-start: clamp(3.5rem, 6vw, 5.5rem);
+  padding-inline-start: clamp(2.5rem, 5vw, 4.5rem);
   perspective: 90rem;
 }
 .house-proof {
   min-width: 0;
   margin: 0;
-  transform: rotateX(1.4deg) rotateY(-3.5deg);
+  transform: rotateX(1deg) rotateY(-2.5deg);
   transform-origin: 20% 50%;
   transform-style: preserve-3d;
   transition: transform var(--dur-long) var(--ease-out);
 }
-.app-icon-module {
+.proof-census {
   display: grid;
   position: absolute;
   z-index: 5;
   inset: 0 auto auto 0;
-  width: clamp(9.5rem, 13vw, 13rem);
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-sm);
-  color: var(--color-ink);
-  text-decoration: none;
-}
-.app-icon-shell {
-  display: block;
-  position: relative;
-  min-width: 0;
-  width: 100%;
-  aspect-ratio: 1;
-  justify-self: stretch;
-  transform: rotateX(10deg) rotateY(14deg) rotateZ(-2deg);
-  transform-style: preserve-3d;
-  transition: transform var(--dur-long) var(--ease-out);
-}
-.app-icon-depth,
-.app-icon-face {
-  display: block;
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 22.5%;
-}
-.app-icon-depth { border: 1px solid color-mix(in oklch, var(--color-accent) 72%, transparent); }
-.app-icon-depth--back {
-  background: color-mix(in oklch, var(--color-jewel-sapphire) 52%, var(--color-paper));
-  box-shadow: 0 2.6rem 5rem rgba(2, 5, 18, .52);
-  transform: translate3d(-1.15rem, 1.35rem, -3rem);
-}
-.app-icon-depth--middle {
-  background: color-mix(in oklch, var(--color-jewel-ruby) 42%, var(--color-paper-2));
-  transform: translate3d(-.55rem, .7rem, -1.5rem);
-}
-.app-icon-face {
-  position: relative;
-  z-index: 2;
-  object-fit: contain;
-  box-shadow:
-    0 0 0 1px color-mix(in oklch, var(--color-accent) 55%, transparent),
-    inset -.7rem -.8rem 1.6rem rgba(2, 5, 18, .18),
-    0 1.7rem 3.8rem rgba(2, 5, 18, .42);
-  transform: translateZ(1.5rem);
-}
-.app-icon-shell::after {
-  position: absolute;
-  z-index: 3;
-  inset: 5% 7% auto;
-  height: 34%;
-  border-radius: 50%;
-  background: linear-gradient(180deg, rgba(255,255,255,.13), transparent);
-  content: "";
-  pointer-events: none;
-  transform: translateZ(1.6rem);
-}
-.app-icon-copy {
-  display: grid;
-  width: min(18rem, 74vw);
-  justify-self: start;
-  gap: var(--space-3xs);
-  padding: var(--space-sm) var(--space-md);
+  grid-template-columns: repeat(3, minmax(4.6rem, 1fr));
+  margin: 0;
   border: 1px solid var(--color-rule-strong);
   background: color-mix(in oklch, var(--color-paper-2) 94%, transparent);
   box-shadow: var(--shadow-brass);
   backdrop-filter: blur(.8rem);
 }
-.app-icon-copy strong { color: var(--color-accent); font-family: var(--font-display); font-size: var(--text-md); font-weight: 540; }
-.app-icon-copy > span { color: var(--color-muted); font-size: var(--text-xs); line-height: 1.45; }
-.app-icon-module:focus-visible .app-icon-shell { transform: rotateX(4deg) rotateY(5deg) rotateZ(0) translateY(-.35rem); }
+.proof-census div { display: grid; align-content: center; min-height: 5.4rem; padding: var(--space-sm) var(--space-md); }
+.proof-census div + div { border-inline-start: 1px solid var(--color-rule-strong); }
+.proof-census dt { color: var(--color-accent); font-family: var(--font-display); font-size: var(--text-xl); line-height: 1; }
+.proof-census dd { margin: var(--space-3xs) 0 0; color: var(--color-neutral); font-family: var(--font-mono); font-size: .68rem; letter-spacing: .06em; line-height: 1.25; text-transform: uppercase; }
 .proof-frame {
   position: relative;
   padding: .65rem;
@@ -419,8 +359,7 @@ img { max-width: 100%; }
 @media (hover: hover) and (pointer: fine) {
   .button-primary:hover { background: var(--color-ink-soft); transform: translateY(-1px); }
   .button-secondary:hover, .nav-links a:hover, .site-footer a:hover, .text-link:hover { color: var(--color-accent); }
-  .app-icon-module:hover .app-icon-shell { transform: rotateX(4deg) rotateY(5deg) rotateZ(0) translateY(-.35rem); }
-  .app-icon-module:hover + .house-proof { transform: rotateX(.6deg) rotateY(-1.5deg) translateX(.35rem); }
+  .house-proof:hover { transform: rotateX(.4deg) rotateY(-1deg) translateX(.25rem); }
   .house-guide a:hover { background: color-mix(in oklch, var(--color-paper-3) 76%, var(--color-jewel-sapphire)); }
   .table-directory li:hover h3 { color: var(--color-accent); }
   .download-ledger a:hover, .help-links a:hover { background: color-mix(in oklch, var(--color-paper-2) 80%, var(--color-jewel-sapphire)); }
@@ -470,9 +409,9 @@ img { max-width: 100%; }
   .nav-enter { padding-inline: var(--space-sm); white-space: normal !important; text-align: center; }
   .hero-actions { align-items: stretch; flex-direction: column; }
   .button-primary, .button-secondary { width: 100%; white-space: normal; text-align: center; }
-  .house-stage { display: grid; justify-items: center; gap: var(--space-xl); padding: 0; perspective: none; }
-  .app-icon-module { position: relative; inset: auto; width: min(10.5rem, 54vw); justify-items: center; }
-  .app-icon-copy { width: min(18rem, calc(100vw - (2 * var(--content-gutter)))); justify-self: center; text-align: center; }
+  .house-stage { display: grid; justify-items: stretch; gap: var(--space-lg); padding: 0; perspective: none; }
+  .proof-census { position: relative; inset: auto; order: 2; width: 100%; }
+  .proof-census div { min-height: 4.8rem; padding-inline: var(--space-sm); }
   .house-proof { transform: none; }
   .proof-frame { padding: .35rem; box-shadow: .7rem .7rem 0 rgba(58,74,158,.2); }
   .guide-intro { align-items: flex-start; flex-direction: column; gap: var(--space-xs); }
@@ -492,20 +431,7 @@ img { max-width: 100%; }
     transition-duration: .00001ms !important;
     scroll-behavior: auto !important;
   }
-  .app-icon-module,
-  .app-icon-shell,
-  .app-icon-face,
-  .app-icon-depth,
   .house-proof { animation: none !important; transform: none !important; }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .app-icon-module { animation: nindova-app-icon-arrive 1.4s var(--ease-out) both; }
-}
-
-@keyframes nindova-app-icon-arrive {
-  from { opacity: 0; transform: translate3d(-1.4rem, 1.8rem, 0) rotate(-4deg); }
-  to { opacity: 1; transform: none; }
 }
 
 /* Starlight reading surfaces stay quieter than the House landing page. */

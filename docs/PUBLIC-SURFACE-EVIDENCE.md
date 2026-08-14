@@ -1,5 +1,28 @@
 # Public-surface evidence ledger
 
+## Verified locally on 2026-08-13 — Held Boundaries release candidate
+
+- The House now commits route, History, unfinished-table consent, cancelled destination, teardown, scroll restoration, and focus return through `house-navigation.ts`. A direct unit fixture proves cancel→retry→confirm keeps the requested category and 140-pixel scroll, while the complete House journey preserves browser and in-page Back/Forward behavior on the rendered product.
+- Grand Salon opening, restore, meaningful-progress policy, kind-specific interaction, chapter advance, runner synchronization, focus, and active-table persistence now pass through `salon-table-lifecycle.ts`. The House shell no longer mutates chapter, memory, plinth, resolution, story-beat, or touched fields.
+- The House-facing Sector Sprint surface is five operations. Its three lanes, five ordered Acts, progressively faster authored gates, foreground-only 240-second boundary, pause/hide/blur/exit suspension, complete narrated route, no-sound/no-sight/no-precision completion path, and fail-closed non-persistent reload remain independently exercised.
+- All twelve browser journeys use one local evidence harness for preview, Chromium context, explicit capability adapters, failure and request capture, and teardown. Each adapter exposes only a named browser capability; no journey fulfills routes, replaces state, or mocks away product behavior. Standalone HTML and installable-PWA journeys remain independent, and both same-origin static request capture and zero app telemetry stay direct assertions.
+- The public promise is now “Every room knows when to close.” The README, Astro landing page, Starlight guides, architecture decision, release notes, canonical facts, package versions, v10 House cache, social-card generator, and source-rendered capture path describe the same five-door/eight-game House and deliberately separate bounded Night Room.
+- Targeted verification currently passes 101 unit tests, the complete rendered House suite, root/base-path public surfaces, independent standalone/PWA behavior, Dawn, Night state, layered play, deterministic closure, portrait/zoom/reduced motion, tile latency, and Sector Sprint feel. The final complete matrix, refreshed Graphify corpus, exact commit, checksums, GitHub release assets, and served Pages surface remain publication gates rather than inferred facts.
+- No authored game content, answer, storage schema, Gallery meaning, Night contract, score, streak, rank, visible timer, collection, randomized reward, assessment output, telemetry, third-party runtime request, native capability, or iOS Wall claim changed. Human enjoyment, sleep or memory benefit, cultural authenticity, real-device assistive technology, installed Safari/Android behavior, and physical QR scanning remain unverified.
+
+### Held Boundaries pre-acceptance visual-system rubric
+
+| Axis | Score | Evidence |
+| --- | ---: | --- |
+| Product fidelity | 5/5 | The floor plan, real House captures, eight authored endings, separate Night Room, and local-only boundary match the current product. |
+| Hierarchy | 5/5 | Promise, proof ledger, House map, Sector and Night evidence, privacy, downloads, and limits appear in a deliberate reading order. |
+| Originality | 5/5 | The room directory, architectural plan, brass rules, and source-captured tables are specific to Nindova rather than a generic product template. |
+| Restraint | 5/5 | The refresh removes the decorative app-icon model, keeps ornament subordinate to evidence, and preserves the reduced-motion route. |
+| Proof | 5/5 | Every product claim routes to source-rendered media, canonical facts, architecture decisions, tests, or an explicit unverified limit. |
+| Download clarity | 5/5 | Live, standalone, static archive, checksum, and source paths are distinct and use one candidate version source. |
+| Accessibility | 4/5 | Five widths, 200% zoom, keyboard order, target size, reduced motion, and light/dark docs pass; real-device assistive technology remains open. |
+| Maintenance | 5/5 | Canonical facts, generated social art, capture scripts, asset provenance, and the evidence ledger have repeatable checked-in sources. |
+
 ## Verified locally on 2026-08-13 — Clean Return release candidate
 
 - The current `main` candidate preserves a cancelled unfinished-table exit's destination scroll and reuses it when the same visible Back control is retried. A 320×568 browser regression begins from a scrolled Pattern & Line category, starts meaningful Navakankari progress, invokes browser Back, cancels with Escape, retries, confirms, and returns within two pixels of the recorded category position without creating a Gallery result.

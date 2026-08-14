@@ -59,8 +59,8 @@ test("the social card is the publication-sized regenerated artifact", async () =
   const image = PNG.sync.read(await readFile(resolve(root, "apps/site/public/brand/nindova-og.png")));
   assert.deepEqual([image.width, image.height], [1200, 630]);
   const generator = await readFile(resolve(root, "scripts/capture-brand-social.mjs"), "utf8");
-  assert.match(generator, /A house of authored games/);
-  assert.match(generator, /Choose a room/);
+  assert.match(generator, /Eight authored endings/);
+  assert.match(generator, /Every room knows(?:<br>)?when to close/);
   assert.doesNotMatch(generator, /bedtime game|one round/i);
 });
 
