@@ -214,11 +214,21 @@ try {
   await autoRest.context.close();
 
   const reduced = await open({ reducedMotion: "reduce" });
-  const reducedPair = await reduced.page.evaluate(() => window.__ct.legalPairs[0]);
-  await reduced.page.click(`[data-tile-id="${reducedPair[0]}"]`);
-  await reduced.page.click(`[data-tile-id="${reducedPair[1]}"]`);
-  assert.match(await reduced.page.locator(".tile.is-pairing").first().evaluate((tile) => getComputedStyle(tile).animationName), /pair-fade/);
-  assert.equal(await reduced.page.locator(".pair-bloom").evaluate((bloom) => getComputedStyle(bloom).display), "none");
+  const reducedEvidence = await reduced.page.evaluate(() => {
+    for (const tileId of window.__ct.legalPairs[0]) {
+      const tile = document.querySelector(`[data-tile-id="${tileId}"]`);
+      if (!(tile instanceof HTMLButtonElement)) throw new Error(`Missing reduced-motion tile ${tileId}`);
+      tile.click();
+    }
+    const pairingTile = document.querySelector(".tile.is-pairing");
+    const bloom = document.querySelector(".pair-bloom");
+    return {
+      animationName: pairingTile ? getComputedStyle(pairingTile).animationName : "missing",
+      bloomDisplay: bloom ? getComputedStyle(bloom).display : "missing",
+    };
+  });
+  assert.match(reducedEvidence.animationName, /pair-fade/);
+  assert.equal(reducedEvidence.bloomDisplay, "none");
   assert.deepEqual(reduced.errors, []);
   await reduced.context.close();
 
