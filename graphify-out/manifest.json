@@ -380,8 +380,8 @@
     "semantic_hash": ""
   },
   "docs/PUBLIC-SURFACE-EVIDENCE.md": {
-    "mtime": 1786666618.866811,
-    "ast_hash": "12b9b8c4a59607c629610ba3e2157fbe",
+    "mtime": 1786669854.8271136,
+    "ast_hash": "6e2c77dcfa532da39a812caca11db774",
     "semantic_hash": ""
   },
   "docs/REDESIGN-PLAN.md": {
@@ -455,7 +455,7 @@
     "semantic_hash": "d82b998ec66d551fbdb0ae2215ebc8d1"
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1786668369.3206406,
+    "mtime": 1786669899.3377163,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": "9557448d4a3c6237efa8fe2648d21fa0"
   },
@@ -845,7 +845,7 @@
     "semantic_hash": "2b4fb1daaba81c59ee9c384430421c53"
   },
   "apps/house/src/sector-sprint.ts": {
-    "mtime": 1786663313.7167654,
+    "mtime": 1786669725.9796505,
     "ast_hash": "04a0448491984a6b6cb57bd9c837703b",
     "semantic_hash": "04a0448491984a6b6cb57bd9c837703b"
   },
