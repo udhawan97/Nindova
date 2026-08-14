@@ -2,19 +2,16 @@ import assert from "node:assert/strict";
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { chromium } from "playwright";
+import { createBrowserEvidenceHarness } from "./evidence-harness.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const output = resolve(root, "artifacts/rasoi-arc");
 const target = `${pathToFileURL(resolve(root, "apps/session/dist/nindova.html")).href}?review=1`;
 await mkdir(output, { recursive: true });
 
-const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
-const errors = [];
+const harness = await createBrowserEvidenceHarness();
+const { page, errors } = await harness.open({ contextOptions: { viewport: { width: 1280, height: 800 } } });
 const states = ["intake"];
-page.on("console", (message) => { if (message.type() === "error") errors.push(`console: ${message.text()}`); });
-page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
 
 try {
   await page.goto(target);
@@ -50,5 +47,5 @@ try {
   await writeFile(resolve(output, "result.json"), `${JSON.stringify({ target, states, errors }, null, 2)}\n`, "utf8");
   console.log(`Rasoi Pairs arc passed: ${states.join(" → ")}`);
 } finally {
-  await browser.close();
+  await harness.close();
 }

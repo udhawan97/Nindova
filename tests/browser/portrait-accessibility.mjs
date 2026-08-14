@@ -2,21 +2,16 @@ import assert from "node:assert/strict";
 import { mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { chromium } from "playwright";
+import { createBrowserEvidenceHarness } from "./evidence-harness.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const output = resolve(root, "artifacts/rasoi-responsive");
 const target = `${pathToFileURL(resolve(root, "apps/session/dist/nindova.html")).href}?review=1`;
 await mkdir(output, { recursive: true });
-const browser = await chromium.launch();
+const harness = await createBrowserEvidenceHarness();
 
 async function open(viewport, options = {}) {
-  const context = await browser.newContext({ viewport, ...options });
-  const page = await context.newPage();
-  const errors = [];
-  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
-  page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto(target);
+  const { context, page, errors } = await harness.open({ contextOptions: { viewport, ...options }, target });
   await page.waitForFunction(() => Boolean(window.__ct));
   return { context, page, errors };
 }
@@ -107,7 +102,8 @@ try {
   const reduced = await open({ width: 375, height: 812 }, { reducedMotion: "reduce" });
   assert.equal(await reduced.page.evaluate(() => window.__ct.reduceMotion), true);
   await reduced.context.close();
+  assert.deepEqual(harness.errors, []);
   console.log("Rasoi Pairs responsive, keyboard, target-size, zoom, and reduced-motion checks passed.");
 } finally {
-  await browser.close();
+  await harness.close();
 }

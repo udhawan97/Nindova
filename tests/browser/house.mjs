@@ -1,9 +1,8 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
 import { cp, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { chromium } from "@playwright/test";
+import { createBrowserEvidenceHarness } from "./evidence-harness.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const output = resolve(root, "artifacts/house");
@@ -19,24 +18,14 @@ const publishedHouseText = (await Promise.all(publishedHouseFiles
   .map((path) => readFile(resolve(previewRoot, "house", String(path)), "utf8")))).join("\n");
 assert.doesNotMatch(publishedHouseText, /\b(?:Contra|Subway Surfers|Flappy Bird)\b/i, "the shipped game remains an original work");
 assert.doesNotMatch(publishedHouseText, /\b(?:Pulse|Glide|thrust|gravity|flight|aerial)\b|rise and fall/i, "the shipped controls contain no obsolete altitude language");
-const server = spawn(process.execPath, [resolve(root, "scripts/serve.mjs"), previewRoot], {
-  cwd: root,
-  env: { ...process.env, NINDOVA_PREVIEW_PORT: String(port) },
-  stdio: ["ignore", "pipe", "pipe"],
+const harness = await createBrowserEvidenceHarness({
+  root,
+  previewRoot,
+  port,
+  launchOptions: { headless: true },
+  cleanup: [() => rm(previewRoot, { recursive: true, force: true })],
 });
-await new Promise((resolveReady, reject) => {
-  const timer = setTimeout(() => reject(new Error("preview server did not start")), 5_000);
-  server.once("error", reject);
-  server.stdout.on("data", (chunk) => {
-    if (chunk.toString().includes("Nindova preview")) {
-      clearTimeout(timer);
-      resolveReady();
-    }
-  });
-});
-
-const browser = await chromium.launch({ headless: true });
-const errors = [];
+const { errors } = harness;
 const externalRequests = [];
 
 async function openHouse(viewport, options = {}, {
@@ -49,9 +38,9 @@ async function openHouse(viewport, options = {}, {
   reviewMode = false,
   galleryWriteDenied = false,
 } = {}) {
-  const context = await browser.newContext({ viewport, ...options });
+  const context = await harness.context({ viewport, ...options });
   if (galleryWriteDenied) {
-    await context.addInitScript(() => {
+    await harness.adapt(context, () => {
       const nativeSetItem = Storage.prototype.setItem;
       globalThis.__denyHouseGalleryWrite = true;
       Storage.prototype.setItem = function setItem(key, value) {
@@ -63,7 +52,7 @@ async function openHouse(viewport, options = {}, {
     });
   }
   if (acceleratedRaf) {
-    await context.addInitScript((stepMs) => {
+    await harness.adapt(context, { script: (stepMs) => {
       const nativeRequestAnimationFrame = globalThis.requestAnimationFrame.bind(globalThis);
       let authoredTimestamp = 0;
       let nextFrameId = 1;
@@ -95,10 +84,10 @@ async function openHouse(viewport, options = {}, {
         configurable: true,
         value: (frameId) => queuedFrames.delete(frameId),
       });
-    }, typeof acceleratedRaf === "number" ? acceleratedRaf : 100);
+    }, argument: typeof acceleratedRaf === "number" ? acceleratedRaf : 100 });
   }
   if (manualRaf) {
-    await context.addInitScript(() => {
+    await harness.adapt(context, () => {
       let authoredTimestamp = 0;
       let nextFrameId = 1;
       const queuedFrames = new Map();
@@ -126,7 +115,7 @@ async function openHouse(viewport, options = {}, {
     });
   }
   if (controllableVisibility) {
-    await context.addInitScript(() => {
+    await harness.adapt(context, () => {
       let testHidden = false;
       Object.defineProperty(document, "hidden", { configurable: true, get: () => testHidden });
       globalThis.__setHouseTestHidden = (hidden) => {
@@ -136,12 +125,12 @@ async function openHouse(viewport, options = {}, {
     });
   }
   if (audioDenied) {
-    await context.addInitScript(() => {
+    await harness.adapt(context, () => {
       class DeniedAudioContext { constructor() { throw new Error("audio unavailable in test"); } }
       Object.defineProperty(globalThis, "AudioContext", { configurable: true, value: DeniedAudioContext });
     });
   } else if (audioProbe) {
-    await context.addInitScript(() => {
+    await harness.adapt(context, () => {
       globalThis.__houseAudioContexts = 0;
       globalThis.__houseAudioCloses = 0;
       globalThis.__houseAudioSuspends = 0;
@@ -157,10 +146,8 @@ async function openHouse(viewport, options = {}, {
       Object.defineProperty(globalThis, "AudioContext", { configurable: true, value: ProbeAudioContext });
     });
   }
-  const page = await context.newPage();
+  const { page } = await harness.page(context);
   if (fakeClock) await page.clock.install();
-  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
-  page.on("pageerror", (error) => errors.push(error.message));
   page.on("request", (request) => {
     const url = new URL(request.url());
     if (url.hostname !== "127.0.0.1") externalRequests.push(request.url());
@@ -287,8 +274,8 @@ async function keyboardActivate(page, selector) {
 }
 
 try {
-  const boundaryContext = await browser.newContext({ viewport: { width: 320, height: 568 } });
-  const boundaryPage = await boundaryContext.newPage();
+  const boundaryContext = await harness.context({ viewport: { width: 320, height: 568 } });
+  const { page: boundaryPage } = await harness.page(boundaryContext);
   await boundaryPage.goto(`http://127.0.0.1:${port}/house/`);
   await boundaryPage.waitForFunction(() => Boolean(window.__house));
   const audienceDialogBox = await boundaryPage.locator("#audienceDialog").boundingBox();
@@ -300,8 +287,8 @@ try {
   await boundaryContext.close();
 
   for (const [hash, heading] of [["#gallery", "galleryTitle"], ["#door/pattern-line", "categoryTitle"]]) {
-    const directContext = await browser.newContext({ viewport: { width: 320, height: 568 } });
-    const directPage = await directContext.newPage();
+    const directContext = await harness.context({ viewport: { width: 320, height: 568 } });
+    const { page: directPage } = await harness.page(directContext);
     await directPage.goto(`http://127.0.0.1:${port}/house/${hash}`);
     await directPage.waitForFunction(() => Boolean(window.__house));
     await directPage.click("#enterHouseButton");
@@ -659,7 +646,17 @@ try {
   await runner.page.screenshot({ path: resolve(output, "sector-sprint-prelude-375x812.png"), fullPage: true });
   await runner.page.click('[data-runner-route="action"]');
   await runner.page.waitForSelector("#runnerCanvas");
-  await runner.page.waitForFunction(() => document.querySelector("#runnerCanvas")?.dataset.art === "illustrated");
+  await runner.page.waitForFunction(
+    () => document.querySelector("#runnerCanvas")?.dataset.art === "illustrated",
+    null,
+    { polling: 50 },
+  ).catch(async (cause) => {
+    const evidence = await runner.page.evaluate(() => ({
+      canvas: { ...document.querySelector("#runnerCanvas")?.dataset },
+      sheetRequests: performance.getEntriesByType("resource").filter((entry) => entry.name.includes("sector-sprint-characters")).map((entry) => entry.name),
+    }));
+    throw new Error(`Sector Sprint character sheet did not become ready: ${JSON.stringify({ evidence, errors })}`, { cause });
+  });
   assert.deepEqual(await runner.page.locator("#runnerCanvas").evaluate((canvas) => ({
     width: canvas.width,
     height: canvas.height,
@@ -1155,7 +1152,8 @@ try {
   assert.equal(await deniedSound.page.evaluate(() => window.__house.active?.resolving), false, "denied audio cannot stall chapter progression");
   await deniedSound.context.close();
 
-  const night = await browser.newPage({ viewport: { width: 375, height: 812 } });
+  const nightContext = await harness.context({ viewport: { width: 375, height: 812 } });
+  const { page: night } = await harness.page(nightContext);
   const nightResponse = await night.goto(`http://127.0.0.1:${port}/play/`);
   assert.equal(nightResponse?.ok(), true, `Night response ${nightResponse?.status()}: ${(await night.locator("body").innerText()).slice(0, 200)}`);
   await night.waitForFunction(() => Boolean(window.__ct));
@@ -1171,9 +1169,7 @@ try {
   await cdp.send("Network.clearBrowserCache");
   await offline.page.close();
   await offline.context.setOffline(true);
-  const cold = await offline.context.newPage();
-  cold.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
-  cold.on("pageerror", (error) => errors.push(error.message));
+  const { page: cold } = await harness.page(offline.context);
   const coldResponse = await cold.goto(`http://127.0.0.1:${port}/house/`);
   assert.equal(coldResponse?.ok(), true);
   await cold.waitForFunction(() => Boolean(window.__house));
@@ -1184,7 +1180,5 @@ try {
   assert.deepEqual(errors, []);
   console.log("Nindova House adult boundary, five category doors and all eight five-part games, runner controls/narration, keyboard/nonvisual play, replacement provenance, corrupt recovery, responsive layout, Night isolation, and cold-start offline shell passed.");
 } finally {
-  await browser.close();
-  server.kill("SIGTERM");
-  await rm(previewRoot, { recursive: true, force: true });
+  await harness.close();
 }

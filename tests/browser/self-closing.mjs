@@ -1,19 +1,17 @@
 import assert from "node:assert/strict";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { chromium } from "playwright";
+import { createBrowserEvidenceHarness } from "./evidence-harness.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const source = pathToFileURL(resolve(root, "apps/session/dist/nindova.html")).href;
-const browser = await chromium.launch();
+const harness = await createBrowserEvidenceHarness();
 
 async function open(review = true) {
-  const context = await browser.newContext({ viewport: { width: 375, height: 812 } });
-  const page = await context.newPage();
-  const errors = [];
-  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
-  page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto(`${source}${review ? "?review=1" : ""}`);
+  const { context, page, errors } = await harness.open({
+    contextOptions: { viewport: { width: 375, height: 812 } },
+    target: `${source}${review ? "?review=1" : ""}`,
+  });
   await page.waitForFunction(() => Boolean(window.__ct));
   return { context, page, errors };
 }
@@ -79,7 +77,8 @@ try {
   await rolledBackClock.page.waitForFunction(() => window.__ct.state === "rest");
   assert.equal(await rolledBackClock.page.evaluate(() => window.__ct.endReason), "production-cap");
   await rolledBackClock.context.close();
+  assert.deepEqual(harness.errors, []);
   console.log("Rasoi hint, no-input, partial-input, selected-tile, clock-rollback, and production-boundary checks passed.");
 } finally {
-  await browser.close();
+  await harness.close();
 }

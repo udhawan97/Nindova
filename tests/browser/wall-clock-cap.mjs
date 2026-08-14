@@ -1,26 +1,12 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
 import { resolve } from "node:path";
-import { chromium } from "playwright";
+import { createBrowserEvidenceHarness } from "./evidence-harness.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const port = 4193;
-const server = spawn(process.execPath, [resolve(root, "scripts/serve.mjs"), resolve(root, "dist")], {
-  cwd: root,
-  env: { ...process.env, NINDOVA_PREVIEW_PORT: String(port) },
-  stdio: ["ignore", "pipe", "pipe"],
-});
-await new Promise((resolveReady, reject) => {
-  const timer = setTimeout(() => reject(new Error("preview server did not start")), 5_000);
-  server.once("error", reject);
-  server.stdout.on("data", (chunk) => { if (chunk.toString().includes("Nindova preview")) { clearTimeout(timer); resolveReady(); } });
-});
-
-const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 375, height: 812 } });
-const errors = [];
-page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
-page.on("pageerror", (error) => errors.push(error.message));
+const harness = await createBrowserEvidenceHarness({ root, previewRoot: resolve(root, "dist"), port });
+const opened = await harness.open({ contextOptions: { viewport: { width: 375, height: 812 } } });
+const { page, errors } = opened;
 
 try {
   await page.goto(`http://127.0.0.1:${port}/play/`);
@@ -46,6 +32,5 @@ try {
   assert.deepEqual(errors, []);
   console.log(JSON.stringify({ elapsedToEndSeconds, observedWallSeconds, resultAtEnd, errors }));
 } finally {
-  await browser.close();
-  server.kill("SIGTERM");
+  await harness.close();
 }

@@ -1,37 +1,19 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
 import { resolve } from "node:path";
 import jsQR from "jsqr";
 import { PNG } from "pngjs";
-import { chromium } from "playwright";
 import publicFacts from "../../public-facts.json" with { type: "json" };
+import { createBrowserEvidenceHarness } from "./evidence-harness.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const port = 4189;
 const mountPath = process.env.NINDOVA_PREVIEW_BASE?.replace(/^\/+|\/+$/g, "") ?? "";
-const server = spawn(process.execPath, [resolve(root, "scripts/serve.mjs"), resolve(root, "dist")], {
-  cwd: root,
-  env: { ...process.env, NINDOVA_PREVIEW_PORT: String(port) },
-  stdio: ["ignore", "pipe", "pipe"],
-});
-await new Promise((resolveReady, reject) => {
-  const timer = setTimeout(() => reject(new Error("preview server did not start")), 5_000);
-  server.once("error", reject);
-  server.stdout.on("data", (chunk) => { if (chunk.toString().includes("Nindova preview")) { clearTimeout(timer); resolveReady(); } });
-});
-
-const browser = await chromium.launch();
-const context = await browser.newContext({ viewport: { width: 375, height: 812 } });
-await context.addInitScript(() => {
+const harness = await createBrowserEvidenceHarness({ root, previewRoot: resolve(root, "dist"), port });
+const context = await harness.context({ viewport: { width: 375, height: 812 } }, [() => {
   class DeniedAudioContext { constructor() { throw new Error("audio unavailable in test"); } }
   Object.defineProperty(globalThis, "AudioContext", { configurable: true, value: DeniedAudioContext });
-});
-const page = await context.newPage();
-const errors = [];
-const requests = [];
-page.on("request", (request) => requests.push(request.url()));
-page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
-page.on("pageerror", (error) => errors.push(error.message));
+}]);
+const { page, errors, requests } = await harness.page(context);
 const prefix = `http://127.0.0.1:${port}/${mountPath ? `${mountPath}/` : ""}`;
 const base = `${prefix}play/`;
 
@@ -62,12 +44,12 @@ try {
   assert.equal(await page.locator(".table-directory li").count(), 5);
   assert.match(await page.locator('meta[property="og:image"]').getAttribute("content") ?? "", /\/Nindova\/brand\/nindova-og\.png$/);
   for (const href of [landingLinks.house, landingLinks.docs, landingLinks.standalone]) {
-    const linkedPage = await context.newPage();
+    const { page: linkedPage } = await harness.page(context);
     const response = await linkedPage.goto(new URL(href, prefix).href);
     assert.equal(response?.ok(), true);
     await linkedPage.close();
   }
-  const qrPage = await context.newPage();
+  const { page: qrPage } = await harness.page(context);
   await qrPage.setContent(`<img id="qr" src="${new URL(`${rootPath}play-qr.svg`, prefix).href}" alt="">`);
   await qrPage.locator("#qr").waitFor({ state: "visible" });
   const qrPng = PNG.sync.read(await qrPage.locator("#qr").screenshot());
@@ -81,13 +63,8 @@ try {
   }
 
   const houseBase = `${prefix}house/`;
-  const houseContext = await browser.newContext({ viewport: { width: 375, height: 812 } });
-  const housePage = await houseContext.newPage();
-  const houseErrors = [];
-  const houseRequests = [];
-  housePage.on("pageerror", (error) => houseErrors.push(error.message));
-  housePage.on("console", (message) => { if (message.type() === "error") houseErrors.push(message.text()); });
-  housePage.on("request", (request) => houseRequests.push(request.url()));
+  const houseContext = await harness.context({ viewport: { width: 375, height: 812 } });
+  const { page: housePage, errors: houseErrors, requests: houseRequests } = await harness.page(houseContext);
   await housePage.goto(prefix);
   await housePage.evaluate(async () => {
     const legacy = await caches.open("nindova-house-v3");
@@ -118,7 +95,7 @@ try {
   await houseCdp.send("Network.clearBrowserCache");
   await housePage.close();
   await houseContext.setOffline(true);
-  const coldHouse = await houseContext.newPage();
+  const { page: coldHouse } = await harness.page(houseContext);
   const coldHouseResponse = await coldHouse.goto(houseBase);
   assert.equal(coldHouseResponse?.ok(), true);
   await coldHouse.waitForFunction(() => Boolean(window.__house));
@@ -197,9 +174,7 @@ try {
   assert.equal(await page.evaluate(() => window.__ct.memory.tomorrowIntention.nightId === window.__ct.memory.lastCompleted.nightId), true);
 
   await context.setOffline(false);
-  const portable = await context.newPage();
-  const portableErrors = [];
-  portable.on("pageerror", (error) => portableErrors.push(error.message));
+  const { page: portable, errors: portableErrors } = await harness.page(context);
   await portable.goto(`${prefix}nindova.html?review=1`);
   await portable.waitForFunction(() => Boolean(window.__ct));
   assert.equal(await portable.locator('link[rel="manifest"]').count(), 0);
@@ -210,10 +185,9 @@ try {
   assert.deepEqual(portableErrors, []);
   assert.ok(requests.every((url) => new URL(url).origin === new URL(base).origin));
   assert.deepEqual(errors, []);
+  assert.deepEqual(harness.errors, []);
   console.log("House base-path cache migration/cold offline plus Rasoi PWA update, QR, license, resume, denied audio, offline closure, privacy, and standalone checks passed.");
 } finally {
   await context.setOffline(false).catch(() => {});
-  await context.close();
-  await browser.close();
-  server.kill("SIGTERM");
+  await harness.close();
 }

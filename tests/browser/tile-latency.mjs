@@ -1,9 +1,7 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
-import { createServer } from "node:net";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { chromium } from "playwright";
+import { createBrowserEvidenceHarness } from "./evidence-harness.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const cpuThrottle = Number(process.env.NINDOVA_CPU_THROTTLE ?? 1);
@@ -11,20 +9,7 @@ const explicitTarget = process.env.NINDOVA_LATENCY_URL;
 const targets = explicitTarget
   ? [["served route", explicitTarget]]
   : [["standalone", pathToFileURL(resolve(root, "apps/session/dist/nindova.html")).href]];
-let server = null;
-let browser = null;
-
-async function availablePort() {
-  return new Promise((resolvePort, reject) => {
-    const probe = createServer();
-    probe.once("error", reject);
-    probe.listen(0, "127.0.0.1", () => {
-      const address = probe.address();
-      assert.ok(address && typeof address !== "string");
-      probe.close(() => resolvePort(address.port));
-    });
-  });
-}
+const harness = await createBrowserEvidenceHarness(explicitTarget ? {} : { root, previewRoot: resolve(root, "dist") });
 
 async function tapTile(page, tileId) {
   const tile = page.locator(`[data-tile-id="${tileId}"]`);
@@ -40,16 +25,15 @@ async function elapsedUntil(predicate) {
 }
 
 async function measureTarget(label, href) {
-  assert.ok(browser, "browser should be available before measuring latency");
   const targetUrl = new URL(href);
   targetUrl.searchParams.set("review", "1");
-  const context = await browser.newContext({
+  const context = await harness.context({
     viewport: { width: 375, height: 812 },
     deviceScaleFactor: 3,
     hasTouch: true,
     isMobile: true,
   });
-  const page = await context.newPage();
+  const { page } = await harness.page(context);
   if (cpuThrottle > 1) {
     const devtools = await context.newCDPSession(page);
     await devtools.send("Emulation.setCPUThrottlingRate", { rate: cpuThrottle });
@@ -112,36 +96,10 @@ async function measureTarget(label, href) {
 
 try {
   if (!explicitTarget) {
-    const port = await availablePort();
-    server = spawn(process.execPath, [resolve(root, "scripts/serve.mjs"), resolve(root, "dist")], {
-      cwd: root,
-      env: { ...process.env, NINDOVA_PREVIEW_PORT: String(port) },
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-    await new Promise((resolveReady, reject) => {
-      let stderr = "";
-      const timer = setTimeout(() => reject(new Error("latency preview server did not start")), 5_000);
-      server.once("error", reject);
-      server.once("exit", (code) => {
-        clearTimeout(timer);
-        reject(new Error(`latency preview server exited with ${code}: ${stderr.trim()}`));
-      });
-      server.stderr.on("data", (chunk) => { stderr += chunk.toString(); });
-      server.stdout.on("data", (chunk) => {
-        if (chunk.toString().includes("Nindova preview")) {
-          clearTimeout(timer);
-          resolveReady();
-        }
-      });
-    });
-    targets.push(["PWA", `http://127.0.0.1:${port}/play/`]);
+    targets.push(["PWA", `${harness.origin}/play/`]);
   }
-  browser = await chromium.launch();
   for (const [label, target] of targets) await measureTarget(label, target);
+  assert.deepEqual(harness.errors, []);
 } finally {
-  await browser?.close();
-  if (server && server.exitCode === null) {
-    server.kill("SIGTERM");
-    await new Promise((resolveExit) => server.once("exit", resolveExit));
-  }
+  await harness.close();
 }

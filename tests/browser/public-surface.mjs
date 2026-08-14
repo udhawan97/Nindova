@@ -1,8 +1,7 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
 import { mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
-import { chromium } from "@playwright/test";
+import { createBrowserEvidenceHarness } from "./evidence-harness.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const output = resolve(root, "artifacts/public-surface");
@@ -11,31 +10,11 @@ const configuredBase = process.env.NINDOVA_PREVIEW_BASE?.replace(/^\/+|\/+$/g, "
 const prefix = configuredBase ? `/${configuredBase}/` : "/";
 const previewRoot = `http://127.0.0.1:${port}${prefix}`;
 await mkdir(output, { recursive: true });
-const server = spawn(process.execPath, [resolve(root, "scripts/serve.mjs"), resolve(root, "dist")], {
-  cwd: root,
-  env: { ...process.env, NINDOVA_PREVIEW_PORT: String(port) },
-  stdio: ["ignore", "pipe", "pipe"],
-});
-await new Promise((resolveReady, reject) => {
-  const timer = setTimeout(() => reject(new Error("preview server did not start")), 5_000);
-  server.once("error", reject);
-  server.stdout.on("data", (chunk) => {
-    if (chunk.toString().includes("Nindova preview")) {
-      clearTimeout(timer);
-      resolveReady();
-    }
-  });
-});
-
-const browser = await chromium.launch({ headless: true });
-const errors = [];
+const harness = await createBrowserEvidenceHarness({ root, previewRoot: resolve(root, "dist"), port, launchOptions: { headless: true } });
+const { errors } = harness;
 
 async function open(viewport, options = {}) {
-  const context = await browser.newContext({ viewport, ...options });
-  const page = await context.newPage();
-  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
-  page.on("pageerror", (error) => errors.push(error.message));
-  const response = await page.goto(previewRoot);
+  const { context, page, response } = await harness.open({ contextOptions: { viewport, ...options }, target: previewRoot });
   assert.equal(response?.ok(), true);
   await page.locator("header .brand-lockup").waitFor({ state: "visible" });
   return { context, page };
@@ -156,6 +135,5 @@ try {
   assert.deepEqual(errors, []);
   console.log(`Public site responsive, asset, docs, target-size, zoom, reduced-motion, keyboard, light/dark, and ${prefix} route checks passed.`);
 } finally {
-  await browser.close();
-  server.kill("SIGTERM");
+  await harness.close();
 }

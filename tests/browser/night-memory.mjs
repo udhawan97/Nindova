@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { chromium } from "playwright";
+import { createBrowserEvidenceHarness } from "./evidence-harness.mjs";
 
 await import("../../apps/session/dist/night-core.js");
 const Night = globalThis.NindovaNight;
@@ -9,12 +9,8 @@ const root = resolve(import.meta.dirname, "../..");
 const target = `${pathToFileURL(resolve(root, "apps/session/dist/nindova.html")).href}?review=1`;
 const activeSessionKey = "nindova:active-session:v4";
 const legacyActiveSessionKey = "nindova:active-session:v3";
-const browser = await chromium.launch();
-const context = await browser.newContext({ viewport: { width: 375, height: 812 } });
-const page = await context.newPage();
-const errors = [];
-page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
-page.on("pageerror", (error) => errors.push(error.message));
+const harness = await createBrowserEvidenceHarness();
+const { context, page, errors } = await harness.open({ contextOptions: { viewport: { width: 375, height: 812 } } });
 
 try {
   await page.goto(target);
@@ -178,6 +174,5 @@ try {
   assert.equal(Night.SCHEMA_VERSION, 3);
   console.log("Rasoi dismissal return, strict clock-bound resume, deterministic replay, and idempotent local memory checks passed.");
 } finally {
-  await context.close();
-  await browser.close();
+  await harness.close();
 }

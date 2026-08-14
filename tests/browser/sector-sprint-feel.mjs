@@ -1,30 +1,20 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
 import { cp, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { chromium } from "@playwright/test";
+import { createBrowserEvidenceHarness } from "./evidence-harness.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const port = 4207;
 const previewRoot = await mkdtemp(join(tmpdir(), "nindova-sector-feel-"));
 await cp(resolve(root, "dist"), previewRoot, { recursive: true });
 
-const server = spawn(process.execPath, [resolve(root, "scripts/serve.mjs"), previewRoot], {
-  cwd: root,
-  env: { ...process.env, NINDOVA_PREVIEW_PORT: String(port) },
-  stdio: ["ignore", "pipe", "pipe"],
-});
-
-await new Promise((resolveReady, reject) => {
-  const timer = setTimeout(() => reject(new Error("Sector Sprint preview did not start")), 5_000);
-  server.once("error", reject);
-  server.stdout.on("data", (chunk) => {
-    if (chunk.toString().includes("Nindova preview")) {
-      clearTimeout(timer);
-      resolveReady();
-    }
-  });
+const harness = await createBrowserEvidenceHarness({
+  root,
+  previewRoot,
+  port,
+  launchOptions: { headless: true },
+  cleanup: [() => rm(previewRoot, { recursive: true, force: true })],
 });
 
 const percentile = (values, amount) => {
@@ -32,15 +22,11 @@ const percentile = (values, amount) => {
   return ordered[Math.max(0, Math.ceil(ordered.length * amount) - 1)];
 };
 
-const browser = await chromium.launch({ headless: true });
-const errors = [];
+const { errors } = harness;
 
 async function openRunner(viewport, cpuRate = 1) {
-  const context = await browser.newContext({ viewport });
-  await context.addInitScript(() => localStorage.setItem("nindova:house:adult-audience:v1", "acknowledged"));
-  const page = await context.newPage();
-  page.on("console", (message) => { if (message.type() === "error") errors.push(`console: ${message.text()}`); });
-  page.on("pageerror", (error) => errors.push(`page: ${error.message}`));
+  const context = await harness.context({ viewport }, [() => localStorage.setItem("nindova:house:adult-audience:v1", "acknowledged")]);
+  const { page } = await harness.page(context, { errorPrefix: "Sector Sprint: " });
   if (cpuRate > 1) {
     const cdp = await context.newCDPSession(page);
     await cdp.send("Emulation.setCPUThrottlingRate", { rate: cpuRate });
@@ -169,7 +155,5 @@ try {
     desktopFrameP95Ms: Number(percentile(desktopFrames, 0.95).toFixed(2)),
   }));
 } finally {
-  await browser.close();
-  server.kill("SIGTERM");
-  await rm(previewRoot, { recursive: true, force: true });
+  await harness.close();
 }

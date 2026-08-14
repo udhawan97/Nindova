@@ -2,24 +2,18 @@ import assert from "node:assert/strict";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { PNG } from "pngjs";
-import { chromium } from "playwright";
+import { createBrowserEvidenceHarness } from "./evidence-harness.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const target = `${pathToFileURL(resolve(root, "apps/session/dist/nindova.html")).href}?review=1`;
-const browser = await chromium.launch();
-
-function watchPage(page, errors) {
-  page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
-  page.on("pageerror", (error) => errors.push(error.message));
-}
+const harness = await createBrowserEvidenceHarness();
 
 async function open(options = {}) {
   const { profile = "gentle", ...contextOptions } = options;
-  const context = await browser.newContext({ viewport: { width: 375, height: 812 }, ...contextOptions });
-  const page = await context.newPage();
-  const errors = [];
-  watchPage(page, errors);
-  await page.goto(target);
+  const { context, page, errors } = await harness.open({
+    contextOptions: { viewport: { width: 375, height: 812 }, ...contextOptions },
+    target,
+  });
   await page.waitForFunction(() => Boolean(window.__ct));
   await page.check(`input[name="rasoi-profile"][value="${profile}"]`);
   await page.click("#beginBtn");
@@ -43,8 +37,7 @@ function meanLuminance(buffer) {
 }
 
 async function recordedOpeningChime(reverse) {
-  const context = await browser.newContext({ viewport: { width: 375, height: 812 } });
-  await context.addInitScript(() => {
+  const context = await harness.context({ viewport: { width: 375, height: 812 } }, [() => {
     globalThis.__toneFrequencies = [];
     class FakeParam {
       setValueAtTime() {}
@@ -66,8 +59,8 @@ async function recordedOpeningChime(reverse) {
       }
     }
     Object.defineProperty(globalThis, "AudioContext", { configurable: true, value: FakeAudioContext });
-  });
-  const page = await context.newPage();
+  }]);
+  const { page } = await harness.page(context);
   await page.goto(target);
   await page.waitForFunction(() => Boolean(window.__ct));
   await page.check('input[name="rasoi-profile"][value="deeper"]');
@@ -150,8 +143,7 @@ try {
   assert.match(await normal.page.locator("#rest").innerText(), /Put the phone down/);
   assert.equal(await normal.page.locator("#rest button").count(), 0);
   await normal.page.close();
-  normal.page = await normal.context.newPage();
-  watchPage(normal.page, normal.errors);
+  normal.page = (await harness.page(normal.context)).page;
   await normal.page.goto(target);
   await normal.page.waitForFunction(() => Boolean(window.__ct));
   assert.equal(await normal.page.evaluate(() => window.__ct.state), "intake");
@@ -230,7 +222,8 @@ try {
   assert.deepEqual(reduced.errors, []);
   await reduced.context.close();
 
+  assert.deepEqual(harness.errors, []);
   console.log("Gentle/Deeper occlusion, brass bloom, optional Image Drift, reduced motion, Rest, and deliberate same-night return passed.");
 } finally {
-  await browser.close();
+  await harness.close();
 }
