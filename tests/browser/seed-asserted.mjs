@@ -27,14 +27,16 @@ try {
   assert.equal(await page.evaluate(() => window.__ct.legalPairs.length), 3);
   await page.screenshot({ path: resolve(output, "02-board.png") });
 
-  while (await page.evaluate(() => window.__ct.state === "play")) {
-    await page.evaluate(() => {
+  let stateAfterSelection = "play";
+  while (stateAfterSelection === "play") {
+    stateAfterSelection = await page.evaluate(() => {
       const pair = window.__ct.legalPairs[0];
       window.__ct.selectTile(pair[0]);
       window.__ct.selectTile(pair[1]);
+      return window.__ct.state;
     });
   }
-  assert.equal(await page.evaluate(() => window.__ct.state), "settling");
+  assert.equal(stateAfterSelection, "settling");
   states.push("settling");
   await page.waitForFunction(() => window.__ct.state === "end");
   states.push("end");
