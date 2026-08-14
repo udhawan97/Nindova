@@ -6,51 +6,120 @@ import { chromium } from "@playwright/test";
 async function availablePort() {
   return new Promise((resolvePort, reject) => {
     const probe = createServer();
-    probe.once("error", reject);
+    let settled = false;
+    const finish = ({ error, port }) => {
+      if (settled) return;
+      settled = true;
+      probe.removeListener("error", fail);
+      const complete = (closeError) => {
+        if (error || closeError) reject(error ?? closeError);
+        else resolvePort(port);
+      };
+      if (probe.listening) probe.close(complete);
+      else complete();
+    };
+    const fail = (error) => finish({ error });
+    probe.once("error", fail);
     probe.listen(0, "127.0.0.1", () => {
       const address = probe.address();
       if (!address || typeof address === "string") {
-        reject(new Error("preview port probe returned no TCP address"));
+        finish({ error: new Error("preview port probe returned no TCP address") });
         return;
       }
-      probe.close(() => resolvePort(address.port));
+      finish({ port: address.port });
     });
   });
 }
 
-async function startPreview({ root, previewRoot, port, environment = {}, readyText = "Nindova preview" }) {
+async function waitForPreviewReady(server, readyText) {
+  await new Promise((resolveReady, reject) => {
+    let stderr = "";
+    const finish = (outcome, value) => {
+      clearTimeout(timer);
+      server.removeListener("error", fail);
+      server.removeListener("exit", exit);
+      server.stderr.removeListener("data", stderrData);
+      server.stdout.removeListener("data", stdoutData);
+      outcome(value);
+    };
+    const fail = (error) => finish(reject, error);
+    const exit = (code) => fail(new Error(`preview server exited with ${code}: ${stderr.trim()}`));
+    const stderrData = (chunk) => { stderr += chunk.toString(); };
+    const stdoutData = (chunk) => {
+      if (chunk.toString().includes(readyText)) finish(resolveReady);
+    };
+    const timer = setTimeout(
+      () => fail(new Error(`preview server did not start: ${stderr.trim()}`)),
+      5_000,
+    );
+    server.once("error", fail);
+    server.once("exit", exit);
+    server.stderr.on("data", stderrData);
+    server.stdout.on("data", stdoutData);
+  });
+}
+
+async function startPreview(
+  { root, previewRoot, port, environment = {}, readyText = "Nindova preview" },
+  { spawnProcess = spawn, awaitReady = waitForPreviewReady } = {},
+) {
   const selectedPort = port ?? await availablePort();
-  const server = spawn(process.execPath, [resolve(root, "scripts/serve.mjs"), previewRoot], {
+  const server = spawnProcess(process.execPath, [resolve(root, "scripts/serve.mjs"), previewRoot], {
     cwd: root,
     env: { ...process.env, ...environment, NINDOVA_PREVIEW_PORT: String(selectedPort) },
     stdio: ["ignore", "pipe", "pipe"],
   });
-  await new Promise((resolveReady, reject) => {
-    let stderr = "";
-    const timer = setTimeout(() => reject(new Error(`preview server did not start: ${stderr.trim()}`)), 5_000);
-    const fail = (error) => {
-      clearTimeout(timer);
-      reject(error);
-    };
-    server.once("error", fail);
-    server.once("exit", (code) => fail(new Error(`preview server exited with ${code}: ${stderr.trim()}`)));
-    server.stderr.on("data", (chunk) => { stderr += chunk.toString(); });
-    server.stdout.on("data", (chunk) => {
-      if (!chunk.toString().includes(readyText)) return;
-      clearTimeout(timer);
-      server.removeListener("error", fail);
-      resolveReady();
-    });
-  });
+  try {
+    await awaitReady(server, readyText);
+  } catch (error) {
+    const cleanupErrors = await attemptAll([() => stopPreview(server)]);
+    if (cleanupErrors.length > 0) {
+      throw new AggregateError([error, ...cleanupErrors], "Preview startup and rollback both failed");
+    }
+    throw error;
+  }
   return { server, port: selectedPort };
 }
 
 async function stopPreview(server) {
-  if (!server || server.exitCode !== null) return;
-  const exited = new Promise((resolveExit) => server.once("exit", resolveExit));
+  if (!server) return;
+  const hasExited = () => server.exitCode !== null || server.signalCode != null;
+  if (hasExited()) return;
+  const waitForExit = () => new Promise((resolveExit) => {
+    const finish = (exited) => {
+      clearTimeout(timer);
+      server.removeListener("exit", onExit);
+      resolveExit(exited);
+    };
+    const onExit = () => finish(true);
+    const timer = setTimeout(() => finish(false), 2_000);
+    server.once("exit", onExit);
+    if (hasExited()) finish(true);
+  });
+  const termExit = waitForExit();
   server.kill("SIGTERM");
-  await Promise.race([exited, new Promise((resolveWait) => setTimeout(resolveWait, 2_000))]);
-  if (server.exitCode === null) server.kill("SIGKILL");
+  if (await termExit || hasExited()) return;
+  const killExit = waitForExit();
+  server.kill("SIGKILL");
+  if (await killExit || hasExited()) return;
+  throw new Error("preview server did not exit after SIGKILL");
+}
+
+async function attemptAll(actions) {
+  const failures = [];
+  for (const action of actions) {
+    try {
+      await action();
+    } catch (error) {
+      failures.push(error);
+    }
+  }
+  return failures;
+}
+
+function throwFailures(failures, message) {
+  if (failures.length === 1) throw failures[0];
+  if (failures.length > 1) throw new AggregateError(failures, message);
 }
 
 function normalizeAdapter(adapter) {
@@ -64,13 +133,36 @@ export async function createBrowserEvidenceHarness({
   previewEnvironment,
   launchOptions = {},
   cleanup = [],
+} = {}, {
+  spawnProcess = spawn,
+  awaitPreviewReady = waitForPreviewReady,
+  launchBrowser = (options) => chromium.launch(options),
 } = {}) {
-  const preview = previewRoot ? await startPreview({ root, previewRoot, port, environment: previewEnvironment }) : null;
-  const browser = await chromium.launch(launchOptions);
+  let preview = null;
+  let browser = null;
+  try {
+    preview = previewRoot
+      ? await startPreview(
+        { root, previewRoot, port, environment: previewEnvironment },
+        { spawnProcess, awaitReady: awaitPreviewReady },
+      )
+      : null;
+    browser = await launchBrowser(launchOptions);
+  } catch (error) {
+    const rollbackFailures = await attemptAll([
+      () => browser?.close(),
+      () => stopPreview(preview?.server),
+      ...cleanup.toReversed(),
+    ]);
+    if (rollbackFailures.length > 0) {
+      throw new AggregateError([error, ...rollbackFailures], "Browser evidence startup and rollback failed");
+    }
+    throw error;
+  }
   const contexts = new Set();
   const errors = [];
   const requests = [];
-  let closed = false;
+  let closePromise = null;
 
   async function adapt(browserContext, candidate) {
     const adapter = normalizeAdapter(candidate);
@@ -116,13 +208,17 @@ export async function createBrowserEvidenceHarness({
     return { context: browserContext, ...opened, response };
   }
 
-  async function close() {
-    if (closed) return;
-    closed = true;
-    await Promise.allSettled([...contexts].map((browserContext) => browserContext.close()));
-    await browser.close();
-    await stopPreview(preview?.server);
-    for (const dispose of cleanup.toReversed()) await dispose();
+  function close() {
+    closePromise ??= (async () => {
+      const failures = await attemptAll([
+        ...[...contexts].map((browserContext) => () => browserContext.close()),
+        () => browser.close(),
+        () => stopPreview(preview?.server),
+        ...cleanup.toReversed(),
+      ]);
+      throwFailures(failures, "Browser evidence teardown failed");
+    })();
+    return closePromise;
   }
 
   return Object.freeze({

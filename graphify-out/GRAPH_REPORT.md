@@ -1,16 +1,16 @@
 # Graph Report - nindova-integration.d0xWn8  (2026-08-13)
 
 ## Corpus Check
-- 145 files · ~179,123 words
+- 145 files · ~180,037 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1259 nodes · 1706 edges · 124 communities (94 shown, 30 thin omitted)
-- Extraction: 92% EXTRACTED · 8% INFERRED · 0% AMBIGUOUS · INFERRED: 137 edges (avg confidence: 0.73)
+- 1265 nodes · 1717 edges · 125 communities (93 shown, 32 thin omitted)
+- Extraction: 92% EXTRACTED · 8% INFERRED · 0% AMBIGUOUS · INFERRED: 136 edges (avg confidence: 0.73)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `b7c2fce9`
+- Built from commit: `eee96e9c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -90,14 +90,15 @@
 - Nindova v0.4.2 — Clean Return
 - chapterView
 - house-session-codec.ts
-- Conservative product constraints
+- Visual system
 - Nindova v0.4.3 — Held Boundaries
 - Deepen House boundaries and browser evidence
-- 2. Evening light, arousal, and media displacement
+- Board contract
 - playChime
-- Claim language
 - browser-evidence-harness.test.mjs
 - salon-table-lifecycle.test.mjs
+- public-surface.mjs
+- self-closing.mjs
 - serve.mjs
 - seed-asserted.mjs
 - sector-sprint.test.mjs
@@ -134,8 +135,8 @@
 ## God Nodes (most connected - your core abstractions)
 1. `scripts` - 29 edges
 2. `drawRunnerFrame()` - 23 edges
-3. `Bedtime game evidence brief` - 17 edges
-4. `createBrowserEvidenceHarness()` - 15 edges
+3. `createBrowserEvidenceHarness()` - 17 edges
+4. `Bedtime game evidence brief` - 17 edges
 5. `escape()` - 14 edges
 6. `GRAND_SALON` - 14 edges
 7. `renderGame()` - 13 edges
@@ -172,15 +173,15 @@
 - **Rasoi Dawn Visual Composition** — apps_site_public_media_rasoi_dawn_rasoi_dawn_image, apps_site_public_media_rasoi_dawn_first_light_kitchen, apps_site_public_media_rasoi_dawn_brass_plate_arrangement, apps_site_public_media_rasoi_dawn_warm_dawn_palette [INFERRED 0.95]
 - **Bounded Session Decision and Proof** — reference_nindova_master_brief_two_loop_law, reference_nindova_demo_fixed_session_state_arc, docs_adr_0005_cap_the_real_session_at_fifteen_minutes_fifteen_minute_session_cap [INFERRED 0.95]
 
-## Communities (124 total, 30 thin omitted)
+## Communities (125 total, 32 thin omitted)
 
 ### Community 0 - "session.ts"
-Cohesion: 0.05
-Nodes (75): RasoiDebug, RasoiTileSnapshot, SessionState, Window, NindovaDawn, NindovaNight, NindovaRasoi, RasoiBoard (+67 more)
+Cohesion: 0.06
+Nodes (69): NindovaDawn, NindovaNight, NindovaRasoi, advanceBy(), anchorSessionClock(), animatePair(), beginSession(), boardElement (+61 more)
 
 ### Community 1 - "rasoi-core.ts"
-Cohesion: 0.12
-Nodes (29): activeTiles(), availabilityReason(), BoardVerification, createBoard(), createPrng(), DEEPER_LAYOUT, freeTiles(), GENTLE_LAYOUT (+21 more)
+Cohesion: 0.07
+Nodes (35): RasoiDebug, RasoiTileSnapshot, SessionState, Window, activeTiles(), availabilityReason(), BoardVerification, createBoard() (+27 more)
 
 ### Community 2 - "classic-studies.ts"
 Cohesion: 0.07
@@ -259,8 +260,8 @@ Cohesion: 0.15
 Nodes (8): completeRunnerStory(), completeStackGame(), enterRunnerNarrated(), externalRequests, hanoiMoves(), output, publishedHouseText, root
 
 ### Community 21 - "Bedtime game evidence brief"
-Cohesion: 0.14
-Nodes (14): 0. Why sleep matters—and how to say it without fear, 1. Interactive screen games and sleepiness, 3. Cognitive distraction and serial diverse imagining, 4. Memory evidence: pair matching is not general memory improvement, 5. Why “dopamine effect” is not supportable, 6. Why rankings, streaks and weekly performance are the wrong layer, 7. Candidate post-board transitions, 8. Open-source reference-product scan (+6 more)
+Cohesion: 0.07
+Nodes (27): 0. Why sleep matters—and how to say it without fear, 1. Interactive screen games and sleepiness, 2. Evening light, arousal, and media displacement, 3. Cognitive distraction and serial diverse imagining, 4. Memory evidence: pair matching is not general memory improvement, 5. Why “dopamine effect” is not supportable, 6. Why rankings, streaks and weekly performance are the wrong layer, 7. Candidate post-board transitions (+19 more)
 
 ### Community 22 - "dawn.mjs"
 Cohesion: 0.18
@@ -303,8 +304,8 @@ Cohesion: 0.17
 Nodes (12): Rasoi Legality Kernel, Known Evidence and Product Limits, Universal 343-state Board Guarantee, Voluntary Pair-removal Session Path, Mahjong-solitaire Rule Inspiration, Rasoi Pairs Session Arc, Semantic Safe-pair Hint, Twelve-minute Settle and Fifteen-minute Ceiling (+4 more)
 
 ### Community 32 - "Layered Rasoi plan"
-Cohesion: 0.12
-Nodes (17): Acceptance gates, Availability, Board contract, Desktop wireframe, Experience sequence, Explicitly out, Feedback contract, Geometry (+9 more)
+Cohesion: 0.25
+Nodes (8): Acceptance gates, Experience sequence, Explicitly out, Feedback contract, Layered Rasoi plan, Open access, Outcome, Rest and replay contract
 
 ### Community 33 - "Quiet Depth plan"
 Cohesion: 0.18
@@ -339,7 +340,7 @@ Cohesion: 0.22
 Nodes (9): First-Light Dawn Surface, Browser Dismissal Surface, Voluntary Intake Surface, Quiet End Card, Rasoi Pairs Session Interface, Semantic Rasoi Board, Local Dawn Keepsake Exports, Deferred iOS Wall (+1 more)
 
 ### Community 41 - "Group the Grand Salon and add sourced classic rule studies"
-Cohesion: 0.22
+Cohesion: 0.25
 Nodes (8): Aadu Puli Aattam, Deferred candidates, Evidence boundary, Group the Grand Salon and add sourced classic rule studies, Navakankari, Pallanguzhi, Product and state constraints, Selected rulesets and boundaries
 
 ### Community 42 - "Nindova Asset Manifest"
@@ -411,15 +412,15 @@ Cohesion: 0.33
 Nodes (5): houseOutput, output, root, sessionOutput, siteOutput
 
 ### Community 61 - "evidence-harness.mjs"
-Cohesion: 0.14
-Nodes (9): availablePort(), createBrowserEvidenceHarness(), startPreview(), root, output, root, root, root (+1 more)
+Cohesion: 0.26
+Nodes (7): attemptAll(), availablePort(), createBrowserEvidenceHarness(), startPreview(), stopPreview(), root, root
 
 ### Community 63 - "visual-identity.md"
 Cohesion: 0.40
 Nodes (4): Masala Mound silhouettes, Motion and provenance, Phulkari lattice, Shahi Raat palette
 
 ### Community 64 - "bedtime-game-evidence.md"
-Cohesion: 0.25
+Cohesion: 0.22
 Nodes (3): Add the adult Nindova House while preserving the Night Room, Add a fail-closed assessment-readiness contract, Third-party notices
 
 ### Community 65 - "0017-make-sector-sprint-a-one-hit-jetpack-gauntlet.md"
@@ -462,9 +463,9 @@ Nodes (9): chapterView(), describeAaduChapter(), describeAaduOption(), describeN
 Cohesion: 0.36
 Nodes (6): HOUSE_ACTIVE_SESSION_CODEC, ActiveDecodeResult, ActiveGame, ActiveSessionCodec, decodeSectorSprintActive(), encodeSectorSprintActive()
 
-### Community 75 - "Conservative product constraints"
-Cohesion: 0.33
-Nodes (6): Accessibility and trust, Challenge, Conservative product constraints, Light and transition away from the screen, Match feedback, Session and stopping
+### Community 75 - "Visual system"
+Cohesion: 0.40
+Nodes (5): Desktop wireframe, Phone wireframe, Self-critique, Tokens, Visual system
 
 ### Community 76 - "Nindova v0.4.3 — Held Boundaries"
 Cohesion: 0.40
@@ -474,17 +475,13 @@ Nodes (4): Evidence boundary, Highlights, Nindova v0.4.3 — Held Boundaries, Re
 Cohesion: 0.50
 Nodes (3): Deepen House boundaries and browser evidence, Evidence boundary, Preserved product constraints
 
-### Community 78 - "2. Evening light, arousal, and media displacement"
+### Community 78 - "Board contract"
 Cohesion: 0.50
-Nodes (4): 2. Evening light, arousal, and media displacement, Cognitive and emotional arousal, Light, Time displacement and bedtime boundaries
+Nodes (4): Availability, Board contract, Geometry, Solvability
 
 ### Community 79 - "playChime"
 Cohesion: 1.00
 Nodes (3): playChime(), playSectorTone(), playToneSequence()
-
-### Community 80 - "Claim language"
-Cohesion: 0.67
-Nodes (3): Allowed when the implementation is true, Claim language, Not supported
 
 ### Community 85 - "serve.mjs"
 Cohesion: 0.40
@@ -517,21 +514,21 @@ Nodes (3): Cultural Visual Guardrails, Punjabi and Indian Material World, Theme 
 ## Knowledge Gaps
 - **539 isolated node(s):** `name`, `version`, `license`, `private`, `type` (+534 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **30 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **32 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `createHouseNavigation()` connect `house-navigation.test.mjs` to `session.ts`, `house.ts`, `salon-catalog.ts`?**
-  _High betweenness centrality (0.142) - this node is a cross-community bridge._
+  _High betweenness centrality (0.084) - this node is a cross-community bridge._
 - **Why does `settle()` connect `session.ts` to `house-navigation.test.mjs`?**
-  _High betweenness centrality (0.095) - this node is a cross-community bridge._
+  _High betweenness centrality (0.073) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `license` to the rest of the system?**
   _539 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `session.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.05034199726402189 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06416275430359937 - nodes in this community are weakly interconnected._
 - **Should `rasoi-core.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.11724137931034483 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07293868921775898 - nodes in this community are weakly interconnected._
 - **Should `classic-studies.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.06951871657754011 - nodes in this community are weakly interconnected._
 - **Should `Rasoi Pairs Redesign Evidence` be split into smaller, more focused modules?**

@@ -35,4 +35,4 @@ npm run test:wall-clock
 
 Interface changes also require visual inspection at phone and desktop widths. Automation cannot close the current real-device screen-reader or Punjabi cultural-review limitations.
 
-All twelve browser journey modules share `tests/browser/evidence-harness.mjs` for preview, Chromium context, capability adapters, failure/request capture, and guaranteed teardown. Journey code remains responsible for user-visible behavior and assertions; the harness is not product authority.
+All twelve browser journey modules share `tests/browser/evidence-harness.mjs` for preview, Chromium context, capability adapters, failure/request capture, and fail-clean teardown that attempts every owned resource. Journey code remains responsible for user-visible behavior and assertions; the harness is not product authority.

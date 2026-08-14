@@ -9,7 +9,7 @@ Nindova deepens those seams behind four local modules:
 1. `house-navigation.ts` owns a complete destination transaction: route parsing and writing, History depth, requested and cancelled exit destinations, consent, game teardown, scroll restoration, and focus return.
 2. `salon-table-lifecycle.ts` owns opening, restore, meaningful-progress policy, kind-specific interaction, chapter advance, focus policy, runner synchronization, and active-table persistence.
 3. `sector-sprint-table.ts` owns the production browser protocol around the pure Sector Sprint engine. The House consumes only `start`, `view`, `afterRender`, `setExitSuspended`, and `close`.
-4. `tests/browser/evidence-harness.mjs` owns local preview startup, Chromium launch, contexts, capability adapters, console/page failure capture, request capture, and guaranteed teardown. Journey files retain only product setup and assertions.
+4. `tests/browser/evidence-harness.mjs` owns local preview startup, Chromium launch, contexts, capability adapters, console/page failure capture, request capture, and fail-clean teardown that attempts every owned resource. Journey files retain only product setup and assertions.
 
 These interfaces are deliberately local. They do not introduce a framework, dependency, service, shared global event bus, generalized router, or test mock server. The House shell still composes markup and presentation. The state store and codecs remain separate authorities for schema validation and browser storage.
 
