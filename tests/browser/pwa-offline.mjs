@@ -21,7 +21,7 @@ try {
   await page.goto(prefix);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 375);
   const publicCopy = await page.locator("body").innerText();
-  assert.match(publicCopy, /Five doors\.\s+Eight clean endings\./);
+  assert.match(publicCopy, /Five doors\.\s+Eight authored endings\./);
   assert.ok(publicCopy.includes("no account · no comparison · no app telemetry"));
   const rootPath = mountPath ? `/${mountPath}/` : "/";
   const landingLinks = {
@@ -78,11 +78,11 @@ try {
   const houseRegistration = await housePage.evaluate(async () => {
     const ready = await navigator.serviceWorker.ready;
     const keys = await caches.keys();
-    const cache = await caches.open("nindova-house-v9");
+    const cache = await caches.open("nindova-house-v10");
     return { scope: ready.scope, keys, entries: (await cache.keys()).map((request) => request.url) };
   });
   assert.equal(houseRegistration.scope, houseBase);
-  assert.ok(houseRegistration.keys.includes("nindova-house-v9"));
+  assert.ok(houseRegistration.keys.includes("nindova-house-v10"));
   assert.equal(houseRegistration.keys.includes("nindova-house-v3"), false);
   assert.ok(houseRegistration.entries.length > 0);
   const cachedRunnerSheet = houseRegistration.entries.find((url) => /sector-sprint-characters-.*\.png$/.test(url));

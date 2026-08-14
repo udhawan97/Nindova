@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.4.3 — 2026-08-13
+
+### Changed
+
+- Concentrated House hash, History, unfinished-table consent, scroll restoration, and focus return into one navigation transaction.
+- Moved Grand Salon opening, restore, progress, table-kind interaction, chapter advance, focus policy, and persistence into one lifecycle module.
+- Reduced the House-facing Sector Sprint interface to five operations while preserving its fixed route, foreground boundary, narrated parity, optional inputs, and fail-closed reload.
+- Centralized preview, Chromium context, capability adapters, failure/request capture, and teardown for all twelve browser journeys without mocking product routes.
+- Reframed the README and public site around one verified promise—every room knows when to close—and synchronized the Starlight docs, architecture decision, source-rendered media, social card, release facts, and House cache.
+
+### Verified
+
+- Added direct navigation-transaction and architecture ownership tests, then reran all eight rendered House completions, Sector Sprint Action/Narrated and feel paths, standalone and PWA journeys, local-state recovery, responsive/zoom/reduced-motion surfaces, same-origin request capture, and cold-offline entry.
+
+### Not added
+
+- No game, authored answer, state schema, score, streak, rank, visible timer, collection, randomized reward, assessment output, telemetry, or third-party runtime request.
+- No native installer or iOS Wall; no claim of human enjoyment, sleep or memory benefit, cultural authenticity, or real-device assistive-technology acceptance.
+
 ## 0.4.2 — 2026-08-13
 
 ### Fixed
