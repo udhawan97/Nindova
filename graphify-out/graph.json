@@ -8071,7 +8071,7 @@
       "label": ".removeItem()",
       "file_type": "code",
       "source_file": "tests/browser/house.mjs",
-      "source_location": "L1016",
+      "source_location": "L1025",
       "_origin": "ast",
       "id": "tests_browser_house_storage_removeitem",
       "community": 129,
@@ -8082,7 +8082,7 @@
       "label": ".setItem()",
       "file_type": "code",
       "source_file": "tests/browser/house.mjs",
-      "source_location": "L1020",
+      "source_location": "L1029",
       "_origin": "ast",
       "id": "tests_browser_house_storage_setitem",
       "community": 130,
@@ -34112,5 +34112,5 @@
       "source_file": "reference/nindova-master-brief.md"
     }
   ],
-  "built_at_commit": "fa8593520122f6d8067bed856db46ba09252ca35"
+  "built_at_commit": "b7c2fce9001ebad1ac779bb1d0a50586056aff97"
 }
