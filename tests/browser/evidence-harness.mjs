@@ -164,6 +164,16 @@ export async function createBrowserEvidenceHarness({
   const requests = [];
   let closePromise = null;
 
+  async function failClosed(error, message) {
+    try {
+      await close();
+    } catch (teardownError) {
+      const teardownFailures = teardownError instanceof AggregateError ? teardownError.errors : [teardownError];
+      throw new AggregateError([error, ...teardownFailures], message);
+    }
+    throw error;
+  }
+
   async function adapt(browserContext, candidate) {
     const adapter = normalizeAdapter(candidate);
     if (adapter.argument === undefined) await browserContext.addInitScript(adapter.script);
@@ -171,11 +181,15 @@ export async function createBrowserEvidenceHarness({
   }
 
   async function context(contextOptions = {}, adapters = []) {
-    const browserContext = await browser.newContext(contextOptions);
-    contexts.add(browserContext);
-    browserContext.on("close", () => contexts.delete(browserContext));
-    for (const adapter of adapters) await adapt(browserContext, adapter);
-    return browserContext;
+    try {
+      const browserContext = await browser.newContext(contextOptions);
+      contexts.add(browserContext);
+      browserContext.on("close", () => contexts.delete(browserContext));
+      for (const adapter of adapters) await adapt(browserContext, adapter);
+      return browserContext;
+    } catch (error) {
+      return failClosed(error, "Browser context acquisition and teardown failed");
+    }
   }
 
   function watchPage(page, { errorPrefix = "" } = {}) {
@@ -196,15 +210,26 @@ export async function createBrowserEvidenceHarness({
   }
 
   async function page(browserContext, options = {}) {
-    const browserPage = await browserContext.newPage();
-    const evidence = watchPage(browserPage, options);
-    return { page: browserPage, ...evidence };
+    try {
+      const browserPage = await browserContext.newPage();
+      const evidence = watchPage(browserPage, options);
+      return { page: browserPage, ...evidence };
+    } catch (error) {
+      return failClosed(error, "Browser page acquisition and teardown failed");
+    }
   }
 
   async function open({ contextOptions = {}, adapters = [], pageOptions = {}, target, gotoOptions } = {}) {
     const browserContext = await context(contextOptions, adapters);
     const opened = await page(browserContext, pageOptions);
-    const response = target ? await opened.page.goto(target, gotoOptions) : null;
+    let response = null;
+    if (target) {
+      try {
+        response = await opened.page.goto(target, gotoOptions);
+      } catch (error) {
+        return failClosed(error, "Browser navigation acquisition and teardown failed");
+      }
+    }
     return { context: browserContext, ...opened, response };
   }
 

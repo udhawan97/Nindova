@@ -380,8 +380,8 @@
     "semantic_hash": ""
   },
   "docs/PUBLIC-SURFACE-EVIDENCE.md": {
-    "mtime": 1786670640.6824055,
-    "ast_hash": "e939679e231ce639d880d568da26319e",
+    "mtime": 1786672190.7943656,
+    "ast_hash": "dc5825ebd94522af44d5d30719ca6c81",
     "semantic_hash": ""
   },
   "docs/REDESIGN-PLAN.md": {
@@ -455,7 +455,7 @@
     "semantic_hash": "d82b998ec66d551fbdb0ae2215ebc8d1"
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1786671336.4302611,
+    "mtime": 1786672284.869642,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": "9557448d4a3c6237efa8fe2648d21fa0"
   },
@@ -995,13 +995,13 @@
     "semantic_hash": ""
   },
   "tests/browser/evidence-harness.mjs": {
-    "mtime": 1786671310.746842,
-    "ast_hash": "ac126734f8b8f7f98f55c88e105f7497",
+    "mtime": 1786672150.8876994,
+    "ast_hash": "0ebc2506a75da5e35555f1a648b26e6f",
     "semantic_hash": ""
   },
   "tests/unit/browser-evidence-harness.test.mjs": {
-    "mtime": 1786671226.4253533,
-    "ast_hash": "92330a01910ca15b27eaaa22d2b4b16f",
+    "mtime": 1786672190.7932045,
+    "ast_hash": "35c5a6a05bd6c3a22eff20ef0a71dbb5",
     "semantic_hash": ""
   },
   "tests/unit/house-navigation.test.mjs": {
@@ -1020,8 +1020,8 @@
     "semantic_hash": ""
   },
   "docs/releases/v0.4.3.md": {
-    "mtime": 1786670640.6839077,
-    "ast_hash": "c59a94322d19209c6b40de0ba063d5c7",
+    "mtime": 1786672190.7963567,
+    "ast_hash": "a0c7aeb675595efdbb045d7f94a6fa80",
     "semantic_hash": ""
   }
 }

@@ -91,6 +91,102 @@ test("failed browser launch rolls back the ready preview and every cleanup actio
   assert.deepEqual(events, ["preview:ready", "preview:SIGTERM", "cleanup:last", "cleanup:first"]);
 });
 
+test("failed browser-context acquisition closes the harness before caller cleanup exists", async () => {
+  const events = [];
+  const harness = await createBrowserEvidenceHarness({
+    root,
+    previewRoot: "dist",
+    port: 41_004,
+    cleanup: [async () => { events.push("cleanup"); }],
+  }, {
+    spawnProcess: () => previewProcess(events),
+    awaitPreviewReady: async () => { events.push("preview:ready"); },
+    launchBrowser: async () => ({
+      async newContext() { throw new Error("new context failed"); },
+      async close() { events.push("browser:close"); },
+    }),
+  });
+
+  await assert.rejects(harness.context(), /new context failed/);
+  await harness.close();
+  assert.deepEqual(events, ["preview:ready", "browser:close", "preview:SIGTERM", "cleanup"]);
+});
+
+test("failed init adapter closes its context and every remaining harness resource", async () => {
+  const events = [];
+  const harness = await createBrowserEvidenceHarness({
+    root,
+    previewRoot: "dist",
+    port: 41_005,
+    cleanup: [async () => { events.push("cleanup"); }],
+  }, {
+    spawnProcess: () => previewProcess(events),
+    awaitPreviewReady: async () => { events.push("preview:ready"); },
+    launchBrowser: async () => ({
+      async newContext() {
+        return {
+          on() {},
+          async addInitScript() { throw new Error("adapter failed"); },
+          async close() { events.push("context:close"); },
+        };
+      },
+      async close() { events.push("browser:close"); },
+    }),
+  });
+
+  await assert.rejects(harness.context({}, [() => {}]), /adapter failed/);
+  assert.deepEqual(events, [
+    "preview:ready",
+    "context:close",
+    "browser:close",
+    "preview:SIGTERM",
+    "cleanup",
+  ]);
+});
+
+test("failed page and navigation acquisition each close their complete harness", async () => {
+  for (const stage of ["page", "navigation"]) {
+    const events = [];
+    const harness = await createBrowserEvidenceHarness({
+      root,
+      previewRoot: "dist",
+      port: stage === "page" ? 41_006 : 41_007,
+      cleanup: [async () => { events.push("cleanup"); }],
+    }, {
+      spawnProcess: () => previewProcess(events),
+      awaitPreviewReady: async () => { events.push("preview:ready"); },
+      launchBrowser: async () => ({
+        async newContext() {
+          return {
+            on() {},
+            async newPage() {
+              if (stage === "page") throw new Error("new page failed");
+              return {
+                on() {},
+                async goto() { throw new Error("navigation failed"); },
+              };
+            },
+            async close() { events.push("context:close"); },
+          };
+        },
+        async close() { events.push("browser:close"); },
+      }),
+    });
+
+    await assert.rejects(
+      harness.open({ target: "http://127.0.0.1/" }),
+      stage === "page" ? /new page failed/ : /navigation failed/,
+    );
+    assert.deepEqual(events, [
+      "preview:ready",
+      "context:close",
+      "browser:close",
+      "preview:SIGTERM",
+      "cleanup",
+    ]);
+  }
+});
+
 test("teardown attempts every resource when context, browser, and cleanup fail", async () => {
   const events = [];
   let contextNumber = 0;
