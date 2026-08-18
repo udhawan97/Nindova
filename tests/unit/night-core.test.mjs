@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { recipeTwoCompletion } from "../fixtures/recipe-two.mjs";
 
+await import("../../apps/session/dist/rasoi-core.js");
 await import("../../apps/session/dist/night-core.js");
 const Night = globalThis.NindovaNight;
+const Rasoi = globalThis.NindovaRasoi;
 
 test("night capture switches Dawn date at local noon and uses recipe three", () => {
   assert.deepEqual(Night.captureNight(new Date("2026-08-02T16:59:00Z"), "America/Chicago"), {
@@ -31,26 +33,51 @@ test("active-session Night captures are fully validated and normalized", () => {
   assert.equal(Night.sanitizeCapture({ nightId: capture.nightId }), null);
 });
 
-test("the nightly Rasoi recipe is deterministic", () => {
-  const first = Night.recipeForNight("2026-08-03|America/Chicago|r3");
-  const replay = Night.recipeForNight("2026-08-03|America/Chicago|r3");
-  assert.deepEqual(replay, first);
-  assert.equal(first.motifOrder.length, 9);
-  assert.equal(new Set(first.motifOrder).size, 9);
-});
-
-function rasoiCompletion(nightId = "2026-08-03|America/Chicago|r3") {
-  const recipe = Night.recipeForNight(nightId);
+/** Built exactly as `finishSession` writes a completed Night. */
+function rasoiCompletion(nightId = "2026-08-03|America/Chicago|r3", profile = "gentle") {
+  const board = Rasoi.createBoard(nightId, profile);
   return {
     kind: "rasoi-pairs",
     nightId,
     dawnDate: nightId.slice(0, 10),
     timeZone: "America/Chicago",
-    recipeVersion: 3,
-    boardId: recipe.boardId,
-    motifOrder: recipe.motifOrder,
+    recipeVersion: Night.RECIPE_VERSION,
+    boardId: board.id,
+    motifOrder: board.motifOrder,
   };
 }
+
+test("the completion a finished Session actually writes survives the round trip", () => {
+  for (const profile of ["gentle", "deeper"]) {
+    const completion = rasoiCompletion("2026-08-03|America/Chicago|r3", profile);
+    const stored = Night.completeState(Night.emptyState(), completion);
+    assert.equal(stored.changed, true);
+    assert.deepEqual(stored.state.lastCompleted, { ...completion, motifOrder: [...completion.motifOrder] });
+  }
+});
+
+// An independent witness. `night-core` now derives its vocabulary from
+// `rasoi-core`, so comparing the two would be a tautology: a change to the board
+// would silently invalidate every stored Dawn keepsake with a green suite. These
+// nine ids are written out so that change has to be made here, deliberately.
+const KITCHEN_FORMS = ["belan", "chakla", "tawa", "chimta", "katori", "tiffin", "masala", "chai", "cooker"];
+
+test("the nine kitchen forms are fixed, because stored Dawn keepsakes depend on them", () => {
+  assert.deepEqual([...Rasoi.RASOI_MOTIFS.map((motif) => motif.id)].sort(), [...KITCHEN_FORMS].sort());
+  const completion = rasoiCompletion();
+  assert.deepEqual([...completion.motifOrder].sort(), [...KITCHEN_FORMS].sort());
+});
+
+test("local memory validates completions against the one Masala Mound vocabulary", () => {
+  const completion = rasoiCompletion();
+  assert.equal(completion.motifOrder.length, KITCHEN_FORMS.length);
+  const foreign = { ...completion, motifOrder: [...completion.motifOrder.slice(0, -1), "samovar"] };
+  assert.throws(() => Night.completeState(Night.emptyState(), foreign), TypeError);
+  assert.equal(
+    Night.decodeState(JSON.stringify({ ...Night.emptyState(), lastCompleted: foreign })).state.lastCompleted,
+    null,
+  );
+});
 
 test("missing, stale, and corrupt state recover without throwing", () => {
   assert.deepEqual(Night.decodeState(null), {

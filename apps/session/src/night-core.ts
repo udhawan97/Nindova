@@ -1,3 +1,5 @@
+import { RASOI_MOTIFS } from "./rasoi-core.js";
+
 export type LegacyVista = "meadow" | "harbor";
 
 export interface NightCapture {
@@ -23,13 +25,6 @@ export interface LegacyCompletion extends Omit<NightCapture, "startedAt"> {
 
 export type NightCompletion = RasoiCompletion | LegacyCompletion;
 
-export interface NightRecipe {
-  version: number;
-  boardId: string;
-  motifOrder: readonly string[];
-  cloth: "indigo" | "madder" | "mustard";
-}
-
 export interface NightState {
   version: number;
   lastCompleted: NightCompletion | null;
@@ -52,10 +47,13 @@ const RECIPE_VERSION = 3;
 const SUPPORTED_RASOI_RECIPE_VERSIONS = [2, RECIPE_VERSION] as const;
 const STORAGE_KEY = "nindova:night-state:v3";
 const LEGACY_STORAGE_KEYS = ["nindova:night-state:v2", "nindova:night-state:v1"] as const;
-const MOTIFS = ["belan", "chakla", "tawa", "chimta", "katori", "tiffin", "masala", "chai", "cooker"] as const;
+/**
+ * The Tile vocabulary is owned by the Masala Mound, not restated here. A stored
+ * completion is validated against the same kitchen forms the board can deal.
+ */
+const MOTIFS: readonly string[] = RASOI_MOTIFS.map((motif) => motif.id);
 const LEGACY_MEADOW = ["sheep", "goose", "tortoise", "rabbit"] as const;
 const LEGACY_HARBOR = ["skiff", "tug"] as const;
-const CLOTHS = ["indigo", "madder", "mustard"] as const;
 
 function pad(value: number) {
   return String(value).padStart(2, "0");
@@ -97,47 +95,6 @@ function captureNight(now: Date | string | number = new Date(), timeZone = Intl.
   });
 }
 
-function seedFrom(text: string) {
-  let hash = 0x811c9dc5;
-  for (let index = 0; index < text.length; index += 1) {
-    hash ^= text.charCodeAt(index);
-    hash = Math.imul(hash, 0x01000193);
-  }
-  return hash >>> 0;
-}
-
-function createPrng(seedText: string) {
-  let value = seedFrom(seedText);
-  return function next() {
-    value = (value + 0x6d2b79f5) >>> 0;
-    let mixed = value;
-    mixed = Math.imul(mixed ^ (mixed >>> 15), mixed | 1);
-    mixed ^= mixed + Math.imul(mixed ^ (mixed >>> 7), mixed | 61);
-    return ((mixed ^ (mixed >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function shuffled<T>(list: readonly T[], random: () => number): T[] {
-  const result = [...list];
-  for (let index = result.length - 1; index > 0; index -= 1) {
-    const target = Math.floor(random() * (index + 1));
-    [result[index], result[target]] = [result[target], result[index]];
-  }
-  return result;
-}
-
-function recipeForNight(nightId: string): Readonly<NightRecipe> {
-  if (!nightId) throw new TypeError("recipeForNight requires a nightId");
-  const random = createPrng(`${nightId}|rasoi-pairs-${RECIPE_VERSION}`);
-  const motifOrder = Object.freeze(shuffled(MOTIFS, random));
-  return Object.freeze({
-    version: RECIPE_VERSION,
-    boardId: `rasoi-r${RECIPE_VERSION}-${seedFrom(nightId).toString(36)}`,
-    motifOrder,
-    cloth: CLOTHS[Math.floor(random() * CLOTHS.length)],
-  });
-}
-
 function emptyState(): NightState {
   return { version: SCHEMA_VERSION, lastCompleted: null, legacyMemory: null, tomorrowIntention: null };
 }
@@ -174,7 +131,7 @@ function validRasoiCompletion(value: any): value is RasoiCompletion {
     validBase(value) && value.kind === "rasoi-pairs"
       && SUPPORTED_RASOI_RECIPE_VERSIONS.includes(value.recipeVersion) && isText(value.boardId)
       && Array.isArray(value.motifOrder) && value.motifOrder.length === MOTIFS.length
-      && new Set(value.motifOrder).size === MOTIFS.length && value.motifOrder.every((motif: string) => MOTIFS.includes(motif as any)),
+      && new Set(value.motifOrder).size === MOTIFS.length && value.motifOrder.every((motif: string) => MOTIFS.includes(motif)),
   );
 }
 
@@ -329,13 +286,10 @@ export const NindovaNight = Object.freeze({
   addCivilDays,
   captureNight,
   completeState,
-  createPrng,
   decodeState,
   emptyState,
   readStorage,
-  recipeForNight,
   sanitizeCapture,
-  seedFrom,
   setTomorrowIntention,
   writeStorage,
 });
