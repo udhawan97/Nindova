@@ -155,13 +155,250 @@ interface RecordLoopOptions {
     }
   }
 
+  const DAWN_PALETTE = Object.freeze({
+    paperLight: "#f3ead7",
+    paper: "#ead9bf",
+    sunrise: "#c98e73",
+    lightWash: "rgba(255,244,213,.54)",
+    lightClear: "rgba(255,244,213,0)",
+    clear: "transparent",
+    lattice: "rgba(83,57,70,.11)",
+    indigo: "#21192d",
+    indigoRaised: "#302239",
+    runner: "#53323d",
+    runnerPattern: "rgba(222,185,112,.17)",
+    brass: "#b77a32",
+    brassLight: "#dfc486",
+    brassShadow: "#7f542a",
+    plate: "#f0e3c7",
+    plateWash: "rgba(183,122,50,.12)",
+    shadow: "rgba(24,15,27,.28)",
+    inkIndigo: "#35243b",
+    inkMadder: "#713b45",
+    inkPeacock: "#285b5a",
+    inkBronze: "#72502f",
+  });
+
+  const MOTIF_INKS = Object.freeze([
+    DAWN_PALETTE.inkMadder,
+    DAWN_PALETTE.inkIndigo,
+    DAWN_PALETTE.inkBronze,
+    DAWN_PALETTE.inkPeacock,
+  ]);
+
+  const RASOI_FRAME_LABEL = "Last night's nine kitchen motifs resting on brass plates at first light.";
+  const LEGACY_FRAME_LABEL = "A safely migrated Dawn from an earlier Nindova night.";
+
+  function drawCanvasMotif(
+    context: CanvasRenderingContext2D,
+    motif: string,
+    x: number,
+    y: number,
+    scale: number,
+    progress = 0,
+    ink: string = DAWN_PALETTE.inkIndigo,
+  ) {
+    context.save();
+    context.translate(x, y);
+    context.scale(scale, scale);
+    context.strokeStyle = ink;
+    context.fillStyle = DAWN_PALETTE.plateWash;
+    context.lineWidth = 4;
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    const circle = (cx: number, cy: number, radius: number) => { context.beginPath(); context.arc(cx, cy, radius, 0, Math.PI * 2); context.stroke(); };
+    if (motif === "belan") {
+      context.beginPath(); context.moveTo(-38, 0); context.lineTo(38, 0); context.stroke();
+      context.strokeRect(-26, -9, 52, 18);
+    } else if (motif === "chakla") {
+      context.beginPath(); context.ellipse(0, 0, 29, 18, 0, 0, Math.PI * 2); context.fill(); context.stroke();
+      context.beginPath(); context.moveTo(-20, 14); context.lineTo(-24, 25); context.moveTo(20, 14); context.lineTo(24, 25); context.stroke();
+    } else if (motif === "tawa") {
+      circle(-7, 0, 21); context.beginPath(); context.moveTo(14, 0); context.lineTo(41, 0); context.stroke();
+    } else if (motif === "chimta") {
+      context.beginPath(); context.moveTo(-22, -23); context.quadraticCurveTo(-12, 12, 0, 25); context.moveTo(22, -23); context.quadraticCurveTo(12, 12, 0, 25); context.stroke();
+    } else if (motif === "katori") {
+      context.beginPath(); context.moveTo(-28, -10); context.quadraticCurveTo(-22, 22, 0, 23); context.quadraticCurveTo(22, 22, 28, -10); context.closePath(); context.fill(); context.stroke();
+    } else if (motif === "tiffin") {
+      context.strokeRect(-23, -24, 46, 48); context.beginPath(); context.moveTo(-23, -8); context.lineTo(23, -8); context.moveTo(-23, 9); context.lineTo(23, 9); context.moveTo(-13, -24); context.quadraticCurveTo(0, -39, 13, -24); context.stroke();
+    } else if (motif === "masala") {
+      circle(0, 0, 29); for (const [dx, dy] of [[0,0],[-14,-9],[14,-9],[-14,10],[14,10]]) circle(dx, dy, 5);
+    } else if (motif === "chai") {
+      context.beginPath(); context.moveTo(-21, -18); context.lineTo(21, -18); context.lineTo(17, 24); context.lineTo(-17, 24); context.closePath(); context.fill(); context.stroke();
+      context.beginPath(); context.moveTo(-8, -25 + progress * 4); context.quadraticCurveTo(-15, -34, -7, -40); context.moveTo(7, -26 - progress * 4); context.quadraticCurveTo(15, -36, 7, -42); context.stroke();
+    } else {
+      context.strokeRect(-28, -15, 50, 35); context.beginPath(); context.moveTo(-23, -15); context.quadraticCurveTo(0, -31, 20, -15); context.moveTo(22, 0); context.lineTo(39, 0); context.stroke(); circle(0, -27, 3);
+    }
+    context.restore();
+  }
+
+  function drawDawnLattice(context: CanvasRenderingContext2D, width: number) {
+    context.save();
+    context.beginPath();
+    context.rect(width * .52, 48, width * .39, 318);
+    context.clip();
+    context.strokeStyle = DAWN_PALETTE.lattice;
+    context.lineWidth = 2;
+    for (let offset = -520; offset < width + 520; offset += 112) {
+      context.beginPath();
+      context.moveTo(offset, 34);
+      context.lineTo(offset + 430, 464);
+      context.stroke();
+      context.beginPath();
+      context.moveTo(offset, 382);
+      context.lineTo(offset + 430, 34);
+      context.stroke();
+    }
+    context.restore();
+  }
+
+  function drawDawnPlate(context: CanvasRenderingContext2D, x: number, y: number, ink: string) {
+    context.save();
+    context.shadowColor = DAWN_PALETTE.shadow;
+    context.shadowBlur = 18;
+    context.shadowOffsetY = 12;
+    context.fillStyle = DAWN_PALETTE.brassShadow;
+    context.beginPath();
+    context.ellipse(x, y + 8, 83, 44, 0, 0, Math.PI * 2);
+    context.fill();
+    context.shadowColor = DAWN_PALETTE.clear;
+    context.fillStyle = DAWN_PALETTE.brassLight;
+    context.beginPath();
+    context.ellipse(x, y, 80, 42, 0, 0, Math.PI * 2);
+    context.fill();
+    context.strokeStyle = DAWN_PALETTE.brass;
+    context.lineWidth = 4;
+    context.stroke();
+    context.fillStyle = DAWN_PALETTE.plate;
+    context.beginPath();
+    context.ellipse(x, y - 2, 68, 33, 0, 0, Math.PI * 2);
+    context.fill();
+    context.strokeStyle = DAWN_PALETTE.brassShadow;
+    context.lineWidth = 2;
+    context.stroke();
+    context.strokeStyle = ink;
+    context.beginPath();
+    context.moveTo(x - 23, y + 29);
+    context.lineTo(x, y + 34);
+    context.lineTo(x + 23, y + 29);
+    context.stroke();
+    context.restore();
+  }
+
+  /** Where each remembered motif rests on the Dawn table. */
+  function platePositions(motifOrder: readonly string[]) {
+    return motifOrder.map((motif, index) => ({
+      motif,
+      x: 150 + (index % 5) * 225 + (index >= 5 ? 110 : 0),
+      y: index < 5 ? 490 : 632,
+      ink: MOTIF_INKS[index % MOTIF_INKS.length],
+    }));
+  }
+
+  /**
+   * Paint one Dawn keepsake frame for a completed Night.
+   *
+   * `progress` runs 0 to 1 across a silent loop and only stirs the chai steam,
+   * so the still saved at 0 is the frame the person keeps.
+   */
+  function renderFrame(canvas: HTMLCanvasElement, completion: NightCompletion | null, progress = 0) {
+    const context = canvas?.getContext?.("2d");
+    if (!context || !completion) return false;
+    const width = canvas.width;
+    const height = canvas.height;
+    const sky = context.createLinearGradient(0, 0, 0, height);
+    sky.addColorStop(0, DAWN_PALETTE.paperLight);
+    sky.addColorStop(1, DAWN_PALETTE.sunrise);
+    context.fillStyle = sky;
+    context.fillRect(0, 0, width, height);
+
+    const wall = context.createLinearGradient(108, 48, width - 108, 366);
+    wall.addColorStop(0, DAWN_PALETTE.paperLight);
+    wall.addColorStop(1, DAWN_PALETTE.paper);
+    context.fillStyle = wall;
+    context.fillRect(108, 48, width - 216, 318);
+    context.strokeStyle = DAWN_PALETTE.brass;
+    context.lineWidth = 3;
+    context.strokeRect(108, 48, width - 216, 318);
+    context.strokeStyle = DAWN_PALETTE.brassLight;
+    context.lineWidth = 1;
+    context.strokeRect(118, 58, width - 236, 298);
+    const firstLight = context.createRadialGradient(width * .84, height * .08, 12, width * .84, height * .08, 430);
+    firstLight.addColorStop(0, DAWN_PALETTE.lightWash);
+    firstLight.addColorStop(1, DAWN_PALETTE.lightClear);
+    context.fillStyle = firstLight;
+    context.fillRect(108, 48, width - 216, 318);
+    context.fillStyle = DAWN_PALETTE.lightWash;
+    context.beginPath();
+    context.moveTo(width * .56, 48);
+    context.lineTo(width - 108, 48);
+    context.lineTo(width * .78, 366);
+    context.lineTo(width * .39, 366);
+    context.closePath();
+    context.fill();
+    drawDawnLattice(context, width);
+
+    const table = context.createLinearGradient(0, 390, 0, height);
+    table.addColorStop(0, DAWN_PALETTE.indigoRaised);
+    table.addColorStop(1, DAWN_PALETTE.indigo);
+    context.fillStyle = table;
+    context.fillRect(0, 390, width, height - 390);
+    context.fillStyle = DAWN_PALETTE.brass;
+    context.fillRect(0, 390, width, 7);
+    context.fillStyle = DAWN_PALETTE.runner;
+    context.fillRect(74, 420, width - 148, 297);
+    context.strokeStyle = DAWN_PALETTE.brassShadow;
+    context.lineWidth = 2;
+    context.strokeRect(74, 420, width - 148, 297);
+    context.strokeStyle = DAWN_PALETTE.runnerPattern;
+    context.lineWidth = 1;
+    context.save();
+    context.beginPath();
+    context.rect(74, 420, width - 148, 297);
+    context.clip();
+    for (let x = 74; x <= width - 74; x += 76) {
+      context.beginPath();
+      context.moveTo(x, 420);
+      context.lineTo(x + 118, 717);
+      context.stroke();
+      context.beginPath();
+      context.moveTo(x, 717);
+      context.lineTo(x + 118, 420);
+      context.stroke();
+    }
+    context.restore();
+
+    if (completion.kind === "rasoi-pairs") {
+      for (const item of platePositions(completion.motifOrder)) {
+        drawDawnPlate(context, item.x, item.y, item.ink);
+        drawCanvasMotif(context, item.motif, item.x, item.y - 5, .82, progress, item.ink);
+      }
+      canvas.setAttribute?.("aria-label", RASOI_FRAME_LABEL);
+      return true;
+    }
+    context.fillStyle = DAWN_PALETTE.brassLight;
+    context.beginPath(); context.ellipse(width / 2, 584, 270, 92, 0, 0, Math.PI * 2); context.fill();
+    context.strokeStyle = DAWN_PALETTE.brassShadow; context.lineWidth = 5; context.stroke();
+    context.fillStyle = DAWN_PALETTE.inkIndigo;
+    context.font = "44px Iowan Old Style, Palatino, serif";
+    context.textAlign = "center";
+    context.fillText("An earlier Nindova night, kept safely", width / 2, 592);
+    canvas.setAttribute?.("aria-label", LEGACY_FRAME_LABEL);
+    return true;
+  }
+
   export const NindovaDawn = Object.freeze({
+    DAWN_PALETTE,
+    LEGACY_FRAME_LABEL,
     LOOP_DURATION_MS,
+    RASOI_FRAME_LABEL,
     chooseLoopType,
     eligibility,
     leaseUrl,
     localParts,
+    platePositions,
     recordLoop,
+    renderFrame,
     shareBlob,
     stillBlob,
   });

@@ -70,3 +70,87 @@ test("still export requests PNG without metadata inputs", async () => {
   assert.equal(blob.type, "image/png");
   assert.equal(await blob.text(), "png");
 });
+
+const MOTIF_ORDER = ["belan", "chakla", "tawa", "chimta", "katori", "tiffin", "masala", "chai", "cooker"];
+
+function recordingCanvas(width = 1200, height = 750) {
+  const calls = [];
+  const attributes = {};
+  const gradient = { addColorStop: () => {} };
+  const context = new Proxy({}, {
+    get(_target, property) {
+      if (property === "createLinearGradient" || property === "createRadialGradient") return () => gradient;
+      return (...args) => { calls.push({ op: property, args }); };
+    },
+    set(_target, property, value) {
+      calls.push({ op: `set:${String(property)}`, args: [value] });
+      return true;
+    },
+  });
+  return {
+    width,
+    height,
+    getContext: (kind) => (kind === "2d" ? context : null),
+    setAttribute: (name, value) => { attributes[name] = value; },
+    calls,
+    attributes,
+  };
+}
+
+const rasoiCompletion = { kind: "rasoi-pairs", motifOrder: MOTIF_ORDER };
+const legacyCompletion = { kind: "legacy-vista", vista: "meadow", finalKind: "rabbit" };
+
+test("a Dawn frame needs both a drawing surface and a remembered Night", () => {
+  assert.equal(Dawn.renderFrame(recordingCanvas(), null), false);
+  assert.equal(Dawn.renderFrame({ getContext: () => null, width: 10, height: 10 }, rasoiCompletion), false);
+  assert.equal(Dawn.renderFrame(recordingCanvas(), rasoiCompletion), true);
+});
+
+test("a remembered Rasoi Night paints one plate per kitchen motif", () => {
+  const canvas = recordingCanvas();
+  Dawn.renderFrame(canvas, rasoiCompletion);
+  // Nine plates, each an ellipse trio, plus the motif drawn on top of it.
+  const positions = Dawn.platePositions(MOTIF_ORDER);
+  assert.equal(positions.length, 9);
+  assert.equal(new Set(positions.map((item) => `${item.x}x${item.y}`)).size, 9);
+  assert.equal(positions.filter((item) => item.y === 490).length, 5);
+  assert.equal(positions.filter((item) => item.y === 632).length, 4);
+  assert.equal(canvas.attributes["aria-label"], Dawn.RASOI_FRAME_LABEL);
+  assert.equal(canvas.calls.some((call) => call.op === "fillText"), false);
+});
+
+test("a migrated legacy Night is named rather than painted with plates", () => {
+  const canvas = recordingCanvas();
+  Dawn.renderFrame(canvas, legacyCompletion);
+  assert.equal(canvas.attributes["aria-label"], Dawn.LEGACY_FRAME_LABEL);
+  const text = canvas.calls.find((call) => call.op === "fillText");
+  assert.ok(text, "the legacy frame must name the night it kept");
+  assert.equal(text.args[0], "An earlier Nindova night, kept safely");
+});
+
+test("loop progress stirs the chai steam and nothing structural", () => {
+  const shape = (progress) => {
+    const canvas = recordingCanvas();
+    Dawn.renderFrame(canvas, rasoiCompletion, progress);
+    return canvas.calls.map((call) => call.op).join("|");
+  };
+  assert.equal(shape(0), shape(1), "a loop frame must not add or drop drawing operations");
+  // The steam rises by moving where each wisp starts, not by redrawing its curve.
+  const steamAt = (progress) => {
+    const canvas = recordingCanvas();
+    Dawn.renderFrame(canvas, { kind: "rasoi-pairs", motifOrder: ["chai"] }, progress);
+    return JSON.stringify(canvas.calls.filter((call) => call.op === "moveTo").map((call) => call.args));
+  };
+  assert.notEqual(steamAt(0), steamAt(1), "the chai steam must move across a loop");
+  assert.equal(steamAt(0), steamAt(0), "one progress value must paint one deterministic frame");
+});
+
+test("every kitchen motif has its own keepsake drawing", () => {
+  const strokeShape = (motif) => {
+    const canvas = recordingCanvas();
+    Dawn.renderFrame(canvas, { kind: "rasoi-pairs", motifOrder: [motif] });
+    return JSON.stringify(canvas.calls.map((call) => [call.op, call.args]));
+  };
+  const shapes = new Map(MOTIF_ORDER.map((motif) => [motif, strokeShape(motif)]));
+  assert.equal(new Set(shapes.values()).size, MOTIF_ORDER.length, "no two motifs may share one drawing");
+});
