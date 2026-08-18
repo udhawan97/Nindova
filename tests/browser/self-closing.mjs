@@ -30,6 +30,14 @@ async function expectBoundaryCloses(instance, partial = false) {
   await instance.page.waitForFunction(() => window.__ct.state === "rest");
   assert.equal(await instance.page.evaluate(() => window.__ct.endReason), "production-cap");
   assert.equal((await instance.page.locator("#endTitle").textContent())?.trim(), "The session is over. That's the point.");
+  // Reaching Rest is not proof the Session closed properly: `endReason` is set by
+  // the settle step and #endTitle is static. Only a recorded Night witnesses that
+  // the final response actually completed before the return (ADR 0005).
+  assert.equal(
+    await instance.page.evaluate(() => window.__ct.memory?.lastCompleted?.kind ?? null),
+    "rasoi-pairs",
+    "a capped Session must record its Night before Rest, not merely reach Rest",
+  );
   assert.deepEqual(instance.errors, []);
 }
 

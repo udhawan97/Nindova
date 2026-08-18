@@ -1,6 +1,8 @@
+import { NindovaActiveSession } from "./active-session.js";
 import { NindovaDawn } from "./dawn-core.js";
-import { NindovaNight, type NightCapture, type NightCompletion, type NightState, type RasoiCompletion } from "./night-core.js";
+import { NindovaNight, type NightCapture, type RasoiCompletion } from "./night-core.js";
 import { NindovaRasoi, type RasoiBoard, type RasoiMotifId, type RasoiProfileId } from "./rasoi-core.js";
+import { NindovaBoundary } from "./session-boundary.js";
 import type { RasoiDebug, SessionState } from "./contracts.js";
 
 const ACTIVE_SESSION_KEY = "nindova:active-session:v4";
@@ -195,7 +197,8 @@ function persistActiveSession() {
   if (!board || !currentNight || (state !== "play" && state !== "settling")) return;
   try {
     safeStorage("session")?.setItem(ACTIVE_SESSION_KEY, JSON.stringify({
-      version: 4,
+      // The writer takes its version from the decoder, so the two cannot drift.
+      version: NindovaActiveSession.ACTIVE_SESSION_VERSION,
       profile: board.profile,
       phase: state,
       endReason,
@@ -224,73 +227,47 @@ function anchorSessionClock(wallMs: number) {
   clockAnchorMonotonicMs = performance.now();
 }
 
-function restoreActiveSession() {
+function readActiveSessionRaw() {
   try {
-    const storage = safeStorage("session");
-    const raw = storage?.getItem(ACTIVE_SESSION_KEY);
-    if (!raw) {
-      LEGACY_ACTIVE_SESSION_KEYS.forEach((key) => storage?.removeItem(key));
-      return false;
-    }
-    const candidate = JSON.parse(raw);
-    const restoredNight = NindovaNight.sanitizeCapture(candidate.night);
-    if (candidate.version !== 4 || !restoredNight || !Array.isArray(candidate.removed)
-      || (candidate.profile !== "gentle" && candidate.profile !== "deeper")
-      || (candidate.phase !== "play" && candidate.phase !== "settling")
-      || (candidate.endReason !== "completed" && candidate.endReason !== "production-cap")) {
-      clearActiveSession();
-      return false;
-    }
-    const restoredBoard = NindovaRasoi.createBoard(restoredNight.nightId, candidate.profile);
-    if (restoredBoard.id !== candidate.boardId) {
-      clearActiveSession();
-      return false;
-    }
-    const allowed = new Set(restoredBoard.tiles.map((tile) => tile.id));
-    if (candidate.removed.some((tileId: unknown) => typeof tileId !== "string" || !allowed.has(tileId))
-      || new Set(candidate.removed).size !== candidate.removed.length) {
-      clearActiveSession();
-      return false;
-    }
-    const restoredRemoved = new Set<string>(candidate.removed);
-    if (!NindovaRasoi.isReachableState(restoredBoard, restoredRemoved)) {
-      clearActiveSession();
-      return false;
-    }
-    const restoredComplete = NindovaRasoi.isComplete(restoredBoard, restoredRemoved);
-    if ((candidate.phase === "play" && candidate.endReason !== "completed")
-      || (candidate.phase === "settling" && candidate.endReason === "completed" && !restoredComplete)) {
-      clearActiveSession();
-      return false;
-    }
-    currentNight = restoredNight;
-    board = restoredBoard;
-    removed = restoredRemoved;
+    return safeStorage("session")?.getItem(ACTIVE_SESSION_KEY) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function restoreActiveSession() {
+  const restoredAtMs = Date.now();
+  const decoded = NindovaActiveSession.decodeActiveSession(readActiveSessionRaw(), {
+    hardCapSeconds,
+    windDownSeconds,
+    restoredAtMs,
+  });
+  if (decoded.status !== "accepted") {
+    clearActiveSession();
+    return false;
+  }
+  const record = decoded.record;
+  try {
+    currentNight = record.night;
+    board = record.board;
+    removed = new Set(record.removed);
     selectedTile = null;
-    startedAtMs = Number(candidate.startedAtMs);
-    deadlineAtMs = Number(candidate.deadlineAtMs);
-    windDownAtMs = Number(candidate.windDownAtMs);
-    const expectedStartedAtMs = Date.parse(restoredNight.startedAt);
-    const restoredAtMs = Date.now();
-    if (![startedAtMs, deadlineAtMs, windDownAtMs].every(Number.isFinite)
-      || startedAtMs !== expectedStartedAtMs
-      || startedAtMs > restoredAtMs + 5000
-      || deadlineAtMs - startedAtMs !== hardCapSeconds * 1000
-      || windDownAtMs - startedAtMs !== windDownSeconds * 1000) {
-      clearActiveSession();
-      return false;
-    }
+    startedAtMs = record.startedAtMs;
+    deadlineAtMs = record.deadlineAtMs;
+    windDownAtMs = record.windDownAtMs;
     anchorSessionClock(Math.max(restoredAtMs, startedAtMs));
     showView("play");
     createBoardDom();
-    if (candidate.phase === "settling" || restoredComplete) {
-      settle(candidate.endReason);
+    if (record.phase === "settling" || record.complete) {
+      settle(record.endReason);
       return true;
     }
     setStatus("The same kitchen is still here.");
     enforceBoundary();
     return true;
   } catch {
+    // Applying a resume must never leave the Night Room unopenable; a fresh
+    // intake is always better than a boot that throws.
     clearActiveSession();
     return false;
   }
@@ -461,10 +438,13 @@ function finishSession() {
     boardId: board.id,
     motifOrder: board.motifOrder,
   };
+  // Retire the resume record first. If recording the Night ever failed, the
+  // record would otherwise survive and every later boot would replay the same
+  // failure on this tab.
+  clearActiveSession();
   const completed = NindovaNight.completeState(nightState, completion);
   nightState = completed.state;
   NindovaNight.writeStorage(safeStorage("local"), nightState);
-  clearActiveSession();
   boardShell.classList.remove("is-settling");
   renderPathNote();
   showView("end");
@@ -497,8 +477,11 @@ function nowMs() {
 function clearClosureTimers() {
   if (endRestTimer !== null) window.clearTimeout(endRestTimer);
   if (driftRestTimer !== null) window.clearTimeout(driftRestTimer);
+  // A settlement that has not finished must not reopen the end card behind Rest.
+  if (settlementTimer !== null) window.clearTimeout(settlementTimer);
   endRestTimer = null;
   driftRestTimer = null;
+  settlementTimer = null;
 }
 
 function enterRest() {
@@ -543,13 +526,24 @@ function enterDrift() {
 }
 
 function enforceBoundary() {
-  const current = nowMs();
-  if (state === "play" && (current >= deadlineAtMs || current >= windDownAtMs)) {
+  const outcome = NindovaBoundary.boundaryOutcome(state, nowMs(), { windDownAtMs, deadlineAtMs });
+  if (outcome === "settle") {
     settle("production-cap");
     return true;
   }
-  if ((state === "end" || state === "drift") && current >= deadlineAtMs) {
-    enterRest();
+  if (outcome === "rest") {
+    // ADR 0005: at the cap the Session completes one final response and then
+    // continues into the return. A board still settling must therefore record
+    // its Night before Rest, or the person silently loses their Dawn and the
+    // stored record is never cleared. `enterRest` then cancels the pending
+    // settlement so the end card cannot reappear behind Rest.
+    try {
+      if (state === "settling") finishSession();
+    } finally {
+      // Rest is unconditional. If recording the Night ever failed, the Session
+      // must still close rather than retry the failure every second.
+      enterRest();
+    }
     return true;
   }
   return false;
@@ -583,222 +577,8 @@ function setDawnNow(instant: string) {
   return currentDawnEligibility().available;
 }
 
-const DAWN_PALETTE = Object.freeze({
-  paperLight: "#f3ead7",
-  paper: "#ead9bf",
-  sunrise: "#c98e73",
-  lightWash: "rgba(255,244,213,.54)",
-  lightClear: "rgba(255,244,213,0)",
-  clear: "transparent",
-  lattice: "rgba(83,57,70,.11)",
-  indigo: "#21192d",
-  indigoRaised: "#302239",
-  runner: "#53323d",
-  runnerPattern: "rgba(222,185,112,.17)",
-  brass: "#b77a32",
-  brassLight: "#dfc486",
-  brassShadow: "#7f542a",
-  plate: "#f0e3c7",
-  plateWash: "rgba(183,122,50,.12)",
-  shadow: "rgba(24,15,27,.28)",
-  inkIndigo: "#35243b",
-  inkMadder: "#713b45",
-  inkPeacock: "#285b5a",
-  inkBronze: "#72502f",
-});
-
-function drawCanvasMotif(
-  context: CanvasRenderingContext2D,
-  motif: string,
-  x: number,
-  y: number,
-  scale: number,
-  progress = 0,
-  ink: string = DAWN_PALETTE.inkIndigo,
-) {
-  context.save();
-  context.translate(x, y);
-  context.scale(scale, scale);
-  context.strokeStyle = ink;
-  context.fillStyle = DAWN_PALETTE.plateWash;
-  context.lineWidth = 4;
-  context.lineCap = "round";
-  context.lineJoin = "round";
-  const circle = (cx: number, cy: number, radius: number) => { context.beginPath(); context.arc(cx, cy, radius, 0, Math.PI * 2); context.stroke(); };
-  if (motif === "belan") {
-    context.beginPath(); context.moveTo(-38, 0); context.lineTo(38, 0); context.stroke();
-    context.strokeRect(-26, -9, 52, 18);
-  } else if (motif === "chakla") {
-    context.beginPath(); context.ellipse(0, 0, 29, 18, 0, 0, Math.PI * 2); context.fill(); context.stroke();
-    context.beginPath(); context.moveTo(-20, 14); context.lineTo(-24, 25); context.moveTo(20, 14); context.lineTo(24, 25); context.stroke();
-  } else if (motif === "tawa") {
-    circle(-7, 0, 21); context.beginPath(); context.moveTo(14, 0); context.lineTo(41, 0); context.stroke();
-  } else if (motif === "chimta") {
-    context.beginPath(); context.moveTo(-22, -23); context.quadraticCurveTo(-12, 12, 0, 25); context.moveTo(22, -23); context.quadraticCurveTo(12, 12, 0, 25); context.stroke();
-  } else if (motif === "katori") {
-    context.beginPath(); context.moveTo(-28, -10); context.quadraticCurveTo(-22, 22, 0, 23); context.quadraticCurveTo(22, 22, 28, -10); context.closePath(); context.fill(); context.stroke();
-  } else if (motif === "tiffin") {
-    context.strokeRect(-23, -24, 46, 48); context.beginPath(); context.moveTo(-23, -8); context.lineTo(23, -8); context.moveTo(-23, 9); context.lineTo(23, 9); context.moveTo(-13, -24); context.quadraticCurveTo(0, -39, 13, -24); context.stroke();
-  } else if (motif === "masala") {
-    circle(0, 0, 29); for (const [dx, dy] of [[0,0],[-14,-9],[14,-9],[-14,10],[14,10]]) circle(dx, dy, 5);
-  } else if (motif === "chai") {
-    context.beginPath(); context.moveTo(-21, -18); context.lineTo(21, -18); context.lineTo(17, 24); context.lineTo(-17, 24); context.closePath(); context.fill(); context.stroke();
-    context.beginPath(); context.moveTo(-8, -25 + progress * 4); context.quadraticCurveTo(-15, -34, -7, -40); context.moveTo(7, -26 - progress * 4); context.quadraticCurveTo(15, -36, 7, -42); context.stroke();
-  } else {
-    context.strokeRect(-28, -15, 50, 35); context.beginPath(); context.moveTo(-23, -15); context.quadraticCurveTo(0, -31, 20, -15); context.moveTo(22, 0); context.lineTo(39, 0); context.stroke(); circle(0, -27, 3);
-  }
-  context.restore();
-}
-
-function drawDawnLattice(context: CanvasRenderingContext2D, width: number) {
-  context.save();
-  context.beginPath();
-  context.rect(width * .52, 48, width * .39, 318);
-  context.clip();
-  context.strokeStyle = DAWN_PALETTE.lattice;
-  context.lineWidth = 2;
-  for (let offset = -520; offset < width + 520; offset += 112) {
-    context.beginPath();
-    context.moveTo(offset, 34);
-    context.lineTo(offset + 430, 464);
-    context.stroke();
-    context.beginPath();
-    context.moveTo(offset, 382);
-    context.lineTo(offset + 430, 34);
-    context.stroke();
-  }
-  context.restore();
-}
-
-function drawDawnPlate(context: CanvasRenderingContext2D, x: number, y: number, ink: string) {
-  context.save();
-  context.shadowColor = DAWN_PALETTE.shadow;
-  context.shadowBlur = 18;
-  context.shadowOffsetY = 12;
-  context.fillStyle = DAWN_PALETTE.brassShadow;
-  context.beginPath();
-  context.ellipse(x, y + 8, 83, 44, 0, 0, Math.PI * 2);
-  context.fill();
-  context.shadowColor = DAWN_PALETTE.clear;
-  context.fillStyle = DAWN_PALETTE.brassLight;
-  context.beginPath();
-  context.ellipse(x, y, 80, 42, 0, 0, Math.PI * 2);
-  context.fill();
-  context.strokeStyle = DAWN_PALETTE.brass;
-  context.lineWidth = 4;
-  context.stroke();
-  context.fillStyle = DAWN_PALETTE.plate;
-  context.beginPath();
-  context.ellipse(x, y - 2, 68, 33, 0, 0, Math.PI * 2);
-  context.fill();
-  context.strokeStyle = DAWN_PALETTE.brassShadow;
-  context.lineWidth = 2;
-  context.stroke();
-  context.strokeStyle = ink;
-  context.beginPath();
-  context.moveTo(x - 23, y + 29);
-  context.lineTo(x, y + 34);
-  context.lineTo(x + 23, y + 29);
-  context.stroke();
-  context.restore();
-}
-
 function renderDawnFrame(progress = 0) {
-  const context = dawnCanvas.getContext("2d");
-  const completion = nightState.lastCompleted;
-  if (!context || !completion) return;
-  const width = dawnCanvas.width;
-  const height = dawnCanvas.height;
-  const sky = context.createLinearGradient(0, 0, 0, height);
-  sky.addColorStop(0, DAWN_PALETTE.paperLight);
-  sky.addColorStop(1, DAWN_PALETTE.sunrise);
-  context.fillStyle = sky;
-  context.fillRect(0, 0, width, height);
-
-  const wall = context.createLinearGradient(108, 48, width - 108, 366);
-  wall.addColorStop(0, DAWN_PALETTE.paperLight);
-  wall.addColorStop(1, DAWN_PALETTE.paper);
-  context.fillStyle = wall;
-  context.fillRect(108, 48, width - 216, 318);
-  context.strokeStyle = DAWN_PALETTE.brass;
-  context.lineWidth = 3;
-  context.strokeRect(108, 48, width - 216, 318);
-  context.strokeStyle = DAWN_PALETTE.brassLight;
-  context.lineWidth = 1;
-  context.strokeRect(118, 58, width - 236, 298);
-  const firstLight = context.createRadialGradient(width * .84, height * .08, 12, width * .84, height * .08, 430);
-  firstLight.addColorStop(0, DAWN_PALETTE.lightWash);
-  firstLight.addColorStop(1, DAWN_PALETTE.lightClear);
-  context.fillStyle = firstLight;
-  context.fillRect(108, 48, width - 216, 318);
-  context.fillStyle = DAWN_PALETTE.lightWash;
-  context.beginPath();
-  context.moveTo(width * .56, 48);
-  context.lineTo(width - 108, 48);
-  context.lineTo(width * .78, 366);
-  context.lineTo(width * .39, 366);
-  context.closePath();
-  context.fill();
-  drawDawnLattice(context, width);
-
-  const table = context.createLinearGradient(0, 390, 0, height);
-  table.addColorStop(0, DAWN_PALETTE.indigoRaised);
-  table.addColorStop(1, DAWN_PALETTE.indigo);
-  context.fillStyle = table;
-  context.fillRect(0, 390, width, height - 390);
-  context.fillStyle = DAWN_PALETTE.brass;
-  context.fillRect(0, 390, width, 7);
-  context.fillStyle = DAWN_PALETTE.runner;
-  context.fillRect(74, 420, width - 148, 297);
-  context.strokeStyle = DAWN_PALETTE.brassShadow;
-  context.lineWidth = 2;
-  context.strokeRect(74, 420, width - 148, 297);
-  context.strokeStyle = DAWN_PALETTE.runnerPattern;
-  context.lineWidth = 1;
-  context.save();
-  context.beginPath();
-  context.rect(74, 420, width - 148, 297);
-  context.clip();
-  for (let x = 74; x <= width - 74; x += 76) {
-    context.beginPath();
-    context.moveTo(x, 420);
-    context.lineTo(x + 118, 717);
-    context.stroke();
-    context.beginPath();
-    context.moveTo(x, 717);
-    context.lineTo(x + 118, 420);
-    context.stroke();
-  }
-  context.restore();
-
-  if (completion.kind === "rasoi-pairs") {
-    const motifInks = [
-      DAWN_PALETTE.inkMadder,
-      DAWN_PALETTE.inkIndigo,
-      DAWN_PALETTE.inkBronze,
-      DAWN_PALETTE.inkPeacock,
-    ];
-    const positions = completion.motifOrder.map((motif, index) => ({
-      motif,
-      x: 150 + (index % 5) * 225 + (index >= 5 ? 110 : 0),
-      y: index < 5 ? 490 : 632,
-      ink: motifInks[index % motifInks.length],
-    }));
-    for (const item of positions) {
-      drawDawnPlate(context, item.x, item.y, item.ink);
-      drawCanvasMotif(context, item.motif, item.x, item.y - 5, .82, progress, item.ink);
-    }
-    dawnCanvas.setAttribute("aria-label", "Last night's nine kitchen motifs resting on brass plates at first light.");
-  } else {
-    context.fillStyle = DAWN_PALETTE.brassLight;
-    context.beginPath(); context.ellipse(width / 2, 584, 270, 92, 0, 0, Math.PI * 2); context.fill();
-    context.strokeStyle = DAWN_PALETTE.brassShadow; context.lineWidth = 5; context.stroke();
-    context.fillStyle = DAWN_PALETTE.inkIndigo;
-    context.font = "44px Iowan Old Style, Palatino, serif";
-    context.textAlign = "center";
-    context.fillText("An earlier Nindova night, kept safely", width / 2, 592);
-    dawnCanvas.setAttribute("aria-label", "A safely migrated Dawn from an earlier Nindova night.");
-  }
+  NindovaDawn.renderFrame(dawnCanvas, nightState.lastCompleted, progress);
 }
 
 async function openDawn() {

@@ -170,6 +170,60 @@ try {
   await page.evaluate(() => window.__ct.advanceBy(window.__ct.hardCapSeconds));
   await page.waitForFunction(() => window.__ct.state === "rest");
 
+  // A Session that was already settling when its tab went away must still record
+  // its Night when it resumes past the cap. Cancelling that final response would
+  // silently cost the person their Dawn and leave the record poisoning the tab.
+  //
+  // This runs at PRODUCTION timings deliberately. The reviewer cut settles in
+  // 80ms and would beat the one-second boundary tick, hiding the race; at the
+  // real 1300ms the tick lands first, which is the case that must stay correct.
+  const staleSettling = await harness.open({
+    contextOptions: { viewport: { width: 375, height: 812 } },
+    target: pathToFileURL(resolve(root, "apps/session/dist/nindova.html")).href,
+  });
+  await staleSettling.page.waitForFunction(() => Boolean(window.__ct));
+  assert.equal(await staleSettling.page.evaluate(() => window.__ct.hardCapSeconds), 900);
+  await staleSettling.page.evaluate((key) => {
+    localStorage.clear();
+    const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const night = NindovaNight.captureNight(new Date(Date.now() - 40 * 60 * 1000), zone);
+    const board = NindovaRasoi.createBoard(night.nightId, "gentle");
+    const startedAtMs = Date.parse(night.startedAt);
+    sessionStorage.setItem(key, JSON.stringify({
+      version: 4,
+      profile: "gentle",
+      phase: "settling",
+      endReason: "production-cap",
+      night,
+      boardId: board.id,
+      removed: [],
+      startedAtMs,
+      deadlineAtMs: startedAtMs + 900_000,
+      windDownAtMs: startedAtMs + 720_000,
+    }));
+  }, activeSessionKey);
+  await staleSettling.page.reload();
+  await staleSettling.page.waitForFunction(() => window.__ct.state === "rest");
+  assert.equal(
+    await staleSettling.page.evaluate(() => window.__ct.memory.lastCompleted?.kind ?? null),
+    "rasoi-pairs",
+    "a resumed settling Session must record its Night before Rest",
+  );
+  assert.equal(
+    await staleSettling.page.evaluate((key) => sessionStorage.getItem(key), activeSessionKey),
+    null,
+    "a resumed settling Session must clear its stored record, or the tab stays poisoned",
+  );
+  // NOT asserted here, deliberately: that entering Rest cancels the pending
+  // settlement. Removing that cancel changes nothing observable — the stale timer
+  // calls finishSession, which calls scheduleRest, which past the deadline re-enters
+  // Rest synchronously in the same turn, so no paint and no state sample can catch
+  // it. The cancel is defence in depth and is guarded by a source assertion in
+  // tests/unit/session-architecture.test.mjs instead of a test that would pass
+  // whether or not it were there.
+  assert.deepEqual(staleSettling.errors, []);
+  await staleSettling.context.close();
+
   assert.deepEqual(errors, []);
   assert.equal(Night.SCHEMA_VERSION, 3);
   console.log("Rasoi dismissal return, strict clock-bound resume, deterministic replay, and idempotent local memory checks passed.");
