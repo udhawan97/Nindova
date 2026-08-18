@@ -32,9 +32,11 @@ The authored Gentle geometry has 24 base, 8 middle, and 4 top Tiles. Deeper has 
 
 ## Browser and local state
 
-`session.ts` renders semantic buttons and layered coordinates, applies the tonight-only profile, begins the hidden automatic settle at twelve minutes, enforces one fifteen-minute deadline through Rest, manages version-4 same-tab resume, synthesizes optional deterministic audio, presents the paired bloom, qualitative path reflection, and optional response-free Image Drift, and maintains versioned `window.__rasoi`. `window.__ct` remains an alias for compatibility evidence.
+`session.ts` renders semantic buttons and layered coordinates, applies the tonight-only profile, synthesizes optional deterministic audio, presents the paired bloom, qualitative path reflection, and optional response-free Image Drift, and maintains versioned `window.__rasoi`. `window.__ct` remains an alias for compatibility evidence. It applies the closure and resume decisions below rather than making them.
 
-`night-core.ts` owns Night ID and Dawn-record recipe version 3, v3 state sanitization, v1/v2 migration, preservation of recipe-two Rasoi Dawn data, and idempotent completion. `rasoi-core.ts` independently owns board-geometry recipe version 5. `dawn-core.ts` owns captured-zone eligibility, still/loop capability handling, sharing, and temporary URL leases.
+`session-boundary.ts` decides what every Session phase owes the person at one instant, from one threshold pair: an open board settles at the hidden twelve-minute wind-down, and settling, the end card, and Image Drift each give way to Rest at the fifteen-minute deadline, so no phase can outlive the cap. `session.ts` performs those outcomes and, per ADR 0005, completes a still-settling board's final response so the Night is recorded before the return. `active-session.ts` owns version-4 same-tab resume validation — schema, Board profile, board-identity re-derivation, settled-Tile membership and reachability, phase-and-ending agreement, and the clock audit — returning either a rebuilt Session or one refusal reason.
+
+`night-core.ts` owns Night ID and Dawn-record recipe version 3, v3 state sanitization, v1/v2 migration, preservation of recipe-two Rasoi Dawn data, and idempotent completion; it validates a stored completion against the Tile vocabulary `rasoi-core.ts` deals rather than keeping a second copy of it. `rasoi-core.ts` owns that vocabulary and board-geometry recipe version 5. `dawn-core.ts` owns captured-zone eligibility, the keepsake frame for both remembered Rasoi Nights and migrated legacy records, still/loop capability handling, sharing, and temporary URL leases.
 
 ## Browser evidence boundary
 

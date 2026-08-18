@@ -1,5 +1,28 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Gave the Session boundary an answer for every phase. A board still settling was previously unsupervised — nothing would close it if its final response never completed — and at the cap it now completes that response and records the Night before Rest.
+- Moved the Session closure decision into one module so the fifteen-minute promise is decided in a single place and covered directly instead of only through the rendered Session.
+- Moved version-4 same-tab resume validation into one decoder, so board identity, settled-Tile reachability, phase agreement, and the clock audit are proven directly rather than only through page reloads.
+- Made the Masala Mound the single authority for kitchen-form Tiles; local memory now validates a stored completion against the vocabulary the board deals instead of a second hand-maintained list.
+- Moved the Dawn keepsake frame beside the rest of Dawn, leaving the Session surface only to host the canvas and its export.
+
+### Removed
+
+- Deleted an unused nightly-recipe path in local memory that could never produce a board this product deals, and rebuilt the persistence fixture from a real Masala Mound.
+
+### Verified
+
+- Reran the full unit and rendered browser suites, added direct coverage for the closure rule and the resume decoder, and confirmed a capped Session records its Night before Rest through both the standalone HTML and the Session surface.
+- Confirmed the Dawn keepsake frame is byte-identical before and after its move, on both the remembered Rasoi Night and the migrated legacy record.
+
+### Not added
+
+- No game, authored answer, state schema, score, streak, rank, visible timer, collection, randomized reward, assessment output, telemetry, or third-party runtime request. No release, tag, or deployment.
+
 ## 0.4.3 — 2026-08-13
 
 ### Changed
