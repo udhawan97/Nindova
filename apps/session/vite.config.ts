@@ -26,6 +26,8 @@ function emitPortableHtml(): Plugin {
       const nightCoreSource = resolve("src/night-core.ts");
       const rasoiCoreSource = resolve("src/rasoi-core.ts");
       const dawnCoreSource = resolve("src/dawn-core.ts");
+      const boundarySource = resolve("src/session-boundary.ts");
+      const activeSessionSource = resolve("src/active-session.ts");
       const manifestSource = resolve("manifest.webmanifest");
       const workerSource = resolve("sw.js");
       const iconSource = resolve("assets/nindova-icon.svg");
@@ -34,6 +36,8 @@ function emitPortableHtml(): Plugin {
       await emitTypedModule(nightCoreSource, resolve("dist/night-core.js"));
       await emitTypedModule(rasoiCoreSource, resolve("dist/rasoi-core.js"));
       await emitTypedModule(dawnCoreSource, resolve("dist/dawn-core.js"));
+      await emitTypedModule(boundarySource, resolve("dist/session-boundary.js"));
+      await emitTypedModule(activeSessionSource, resolve("dist/active-session.js"));
       await copyFile(manifestSource, resolve("dist/manifest.webmanifest"));
       await copyFile(workerSource, resolve("dist/sw.js"));
       await copyFile(iconSource, resolve(assetDirectory, "nindova-icon.svg"));
