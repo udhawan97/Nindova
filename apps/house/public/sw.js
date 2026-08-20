@@ -1,4 +1,4 @@
-const CACHE = "nindova-house-v10";
+const CACHE = "nindova-house-v11";
 const PRECACHE = __NINDOVA_PRECACHE__;
 
 self.addEventListener("install", (event) => {

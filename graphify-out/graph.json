@@ -10043,8 +10043,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_board_contract",
-      "community": 96,
-      "community_name": "Board contract",
+      "community": 32,
+      "community_name": "Layered Rasoi plan",
       "norm_label": "board contract"
     },
     {
@@ -10054,8 +10054,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_geometry",
-      "community": 96,
-      "community_name": "Board contract",
+      "community": 32,
+      "community_name": "Layered Rasoi plan",
       "norm_label": "geometry"
     },
     {
@@ -10065,8 +10065,8 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_availability",
-      "community": 96,
-      "community_name": "Board contract",
+      "community": 32,
+      "community_name": "Layered Rasoi plan",
       "norm_label": "availability"
     },
     {
@@ -10076,8 +10076,8 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_solvability",
-      "community": 96,
-      "community_name": "Board contract",
+      "community": 32,
+      "community_name": "Layered Rasoi plan",
       "norm_label": "solvability"
     },
     {
@@ -10241,8 +10241,8 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_board_profiles",
-      "community": 102,
-      "community_name": "Board profiles",
+      "community": 33,
+      "community_name": "Quiet Depth plan",
       "norm_label": "board profiles"
     },
     {
@@ -10252,8 +10252,8 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_gentle_stack",
-      "community": 102,
-      "community_name": "Board profiles",
+      "community": 33,
+      "community_name": "Quiet Depth plan",
       "norm_label": "gentle stack"
     },
     {
@@ -10263,8 +10263,8 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_deeper_stack",
-      "community": 102,
-      "community_name": "Board profiles",
+      "community": 33,
+      "community_name": "Quiet Depth plan",
       "norm_label": "deeper stack"
     },
     {
@@ -10274,8 +10274,8 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "docs_quiet_depth_plan_shared_proof",
-      "community": 102,
-      "community_name": "Board profiles",
+      "community": 33,
+      "community_name": "Quiet Depth plan",
       "norm_label": "shared proof"
     },
     {
@@ -10516,8 +10516,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "docs_adr_0019_group_the_grand_salon_and_add_classic_rule_studies",
-      "community": 64,
-      "community_name": "bedtime-game-evidence.md",
+      "community": 41,
+      "community_name": "Group the Grand Salon and add sourced classic rule studies",
       "norm_label": "0019-group-the-grand-salon-and-add-classic-rule-studies.md"
     },
     {
@@ -11137,6 +11137,61 @@
       "norm_label": "release files"
     },
     {
+      "label": "v0.4.4.md",
+      "file_type": "document",
+      "source_file": "docs/releases/v0.4.4.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_releases_v0_4_4",
+      "community": 102,
+      "community_name": "Nindova v0.4.4 \u2014 Kept Nights",
+      "norm_label": "v0.4.4.md"
+    },
+    {
+      "label": "Nindova v0.4.4 \u2014 Kept Nights",
+      "file_type": "document",
+      "source_file": "docs/releases/v0.4.4.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_releases_v0_4_4_nindova_v0_4_4_kept_nights",
+      "community": 102,
+      "community_name": "Nindova v0.4.4 \u2014 Kept Nights",
+      "norm_label": "nindova v0.4.4 \u2014 kept nights"
+    },
+    {
+      "label": "Highlights",
+      "file_type": "document",
+      "source_file": "docs/releases/v0.4.4.md",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "docs_releases_v0_4_4_highlights",
+      "community": 102,
+      "community_name": "Nindova v0.4.4 \u2014 Kept Nights",
+      "norm_label": "highlights"
+    },
+    {
+      "label": "Evidence boundary",
+      "file_type": "document",
+      "source_file": "docs/releases/v0.4.4.md",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "docs_releases_v0_4_4_evidence_boundary",
+      "community": 102,
+      "community_name": "Nindova v0.4.4 \u2014 Kept Nights",
+      "norm_label": "evidence boundary"
+    },
+    {
+      "label": "Notes",
+      "file_type": "document",
+      "source_file": "docs/releases/v0.4.4.md",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "docs_releases_v0_4_4_notes",
+      "community": 102,
+      "community_name": "Nindova v0.4.4 \u2014 Kept Nights",
+      "norm_label": "notes"
+    },
+    {
       "label": "bedtime-game-evidence.md",
       "file_type": "document",
       "source_file": "docs/research/bedtime-game-evidence.md",
@@ -11220,8 +11275,8 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_2_evening_light_arousal_and_media_displacement",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 145,
+      "community_name": "2. Evening light, arousal, and media displacement",
       "norm_label": "2. evening light, arousal, and media displacement"
     },
     {
@@ -11231,8 +11286,8 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_light",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 145,
+      "community_name": "2. Evening light, arousal, and media displacement",
       "norm_label": "light"
     },
     {
@@ -11242,8 +11297,8 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_cognitive_and_emotional_arousal",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 145,
+      "community_name": "2. Evening light, arousal, and media displacement",
       "norm_label": "cognitive and emotional arousal"
     },
     {
@@ -11253,8 +11308,8 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_time_displacement_and_bedtime_boundaries",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 145,
+      "community_name": "2. Evening light, arousal, and media displacement",
       "norm_label": "time displacement and bedtime boundaries"
     },
     {
@@ -11341,8 +11396,8 @@
       "source_location": "L152",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_conservative_product_constraints",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 96,
+      "community_name": "Conservative product constraints",
       "norm_label": "conservative product constraints"
     },
     {
@@ -11352,8 +11407,8 @@
       "source_location": "L154",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_session_and_stopping",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 96,
+      "community_name": "Conservative product constraints",
       "norm_label": "session and stopping"
     },
     {
@@ -11363,8 +11418,8 @@
       "source_location": "L162",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_challenge",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 96,
+      "community_name": "Conservative product constraints",
       "norm_label": "challenge"
     },
     {
@@ -11374,8 +11429,8 @@
       "source_location": "L169",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_match_feedback",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 96,
+      "community_name": "Conservative product constraints",
       "norm_label": "match feedback"
     },
     {
@@ -11385,8 +11440,8 @@
       "source_location": "L176",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_light_and_transition_away_from_the_screen",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 96,
+      "community_name": "Conservative product constraints",
       "norm_label": "light and transition away from the screen"
     },
     {
@@ -11396,8 +11451,8 @@
       "source_location": "L183",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_accessibility_and_trust",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 96,
+      "community_name": "Conservative product constraints",
       "norm_label": "accessibility and trust"
     },
     {
@@ -11407,8 +11462,8 @@
       "source_location": "L192",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_claim_language",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 147,
+      "community_name": "Claim language",
       "norm_label": "claim language"
     },
     {
@@ -11418,8 +11473,8 @@
       "source_location": "L194",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_allowed_when_the_implementation_is_true",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 147,
+      "community_name": "Claim language",
       "norm_label": "allowed when the implementation is true"
     },
     {
@@ -11429,8 +11484,8 @@
       "source_location": "L203",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_not_supported",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 147,
+      "community_name": "Claim language",
       "norm_label": "not supported"
     },
     {
@@ -11509,6 +11564,765 @@
       "community": 58,
       "community_name": "Sector Sprint progressive-lane checkpoint",
       "norm_label": "evidence boundary"
+    },
+    {
+      "label": "query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for.md",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for",
+      "community": 103,
+      "community_name": "Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks",
+      "norm_label": "query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for.md"
+    },
+    {
+      "label": "Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for_q_independently_review_revised_rasoi_pairs_plan_for_nindova_product_contract_timing_state_dawn_and_migration_risks",
+      "community": 103,
+      "community_name": "Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks",
+      "norm_label": "q: independently review revised rasoi pairs plan for nindova product contract, timing, state, dawn, and migration risks"
+    },
+    {
+      "label": "Answer",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for_answer",
+      "community": 103,
+      "community_name": "Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks",
+      "norm_label": "answer"
+    },
+    {
+      "label": "Outcome",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for_outcome",
+      "community": 103,
+      "community_name": "Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks",
+      "norm_label": "outcome"
+    },
+    {
+      "label": "Source Nodes",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for_source_nodes",
+      "community": 103,
+      "community_name": "Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks",
+      "norm_label": "source nodes"
+    },
+    {
+      "label": "query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha.md",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha",
+      "community": 133,
+      "community_name": "Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?",
+      "norm_label": "query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha.md"
+    },
+    {
+      "label": "Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha_q_why_does_rasoi_pairs_lack_mahjong_like_layered_challenge_and_visible_replay",
+      "community": 133,
+      "community_name": "Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?",
+      "norm_label": "q: why does rasoi pairs lack mahjong-like layered challenge and visible replay?"
+    },
+    {
+      "label": "Answer",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha_answer",
+      "community": 133,
+      "community_name": "Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?",
+      "norm_label": "answer"
+    },
+    {
+      "label": "Outcome",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha_outcome",
+      "community": 133,
+      "community_name": "Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?",
+      "norm_label": "outcome"
+    },
+    {
+      "label": "Source Nodes",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha_source_nodes",
+      "community": 133,
+      "community_name": "Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?",
+      "norm_label": "source nodes"
+    },
+    {
+      "label": "query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated.md",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated",
+      "community": 134,
+      "community_name": "Q: Make the app theme more royal and sophisticated",
+      "norm_label": "query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated.md"
+    },
+    {
+      "label": "Q: Make the app theme more royal and sophisticated",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated_q_make_the_app_theme_more_royal_and_sophisticated",
+      "community": 134,
+      "community_name": "Q: Make the app theme more royal and sophisticated",
+      "norm_label": "q: make the app theme more royal and sophisticated"
+    },
+    {
+      "label": "Answer",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated_answer",
+      "community": 134,
+      "community_name": "Q: Make the app theme more royal and sophisticated",
+      "norm_label": "answer"
+    },
+    {
+      "label": "Outcome",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated_outcome",
+      "community": 134,
+      "community_name": "Q: Make the app theme more royal and sophisticated",
+      "norm_label": "outcome"
+    },
+    {
+      "label": "Source Nodes",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated_source_nodes",
+      "community": 134,
+      "community_name": "Q: Make the app theme more royal and sophisticated",
+      "norm_label": "source nodes"
+    },
+    {
+      "label": "query_20260804_180157_rasoi_dawn_looks_so_ugly.md",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_180157_rasoi_dawn_looks_so_ugly.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_180157_rasoi_dawn_looks_so_ugly",
+      "community": 135,
+      "community_name": "Q: rasoi dawn looks so ugly",
+      "norm_label": "query_20260804_180157_rasoi_dawn_looks_so_ugly.md"
+    },
+    {
+      "label": "Q: rasoi dawn looks so ugly",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_180157_rasoi_dawn_looks_so_ugly.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_180157_rasoi_dawn_looks_so_ugly_q_rasoi_dawn_looks_so_ugly",
+      "community": 135,
+      "community_name": "Q: rasoi dawn looks so ugly",
+      "norm_label": "q: rasoi dawn looks so ugly"
+    },
+    {
+      "label": "Answer",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_180157_rasoi_dawn_looks_so_ugly.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_180157_rasoi_dawn_looks_so_ugly_answer",
+      "community": 135,
+      "community_name": "Q: rasoi dawn looks so ugly",
+      "norm_label": "answer"
+    },
+    {
+      "label": "Outcome",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_180157_rasoi_dawn_looks_so_ugly.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_180157_rasoi_dawn_looks_so_ugly_outcome",
+      "community": 135,
+      "community_name": "Q: rasoi dawn looks so ugly",
+      "norm_label": "outcome"
+    },
+    {
+      "label": "Source Nodes",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_180157_rasoi_dawn_looks_so_ugly.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_180157_rasoi_dawn_looks_so_ugly_source_nodes",
+      "community": 135,
+      "community_name": "Q: rasoi dawn looks so ugly",
+      "norm_label": "source nodes"
+    },
+    {
+      "label": "query_20260804_184502_council_coverage_review_of_the_adult_nindova_house.md",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_184502_council_coverage_review_of_the_adult_nindova_house.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_184502_council_coverage_review_of_the_adult_nindova_house",
+      "community": 136,
+      "community_name": "Q: Council coverage review of the adult Nindova House entertainment implementation",
+      "norm_label": "query_20260804_184502_council_coverage_review_of_the_adult_nindova_house.md"
+    },
+    {
+      "label": "Q: Council coverage review of the adult Nindova House entertainment implementation",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_184502_council_coverage_review_of_the_adult_nindova_house.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_184502_council_coverage_review_of_the_adult_nindova_house_q_council_coverage_review_of_the_adult_nindova_house_entertainment_implementation",
+      "community": 136,
+      "community_name": "Q: Council coverage review of the adult Nindova House entertainment implementation",
+      "norm_label": "q: council coverage review of the adult nindova house entertainment implementation"
+    },
+    {
+      "label": "Answer",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_184502_council_coverage_review_of_the_adult_nindova_house.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_184502_council_coverage_review_of_the_adult_nindova_house_answer",
+      "community": 136,
+      "community_name": "Q: Council coverage review of the adult Nindova House entertainment implementation",
+      "norm_label": "answer"
+    },
+    {
+      "label": "Outcome",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_184502_council_coverage_review_of_the_adult_nindova_house.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_184502_council_coverage_review_of_the_adult_nindova_house_outcome",
+      "community": 136,
+      "community_name": "Q: Council coverage review of the adult Nindova House entertainment implementation",
+      "norm_label": "outcome"
+    },
+    {
+      "label": "Source Nodes",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_184502_council_coverage_review_of_the_adult_nindova_house.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_184502_council_coverage_review_of_the_adult_nindova_house_source_nodes",
+      "community": 136,
+      "community_name": "Q: Council coverage review of the adult Nindova House entertainment implementation",
+      "norm_label": "source nodes"
+    },
+    {
+      "label": "query_20260804_194501_build_entertainment_first_for_adults_above_18__tes.md",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_194501_build_entertainment_first_for_adults_above_18__tes.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_194501_build_entertainment_first_for_adults_above_18_tes",
+      "community": 137,
+      "community_name": "Q: Build entertainment first for adults above 18, test it, run a council review, then implement assessment grade.",
+      "norm_label": "query_20260804_194501_build_entertainment_first_for_adults_above_18__tes.md"
+    },
+    {
+      "label": "Q: Build entertainment first for adults above 18, test it, run a council review, then implement assessment grade.",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_194501_build_entertainment_first_for_adults_above_18__tes.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_194501_build_entertainment_first_for_adults_above_18_tes_q_build_entertainment_first_for_adults_above_18_test_it_run_a_council_review_then_implement_assessment_grade",
+      "community": 137,
+      "community_name": "Q: Build entertainment first for adults above 18, test it, run a council review, then implement assessment grade.",
+      "norm_label": "q: build entertainment first for adults above 18, test it, run a council review, then implement assessment grade."
+    },
+    {
+      "label": "Answer",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_194501_build_entertainment_first_for_adults_above_18__tes.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_194501_build_entertainment_first_for_adults_above_18_tes_answer",
+      "community": 137,
+      "community_name": "Q: Build entertainment first for adults above 18, test it, run a council review, then implement assessment grade.",
+      "norm_label": "answer"
+    },
+    {
+      "label": "Outcome",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_194501_build_entertainment_first_for_adults_above_18__tes.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_194501_build_entertainment_first_for_adults_above_18_tes_outcome",
+      "community": 137,
+      "community_name": "Q: Build entertainment first for adults above 18, test it, run a council review, then implement assessment grade.",
+      "norm_label": "outcome"
+    },
+    {
+      "label": "Source Nodes",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_194501_build_entertainment_first_for_adults_above_18__tes.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_194501_build_entertainment_first_for_adults_above_18_tes_source_nodes",
+      "community": 137,
+      "community_name": "Q: Build entertainment first for adults above 18, test it, run a council review, then implement assessment grade.",
+      "norm_label": "source nodes"
+    },
+    {
+      "label": "query_20260804_204420_how_is_sector_sprint_registered__rendered__persist.md",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_204420_how_is_sector_sprint_registered__rendered__persist.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_204420_how_is_sector_sprint_registered_rendered_persist",
+      "community": 138,
+      "community_name": "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?",
+      "norm_label": "query_20260804_204420_how_is_sector_sprint_registered__rendered__persist.md"
+    },
+    {
+      "label": "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_204420_how_is_sector_sprint_registered__rendered__persist.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_204420_how_is_sector_sprint_registered_rendered_persist_q_how_is_sector_sprint_registered_rendered_persisted_completed_tested_and_isolated_from_the_night_room",
+      "community": 138,
+      "community_name": "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?",
+      "norm_label": "q: how is sector sprint registered, rendered, persisted, completed, tested, and isolated from the night room?"
+    },
+    {
+      "label": "Answer",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_204420_how_is_sector_sprint_registered__rendered__persist.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_204420_how_is_sector_sprint_registered_rendered_persist_answer",
+      "community": 138,
+      "community_name": "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?",
+      "norm_label": "answer"
+    },
+    {
+      "label": "Outcome",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_204420_how_is_sector_sprint_registered__rendered__persist.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_204420_how_is_sector_sprint_registered_rendered_persist_outcome",
+      "community": 138,
+      "community_name": "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?",
+      "norm_label": "outcome"
+    },
+    {
+      "label": "Source Nodes",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_204420_how_is_sector_sprint_registered__rendered__persist.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_204420_how_is_sector_sprint_registered_rendered_persist_source_nodes",
+      "community": 138,
+      "community_name": "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?",
+      "norm_label": "source nodes"
+    },
+    {
+      "label": "query_20260804_211827_how_is_sector_sprint_registered__rendered__persist.md",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_211827_how_is_sector_sprint_registered__rendered__persist.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_211827_how_is_sector_sprint_registered_rendered_persist",
+      "community": 139,
+      "community_name": "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?",
+      "norm_label": "query_20260804_211827_how_is_sector_sprint_registered__rendered__persist.md"
+    },
+    {
+      "label": "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_211827_how_is_sector_sprint_registered__rendered__persist.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_211827_how_is_sector_sprint_registered_rendered_persist_q_how_is_sector_sprint_registered_rendered_persisted_completed_tested_and_isolated_from_the_night_room",
+      "community": 139,
+      "community_name": "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?",
+      "norm_label": "q: how is sector sprint registered, rendered, persisted, completed, tested, and isolated from the night room?"
+    },
+    {
+      "label": "Answer",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_211827_how_is_sector_sprint_registered__rendered__persist.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_211827_how_is_sector_sprint_registered_rendered_persist_answer",
+      "community": 139,
+      "community_name": "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?",
+      "norm_label": "answer"
+    },
+    {
+      "label": "Outcome",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_211827_how_is_sector_sprint_registered__rendered__persist.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_211827_how_is_sector_sprint_registered_rendered_persist_outcome",
+      "community": 139,
+      "community_name": "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?",
+      "norm_label": "outcome"
+    },
+    {
+      "label": "Source Nodes",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_211827_how_is_sector_sprint_registered__rendered__persist.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_211827_how_is_sector_sprint_registered_rendered_persist_source_nodes",
+      "community": 139,
+      "community_name": "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?",
+      "norm_label": "source nodes"
+    },
+    {
+      "label": "query_20260804_215805_how_does_the_polished_sector_sprint_connect_render.md",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_215805_how_does_the_polished_sector_sprint_connect_render.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_215805_how_does_the_polished_sector_sprint_connect_render",
+      "community": 140,
+      "community_name": "Q: How does the polished Sector Sprint connect rendering, state, audio, accessibility, and tests?",
+      "norm_label": "query_20260804_215805_how_does_the_polished_sector_sprint_connect_render.md"
+    },
+    {
+      "label": "Q: How does the polished Sector Sprint connect rendering, state, audio, accessibility, and tests?",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_215805_how_does_the_polished_sector_sprint_connect_render.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_215805_how_does_the_polished_sector_sprint_connect_render_q_how_does_the_polished_sector_sprint_connect_rendering_state_audio_accessibility_and_tests",
+      "community": 140,
+      "community_name": "Q: How does the polished Sector Sprint connect rendering, state, audio, accessibility, and tests?",
+      "norm_label": "q: how does the polished sector sprint connect rendering, state, audio, accessibility, and tests?"
+    },
+    {
+      "label": "Answer",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_215805_how_does_the_polished_sector_sprint_connect_render.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_215805_how_does_the_polished_sector_sprint_connect_render_answer",
+      "community": 140,
+      "community_name": "Q: How does the polished Sector Sprint connect rendering, state, audio, accessibility, and tests?",
+      "norm_label": "answer"
+    },
+    {
+      "label": "Outcome",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_215805_how_does_the_polished_sector_sprint_connect_render.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_215805_how_does_the_polished_sector_sprint_connect_render_outcome",
+      "community": 140,
+      "community_name": "Q: How does the polished Sector Sprint connect rendering, state, audio, accessibility, and tests?",
+      "norm_label": "outcome"
+    },
+    {
+      "label": "Source Nodes",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260804_215805_how_does_the_polished_sector_sprint_connect_render.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260804_215805_how_does_the_polished_sector_sprint_connect_render_source_nodes",
+      "community": 140,
+      "community_name": "Q: How does the polished Sector Sprint connect rendering, state, audio, accessibility, and tests?",
+      "norm_label": "source nodes"
+    },
+    {
+      "label": "query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t.md",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t",
+      "community": 141,
+      "community_name": "Q: How do the adult House and Sector Sprint connect through house source/core to Night state, public surface, and PWA/offline boundary?",
+      "norm_label": "query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t.md"
+    },
+    {
+      "label": "Q: How do the adult House and Sector Sprint connect through house source/core to Night state, public surface, and PWA/offline boundary?",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t_q_how_do_the_adult_house_and_sector_sprint_connect_through_house_source_core_to_night_state_public_surface_and_pwa_offline_boundary",
+      "community": 141,
+      "community_name": "Q: How do the adult House and Sector Sprint connect through house source/core to Night state, public surface, and PWA/offline boundary?",
+      "norm_label": "q: how do the adult house and sector sprint connect through house source/core to night state, public surface, and pwa/offline boundary?"
+    },
+    {
+      "label": "Answer",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t_answer",
+      "community": 141,
+      "community_name": "Q: How do the adult House and Sector Sprint connect through house source/core to Night state, public surface, and PWA/offline boundary?",
+      "norm_label": "answer"
+    },
+    {
+      "label": "Outcome",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t_outcome",
+      "community": 141,
+      "community_name": "Q: How do the adult House and Sector Sprint connect through house source/core to Night state, public surface, and PWA/offline boundary?",
+      "norm_label": "outcome"
+    },
+    {
+      "label": "Source Nodes",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t_source_nodes",
+      "community": 141,
+      "community_name": "Q: How do the adult House and Sector Sprint connect through house source/core to Night state, public surface, and PWA/offline boundary?",
+      "norm_label": "source nodes"
+    },
+    {
+      "label": "query_20260805_035832_how_is_sector_sprint_s_runner_state__input__canvas.md",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260805_035832_how_is_sector_sprint_s_runner_state__input__canvas.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260805_035832_how_is_sector_sprint_s_runner_state_input_canvas",
+      "community": 146,
+      "community_name": "Q: How is Sector Sprint's runner state, input, Canvas renderer, audio loop, mobile performance, and reduced-motion route structured?",
+      "norm_label": "query_20260805_035832_how_is_sector_sprint_s_runner_state__input__canvas.md"
+    },
+    {
+      "label": "Q: How is Sector Sprint's runner state, input, Canvas renderer, audio loop, mobile performance, and reduced-motion route structured?",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260805_035832_how_is_sector_sprint_s_runner_state__input__canvas.md",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260805_035832_how_is_sector_sprint_s_runner_state_input_canvas_q_how_is_sector_sprint_s_runner_state_input_canvas_renderer_audio_loop_mobile_performance_and_reduced_motion_route_structured",
+      "community": 146,
+      "community_name": "Q: How is Sector Sprint's runner state, input, Canvas renderer, audio loop, mobile performance, and reduced-motion route structured?",
+      "norm_label": "q: how is sector sprint's runner state, input, canvas renderer, audio loop, mobile performance, and reduced-motion route structured?"
+    },
+    {
+      "label": "Answer",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260805_035832_how_is_sector_sprint_s_runner_state__input__canvas.md",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260805_035832_how_is_sector_sprint_s_runner_state_input_canvas_answer",
+      "community": 146,
+      "community_name": "Q: How is Sector Sprint's runner state, input, Canvas renderer, audio loop, mobile performance, and reduced-motion route structured?",
+      "norm_label": "answer"
+    },
+    {
+      "label": "Outcome",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260805_035832_how_is_sector_sprint_s_runner_state__input__canvas.md",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260805_035832_how_is_sector_sprint_s_runner_state_input_canvas_outcome",
+      "community": 146,
+      "community_name": "Q: How is Sector Sprint's runner state, input, Canvas renderer, audio loop, mobile performance, and reduced-motion route structured?",
+      "norm_label": "outcome"
+    },
+    {
+      "label": "query_20260805_045813_how_do_sector_sprint_hold_to_lift_input__fixed_ste.md",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260805_045813_how_do_sector_sprint_hold_to_lift_input__fixed_ste.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260805_045813_how_do_sector_sprint_hold_to_lift_input_fixed_ste",
+      "community": 142,
+      "community_name": "Q: How do Sector Sprint hold-to-lift input, fixed-step flight, lazy illustrated art, deterministic complications, adaptive Canvas quality, audio suspension, narrated fallback, and offline caching connect without changing the House completion contract?",
+      "norm_label": "query_20260805_045813_how_do_sector_sprint_hold_to_lift_input__fixed_ste.md"
+    },
+    {
+      "label": "Q: How do Sector Sprint hold-to-lift input, fixed-step flight, lazy illustrated art, deterministic complications, adaptive Canvas quality, audio suspension, narrated fallback, and offline caching connect without changing the House completion contract?",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260805_045813_how_do_sector_sprint_hold_to_lift_input__fixed_ste.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260805_045813_how_do_sector_sprint_hold_to_lift_input_fixed_ste_q_how_do_sector_sprint_hold_to_lift_input_fixed_step_flight_lazy_illustrated_art_deterministic_complications_adaptive_canvas_quality_audio_suspension_narrated_fallback_and_offline_caching_connect_without_changing_the_house_completion_contract",
+      "community": 142,
+      "community_name": "Q: How do Sector Sprint hold-to-lift input, fixed-step flight, lazy illustrated art, deterministic complications, adaptive Canvas quality, audio suspension, narrated fallback, and offline caching connect without changing the House completion contract?",
+      "norm_label": "q: how do sector sprint hold-to-lift input, fixed-step flight, lazy illustrated art, deterministic complications, adaptive canvas quality, audio suspension, narrated fallback, and offline caching connect without changing the house completion contract?"
+    },
+    {
+      "label": "Answer",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260805_045813_how_do_sector_sprint_hold_to_lift_input__fixed_ste.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260805_045813_how_do_sector_sprint_hold_to_lift_input_fixed_ste_answer",
+      "community": 142,
+      "community_name": "Q: How do Sector Sprint hold-to-lift input, fixed-step flight, lazy illustrated art, deterministic complications, adaptive Canvas quality, audio suspension, narrated fallback, and offline caching connect without changing the House completion contract?",
+      "norm_label": "answer"
+    },
+    {
+      "label": "Outcome",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260805_045813_how_do_sector_sprint_hold_to_lift_input__fixed_ste.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260805_045813_how_do_sector_sprint_hold_to_lift_input_fixed_ste_outcome",
+      "community": 142,
+      "community_name": "Q: How do Sector Sprint hold-to-lift input, fixed-step flight, lazy illustrated art, deterministic complications, adaptive Canvas quality, audio suspension, narrated fallback, and offline caching connect without changing the House completion contract?",
+      "norm_label": "outcome"
+    },
+    {
+      "label": "Source Nodes",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260805_045813_how_do_sector_sprint_hold_to_lift_input__fixed_ste.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260805_045813_how_do_sector_sprint_hold_to_lift_input_fixed_ste_source_nodes",
+      "community": 142,
+      "community_name": "Q: How do Sector Sprint hold-to-lift input, fixed-step flight, lazy illustrated art, deterministic complications, adaptive Canvas quality, audio suspension, narrated fallback, and offline caching connect without changing the House completion contract?",
+      "norm_label": "source nodes"
+    },
+    {
+      "label": "query_20260813_073915_how_do_house_route_exit_confirmation__dialog_focus.md",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260813_073915_how_do_house_route_exit_confirmation__dialog_focus.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260813_073915_how_do_house_route_exit_confirmation_dialog_focus",
+      "community": 143,
+      "community_name": "Q: How do House route exit confirmation, dialog focus restoration, website and README assets, documentation, standalone and PWA builds, release packaging, and GitHub Pages publication connect?",
+      "norm_label": "query_20260813_073915_how_do_house_route_exit_confirmation__dialog_focus.md"
+    },
+    {
+      "label": "Q: How do House route exit confirmation, dialog focus restoration, website and README assets, documentation, standalone and PWA builds, release packaging, and GitHub Pages publication connect?",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260813_073915_how_do_house_route_exit_confirmation__dialog_focus.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260813_073915_how_do_house_route_exit_confirmation_dialog_focus_q_how_do_house_route_exit_confirmation_dialog_focus_restoration_website_and_readme_assets_documentation_standalone_and_pwa_builds_release_packaging_and_github_pages_publication_connect",
+      "community": 143,
+      "community_name": "Q: How do House route exit confirmation, dialog focus restoration, website and README assets, documentation, standalone and PWA builds, release packaging, and GitHub Pages publication connect?",
+      "norm_label": "q: how do house route exit confirmation, dialog focus restoration, website and readme assets, documentation, standalone and pwa builds, release packaging, and github pages publication connect?"
+    },
+    {
+      "label": "Answer",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260813_073915_how_do_house_route_exit_confirmation__dialog_focus.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260813_073915_how_do_house_route_exit_confirmation_dialog_focus_answer",
+      "community": 143,
+      "community_name": "Q: How do House route exit confirmation, dialog focus restoration, website and README assets, documentation, standalone and PWA builds, release packaging, and GitHub Pages publication connect?",
+      "norm_label": "answer"
+    },
+    {
+      "label": "Outcome",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260813_073915_how_do_house_route_exit_confirmation__dialog_focus.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260813_073915_how_do_house_route_exit_confirmation_dialog_focus_outcome",
+      "community": 143,
+      "community_name": "Q: How do House route exit confirmation, dialog focus restoration, website and README assets, documentation, standalone and PWA builds, release packaging, and GitHub Pages publication connect?",
+      "norm_label": "outcome"
+    },
+    {
+      "label": "Source Nodes",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260813_073915_how_do_house_route_exit_confirmation__dialog_focus.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260813_073915_how_do_house_route_exit_confirmation_dialog_focus_source_nodes",
+      "community": 143,
+      "community_name": "Q: How do House route exit confirmation, dialog focus restoration, website and README assets, documentation, standalone and PWA builds, release packaging, and GitHub Pages publication connect?",
+      "norm_label": "source nodes"
+    },
+    {
+      "label": "query_20260813_231523_which_recently_changed_nindova_house_modules_have.md",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260813_231523_which_recently_changed_nindova_house_modules_have.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260813_231523_which_recently_changed_nindova_house_modules_have",
+      "community": 144,
+      "community_name": "Q: Which recently changed Nindova House modules have credible deepening candidates, excluding already-deepened architecture?",
+      "norm_label": "query_20260813_231523_which_recently_changed_nindova_house_modules_have.md"
+    },
+    {
+      "label": "Q: Which recently changed Nindova House modules have credible deepening candidates, excluding already-deepened architecture?",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260813_231523_which_recently_changed_nindova_house_modules_have.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260813_231523_which_recently_changed_nindova_house_modules_have_q_which_recently_changed_nindova_house_modules_have_credible_deepening_candidates_excluding_already_deepened_architecture",
+      "community": 144,
+      "community_name": "Q: Which recently changed Nindova House modules have credible deepening candidates, excluding already-deepened architecture?",
+      "norm_label": "q: which recently changed nindova house modules have credible deepening candidates, excluding already-deepened architecture?"
+    },
+    {
+      "label": "Answer",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260813_231523_which_recently_changed_nindova_house_modules_have.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260813_231523_which_recently_changed_nindova_house_modules_have_answer",
+      "community": 144,
+      "community_name": "Q: Which recently changed Nindova House modules have credible deepening candidates, excluding already-deepened architecture?",
+      "norm_label": "answer"
+    },
+    {
+      "label": "Outcome",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260813_231523_which_recently_changed_nindova_house_modules_have.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260813_231523_which_recently_changed_nindova_house_modules_have_outcome",
+      "community": 144,
+      "community_name": "Q: Which recently changed Nindova House modules have credible deepening candidates, excluding already-deepened architecture?",
+      "norm_label": "outcome"
+    },
+    {
+      "label": "Source Nodes",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260813_231523_which_recently_changed_nindova_house_modules_have.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260813_231523_which_recently_changed_nindova_house_modules_have_source_nodes",
+      "community": 144,
+      "community_name": "Q: Which recently changed Nindova House modules have credible deepening candidates, excluding already-deepened architecture?",
+      "norm_label": "source nodes"
     },
     {
       "label": "Nindova contributor guidance",
@@ -31958,6 +32772,50 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "docs/releases/v0.4.4.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_releases_v0_4_4",
+      "target": "docs_releases_v0_4_4_nindova_v0_4_4_kept_nights",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/releases/v0.4.4.md",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_releases_v0_4_4_nindova_v0_4_4_kept_nights",
+      "target": "docs_releases_v0_4_4_evidence_boundary",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/releases/v0.4.4.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_releases_v0_4_4_nindova_v0_4_4_kept_nights",
+      "target": "docs_releases_v0_4_4_highlights",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/releases/v0.4.4.md",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_releases_v0_4_4_nindova_v0_4_4_kept_nights",
+      "target": "docs_releases_v0_4_4_notes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "docs/research/bedtime-game-evidence.md",
       "source_location": "L1",
       "weight": 1.0,
@@ -32305,6 +33163,611 @@
       "_origin": "ast",
       "source": "docs_testing_sector_sprint_game_feel_sector_sprint_progressive_lane_checkpoint",
       "target": "docs_testing_sector_sprint_game_feel_verified_gates",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for",
+      "target": "graphify_out_memory_query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for_q_independently_review_revised_rasoi_pairs_plan_for_nindova_product_contract_timing_state_dawn_and_migration_risks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for_q_independently_review_revised_rasoi_pairs_plan_for_nindova_product_contract_timing_state_dawn_and_migration_risks",
+      "target": "graphify_out_memory_query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for_q_independently_review_revised_rasoi_pairs_plan_for_nindova_product_contract_timing_state_dawn_and_migration_risks",
+      "target": "graphify_out_memory_query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for_outcome",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for_q_independently_review_revised_rasoi_pairs_plan_for_nindova_product_contract_timing_state_dawn_and_migration_risks",
+      "target": "graphify_out_memory_query_20260803_045138_independently_review_revised_rasoi_pairs_plan_for_source_nodes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha",
+      "target": "graphify_out_memory_query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha_q_why_does_rasoi_pairs_lack_mahjong_like_layered_challenge_and_visible_replay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha_q_why_does_rasoi_pairs_lack_mahjong_like_layered_challenge_and_visible_replay",
+      "target": "graphify_out_memory_query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha_q_why_does_rasoi_pairs_lack_mahjong_like_layered_challenge_and_visible_replay",
+      "target": "graphify_out_memory_query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha_outcome",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha_q_why_does_rasoi_pairs_lack_mahjong_like_layered_challenge_and_visible_replay",
+      "target": "graphify_out_memory_query_20260803_171943_why_does_rasoi_pairs_lack_mahjong_like_layered_cha_source_nodes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated",
+      "target": "graphify_out_memory_query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated_q_make_the_app_theme_more_royal_and_sophisticated",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated_q_make_the_app_theme_more_royal_and_sophisticated",
+      "target": "graphify_out_memory_query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated_q_make_the_app_theme_more_royal_and_sophisticated",
+      "target": "graphify_out_memory_query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated_outcome",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated_q_make_the_app_theme_more_royal_and_sophisticated",
+      "target": "graphify_out_memory_query_20260804_061157_make_the_app_theme_more_royal_and_sophisticated_source_nodes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_180157_rasoi_dawn_looks_so_ugly.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_180157_rasoi_dawn_looks_so_ugly",
+      "target": "graphify_out_memory_query_20260804_180157_rasoi_dawn_looks_so_ugly_q_rasoi_dawn_looks_so_ugly",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_180157_rasoi_dawn_looks_so_ugly.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_180157_rasoi_dawn_looks_so_ugly_q_rasoi_dawn_looks_so_ugly",
+      "target": "graphify_out_memory_query_20260804_180157_rasoi_dawn_looks_so_ugly_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_180157_rasoi_dawn_looks_so_ugly.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_180157_rasoi_dawn_looks_so_ugly_q_rasoi_dawn_looks_so_ugly",
+      "target": "graphify_out_memory_query_20260804_180157_rasoi_dawn_looks_so_ugly_outcome",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_180157_rasoi_dawn_looks_so_ugly.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_180157_rasoi_dawn_looks_so_ugly_q_rasoi_dawn_looks_so_ugly",
+      "target": "graphify_out_memory_query_20260804_180157_rasoi_dawn_looks_so_ugly_source_nodes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_184502_council_coverage_review_of_the_adult_nindova_house.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_184502_council_coverage_review_of_the_adult_nindova_house",
+      "target": "graphify_out_memory_query_20260804_184502_council_coverage_review_of_the_adult_nindova_house_q_council_coverage_review_of_the_adult_nindova_house_entertainment_implementation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_184502_council_coverage_review_of_the_adult_nindova_house.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_184502_council_coverage_review_of_the_adult_nindova_house_q_council_coverage_review_of_the_adult_nindova_house_entertainment_implementation",
+      "target": "graphify_out_memory_query_20260804_184502_council_coverage_review_of_the_adult_nindova_house_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_184502_council_coverage_review_of_the_adult_nindova_house.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_184502_council_coverage_review_of_the_adult_nindova_house_q_council_coverage_review_of_the_adult_nindova_house_entertainment_implementation",
+      "target": "graphify_out_memory_query_20260804_184502_council_coverage_review_of_the_adult_nindova_house_outcome",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_184502_council_coverage_review_of_the_adult_nindova_house.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_184502_council_coverage_review_of_the_adult_nindova_house_q_council_coverage_review_of_the_adult_nindova_house_entertainment_implementation",
+      "target": "graphify_out_memory_query_20260804_184502_council_coverage_review_of_the_adult_nindova_house_source_nodes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_194501_build_entertainment_first_for_adults_above_18__tes.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_194501_build_entertainment_first_for_adults_above_18_tes",
+      "target": "graphify_out_memory_query_20260804_194501_build_entertainment_first_for_adults_above_18_tes_q_build_entertainment_first_for_adults_above_18_test_it_run_a_council_review_then_implement_assessment_grade",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_194501_build_entertainment_first_for_adults_above_18__tes.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_194501_build_entertainment_first_for_adults_above_18_tes_q_build_entertainment_first_for_adults_above_18_test_it_run_a_council_review_then_implement_assessment_grade",
+      "target": "graphify_out_memory_query_20260804_194501_build_entertainment_first_for_adults_above_18_tes_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_194501_build_entertainment_first_for_adults_above_18__tes.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_194501_build_entertainment_first_for_adults_above_18_tes_q_build_entertainment_first_for_adults_above_18_test_it_run_a_council_review_then_implement_assessment_grade",
+      "target": "graphify_out_memory_query_20260804_194501_build_entertainment_first_for_adults_above_18_tes_outcome",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_194501_build_entertainment_first_for_adults_above_18__tes.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_194501_build_entertainment_first_for_adults_above_18_tes_q_build_entertainment_first_for_adults_above_18_test_it_run_a_council_review_then_implement_assessment_grade",
+      "target": "graphify_out_memory_query_20260804_194501_build_entertainment_first_for_adults_above_18_tes_source_nodes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_204420_how_is_sector_sprint_registered__rendered__persist.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_204420_how_is_sector_sprint_registered_rendered_persist",
+      "target": "graphify_out_memory_query_20260804_204420_how_is_sector_sprint_registered_rendered_persist_q_how_is_sector_sprint_registered_rendered_persisted_completed_tested_and_isolated_from_the_night_room",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_204420_how_is_sector_sprint_registered__rendered__persist.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_204420_how_is_sector_sprint_registered_rendered_persist_q_how_is_sector_sprint_registered_rendered_persisted_completed_tested_and_isolated_from_the_night_room",
+      "target": "graphify_out_memory_query_20260804_204420_how_is_sector_sprint_registered_rendered_persist_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_204420_how_is_sector_sprint_registered__rendered__persist.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_204420_how_is_sector_sprint_registered_rendered_persist_q_how_is_sector_sprint_registered_rendered_persisted_completed_tested_and_isolated_from_the_night_room",
+      "target": "graphify_out_memory_query_20260804_204420_how_is_sector_sprint_registered_rendered_persist_outcome",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_204420_how_is_sector_sprint_registered__rendered__persist.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_204420_how_is_sector_sprint_registered_rendered_persist_q_how_is_sector_sprint_registered_rendered_persisted_completed_tested_and_isolated_from_the_night_room",
+      "target": "graphify_out_memory_query_20260804_204420_how_is_sector_sprint_registered_rendered_persist_source_nodes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_211827_how_is_sector_sprint_registered__rendered__persist.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_211827_how_is_sector_sprint_registered_rendered_persist",
+      "target": "graphify_out_memory_query_20260804_211827_how_is_sector_sprint_registered_rendered_persist_q_how_is_sector_sprint_registered_rendered_persisted_completed_tested_and_isolated_from_the_night_room",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_211827_how_is_sector_sprint_registered__rendered__persist.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_211827_how_is_sector_sprint_registered_rendered_persist_q_how_is_sector_sprint_registered_rendered_persisted_completed_tested_and_isolated_from_the_night_room",
+      "target": "graphify_out_memory_query_20260804_211827_how_is_sector_sprint_registered_rendered_persist_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_211827_how_is_sector_sprint_registered__rendered__persist.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_211827_how_is_sector_sprint_registered_rendered_persist_q_how_is_sector_sprint_registered_rendered_persisted_completed_tested_and_isolated_from_the_night_room",
+      "target": "graphify_out_memory_query_20260804_211827_how_is_sector_sprint_registered_rendered_persist_outcome",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_211827_how_is_sector_sprint_registered__rendered__persist.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_211827_how_is_sector_sprint_registered_rendered_persist_q_how_is_sector_sprint_registered_rendered_persisted_completed_tested_and_isolated_from_the_night_room",
+      "target": "graphify_out_memory_query_20260804_211827_how_is_sector_sprint_registered_rendered_persist_source_nodes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_215805_how_does_the_polished_sector_sprint_connect_render.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_215805_how_does_the_polished_sector_sprint_connect_render",
+      "target": "graphify_out_memory_query_20260804_215805_how_does_the_polished_sector_sprint_connect_render_q_how_does_the_polished_sector_sprint_connect_rendering_state_audio_accessibility_and_tests",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_215805_how_does_the_polished_sector_sprint_connect_render.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_215805_how_does_the_polished_sector_sprint_connect_render_q_how_does_the_polished_sector_sprint_connect_rendering_state_audio_accessibility_and_tests",
+      "target": "graphify_out_memory_query_20260804_215805_how_does_the_polished_sector_sprint_connect_render_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_215805_how_does_the_polished_sector_sprint_connect_render.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_215805_how_does_the_polished_sector_sprint_connect_render_q_how_does_the_polished_sector_sprint_connect_rendering_state_audio_accessibility_and_tests",
+      "target": "graphify_out_memory_query_20260804_215805_how_does_the_polished_sector_sprint_connect_render_outcome",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260804_215805_how_does_the_polished_sector_sprint_connect_render.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260804_215805_how_does_the_polished_sector_sprint_connect_render_q_how_does_the_polished_sector_sprint_connect_rendering_state_audio_accessibility_and_tests",
+      "target": "graphify_out_memory_query_20260804_215805_how_does_the_polished_sector_sprint_connect_render_source_nodes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t",
+      "target": "graphify_out_memory_query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t_q_how_do_the_adult_house_and_sector_sprint_connect_through_house_source_core_to_night_state_public_surface_and_pwa_offline_boundary",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t_q_how_do_the_adult_house_and_sector_sprint_connect_through_house_source_core_to_night_state_public_surface_and_pwa_offline_boundary",
+      "target": "graphify_out_memory_query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t_q_how_do_the_adult_house_and_sector_sprint_connect_through_house_source_core_to_night_state_public_surface_and_pwa_offline_boundary",
+      "target": "graphify_out_memory_query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t_outcome",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t_q_how_do_the_adult_house_and_sector_sprint_connect_through_house_source_core_to_night_state_public_surface_and_pwa_offline_boundary",
+      "target": "graphify_out_memory_query_20260805_015330_how_do_the_adult_house_and_sector_sprint_connect_t_source_nodes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260805_035832_how_is_sector_sprint_s_runner_state__input__canvas.md",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260805_035832_how_is_sector_sprint_s_runner_state_input_canvas",
+      "target": "graphify_out_memory_query_20260805_035832_how_is_sector_sprint_s_runner_state_input_canvas_q_how_is_sector_sprint_s_runner_state_input_canvas_renderer_audio_loop_mobile_performance_and_reduced_motion_route_structured",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260805_035832_how_is_sector_sprint_s_runner_state__input__canvas.md",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260805_035832_how_is_sector_sprint_s_runner_state_input_canvas_q_how_is_sector_sprint_s_runner_state_input_canvas_renderer_audio_loop_mobile_performance_and_reduced_motion_route_structured",
+      "target": "graphify_out_memory_query_20260805_035832_how_is_sector_sprint_s_runner_state_input_canvas_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260805_035832_how_is_sector_sprint_s_runner_state__input__canvas.md",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260805_035832_how_is_sector_sprint_s_runner_state_input_canvas_q_how_is_sector_sprint_s_runner_state_input_canvas_renderer_audio_loop_mobile_performance_and_reduced_motion_route_structured",
+      "target": "graphify_out_memory_query_20260805_035832_how_is_sector_sprint_s_runner_state_input_canvas_outcome",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260805_045813_how_do_sector_sprint_hold_to_lift_input__fixed_ste.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260805_045813_how_do_sector_sprint_hold_to_lift_input_fixed_ste",
+      "target": "graphify_out_memory_query_20260805_045813_how_do_sector_sprint_hold_to_lift_input_fixed_ste_q_how_do_sector_sprint_hold_to_lift_input_fixed_step_flight_lazy_illustrated_art_deterministic_complications_adaptive_canvas_quality_audio_suspension_narrated_fallback_and_offline_caching_connect_without_changing_the_house_completion_contract",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260805_045813_how_do_sector_sprint_hold_to_lift_input__fixed_ste.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260805_045813_how_do_sector_sprint_hold_to_lift_input_fixed_ste_q_how_do_sector_sprint_hold_to_lift_input_fixed_step_flight_lazy_illustrated_art_deterministic_complications_adaptive_canvas_quality_audio_suspension_narrated_fallback_and_offline_caching_connect_without_changing_the_house_completion_contract",
+      "target": "graphify_out_memory_query_20260805_045813_how_do_sector_sprint_hold_to_lift_input_fixed_ste_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260805_045813_how_do_sector_sprint_hold_to_lift_input__fixed_ste.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260805_045813_how_do_sector_sprint_hold_to_lift_input_fixed_ste_q_how_do_sector_sprint_hold_to_lift_input_fixed_step_flight_lazy_illustrated_art_deterministic_complications_adaptive_canvas_quality_audio_suspension_narrated_fallback_and_offline_caching_connect_without_changing_the_house_completion_contract",
+      "target": "graphify_out_memory_query_20260805_045813_how_do_sector_sprint_hold_to_lift_input_fixed_ste_outcome",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260805_045813_how_do_sector_sprint_hold_to_lift_input__fixed_ste.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260805_045813_how_do_sector_sprint_hold_to_lift_input_fixed_ste_q_how_do_sector_sprint_hold_to_lift_input_fixed_step_flight_lazy_illustrated_art_deterministic_complications_adaptive_canvas_quality_audio_suspension_narrated_fallback_and_offline_caching_connect_without_changing_the_house_completion_contract",
+      "target": "graphify_out_memory_query_20260805_045813_how_do_sector_sprint_hold_to_lift_input_fixed_ste_source_nodes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260813_073915_how_do_house_route_exit_confirmation__dialog_focus.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260813_073915_how_do_house_route_exit_confirmation_dialog_focus",
+      "target": "graphify_out_memory_query_20260813_073915_how_do_house_route_exit_confirmation_dialog_focus_q_how_do_house_route_exit_confirmation_dialog_focus_restoration_website_and_readme_assets_documentation_standalone_and_pwa_builds_release_packaging_and_github_pages_publication_connect",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260813_073915_how_do_house_route_exit_confirmation__dialog_focus.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260813_073915_how_do_house_route_exit_confirmation_dialog_focus_q_how_do_house_route_exit_confirmation_dialog_focus_restoration_website_and_readme_assets_documentation_standalone_and_pwa_builds_release_packaging_and_github_pages_publication_connect",
+      "target": "graphify_out_memory_query_20260813_073915_how_do_house_route_exit_confirmation_dialog_focus_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260813_073915_how_do_house_route_exit_confirmation__dialog_focus.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260813_073915_how_do_house_route_exit_confirmation_dialog_focus_q_how_do_house_route_exit_confirmation_dialog_focus_restoration_website_and_readme_assets_documentation_standalone_and_pwa_builds_release_packaging_and_github_pages_publication_connect",
+      "target": "graphify_out_memory_query_20260813_073915_how_do_house_route_exit_confirmation_dialog_focus_outcome",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260813_073915_how_do_house_route_exit_confirmation__dialog_focus.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260813_073915_how_do_house_route_exit_confirmation_dialog_focus_q_how_do_house_route_exit_confirmation_dialog_focus_restoration_website_and_readme_assets_documentation_standalone_and_pwa_builds_release_packaging_and_github_pages_publication_connect",
+      "target": "graphify_out_memory_query_20260813_073915_how_do_house_route_exit_confirmation_dialog_focus_source_nodes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260813_231523_which_recently_changed_nindova_house_modules_have.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260813_231523_which_recently_changed_nindova_house_modules_have",
+      "target": "graphify_out_memory_query_20260813_231523_which_recently_changed_nindova_house_modules_have_q_which_recently_changed_nindova_house_modules_have_credible_deepening_candidates_excluding_already_deepened_architecture",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260813_231523_which_recently_changed_nindova_house_modules_have.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260813_231523_which_recently_changed_nindova_house_modules_have_q_which_recently_changed_nindova_house_modules_have_credible_deepening_candidates_excluding_already_deepened_architecture",
+      "target": "graphify_out_memory_query_20260813_231523_which_recently_changed_nindova_house_modules_have_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260813_231523_which_recently_changed_nindova_house_modules_have.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260813_231523_which_recently_changed_nindova_house_modules_have_q_which_recently_changed_nindova_house_modules_have_credible_deepening_candidates_excluding_already_deepened_architecture",
+      "target": "graphify_out_memory_query_20260813_231523_which_recently_changed_nindova_house_modules_have_outcome",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260813_231523_which_recently_changed_nindova_house_modules_have.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260813_231523_which_recently_changed_nindova_house_modules_have_q_which_recently_changed_nindova_house_modules_have_credible_deepening_candidates_excluding_already_deepened_architecture",
+      "target": "graphify_out_memory_query_20260813_231523_which_recently_changed_nindova_house_modules_have_source_nodes",
       "confidence_score": 1.0
     },
     {
@@ -35373,5 +36836,5 @@
       "source_file": "reference/nindova-master-brief.md"
     }
   ],
-  "built_at_commit": "0f26cb363916a4ee15bb11b00eccae837cc017cd"
+  "built_at_commit": "d153dc648a26c5596b3c7b14d5415d11cf3a61b7"
 }
