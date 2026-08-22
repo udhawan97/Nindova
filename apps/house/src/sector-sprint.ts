@@ -1375,7 +1375,7 @@ function drawAuthoredLead(
   const blend = reducedMotion
     ? { from: runnerAuthoredPoseIndex(state), to: runnerAuthoredPoseIndex(state), mix: 0 }
     : runnerAuthoredPoseBlend(state);
-  const destinationHeight = 96 * scale;
+  const destinationHeight = 112 * scale;
   const destinationWidth = destinationHeight * (sourceWidth / sourceHeight);
   const destinationX = PLAYER_WIDTH / 2 - destinationWidth / 2;
   const destinationY = PLAYER_HEIGHT - destinationHeight;
@@ -1430,6 +1430,21 @@ function drawPerson(
 ) {
   const x = RUNNER_PLAYER_SCREEN_X;
   const formation = runnerLeadFormation(lead);
+  const grade = ACT_GRADES[state.actIndex];
+  context.save();
+  const portraitLight = context.createRadialGradient(x + 26, state.y + 42, 8, x + 26, state.y + 42, 92);
+  portraitLight.addColorStop(0, `${grade.glow}36`);
+  portraitLight.addColorStop(0.46, `${grade.energy}18`);
+  portraitLight.addColorStop(1, "#00000000");
+  context.fillStyle = portraitLight;
+  context.fillRect(x - 74, state.y - 62, 212, 214);
+  context.globalAlpha = 0.72;
+  context.strokeStyle = grade.energy;
+  context.lineWidth = 1.5;
+  context.beginPath();
+  context.ellipse(x + 26, state.y + PLAYER_HEIGHT + 9, 48, 9, 0, 0, Math.PI * 2);
+  context.stroke();
+  context.restore();
   if (spriteSheet?.complete && spriteSheet.naturalWidth > 0) {
     for (const rider of formation) {
       drawAuthoredLead(context, spriteSheet, x + rider.offsetX, state.y + rider.offsetY, rider.role, state, rider.scale, reducedMotion);
@@ -1498,7 +1513,13 @@ function drawSky(context: CanvasRenderingContext2D, state: RunnerState, palette:
   context.globalAlpha = 1;
 }
 
-function drawCityLayers(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette, reducedMotion: boolean) {
+function drawCityLayers(
+  context: CanvasRenderingContext2D,
+  state: RunnerState,
+  palette: RunnerPalette,
+  reducedMotion: boolean,
+  quality: RunnerRenderQuality,
+) {
   const grade = ACT_GRADES[state.actIndex];
   const layers = [
     { speed: 0.08, spacing: 118, y: 172, color: "#10243d", alpha: 0.42 },
@@ -1517,12 +1538,17 @@ function drawCityLayers(context: CanvasRenderingContext2D, state: RunnerState, p
       context.beginPath();
       context.roundRect(x, layer.y - height, buildingWidth, height + FLOOR_Y - layer.y, layerIndex === 2 ? 3 : 1);
       context.fill();
-      context.fillStyle = `${grade.glow}${layerIndex === 2 ? "33" : "20"}`;
-      context.fillRect(x + 8, layer.y - height + 7, buildingWidth - 16, 2);
-      for (let windowIndex = 0; windowIndex < 5; windowIndex += 1) {
-        const lit = (windowIndex + index + state.actIndex) % 3 === 0;
-        const windowX = x + 15 + windowIndex * Math.max(18, buildingWidth / 6);
-        pixelRect(context, windowX, layer.y - height + 24, 7, Math.max(18, height - 48), lit ? `${grade.glow}70` : "#17283a");
+      context.fillStyle = `${grade.glow}${layerIndex === 2 ? "45" : "26"}`;
+      context.fillRect(x + 8, layer.y - height + 7, buildingWidth - 16, layerIndex === 2 ? 3 : 2);
+      const rows = quality === "high" ? 3 : quality === "balanced" ? 2 : 1;
+      for (let row = 0; row < rows; row += 1) {
+        for (let windowIndex = 0; windowIndex < 5; windowIndex += 1) {
+          const lit = (windowIndex + row + index + state.actIndex) % 3 === 0;
+          const windowX = x + 14 + windowIndex * Math.max(18, buildingWidth / 6);
+          const windowY = layer.y - height + 24 + row * 22;
+          if (windowY > layer.y - 14) continue;
+          pixelRect(context, windowX, windowY, 7, 10, lit ? `${grade.glow}${layerIndex === 2 ? "96" : "68"}` : "#17283a");
+        }
       }
     }
     context.globalAlpha = 1;
@@ -1539,6 +1565,50 @@ function drawCityLayers(context: CanvasRenderingContext2D, state: RunnerState, p
     context.lineTo(beamX - 28, FLOOR_Y);
     context.closePath();
     context.fill();
+  }
+  context.restore();
+}
+
+function drawLaneTheatre(
+  context: CanvasRenderingContext2D,
+  state: RunnerState,
+  palette: RunnerPalette,
+  quality: RunnerRenderQuality,
+) {
+  const grade = ACT_GRADES[state.actIndex];
+  const instruction = runnerUpcomingInstruction(state);
+  const safeLane = instruction
+    ? RUNNER_ACTS[state.actIndex].obstacles.find((obstacle) => obstacle.id === instruction.obstacleId)?.safeLane
+    : null;
+  context.save();
+  for (const [lane, laneY] of RUNNER_LANE_Y.entries()) {
+    const isSafe = safeLane === lane;
+    const band = context.createLinearGradient(0, laneY, RUNNER_WIDTH, laneY);
+    band.addColorStop(0, "#00000000");
+    band.addColorStop(0.14, isSafe ? `${grade.energy}22` : `${grade.horizon}20`);
+    band.addColorStop(0.72, isSafe ? `${grade.energy}16` : `${grade.horizon}12`);
+    band.addColorStop(1, "#00000000");
+    context.fillStyle = band;
+    context.fillRect(0, laneY - 8, RUNNER_WIDTH, PLAYER_HEIGHT + 16);
+    context.globalAlpha = isSafe ? 0.74 : 0.28;
+    context.strokeStyle = isSafe ? grade.energy : palette.rule;
+    context.lineWidth = isSafe ? 2 : 1;
+    if (quality !== "quiet") context.setLineDash(isSafe ? [16, 12] : [4, 18]);
+    context.beginPath();
+    context.moveTo(0, laneY + PLAYER_HEIGHT + 5);
+    context.lineTo(RUNNER_WIDTH, laneY + PLAYER_HEIGHT + 5);
+    context.stroke();
+    context.setLineDash([]);
+    context.globalAlpha = 1;
+  }
+  context.globalAlpha = quality === "high" ? 0.5 : quality === "balanced" ? 0.34 : 0.2;
+  context.strokeStyle = palette.accent;
+  context.lineWidth = 1;
+  for (let rail = 0; rail < 4; rail += 1) {
+    context.beginPath();
+    context.moveTo(RUNNER_WIDTH * 0.54, 208);
+    context.lineTo(RUNNER_WIDTH * (0.22 + rail * 0.24), FLOOR_Y);
+    context.stroke();
   }
   context.restore();
 }
@@ -1621,19 +1691,25 @@ function drawActSetting(context: CanvasRenderingContext2D, state: RunnerState, p
 function drawForeground(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette, reducedMotion: boolean) {
   const grade = ACT_GRADES[state.actIndex];
   const road = context.createLinearGradient(0, FLOOR_Y, 0, RUNNER_HEIGHT);
-  road.addColorStop(0, "#17283a");
-  road.addColorStop(1, "#03070d");
+  road.addColorStop(0, "#203a50");
+  road.addColorStop(0.18, "#132538");
+  road.addColorStop(1, "#050911");
   context.fillStyle = road;
   context.fillRect(0, FLOOR_Y, RUNNER_WIDTH, RUNNER_HEIGHT - FLOOR_Y);
   context.fillStyle = grade.glow;
   context.shadowColor = grade.glow;
   context.shadowBlur = 18;
-  context.fillRect(0, FLOOR_Y, RUNNER_WIDTH, 3);
+  context.fillRect(0, FLOOR_Y, RUNNER_WIDTH, 4);
   context.shadowBlur = 0;
+  context.globalAlpha = 0.5;
+  context.fillStyle = grade.energy;
+  context.fillRect(0, FLOOR_Y + 8, RUNNER_WIDTH, 1);
+  context.globalAlpha = 1;
   for (let mark = -80; mark < RUNNER_WIDTH + 80; mark += 150) {
     const roadOffset = reducedMotion ? 0 : (state.worldX * 0.92) % 150;
     const x = mark - roadOffset;
-    context.fillStyle = "#7d6b50";
+    context.fillStyle = grade.glow;
+    context.globalAlpha = 0.44;
     context.beginPath();
     context.moveTo(x, FLOOR_Y + 43);
     context.lineTo(x + 72, FLOOR_Y + 43);
@@ -1641,6 +1717,7 @@ function drawForeground(context: CanvasRenderingContext2D, state: RunnerState, p
     context.lineTo(x - 5, FLOOR_Y + 50);
     context.closePath();
     context.fill();
+    context.globalAlpha = 1;
   }
   context.globalAlpha = 0.42;
   const nearOffset = reducedMotion ? 0 : (state.worldX * 1.04) % 260;
@@ -1656,6 +1733,20 @@ function drawForeground(context: CanvasRenderingContext2D, state: RunnerState, p
   reflection.addColorStop(1, "#00000000");
   context.fillStyle = reflection;
   context.fillRect(0, FLOOR_Y, RUNNER_WIDTH, RUNNER_HEIGHT - FLOOR_Y);
+
+  context.globalAlpha = 0.28;
+  context.fillStyle = palette.inkSoft;
+  const curbOffset = reducedMotion ? 0 : (state.worldX * 1.18) % 84;
+  for (let curb = -84; curb < RUNNER_WIDTH + 84; curb += 84) {
+    context.beginPath();
+    context.moveTo(curb - curbOffset, FLOOR_Y + 12);
+    context.lineTo(curb + 50 - curbOffset, FLOOR_Y + 12);
+    context.lineTo(curb + 58 - curbOffset, FLOOR_Y + 18);
+    context.lineTo(curb + 4 - curbOffset, FLOOR_Y + 18);
+    context.closePath();
+    context.fill();
+  }
+  context.globalAlpha = 1;
 }
 
 function drawComplicationGate(
@@ -1991,8 +2082,9 @@ export function drawRunnerFrame(
   const cameraKick = ambientReduced ? 0 : Math.round(Math.max(-RUNNER_CAMERA_SHAKE_CAP, Math.min(RUNNER_CAMERA_SHAKE_CAP, impactKick)));
   context.translate(cameraKick, Math.abs(cameraKick) * 0.28);
   drawSky(context, state, palette, ambientReduced);
-  drawCityLayers(context, state, palette, ambientReduced);
+  drawCityLayers(context, state, palette, ambientReduced, quality);
   drawActSetting(context, state, palette, ambientReduced);
+  drawLaneTheatre(context, state, palette, quality);
   drawForeground(context, state, palette, ambientReduced);
   drawRunnerObstacles(context, state, quality);
 

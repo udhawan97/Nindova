@@ -50,7 +50,11 @@ Every table has five fixed chapters, studies, or Acts and a designed curtain cal
 
 The three classic additions are explicitly labeled authored tactical rule studies. Each names its source and documented scope and discloses the full-match rules it omits; Nindova does not present them as definitive or complete traditional matches.
 
+The current source gives each table its own physical stage without making decoration part of the rules: geometric inlay for Pattern Court, smoked glass and brass for Mirror Forge, carved line and pit boards for the three classic studies, a velvet lantern procession, and a rosewood tower table. Every required action remains a native control with the same text and nonvisual state.
+
 Sector Sprint offers an Action route with discrete Up/Down lane movement, optional harmless Act tools, and explicit Hold/Up/Down markers. The Narrated route reaches the same five-Act curtain call without timing, sound, precision movement, or visual interpretation. One architectural contact ends an Action attempt; it creates no life count, checkpoint, failure history, or completion.
+
+Its current code-drawn theatre adds illuminated lane bands, layered city windows, curb reflections, perspective rails, and a clearer rider silhouette behind the existing three-lane route. Those details adapt through the existing render-quality tiers; authored gates, collision geometry, speed, order, and outcome do not change.
 
 ![Sector Sprint's current illustrated three-lane route with an authored sandstone gate and Hold Lane marker](./apps/site/public/media/sector-sprint.png)
 

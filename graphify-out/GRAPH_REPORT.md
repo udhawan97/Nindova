@@ -1,16 +1,16 @@
-# Graph Report - Nindova  (2026-08-20)
+# Graph Report - worktree  (2026-08-22)
 
 ## Corpus Check
-- 165 files · ~186,593 words
+- 165 files · ~191,662 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1378 nodes · 1832 edges · 148 communities (114 shown, 34 thin omitted)
+- 1380 nodes · 1837 edges · 147 communities (114 shown, 33 thin omitted)
 - Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 137 edges (avg confidence: 0.73)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d153dc64`
+- Built from commit: `25c1a1ab`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -52,7 +52,7 @@
 - color-contrast.test.mjs
 - compilerOptions
 - pwa-offline.mjs
-- contracts.ts
+- RasoiDebug
 - Distribution Boundary
 - Open-side foreground tiles
 - Rasoi Pairs Session Interface
@@ -88,22 +88,22 @@
 - Nindova v0.4.0 — Five Doors
 - Nindova v0.4.1 — House Continuity
 - Nindova v0.4.2 — Clean Return
-- active-session.ts
+- NindovaDawn
 - finishSession
 - Visual system
 - Nindova v0.4.3 — Held Boundaries
 - Deepen House boundaries and browser evidence
-- selectTile
+- restoreActiveSession
 - playChime
 - createHouseNavigation
 - browser-evidence-harness.test.mjs
 - salon-table-lifecycle.test.mjs
 - public-surface.mjs
-- restoreActiveSession
+- clearActiveSession
 - serve.mjs
 - seed-asserted.mjs
 - sector-sprint.test.mjs
-- RasoiDebug
+- Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks
 - First-Light Kitchen Setting
 - active-session.test.mjs
 - session-architecture.test.mjs
@@ -111,12 +111,12 @@
 - self-closing.mjs
 - workspaces
 - 0011-layer-rasoi-and-keep-replay-deliberate.md
-- Conservative product constraints
+- Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?
 - assessment-readiness.test.mjs
 - Deferred iOS Wall
 - Punjabi and Indian Material World
 - Nindova v0.4.4 — Kept Nights
-- Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks
+- Q: Make the app theme more royal and sophisticated
 - brand-assets.test.mjs
 - copy-contract.test.mjs
 - house-state.test.mjs
@@ -139,8 +139,7 @@
 - Monotonic Fifteen-minute Session Cap
 - M5 Honest Verification Boundary
 - Observational Test Limitation
-- Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?
-- Q: Make the app theme more royal and sophisticated
+- drawRunnerObstacles
 - Q: rasoi dawn looks so ugly
 - Q: Council coverage review of the adult Nindova House entertainment implementation
 - Q: Build entertainment first for adults above 18, test it, run a council review, then implement assessment grade.
@@ -151,13 +150,13 @@
 - Q: How do Sector Sprint hold-to-lift input, fixed-step flight, lazy illustrated art, deterministic complications, adaptive Canvas quality, audio suspension, narrated fallback, and offline caching connect without changing the House completion contract?
 - Q: How do House route exit confirmation, dialog focus restoration, website and README assets, documentation, standalone and PWA builds, release packaging, and GitHub Pages publication connect?
 - Q: Which recently changed Nindova House modules have credible deepening candidates, excluding already-deepened architecture?
-- 2. Evening light, arousal, and media displacement
+- Board contract
+- Board profiles
 - Q: How is Sector Sprint's runner state, input, Canvas renderer, audio loop, mobile performance, and reduced-motion route structured?
-- Claim language
 
 ## God Nodes (most connected - your core abstractions)
 1. `scripts` - 29 edges
-2. `drawRunnerFrame()` - 23 edges
+2. `drawRunnerFrame()` - 24 edges
 3. `createBrowserEvidenceHarness()` - 17 edges
 4. `Bedtime game evidence brief` - 17 edges
 5. `escape()` - 14 edges
@@ -196,11 +195,11 @@
 - **Rasoi Dawn Visual Composition** — apps_site_public_media_rasoi_dawn_rasoi_dawn_image, apps_site_public_media_rasoi_dawn_first_light_kitchen, apps_site_public_media_rasoi_dawn_brass_plate_arrangement, apps_site_public_media_rasoi_dawn_warm_dawn_palette [INFERRED 0.95]
 - **Bounded Session Decision and Proof** — reference_nindova_master_brief_two_loop_law, reference_nindova_demo_fixed_session_state_arc, docs_adr_0005_cap_the_real_session_at_fifteen_minutes_fifteen_minute_session_cap [INFERRED 0.95]
 
-## Communities (148 total, 34 thin omitted)
+## Communities (147 total, 33 thin omitted)
 
 ### Community 0 - "session.ts"
 Cohesion: 0.08
-Nodes (33): NindovaDawn, boardElement, boardShell, boardStatus, closeDawn(), currentDawnEligibility(), dawnButton, dawnCanvas (+25 more)
+Nodes (25): RasoiCompletion, boardElement, boardShell, boardStatus, dawnButton, dawnCanvas, dawnStatus, dawnVideo (+17 more)
 
 ### Community 1 - "rasoi-core.ts"
 Cohesion: 0.12
@@ -215,8 +214,8 @@ Cohesion: 0.05
 Nodes (41): Rasoi Pairs, ADR 0010 Replace the Vista Arc with Rasoi Pairs, Legacy Dawn Migration, Preserved Nindova Contracts, Superseded Experience-specific ADRs, Authored and Exhaustively Verified Board Kernel, Punjabi-inspired Kitchen Cultural Direction, Enter Pair Settle Dawn Experience (+33 more)
 
 ### Community 4 - "night-core.ts"
-Cohesion: 0.12
-Nodes (31): addCivilDays(), captureNight(), completeState(), decodeState(), emptyState(), isText(), LEGACY_HARBOR, LEGACY_MEADOW (+23 more)
+Cohesion: 0.08
+Nodes (46): ActiveSessionDecoded, ActiveSessionEnding, ActiveSessionLimits, ActiveSessionPhase, ActiveSessionRecord, ActiveSessionRejection, decodeActiveSession(), decodeStoredSession() (+38 more)
 
 ### Community 5 - "site/package.json"
 Cohesion: 0.10
@@ -232,7 +231,7 @@ Nodes (34): Adult Audience Boundary Dialog, Gallery Clear Confirmation, Nindova 
 
 ### Community 8 - "sector-sprint.ts"
 Cohesion: 0.06
-Nodes (28): ACT_GRADES, OBSTACLE_COLORS, OBSTACLE_CONTACT_SECONDS, OBSTACLE_GAPS, OBSTACLE_MATERIALS, OBSTACLE_SAFE_LANES, RUNNER_LANE_TRANSITION_MS, RUNNER_LANE_Y (+20 more)
+Nodes (31): ACT_GRADES, advanceLaneTransition(), beginLaneTransition(), laneEase(), OBSTACLE_COLORS, OBSTACLE_CONTACT_SECONDS, OBSTACLE_GAPS, OBSTACLE_MATERIALS (+23 more)
 
 ### Community 9 - "house.ts"
 Cohesion: 0.06
@@ -259,8 +258,8 @@ Cohesion: 0.33
 Nodes (11): escape(), renderAaduStudy(), renderBoardLines(), renderChoice(), renderChoiceVisual(), renderClassicStudy(), renderGame(), renderNavakankariStudy() (+3 more)
 
 ### Community 15 - "drawRunnerFrame"
-Cohesion: 0.16
-Nodes (24): drawActSetting(), drawCinematicGrade(), drawCityLayers(), drawComplicationAura(), drawComplicationGate(), drawDiamond(), drawFlourish(), drawForeground() (+16 more)
+Cohesion: 0.18
+Nodes (21): drawActSetting(), drawCinematicGrade(), drawCityLayers(), drawComplicationAura(), drawComplicationGate(), drawDiamond(), drawFlourish(), drawForeground() (+13 more)
 
 ### Community 16 - "salon-catalog.ts"
 Cohesion: 0.07
@@ -271,8 +270,8 @@ Cohesion: 0.16
 Nodes (18): clearChapterTransition(), closeHouseAudio(), destinationForView(), finishCompletedGame(), gameSigil(), getDoorCategory, getGame, handleSectorTerminal() (+10 more)
 
 ### Community 18 - "stepRunner"
-Cohesion: 0.13
-Nodes (17): advanceLaneTransition(), advanceProjectile(), beginLaneTransition(), failRunner(), firstLethalContact(), laneEase(), launchRunnerTool(), overlaps() (+9 more)
+Cohesion: 0.17
+Nodes (13): advanceProjectile(), failRunner(), firstLethalContact(), launchRunnerTool(), overlaps(), projectile(), projectileBounds(), runnerObstacles() (+5 more)
 
 ### Community 19 - "dawn-core.ts"
 Cohesion: 0.12
@@ -283,8 +282,8 @@ Cohesion: 0.15
 Nodes (8): completeRunnerStory(), completeStackGame(), enterRunnerNarrated(), externalRequests, hanoiMoves(), output, publishedHouseText, root
 
 ### Community 21 - "Bedtime game evidence brief"
-Cohesion: 0.14
-Nodes (14): 0. Why sleep matters—and how to say it without fear, 1. Interactive screen games and sleepiness, 3. Cognitive distraction and serial diverse imagining, 4. Memory evidence: pair matching is not general memory improvement, 5. Why “dopamine effect” is not supportable, 6. Why rankings, streaks and weekly performance are the wrong layer, 7. Candidate post-board transitions, 8. Open-source reference-product scan (+6 more)
+Cohesion: 0.07
+Nodes (27): 0. Why sleep matters—and how to say it without fear, 1. Interactive screen games and sleepiness, 2. Evening light, arousal, and media displacement, 3. Cognitive distraction and serial diverse imagining, 4. Memory evidence: pair matching is not general memory improvement, 5. Why “dopamine effect” is not supportable, 6. Why rankings, streaks and weekly performance are the wrong layer, 7. Candidate post-board transitions (+19 more)
 
 ### Community 22 - "dawn.mjs"
 Cohesion: 0.16
@@ -303,8 +302,8 @@ Cohesion: 0.14
 Nodes (13): Clear space & minimum sizes, Comparison (5 = best), Design rationale — three concepts explored, Final refinements applied, Icon family (Masala Mound motifs), Identity, Incorrect usage, Motion (+5 more)
 
 ### Community 27 - "sector-sprint-table.ts"
-Cohesion: 0.12
-Nodes (14): createRunnerState(), RunnerInput, RunnerPalette, RunnerRenderQuality, runnerRenderQualityForIntervals(), RunnerState, runnerUpcomingInstruction(), AudioPort (+6 more)
+Cohesion: 0.13
+Nodes (13): createRunnerState(), RunnerInput, RunnerPalette, RunnerRenderQuality, runnerRenderQualityForIntervals(), RunnerState, AudioPort, createSectorSprintTable() (+5 more)
 
 ### Community 28 - "session/package.json"
 Cohesion: 0.15
@@ -323,12 +322,12 @@ Cohesion: 0.17
 Nodes (12): Rasoi Legality Kernel, Known Evidence and Product Limits, Universal 343-state Board Guarantee, Voluntary Pair-removal Session Path, Mahjong-solitaire Rule Inspiration, Rasoi Pairs Session Arc, Semantic Safe-pair Hint, Twelve-minute Settle and Fifteen-minute Ceiling (+4 more)
 
 ### Community 32 - "Layered Rasoi plan"
-Cohesion: 0.17
-Nodes (12): Acceptance gates, Availability, Board contract, Experience sequence, Explicitly out, Feedback contract, Geometry, Layered Rasoi plan (+4 more)
+Cohesion: 0.25
+Nodes (8): Acceptance gates, Experience sequence, Explicitly out, Feedback contract, Layered Rasoi plan, Open access, Outcome, Rest and replay contract
 
 ### Community 33 - "Quiet Depth plan"
-Cohesion: 0.13
-Nodes (15): Board profiles, Decision, Deeper stack, Gentle stack, Global closure, Implementation slices, Match confirmation, No weekly grade (+7 more)
+Cohesion: 0.18
+Nodes (11): Decision, Global closure, Implementation slices, Match confirmation, No weekly grade, Open and local boundary, Quiet Depth plan, Rasoi Image Drift (+3 more)
 
 ### Community 34 - "color-contrast.test.mjs"
 Cohesion: 0.24
@@ -342,9 +341,9 @@ Nodes (10): compilerOptions, noEmit, noImplicitAny, strict, strictNullChecks, us
 Cohesion: 0.25
 Nodes (5): base, href(), tables, DeniedAudioContext, root
 
-### Community 37 - "contracts.ts"
-Cohesion: 0.24
-Nodes (8): RasoiTileSnapshot, SessionState, Window, RasoiMotifId, BoundaryOutcome, BoundaryThresholds, NindovaBoundary, NindovaBoundaryApi
+### Community 37 - "RasoiDebug"
+Cohesion: 0.12
+Nodes (9): RasoiDebug, RasoiTileSnapshot, SessionState, Window, RasoiMotifId, BoundaryOutcome, BoundaryThresholds, NindovaBoundary (+1 more)
 
 ### Community 38 - "Distribution Boundary"
 Cohesion: 0.20
@@ -359,7 +358,7 @@ Cohesion: 0.22
 Nodes (9): First-Light Dawn Surface, Browser Dismissal Surface, Voluntary Intake Surface, Quiet End Card, Rasoi Pairs Session Interface, Semantic Rasoi Board, Local Dawn Keepsake Exports, Deferred iOS Wall (+1 more)
 
 ### Community 41 - "Group the Grand Salon and add sourced classic rule studies"
-Cohesion: 0.22
+Cohesion: 0.25
 Nodes (8): Aadu Puli Aattam, Deferred candidates, Evidence boundary, Group the Grand Salon and add sourced classic rule studies, Navakankari, Pallanguzhi, Product and state constraints, Selected rulesets and boundaries
 
 ### Community 42 - "Nindova Asset Manifest"
@@ -439,11 +438,11 @@ Cohesion: 0.20
 Nodes (4): chicagoCompletion, legacyCompletion, MOTIF_ORDER, rasoiCompletion
 
 ### Community 63 - "visual-identity.md"
-Cohesion: 0.40
-Nodes (4): Masala Mound silhouettes, Motion and provenance, Phulkari lattice, Shahi Raat palette
+Cohesion: 0.33
+Nodes (5): Grand Salon table materials, Masala Mound silhouettes, Motion and provenance, Phulkari lattice, Shahi Raat palette
 
 ### Community 64 - "bedtime-game-evidence.md"
-Cohesion: 0.25
+Cohesion: 0.22
 Nodes (3): Add the adult Nindova House while preserving the Night Room, Add a fail-closed assessment-readiness contract, Third-party notices
 
 ### Community 65 - "0017-make-sector-sprint-a-one-hit-jetpack-gauntlet.md"
@@ -478,13 +477,13 @@ Nodes (4): Evidence boundary, Files, Highlights, Nindova v0.4.1 — House Contin
 Cohesion: 0.40
 Nodes (4): Evidence boundary, Files, Highlights, Nindova v0.4.2 — Clean Return
 
-### Community 73 - "active-session.ts"
-Cohesion: 0.18
-Nodes (15): ActiveSessionDecoded, ActiveSessionEnding, ActiveSessionLimits, ActiveSessionPhase, ActiveSessionRecord, ActiveSessionRejection, decodeActiveSession(), decodeStoredSession() (+7 more)
+### Community 73 - "NindovaDawn"
+Cohesion: 0.24
+Nodes (11): NindovaDawn, closeDawn(), currentDawnEligibility(), dawnStillBlob(), downloadBlob(), makeLoop(), renderDawnFrame(), revoke() (+3 more)
 
 ### Community 74 - "finishSession"
-Cohesion: 0.22
-Nodes (15): advanceBy(), clearClosureTimers(), element(), enforceBoundary(), enterDrift(), enterRest(), finishSession(), iconSvg() (+7 more)
+Cohesion: 0.27
+Nodes (13): advanceBy(), clearClosureTimers(), element(), enforceBoundary(), enterDrift(), enterRest(), finishSession(), nowMs() (+5 more)
 
 ### Community 75 - "Visual system"
 Cohesion: 0.40
@@ -498,9 +497,9 @@ Nodes (4): Evidence boundary, Highlights, Nindova v0.4.3 — Held Boundaries, Re
 Cohesion: 0.50
 Nodes (3): Deepen House boundaries and browser evidence, Evidence boundary, Preserved product constraints
 
-### Community 78 - "selectTile"
-Cohesion: 0.38
-Nodes (12): NindovaRasoi, animatePair(), beginSession(), createBoardDom(), hint(), persistActiveSession(), selectTile(), setStatus() (+4 more)
+### Community 78 - "restoreActiveSession"
+Cohesion: 0.33
+Nodes (14): NindovaRasoi, anchorSessionClock(), animatePair(), beginSession(), createBoardDom(), hint(), persistActiveSession(), restoreActiveSession() (+6 more)
 
 ### Community 79 - "playChime"
 Cohesion: 1.00
@@ -510,9 +509,9 @@ Nodes (3): playChime(), playSectorTone(), playToneSequence()
 Cohesion: 0.33
 Nodes (5): createHouseNavigation(), errors, page, state(), back()
 
-### Community 84 - "restoreActiveSession"
-Cohesion: 0.33
-Nodes (7): NindovaActiveSession, anchorSessionClock(), clearActiveSession(), LEGACY_ACTIVE_SESSION_KEYS, readActiveSessionRaw(), restoreActiveSession(), safeStorage()
+### Community 84 - "clearActiveSession"
+Cohesion: 0.50
+Nodes (4): clearActiveSession(), LEGACY_ACTIVE_SESSION_KEYS, readActiveSessionRaw(), safeStorage()
 
 ### Community 85 - "serve.mjs"
 Cohesion: 0.40
@@ -521,6 +520,10 @@ Nodes (4): mime, port, root, server
 ### Community 86 - "seed-asserted.mjs"
 Cohesion: 0.50
 Nodes (3): output, root, states
+
+### Community 88 - "Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks"
+Cohesion: 0.40
+Nodes (4): Answer, Outcome, Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks, Source Nodes
 
 ### Community 89 - "First-Light Kitchen Setting"
 Cohesion: 0.50
@@ -538,9 +541,9 @@ Nodes (3): ADR-0020, ADR-0005, root
 Cohesion: 0.50
 Nodes (4): workspaces, apps/house, apps/session, apps/site
 
-### Community 96 - "Conservative product constraints"
-Cohesion: 0.33
-Nodes (6): Accessibility and trust, Challenge, Conservative product constraints, Light and transition away from the screen, Match feedback, Session and stopping
+### Community 96 - "Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?"
+Cohesion: 0.40
+Nodes (4): Answer, Outcome, Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?, Source Nodes
 
 ### Community 100 - "Deferred iOS Wall"
 Cohesion: 0.67
@@ -554,85 +557,72 @@ Nodes (3): Cultural Visual Guardrails, Punjabi and Indian Material World, Theme 
 Cohesion: 0.40
 Nodes (4): Evidence boundary, Highlights, Nindova v0.4.4 — Kept Nights, Notes
 
-### Community 103 - "Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks"
-Cohesion: 0.40
-Nodes (4): Answer, Outcome, Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks, Source Nodes
-
-### Community 133 - "Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?"
-Cohesion: 0.40
-Nodes (4): Answer, Outcome, Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?, Source Nodes
-
-### Community 134 - "Q: Make the app theme more royal and sophisticated"
+### Community 103 - "Q: Make the app theme more royal and sophisticated"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: Make the app theme more royal and sophisticated, Source Nodes
 
-### Community 135 - "Q: rasoi dawn looks so ugly"
+### Community 133 - "drawRunnerObstacles"
+Cohesion: 0.33
+Nodes (6): drawLaneTheatre(), drawObstacleFace(), drawObstacleTexture(), drawRunnerObstacles(), RUNNER_LANE_Y, runnerUpcomingInstruction()
+
+### Community 134 - "Q: rasoi dawn looks so ugly"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: rasoi dawn looks so ugly, Source Nodes
 
-### Community 136 - "Q: Council coverage review of the adult Nindova House entertainment implementation"
+### Community 135 - "Q: Council coverage review of the adult Nindova House entertainment implementation"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: Council coverage review of the adult Nindova House entertainment implementation, Source Nodes
 
-### Community 137 - "Q: Build entertainment first for adults above 18, test it, run a council review, then implement assessment grade."
+### Community 136 - "Q: Build entertainment first for adults above 18, test it, run a council review, then implement assessment grade."
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: Build entertainment first for adults above 18, test it, run a council review, then implement assessment grade., Source Nodes
+
+### Community 137 - "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?"
+Cohesion: 0.40
+Nodes (4): Answer, Outcome, Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?, Source Nodes
 
 ### Community 138 - "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?, Source Nodes
 
-### Community 139 - "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?"
-Cohesion: 0.40
-Nodes (4): Answer, Outcome, Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?, Source Nodes
-
-### Community 140 - "Q: How does the polished Sector Sprint connect rendering, state, audio, accessibility, and tests?"
+### Community 139 - "Q: How does the polished Sector Sprint connect rendering, state, audio, accessibility, and tests?"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: How does the polished Sector Sprint connect rendering, state, audio, accessibility, and tests?, Source Nodes
 
-### Community 141 - "Q: How do the adult House and Sector Sprint connect through house source/core to Night state, public surface, and PWA/offline boundary?"
+### Community 140 - "Q: How do the adult House and Sector Sprint connect through house source/core to Night state, public surface, and PWA/offline boundary?"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: How do the adult House and Sector Sprint connect through house source/core to Night state, public surface, and PWA/offline boundary?, Source Nodes
 
-### Community 142 - "Q: How do Sector Sprint hold-to-lift input, fixed-step flight, lazy illustrated art, deterministic complications, adaptive Canvas quality, audio suspension, narrated fallback, and offline caching connect without changing the House completion contract?"
+### Community 141 - "Q: How do Sector Sprint hold-to-lift input, fixed-step flight, lazy illustrated art, deterministic complications, adaptive Canvas quality, audio suspension, narrated fallback, and offline caching connect without changing the House completion contract?"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: How do Sector Sprint hold-to-lift input, fixed-step flight, lazy illustrated art, deterministic complications, adaptive Canvas quality, audio suspension, narrated fallback, and offline caching connect without changing the House completion contract?, Source Nodes
 
-### Community 143 - "Q: How do House route exit confirmation, dialog focus restoration, website and README assets, documentation, standalone and PWA builds, release packaging, and GitHub Pages publication connect?"
+### Community 142 - "Q: How do House route exit confirmation, dialog focus restoration, website and README assets, documentation, standalone and PWA builds, release packaging, and GitHub Pages publication connect?"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: How do House route exit confirmation, dialog focus restoration, website and README assets, documentation, standalone and PWA builds, release packaging, and GitHub Pages publication connect?, Source Nodes
 
-### Community 144 - "Q: Which recently changed Nindova House modules have credible deepening candidates, excluding already-deepened architecture?"
+### Community 143 - "Q: Which recently changed Nindova House modules have credible deepening candidates, excluding already-deepened architecture?"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: Which recently changed Nindova House modules have credible deepening candidates, excluding already-deepened architecture?, Source Nodes
 
-### Community 145 - "2. Evening light, arousal, and media displacement"
+### Community 144 - "Board contract"
 Cohesion: 0.50
-Nodes (4): 2. Evening light, arousal, and media displacement, Cognitive and emotional arousal, Light, Time displacement and bedtime boundaries
+Nodes (4): Availability, Board contract, Geometry, Solvability
+
+### Community 145 - "Board profiles"
+Cohesion: 0.50
+Nodes (4): Board profiles, Deeper stack, Gentle stack, Shared proof
 
 ### Community 146 - "Q: How is Sector Sprint's runner state, input, Canvas renderer, audio loop, mobile performance, and reduced-motion route structured?"
 Cohesion: 0.50
 Nodes (3): Answer, Outcome, Q: How is Sector Sprint's runner state, input, Canvas renderer, audio loop, mobile performance, and reduced-motion route structured?
 
-### Community 147 - "Claim language"
-Cohesion: 0.67
-Nodes (3): Allowed when the implementation is true, Claim language, Not supported
-
 ## Knowledge Gaps
 - **607 isolated node(s):** `name`, `version`, `license`, `private`, `type` (+602 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **34 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **33 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Work-memory lessons
-
-**Preferred sources** — corroborated by past sessions; start here.
-- `house.ts` (6× useful, score=5.061650262) _(code changed — re-verify)_
-- `sector-sprint.ts` (4× useful, score=3.252294096)
-- `requestRoute()` (2× useful, score=1.984917294) _(code changed — re-verify)_
-- `sector-sprint.test.mjs` (2× useful, score=1.62138901)
-- `Theme and Behavior Independence` (2× useful, score=1.607059461)
-- `Rasoi Pairs Session Interface` (2× useful, score=1.588067376)
-- `Dawn` (2× useful, score=1.587805904)
 
 **Known dead ends** — questions that led nowhere; don't re-derive.
 - "Council coverage review of the adult Nindova House entertainment implementation" -> `Offline PWA and Public Surface`, `pwa-offline.mjs`
@@ -640,16 +630,16 @@ Nodes (3): Allowed when the implementation is true, Claim language, Not supporte
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `createHouseNavigation()` connect `createHouseNavigation` to `salon-catalog.ts`, `house.ts`, `selectTile`?**
+- **Why does `createHouseNavigation()` connect `createHouseNavigation` to `salon-catalog.ts`, `house.ts`, `restoreActiveSession`?**
   _High betweenness centrality (0.075) - this node is a cross-community bridge._
-- **Why does `settle()` connect `selectTile` to `createHouseNavigation`, `session.ts`, `finishSession`, `restoreActiveSession`?**
+- **Why does `settle()` connect `restoreActiveSession` to `createHouseNavigation`, `session.ts`, `finishSession`?**
   _High betweenness centrality (0.071) - this node is a cross-community bridge._
-- **Why does `drawRunnerFrame()` connect `drawRunnerFrame` to `sector-sprint.ts`, `stepRunner`, `sector-sprint-table.ts`, `drawAuthoredLead`?**
+- **Why does `Nindova Documentation Index` connect `Nindova Documentation Index` to `Nindova Research Receipts`, `Distribution Boundary`, `Rasoi Pairs Session Arc`?**
   _High betweenness centrality (0.006) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `license` to the rest of the system?**
   _607 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `session.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.07777777777777778 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07671957671957672 - nodes in this community are weakly interconnected._
 - **Should `rasoi-core.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.12315270935960591 - nodes in this community are weakly interconnected._
 - **Should `classic-studies.ts` be split into smaller, more focused modules?**

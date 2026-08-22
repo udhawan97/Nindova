@@ -28,6 +28,10 @@ Neelam and Majith do not carry small meaningful text on the night ground. Form a
 
 The nine 48×48 silhouettes cover belan, chakla, tawa, chimta, katori, tiffin, masala dabba, chai glass, and pressure cooker. They use `currentColor`, strong fills, and no stroke thinner than 3px. Every Tile also shows and announces its English name, so sound, color, illustration, or vision is never required.
 
+## Grand Salon table materials
+
+The eight Salon games share the Shahi Raat palette but not one generic board treatment. Pattern Court uses geometric inlay; Mirror Forge uses smoked glass and brass; Navakankari and Aadu Puli Aattam sit on carved line boards; Pallanguzhi uses recessed wooden pits; Lantern Ledger uses a velvet procession; Stack Architect uses rosewood plinths; and Sector Sprint uses a layered Chandigarh lane theatre. These surfaces are decorative presentations of deterministic state. Text, native controls, focus order, nonvisual descriptions, and outcomes remain authoritative.
+
 ## Motion and provenance
 
 The logo entrance and match bloom are fixed and deterministic. The optional chime is deterministic. Reduced motion shows the completed logo immediately and removes match translation and scale; none of these responses awards, measures, or compares anything.

@@ -396,6 +396,11 @@ try {
   assert.match(await classicDoors.page.locator(".category-view").innerText(), /Authored tactical rule study/i);
   await classicDoors.page.click('[data-game="aadu-puli-attam"]');
   assert.equal(await classicDoors.page.locator(".aadu-board .board-point").count(), 23);
+  assert.notEqual(
+    await classicDoors.page.locator(".aadu-board").evaluate((element) => getComputedStyle(element, "::before").backgroundImage),
+    "none",
+    "classic line boards render a crafted table surface beneath canonical geometry",
+  );
   assert.match(await classicDoors.page.locator(".classic-study-description").textContent(), /selected tiger is at point 1.*Goats occupy point 4, point 2, point 7/);
   assert.match(await classicDoors.page.locator('.aadu-board [data-answer="0"]').getAttribute("aria-label"), /Choice A, point 10.*a goat at point 4 between/);
   for (const option of await classicDoors.page.locator(".aadu-board button").all()) {
@@ -417,6 +422,11 @@ try {
   await classicDoors.page.click('[data-category="count-carry"]');
   await classicDoors.page.click('[data-game="pallanguzhi"]');
   assert.equal(await classicDoors.page.locator(".pallanguzhi-pit").count(), 14);
+  assert.notEqual(
+    await classicDoors.page.locator(".pallanguzhi-pit").first().evaluate((element) => getComputedStyle(element).boxShadow),
+    "none",
+    "Pallanguzhi pits read as recessed carved cups",
+  );
   assert.match(await classicDoors.page.locator(".classic-study-description").textContent(), /Lower row left to right: pit 1: 2.*Top row left to right: pit 14: 0/);
   assert.match(await classicDoors.page.locator('button.pallanguzhi-pit[data-answer="0"]').getAttribute("aria-label"), /Choice A, lower pit 1.*2 deposits.*final deposit at pit 3/);
   for (const option of await classicDoors.page.locator("button.pallanguzhi-pit").all()) {
@@ -434,6 +444,15 @@ try {
   await classicDoors.context.close();
 
   const narrow = await openHouse({ width: 320, height: 568 }, { reducedMotion: "reduce" });
+  await narrow.page.evaluate(() => window.__house.start("navakankari"));
+  assert.equal(await narrow.page.evaluate(() => document.documentElement.scrollWidth), 320);
+  for (const option of await narrow.page.locator(".navakankari-board button").all()) {
+    await option.scrollIntoViewIfNeeded();
+    const box = await option.boundingBox();
+    assert.ok(box && box.width >= 44 && box.height >= 44 && box.x >= 0 && box.x + box.width <= 320, `320px Navakankari chapter-one choice is fully actionable (${JSON.stringify(box)})`);
+  }
+  await narrow.page.click('.navakankari-board [data-answer="0"]');
+  await narrow.page.waitForFunction(() => window.__house.active?.chapter === 1);
   await narrow.page.evaluate(() => window.__house.start("lantern-ledger"));
   for (const [chapter, answer] of [0, 1, 0, 1].entries()) {
     await narrow.page.click("[data-cover-memory]");
@@ -541,6 +560,10 @@ try {
   await pattern.page.evaluate(() => window.__house.start("pattern-court"));
   assert.equal(await pattern.page.evaluate(() => window.__house.active?.chapter), 0);
   assert.notEqual(await pattern.page.locator(".pattern-row span").first().evaluate((element) => getComputedStyle(element).animationName), "none", "Pattern Court has an enabled-motion inlay entrance");
+  assert.ok(
+    await pattern.page.locator(".pattern-row span").first().evaluate((element) => getComputedStyle(element).backgroundImage.split("gradient").length - 1 >= 3),
+    "Pattern Court tokens render layered stone, inlay, and highlight treatments",
+  );
   await pattern.page.screenshot({ path: resolve(output, "pattern-court-375x812.png"), fullPage: true, animations: "disabled" });
   await pattern.page.click('[data-answer="1"]');
   assert.match(await pattern.page.locator("#gameStatus").innerText(), /Not this inscription/);
@@ -561,9 +584,53 @@ try {
   assert.equal(patternResult.completionFacts.authoredChapters, 5);
   await pattern.context.close();
 
+  for (const viewport of [{ width: 320, height: 568 }, { width: 375, height: 812 }]) {
+    const patternBounds = await openHouse(viewport);
+    const assertPatternRowsFit = async (label) => {
+      assert.equal(await patternBounds.page.locator(".prompt-column").count(), 1, `${label} renders the Pattern prompt container`);
+      assert.equal(await patternBounds.page.locator(".pattern-row").count(), 1, `${label} renders the authored Pattern row`);
+      assert.equal(await patternBounds.page.locator(".pattern-row span").count(), 7, `${label} renders all seven authored Pattern tokens`);
+      const bounds = await patternBounds.page.locator(".pattern-row").evaluateAll((rows) => rows.map((row) => {
+        const prompt = row.closest(".prompt-column")?.getBoundingClientRect();
+        const tokens = [...row.querySelectorAll("span")].map((token) => token.getBoundingClientRect());
+        return {
+          promptLeft: prompt?.left ?? 0,
+          promptRight: prompt?.right ?? 0,
+          firstLeft: tokens[0]?.left ?? 0,
+          lastRight: tokens.at(-1)?.right ?? 0,
+        };
+      }));
+      assert.ok(bounds.every((row) => row.firstLeft >= row.promptLeft - 0.5 && row.lastRight <= row.promptRight + 0.5), `${label} keeps every required Pattern token inside the visible prompt column: ${JSON.stringify(bounds)}`);
+    };
+    await patternBounds.page.evaluate(() => window.__house.start("pattern-court"));
+    await patternBounds.page.click('[data-answer="0"]');
+    await patternBounds.page.waitForFunction(() => window.__house.active?.chapter === 1);
+    await patternBounds.page.waitForTimeout(700);
+    await assertPatternRowsFit(`${viewport.width}px chapter 2`);
+    await patternBounds.page.evaluate(() => { document.documentElement.style.fontSize = "200%"; });
+    assert.equal(await patternBounds.page.evaluate(() => document.documentElement.scrollWidth), viewport.width, `${viewport.width}px Pattern Court reflows at 200% text scaling`);
+    await assertPatternRowsFit(`${viewport.width}px chapter 2 at 200% text scaling`);
+    await patternBounds.page.evaluate(() => { document.documentElement.style.fontSize = ""; });
+    await patternBounds.page.click('[data-answer="1"]');
+    await patternBounds.page.waitForFunction(() => window.__house.active?.chapter === 2);
+    await patternBounds.page.click('[data-answer="2"]');
+    await patternBounds.page.waitForFunction(() => window.__house.active?.chapter === 3);
+    await patternBounds.page.waitForTimeout(700);
+    await assertPatternRowsFit(`${viewport.width}px chapter 4`);
+    await patternBounds.page.evaluate(() => { document.documentElement.style.fontSize = "200%"; });
+    assert.equal(await patternBounds.page.evaluate(() => document.documentElement.scrollWidth), viewport.width, `${viewport.width}px chapter 4 reflows at 200% text scaling`);
+    await assertPatternRowsFit(`${viewport.width}px chapter 4 at 200% text scaling`);
+    await patternBounds.context.close();
+  }
+
   const mirror = await openHouse({ width: 414, height: 896 });
   await mirror.page.evaluate(() => window.__house.start("mirror-forge"));
   assert.notEqual(await mirror.page.locator(".mirror-ring-outer").evaluate((element) => getComputedStyle(element).animationName), "none", "Mirror Forge has an enabled-motion compass entrance");
+  assert.notEqual(
+    await mirror.page.locator(".mirror-stage").evaluate((element) => getComputedStyle(element, "::before").backgroundImage),
+    "none",
+    "Mirror Forge renders a smoked reflective plate behind the compass rings",
+  );
   await mirror.page.click('[data-answer="0"]');
   assert.match(await mirror.page.locator("#gameStatus").innerText(), /Not this inscription/);
   await mirror.page.click('[data-answer="1"]');
@@ -575,6 +642,11 @@ try {
   assert.equal(await memory.page.locator(".answer-list button").first().isDisabled(), true);
   const processionLabel = await memory.page.locator(".inscription").getAttribute("aria-label");
   assert.notEqual(await memory.page.locator(".lantern").first().evaluate((element) => getComputedStyle(element).animationName), "none", "Lantern Ledger has an enabled-motion light procession");
+  assert.notEqual(
+    await memory.page.locator(".lantern i").first().evaluate((element) => getComputedStyle(element, "::before").content),
+    "none",
+    "Lantern Ledger lights contain a visible flame and cap assembly",
+  );
   await memory.page.waitForTimeout(650);
   await memory.page.screenshot({ path: resolve(output, "lantern-procession-768x1024.png"), fullPage: true });
   await memory.page.click("[data-cover-memory]");
@@ -606,6 +678,11 @@ try {
 
   const stack = await openHouse({ width: 414, height: 896 });
   await stack.page.evaluate(() => window.__house.start("stack-architect"));
+  assert.notEqual(
+    await stack.page.locator(".peg").first().evaluate((element) => getComputedStyle(element, "::before").backgroundImage),
+    "none",
+    "Stack Architect plinths sit on a crafted rosewood table bed",
+  );
   await stack.page.screenshot({ path: resolve(output, "stack-architect-414x896.png"), fullPage: true, animations: "disabled" });
   const renderedDiscs = await stack.page.locator('[data-peg="0"] .disc').evaluateAll((discs) => discs.map((disc) => {
     const box = disc.getBoundingClientRect();

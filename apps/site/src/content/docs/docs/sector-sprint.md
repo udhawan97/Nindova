@@ -9,6 +9,8 @@ Sector Sprint is Table V behind the House's **Motion & Route** door. It is one a
 
 The street advances automatically through three discrete lanes. Read the next marker and use **Move up**, **Move down**, or **Hold lane**. Every safe gate is at most one adjacent move from the previous safe lane; holding a key or repeating it does not chain extra movement.
 
+The current Action theatre draws illuminated lane bands, denser city windows, curb reflections, perspective rails, and a clearer rider silhouette through the existing quiet, balanced, and high render-quality tiers. These layers are visual only: authored gates, three-lane collision geometry, timing, speed, order, and outcome remain identical across quality tiers.
+
 - Touch or click the native **Move up** and **Move down** controls.
 - Use <kbd>↑</kbd>/<kbd>W</kbd> and <kbd>↓</kbd>/<kbd>S</kbd> from the stage.
 - Use the named Act tool button, or <kbd>J</kbd>, <kbd>K</kbd>, or <kbd>X</kbd>, for harmless visual comedy. Tools do not affect completion.
