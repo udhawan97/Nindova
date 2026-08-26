@@ -52,6 +52,7 @@ try {
   const houseWorkerSource = await (await context.request.get(`${prefix}house/sw.js`)).text();
   const houseCacheName = houseWorkerSource.match(/const CACHE = "([^"]+)";/)?.[1];
   assert.ok(houseCacheName, "the built House worker declares its cache name");
+  assert.match(houseWorkerSource, /await cache\.put\(event\.request, response\.clone\(\)\);/, "runtime cache writes stay inside the fetch lifetime");
   for (const slug of ["privacy-local-state", "architecture"]) {
     const { page: docsPage } = await harness.page(context);
     await docsPage.goto(`${prefix}docs/${slug}/`);
