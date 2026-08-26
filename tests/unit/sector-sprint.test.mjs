@@ -231,6 +231,50 @@ test("render quality never changes simulation state", () => {
   }
 });
 
+test("render quality degrades immediately and upgrades only after sustained headroom", () => {
+  assert.deepEqual(Runner.runnerRenderQualityDecision("high", "quiet", 2), { quality: "quiet", upgradeWindows: 0, ceiling: "quiet" });
+  assert.deepEqual(Runner.runnerRenderQualityDecision("quiet", "balanced", 2), { quality: "quiet", upgradeWindows: 0, ceiling: "high" });
+  assert.deepEqual(Runner.runnerRenderQualityDecision("quiet", "high", 0), { quality: "quiet", upgradeWindows: 1, ceiling: "high" });
+  assert.deepEqual(Runner.runnerRenderQualityDecision("quiet", "high", 1), { quality: "quiet", upgradeWindows: 2, ceiling: "high" });
+  assert.deepEqual(Runner.runnerRenderQualityDecision("quiet", "high", 2), { quality: "balanced", upgradeWindows: 0, ceiling: "high" });
+  assert.deepEqual(Runner.runnerRenderQualityDecision("balanced", "high", 2), { quality: "high", upgradeWindows: 0, ceiling: "high" });
+
+  let decision = Runner.runnerRenderQualityDecision("high", "balanced", 0, "high");
+  assert.deepEqual(decision, { quality: "balanced", upgradeWindows: 0, ceiling: "balanced" });
+  for (let window = 0; window < 6; window += 1) {
+    decision = Runner.runnerRenderQualityDecision(decision.quality, "high", decision.upgradeWindows, decision.ceiling);
+  }
+  assert.deepEqual(decision, { quality: "balanced", upgradeWindows: 0, ceiling: "balanced" }, "a degraded run cannot oscillate back into the tier that missed its budget");
+});
+
+test("display interpolation smooths continuous values without changing simulation truth", () => {
+  const previous = Runner.createRunnerState(1);
+  const current = Runner.stepRunner(previous, { laneDelta: 1, toolPressed: true }, Runner.RUNNER_FIXED_STEP_MS);
+  const currentSnapshot = structuredClone(current);
+  const halfway = Runner.runnerInterpolatedFrame(previous, current, 0.5);
+  assert.ok(halfway.worldX > previous.worldX && halfway.worldX < current.worldX);
+  assert.ok(halfway.y > previous.y && halfway.y < current.y);
+  assert.equal(halfway.worldX, previous.worldX + (current.worldX - previous.worldX) * 0.5);
+  assert.equal(halfway.failed, current.failed);
+  assert.equal(halfway.targetLane, current.targetLane);
+  assert.deepEqual(current, currentSnapshot, "render projection cannot mutate the fixed-step snapshot");
+  const clampedStart = Runner.runnerInterpolatedFrame(previous, current, -1);
+  assert.equal(clampedStart.worldX, previous.worldX);
+  assert.equal(clampedStart.y, previous.y);
+  assert.equal(clampedStart.targetLane, current.targetLane, "semantic state always comes from the current fixed step");
+  assert.deepEqual(Runner.runnerInterpolatedFrame(previous, current, 2), current);
+
+  const failed = { ...current, failed: true, failureReason: "corridor" };
+  assert.equal(Runner.runnerInterpolatedFrame(current, failed, 0.5), failed, "failure feedback is immediate, not blended");
+
+  const first = { id: "shot-a", x: 10, y: 20, velocityX: 1, velocityY: 0, ageMs: 10, ttlMs: 100, radius: 4, tool: "bargain-burst", pierce: false };
+  const second = { ...first, id: "shot-b", x: 50 };
+  const shifted = { ...second, x: 70, ageMs: 20 };
+  const beforeRemoval = { ...previous, projectiles: [first, second] };
+  const afterRemoval = { ...current, projectiles: [shifted] };
+  assert.equal(Runner.runnerInterpolatedFrame(beforeRemoval, afterRemoval, 0.5).projectiles[0].x, 60, "projectiles interpolate by stable identity after a sibling is removed");
+});
+
 test("all lead variants share lane lean and stable pose blends", () => {
   assert.deepEqual(Runner.RUNNER_ACTS.map((act) => act.lead), ["son", "mother", "duo", "duo", "duo"]);
   const start = Runner.createRunnerState(0);
@@ -259,9 +303,18 @@ test("five harmless Act tools retain distinct deterministic grammars and hard ca
     const fired = Runner.stepRunner(Runner.createRunnerState(actIndex), { toolPressed: true }, 0);
     assert.ok(fired.projectiles.length > 0 && fired.projectiles.length <= Runner.RUNNER_PROJECTILE_CAP);
     assert.ok(fired.projectiles.every((shot) => shot.tool === act.tool));
+    assert.equal(new Set(fired.projectiles.map((shot) => shot.id)).size, fired.projectiles.length, "a real multi-shot launch assigns stable unique identities");
     return fired.projectiles.map((shot) => [shot.velocityX, shot.velocityY, shot.radius, shot.pierce]);
   });
   assert.equal(new Set(signatures.map((signature) => JSON.stringify(signature))).size, 5);
+
+  let refired = Runner.stepRunner(Runner.createRunnerState(1), { toolPressed: true }, 0);
+  const firstIds = refired.projectiles.map((shot) => shot.id);
+  for (let frame = 0; frame < 17; frame += 1) refired = Runner.stepRunner(refired, {}, Runner.RUNNER_FIXED_STEP_MS);
+  refired = Runner.stepRunner(refired, { toolPressed: true }, 0);
+  const allIds = refired.projectiles.map((shot) => shot.id);
+  assert.ok(allIds.length > firstIds.length);
+  assert.equal(new Set(allIds).size, allIds.length, "refiring never reuses a live projectile identity");
 });
 
 test("pause freezes the engine and a fresh Act has no failure or buffered move", () => {

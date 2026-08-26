@@ -75,3 +75,15 @@ test("restore, runner choice, and runner fail-closed state share one lifecycle",
   lifecycle.syncRunner(null);
   assert.equal(lifecycle.view().active, null);
 });
+
+test("Stack move effects retain the truthful source and destination for presentation", () => {
+  const { lifecycle } = create();
+  lifecycle.open("stack-architect", false);
+
+  const lifted = lifecycle.interact({ type: "peg", pegIndex: 0 });
+  assert.equal(lifted.message, "Disc lifted from the first plinth.");
+  const placed = lifecycle.interact({ type: "peg", pegIndex: 1 });
+
+  assert.deepEqual(placed.placedDisk, { from: 0, peg: 1, disk: 1 });
+  assert.deepEqual(lifecycle.view().active.pegs, [[2], [1], []]);
+});

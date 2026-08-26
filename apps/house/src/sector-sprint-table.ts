@@ -11,6 +11,8 @@ import {
   RUNNER_WIDTH,
   createRunnerState,
   drawRunnerFrame,
+  runnerInterpolatedFrame,
+  runnerRenderQualityDecision,
   runnerRenderQualityForIntervals,
   runnerUpcomingInstruction,
   stepRunner,
@@ -59,6 +61,7 @@ function escape(value: string): string {
 export function createSectorSprintTable(options: TableOptions) {
   let session: ActiveGame | null = null;
   let runnerState: RunnerState | null = null;
+  let renderPreviousState: RunnerState | null = null;
   let frame = 0;
   let lastTimestamp = 0;
   let elapsedMs = 0;
@@ -67,6 +70,9 @@ export function createSectorSprintTable(options: TableOptions) {
   let activePointerAction: "up" | "down" | "tool" | null = null;
   let accumulatorMs = 0;
   let renderQuality: RunnerRenderQuality = "high";
+  let qualityUpgradeWindows = 0;
+  let qualityCeiling: RunnerRenderQuality = "high";
+  let qualityViewportIsNarrow: boolean | null = null;
   let frameIntervals: number[] = [];
   let paused = false;
   let interrupted = false;
@@ -80,7 +86,7 @@ export function createSectorSprintTable(options: TableOptions) {
   let renderSequence = 0;
   let paletteCache: RunnerPalette | null = null;
   let characterSheet: HTMLImageElement | null = null;
-  let characterSheetPending = false;
+  let characterSheetPendingGeneration: number | null = null;
   let terminalOutcome: SectorSprintTerminal | null = null;
   let generation = 0;
   let statusMessage = "";
@@ -117,17 +123,34 @@ export function createSectorSprintTable(options: TableOptions) {
     options.terminal(outcome);
   }
 
+  async function cachedImageSource(response: Response): Promise<string> {
+    const blob = await response.blob();
+    return new Promise((resolveSource, rejectSource) => {
+      const reader = new FileReader();
+      reader.addEventListener("load", () => {
+        if (typeof reader.result === "string") resolveSource(reader.result);
+        else rejectSource(new Error("Cached Sector Sprint art did not decode as a local image source."));
+      }, { once: true });
+      reader.addEventListener("error", () => rejectSource(reader.error ?? new Error("Cached Sector Sprint art could not be read.")), { once: true });
+      reader.readAsDataURL(blob);
+    });
+  }
+
   async function ensureCharacterSheet(): Promise<void> {
     const currentGeneration = generation;
     if (characterSheet) {
       void characterSheet.decode().then(() => { if (currentGeneration === generation && !terminalOutcome) drawCurrentFrame(); }, () => undefined);
       return;
     }
-    if (characterSheetPending) return;
-    characterSheetPending = true;
+    if (characterSheetPendingGeneration === currentGeneration) return;
+    characterSheetPendingGeneration = currentGeneration;
     try {
+      let source = runnerCharacterSheetUrl;
       if (!navigator.onLine) {
-        if (!("caches" in globalThis) || !(await caches.match(runnerCharacterSheetUrl))) return;
+        if (!("caches" in globalThis)) return;
+        const cached = await caches.match(runnerCharacterSheetUrl);
+        if (!cached) return;
+        source = await cachedImageSource(cached);
       }
       if (currentGeneration !== generation || terminalOutcome) return;
       const sheet = new Image();
@@ -136,11 +159,11 @@ export function createSectorSprintTable(options: TableOptions) {
       const resetFailedSheet = () => { if (characterSheet === sheet) characterSheet = null; };
       sheet.addEventListener("load", redraw);
       sheet.addEventListener("error", resetFailedSheet, { once: true });
-      sheet.src = runnerCharacterSheetUrl;
+      sheet.src = source;
       characterSheet = sheet;
       void sheet.decode().then(redraw, () => undefined);
     } finally {
-      characterSheetPending = false;
+      if (characterSheetPendingGeneration === currentGeneration) characterSheetPendingGeneration = null;
     }
   }
 
@@ -178,17 +201,18 @@ export function createSectorSprintTable(options: TableOptions) {
     return context;
   }
 
-  function drawCurrentFrame(): void {
+  function drawCurrentFrame(renderState: RunnerState | null = runnerState): void {
     const canvas = document.querySelector<HTMLCanvasElement>("#runnerCanvas");
     const context = canvas ? prepareCanvas(canvas) : null;
-    if (!canvas || !context || !runnerState) return;
+    if (!canvas || !context || !runnerState || !renderState) return;
     const illustrated = Boolean(characterSheet?.complete && characterSheet.naturalWidth > 0);
-    drawRunnerFrame(context, { ...runnerState, paused: isSuspended() }, palette(), matchMedia("(prefers-reduced-motion: reduce)").matches, illustrated ? characterSheet : null, renderQuality);
+    drawRunnerFrame(context, { ...renderState, paused: isSuspended() }, palette(), matchMedia("(prefers-reduced-motion: reduce)").matches, illustrated ? characterSheet : null, renderQuality);
     renderSequence += 1;
     canvas.dataset.renderSequence = String(renderSequence);
     canvas.dataset.lastAction = runnerState.lastAction ?? "idle";
     canvas.dataset.art = illustrated ? "illustrated" : "vector-fallback";
     canvas.dataset.quality = renderQuality;
+    canvas.dataset.interpolation = "fixed-step";
     canvas.dataset.camera = matchMedia("(max-width: 480px) and (orientation: portrait)").matches ? "portrait-close" : "full-stage";
     const playerWorldX = runnerState.worldX + RUNNER_PLAYER_SCREEN_X;
     const nextObstacle = RUNNER_ACTS[runnerState.actIndex].obstacles.find((obstacle) => obstacle.x + obstacle.width >= playerWorldX);
@@ -226,20 +250,35 @@ export function createSectorSprintTable(options: TableOptions) {
       ...act.complications.filter((candidate) => !runnerState!.encounteredComplicationIds.includes(candidate.id)).map((candidate) => ({ x: candidate.x, label: candidate.label })),
     ].filter((candidate) => candidate.x >= runnerState!.worldX + RUNNER_PLAYER_SCREEN_X).sort((left, right) => left.x - right.x)[0];
     const label = document.querySelector<HTMLElement>("#runnerApproach strong");
-    if (label) label.textContent = instruction?.label ?? next?.label ?? "The Act curtain";
+    const nextLabel = instruction?.label ?? next?.label ?? "The Act curtain";
+    if (label && label.textContent !== nextLabel) label.textContent = nextLabel;
   }
 
   function updateHud(): void {
     const power = document.querySelector<HTMLElement>("#runnerPowerLabel");
-    if (power) power.textContent = effectLabel();
+    const nextLabel = effectLabel();
+    if (power && power.textContent !== nextLabel) power.textContent = nextLabel;
   }
 
   function sampleQuality(interval: number): void {
     if (options.reviewMode || interval <= 0 || interval > 250) return;
     frameIntervals.push(interval);
     if (frameIntervals.length < 90) return;
-    renderQuality = runnerRenderQualityForIntervals(frameIntervals);
+    const decision = runnerRenderQualityDecision(renderQuality, runnerRenderQualityForIntervals(frameIntervals), qualityUpgradeWindows, qualityCeiling);
+    renderQuality = decision.quality;
+    qualityUpgradeWindows = decision.upgradeWindows;
+    qualityCeiling = decision.ceiling;
     frameIntervals = frameIntervals.slice(-30);
+  }
+
+  function resetQualityForViewport(force = false): void {
+    const isNarrow = matchMedia("(max-width: 480px)").matches;
+    if (!force && qualityViewportIsNarrow === isNarrow) return;
+    frameIntervals = [];
+    qualityUpgradeWindows = 0;
+    qualityViewportIsNarrow = isNarrow;
+    renderQuality = isNarrow ? "quiet" : "high";
+    qualityCeiling = "high";
   }
 
   function toneFor(previous: RunnerState, next: RunnerState, frameInput: RunnerInput): void {
@@ -271,6 +310,7 @@ export function createSectorSprintTable(options: TableOptions) {
     }
     lastTimestamp = 0;
     accumulatorMs = 0;
+    renderPreviousState = runnerState;
     activePointerId = null;
     activePointerAction = null;
     input = {};
@@ -297,6 +337,7 @@ export function createSectorSprintTable(options: TableOptions) {
       let firstStep = true;
       let steps = 0;
       while (accumulatorMs + 0.001 >= RUNNER_FIXED_STEP_MS && steps < RUNNER_MAX_CATCH_UP_STEPS) {
+        renderPreviousState = runnerState;
         runnerState = stepRunner(runnerState, firstStep ? frameInput : {}, RUNNER_FIXED_STEP_MS);
         input = {};
         firstStep = false;
@@ -304,7 +345,9 @@ export function createSectorSprintTable(options: TableOptions) {
         accumulatorMs -= RUNNER_FIXED_STEP_MS;
       }
       toneFor(previous, runnerState, frameInput);
-      drawCurrentFrame(); updateApproach(); updateHud(); updateLive(runnerState.message);
+      const frameAlpha = Math.max(0, Math.min(1, accumulatorMs / RUNNER_FIXED_STEP_MS));
+      const renderState = renderPreviousState ? runnerInterpolatedFrame(renderPreviousState, runnerState, frameAlpha) : runnerState;
+      drawCurrentFrame(renderState); updateApproach(); updateHud(); updateLive(runnerState.message);
       if (runnerState.failed) {
         stopLoop(); options.audio.suspend(); options.renderShell(); options.focus(retryAvailable() ? "[data-runner-retry]" : "[data-runner-story]"); return;
       }
@@ -395,9 +438,10 @@ export function createSectorSprintTable(options: TableOptions) {
   function start(route: "action" | "narrated", runId: string): void {
     generation += 1;
     stopLoop(); clearTransition(); terminalOutcome = null; elapsedMs = 0; paused = false; interrupted = false; exitSuspended = false;
-    renderQuality = matchMedia("(max-width: 480px)").matches ? "balanced" : "high";
+    resetQualityForViewport(true);
     session = { gameId: "sector-sprint", chapter: 0, runId, memoryCovered: false, pegs: [], selectedPeg: null, resolving: false, storyBeat: route === "narrated" ? 0 : null, touched: false };
     runnerState = route === "action" ? createRunnerState(0) : null;
+    renderPreviousState = runnerState;
     statusMessage = route === "narrated" ? "The narrated city route is ready." : "The lane route begins gently. One architectural contact pauses this Action attempt.";
     if (route === "action") void ensureCharacterSheet();
     persistAndRender();
@@ -412,6 +456,7 @@ export function createSectorSprintTable(options: TableOptions) {
     if (session.storyBeat === null) {
       void ensureCharacterSheet();
       if (!runnerState || runnerState.actIndex !== session.chapter) runnerState = createRunnerState(session.chapter);
+      renderPreviousState = runnerState;
       lastTimestamp = 0; drawCurrentFrame();
       if (runnerState.failed) startBoundaryTimer();
       else if (!isSuspended()) frame = requestAnimationFrame(runFrame);
@@ -464,6 +509,7 @@ export function createSectorSprintTable(options: TableOptions) {
     options.audio.close();
     session.chapter = 0; session.storyBeat = null; session.resolving = false; session.touched = true;
     runnerState = createRunnerState(0); paused = false;
+    renderPreviousState = runnerState;
     statusMessage = "A fresh Action attempt begins inside the same table boundary.";
     persistAndRender('[data-runner-action="up"]'); mount();
   }
@@ -505,12 +551,13 @@ export function createSectorSprintTable(options: TableOptions) {
   function orientationChanged(): void {
     activePointerId = null; activePointerAction = null; input = {};
     if (runnerState) runnerState = { ...runnerState, pendingLaneDelta: null };
-    clearPressed(); drawCurrentFrame();
+    resetQualityForViewport(true); clearPressed(); drawCurrentFrame();
   }
 
   function destroy(optionsForDestroy: { abandon?: boolean } = {}): void {
     if (optionsForDestroy.abandon && session && !terminalOutcome) emitTerminal("abandoned");
-    generation += 1; stopLoop(); clearTransition(); session = null; runnerState = null; terminalOutcome = null; characterSheet = null;
+    generation += 1; stopLoop(); clearTransition(); session = null; runnerState = null; renderPreviousState = null; terminalOutcome = null; characterSheet = null; characterSheetPendingGeneration = null;
+    frameIntervals = []; qualityUpgradeWindows = 0; qualityCeiling = "high"; qualityViewportIsNarrow = null;
   }
 
   function preferredFocusSelector(): string {
@@ -604,7 +651,7 @@ export function createSectorSprintTable(options: TableOptions) {
   });
   window.addEventListener("blur", () => suspend("blur"));
   window.addEventListener("focus", () => resume("focus"));
-  window.addEventListener("resize", drawCurrentFrame);
+  window.addEventListener("resize", () => { resetQualityForViewport(); drawCurrentFrame(); });
   window.addEventListener("orientationchange", orientationChanged);
   matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", (event) => {
     if (event.matches && session?.storyBeat === null) chooseNarrated();

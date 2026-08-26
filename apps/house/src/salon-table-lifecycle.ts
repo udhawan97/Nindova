@@ -21,7 +21,7 @@ export type SalonTableEffect = {
   readonly message?: string;
   readonly focusSelector?: string;
   readonly completedChapter?: number;
-  readonly placedDisk?: { readonly peg: number; readonly disk: number };
+  readonly placedDisk?: { readonly from: number; readonly peg: number; readonly disk: number };
 };
 
 type LifecycleOptions = {
@@ -216,7 +216,7 @@ export function createSalonTableLifecycle(options: LifecycleOptions) {
       message: "Disc placed.",
       focusSelector: `[data-peg="${pegIndex}"]`,
       completedChapter: solved ? completedChapter : undefined,
-      placedDisk: moving === undefined ? undefined : { peg: pegIndex, disk: moving },
+      placedDisk: moving === undefined ? undefined : { from, peg: pegIndex, disk: moving },
     };
   }
 

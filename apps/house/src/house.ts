@@ -39,6 +39,7 @@ import {
 } from "./sector-sprint-table";
 
 type PendingCompletion = { readonly gameId: GameId; readonly runId: string; readonly completedAt: string };
+type StackMovePresentation = NonNullable<SalonTableEffect["placedDisk"]>;
 
 const getGame = GRAND_SALON.game.bind(GRAND_SALON);
 const getDoorCategory = GRAND_SALON.door.bind(GRAND_SALON);
@@ -99,7 +100,14 @@ let chapterTransitionStartedAt: number | null = null;
 let chapterTransitionCallback: (() => void) | null = null;
 let houseAudioContext: AudioContext | null = null;
 const houseAudioVoices = new Set<OscillatorNode>();
-let lastStackMove: { peg: number; disk: number } | null = null;
+let lastStackMove: StackMovePresentation | null = null;
+let stackMoveTimer = 0;
+
+function clearStackMove(): void {
+  window.clearTimeout(stackMoveTimer);
+  stackMoveTimer = 0;
+  lastStackMove = null;
+}
 
 const tableLifecycle = createSalonTableLifecycle({
   initial: active,
@@ -211,7 +219,7 @@ function startGame(gameId: GameId, options: ViewOptions = {}) {
   sectorTable.close();
   closeHouseAudio();
   clearChapterTransition();
-  lastStackMove = null;
+  clearStackMove();
   const opened = tableLifecycle.open(gameId, matchMedia("(prefers-reduced-motion: reduce)").matches);
   navigation.commit(
     { view: "game", gameId, categoryId: game.categoryId },
@@ -521,11 +529,18 @@ function renderChoice(game: ChoiceGameDefinition | MemoryGameDefinition): string
 
 function renderChoiceVisual(game: GameDefinition, display: string, covered: boolean): string {
   if (game.kind === "memory") {
-    if (covered) return `<div class="lantern-veil" aria-hidden="true"><i></i><span>The velvet is drawn.</span><i></i></div>`;
+    if (covered) return `<div class="lantern-veil" aria-hidden="true"><i class="lantern-veil-panel lantern-veil-panel-left"></i><i class="lantern-veil-panel lantern-veil-panel-right"></i><span class="lantern-veil-clasp"><b></b><small>The velvet is drawn.</small><b></b></span></div>`;
     const lanterns = display.split(" · ");
-    return `<div class="lantern-procession" aria-hidden="true">${lanterns.map((name, index) => `
-      <span class="lantern lantern-${name.toLowerCase()}" style="--lantern-index:${index}"><i></i><small>${escape(name)}</small></span>
-    `).join("")}</div>`;
+    const numerals = ["I", "II", "III", "IV", "V", "VI", "VII"];
+    return `<div class="lantern-instrument" style="--lantern-count:${lanterns.length}" aria-hidden="true">
+      <span class="lantern-reading-line"><i></i><b>Read left to right</b><i></i></span>
+      <div class="lantern-procession">${lanterns.map((name, index) => `
+        <span class="lantern lantern-${name.toLowerCase()}" data-lantern-position="${index + 1}" style="--lantern-index:${index}">
+          <b class="lantern-order">${numerals[index]}</b><i class="lantern-body"><em class="lantern-flame"></em></i><small>${escape(name)}</small>
+        </span>
+      `).join("")}</div>
+      <span class="lantern-even-glow"><i></i><b>One fixed procession</b><i></i></span>
+    </div>`;
   }
   if (game.id === "mirror-forge") {
     const arrows = display.trim().split(/\s+/);
@@ -642,17 +657,27 @@ function renderPallanguzhiStudy(chapter: ClassicChapterView): string {
 function renderStack(game: StackGameDefinition): string {
   if (!active) return "";
   const diskCount = game.diskCounts[active.chapter] ?? 2;
+  const selectedPeg = active.selectedPeg;
+  const sourcePosition = lastStackMove ? ((lastStackMove.from + .5) / 3) * 100 : 0;
+  const destinationPosition = lastStackMove ? ((lastStackMove.peg + .5) / 3) * 100 : 0;
+  const traceLeft = Math.min(sourcePosition, destinationPosition);
+  const traceWidth = Math.abs(destinationPosition - sourcePosition);
+  const travel = destinationPosition - sourcePosition;
+  const traceDiscWidth = lastStackMove ? (18 + lastStackMove.disk * 11) / 3 : 0;
   return `
     <div class="stack-instruction">
-      <div><p>Move every disc from the first plinth to the third.</p><p>Only the top disc may move. A larger disc may never rest on a smaller one.</p></div>
+      <div class="stack-brief"><p>Move every disc from the first plinth to the third.</p><p>Only the top disc may move. A larger disc may never rest on a smaller one.</p></div>
+      <span class="stack-action-rhythm" aria-hidden="true"><i>Lift</i><b></b><i>Traverse</i><b></b><i>Settle</i></span>
       <button class="quiet-action reset-stack" type="button" data-reset-stack>Reset this tower</button>
     </div>
-    <div class="stack-board" style="--disc-count: ${diskCount}" aria-label="Three-plinth tower puzzle">
+    <div class="stack-board" data-stack-state="${lastStackMove ? "placed" : selectedPeg === null ? "ready" : "lifted"}" style="--disc-count: ${diskCount}" aria-label="Three-plinth tower puzzle">
+      <span class="stack-datum" aria-hidden="true"><i></i><b>01</b><i></i><b>02</b><i></i><b>03</b><i></i></span>
+      ${lastStackMove ? `<span class="stack-move-trace" data-stack-from="${lastStackMove.from}" data-stack-to="${lastStackMove.peg}" style="--stack-source: ${sourcePosition}%; --stack-travel: ${travel}cqw; --trace-left: ${traceLeft}%; --trace-width: ${traceWidth}%; --trace-disc-width: ${traceDiscWidth}cqw" aria-hidden="true"><i></i><b></b></span>` : ""}
       ${active.pegs.map((peg, pegIndex) => `
-        <button class="peg ${active?.selectedPeg === pegIndex ? "is-selected" : ""}" type="button" data-peg="${pegIndex}" aria-pressed="${active?.selectedPeg === pegIndex}" aria-label="${describePeg(peg, pegIndex)}">
+        <button class="peg ${selectedPeg === pegIndex ? "is-selected" : ""}" type="button" data-peg="${pegIndex}" aria-pressed="${selectedPeg === pegIndex}" aria-label="${describePeg(peg, pegIndex)}">
           <span class="peg-post" aria-hidden="true"></span>
           <span class="discs" aria-hidden="true">
-            ${[...peg].reverse().map((disk) => `<i class="disc ${lastStackMove?.peg === pegIndex && lastStackMove.disk === disk ? "is-placed" : ""}" data-disc="${disk}" style="--disc: ${disk}"></i>`).join("")}
+            ${[...peg].reverse().map((disk) => `<i class="disc ${selectedPeg === pegIndex && peg.at(-1) === disk ? "is-lifted" : ""} ${lastStackMove?.peg === pegIndex && lastStackMove.disk === disk ? "is-placed" : ""}" data-disc="${disk}" style="--disc: ${disk}"></i>`).join("")}
           </span>
           <span class="peg-label">${["First", "Second", "Third"][pegIndex]} plinth</span>
         </button>
@@ -776,8 +801,16 @@ function selectPeg(pegIndex: number) {
   if (effect.kind === "noop") return;
   statusMessage = effect.message ?? "";
   if (effect.placedDisk) {
+    window.clearTimeout(stackMoveTimer);
     lastStackMove = effect.placedDisk;
-    window.setTimeout(() => { lastStackMove = null; }, 520);
+    stackMoveTimer = window.setTimeout(() => {
+      stackMoveTimer = 0;
+      lastStackMove = null;
+      document.querySelector(".stack-move-trace")?.remove();
+      document.querySelectorAll(".disc.is-placed").forEach((disc) => disc.classList.remove("is-placed"));
+      const board = document.querySelector<HTMLElement>(".stack-board");
+      if (board?.dataset.stackState === "placed") board.dataset.stackState = active?.selectedPeg === null ? "ready" : "lifted";
+    }, 620);
   }
   render();
   focusElement(effect.focusSelector ?? `[data-peg="${pegIndex}"]`);
@@ -787,7 +820,7 @@ function selectPeg(pegIndex: number) {
 function resetStackChapter() {
   const effect = tableLifecycle.interact({ type: "reset-stack" });
   if (effect.kind === "noop") return;
-  lastStackMove = null;
+  clearStackMove();
   statusMessage = effect.message ?? "";
   render();
   focusElement(effect.focusSelector ?? '[data-peg="0"]');

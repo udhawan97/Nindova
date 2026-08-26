@@ -454,10 +454,17 @@ try {
   await narrow.page.click('.navakankari-board [data-answer="0"]');
   await narrow.page.waitForFunction(() => window.__house.active?.chapter === 1);
   await narrow.page.evaluate(() => window.__house.start("lantern-ledger"));
+  assert.equal(await narrow.page.locator(".lantern-flame").first().evaluate((element) => getComputedStyle(element).animationName), "none", "reduced motion shows the finished Lantern truth without ignition motion");
+  assert.equal(await narrow.page.locator(".lantern-flame").first().evaluate((element) => getComputedStyle(element).opacity), "1");
   for (const [chapter, answer] of [0, 1, 0, 1].entries()) {
     await narrow.page.click("[data-cover-memory]");
     await narrow.page.click(`[data-answer="${answer}"]`);
     await narrow.page.waitForFunction((next) => window.__house.active?.chapter === next, chapter + 1);
+  }
+  assert.equal(await narrow.page.locator(".lantern").count(), 7, "the final authored procession keeps all seven positions visible at 320px");
+  for (const lantern of await narrow.page.locator(".lantern-body").all()) {
+    const box = await lantern.boundingBox();
+    assert.ok(box && box.x >= 0 && box.x + box.width <= 320, "every final-procession lantern stays inside the phone viewport");
   }
   await narrow.page.click("[data-cover-memory]");
   assert.equal(await narrow.page.evaluate(() => document.documentElement.scrollWidth), 320);
@@ -641,16 +648,25 @@ try {
   await memory.page.evaluate(() => window.__house.start("lantern-ledger"));
   assert.equal(await memory.page.locator(".answer-list button").first().isDisabled(), true);
   const processionLabel = await memory.page.locator(".inscription").getAttribute("aria-label");
-  assert.notEqual(await memory.page.locator(".lantern").first().evaluate((element) => getComputedStyle(element).animationName), "none", "Lantern Ledger has an enabled-motion light procession");
+  assert.deepEqual(await memory.page.locator(".lantern").evaluateAll((lanterns) => lanterns.map((lantern) => ({ position: lantern.getAttribute("data-lantern-position"), order: lantern.querySelector(".lantern-order")?.textContent }))), [
+    { position: "1", order: "I" }, { position: "2", order: "II" }, { position: "3", order: "III" },
+  ], "Lantern positions encode the authored left-to-right order");
+  assert.equal(await memory.page.locator(".lantern-flame").first().evaluate((element) => getComputedStyle(element).animationName), "lantern-ignite", "Lantern Ledger has an authored ignition sequence");
+  const ignitionDelays = await memory.page.locator(".lantern-flame").evaluateAll((flames) => flames.map((flame) => Number.parseFloat(getComputedStyle(flame).animationDelay) * 1_000));
+  assert.ok(ignitionDelays.every((delay, index) => index === 0 || delay > ignitionDelays[index - 1]), "each flame ignites after the preceding authored position");
+  assert.equal(await memory.page.locator(".lantern-even-glow").evaluate((element) => getComputedStyle(element).animationName), "lantern-even-glow", "the procession resolves into one bounded even-glow line");
   assert.notEqual(
     await memory.page.locator(".lantern i").first().evaluate((element) => getComputedStyle(element, "::before").content),
     "none",
     "Lantern Ledger lights contain a visible flame and cap assembly",
   );
-  await memory.page.waitForTimeout(650);
+  await memory.page.waitForTimeout(1_700);
   await memory.page.screenshot({ path: resolve(output, "lantern-procession-768x1024.png"), fullPage: true });
   await memory.page.click("[data-cover-memory]");
   assert.equal(await memory.page.locator(".answer-list button").first().isEnabled(), true);
+  assert.equal(await memory.page.locator(".lantern-veil-panel").count(), 2, "covering draws two deterministic velvet panels");
+  assert.deepEqual(await memory.page.locator(".lantern-veil-panel").evaluateAll((panels) => panels.map((panel) => getComputedStyle(panel).animationName)), ["veil-close-left", "veil-close-right"]);
+  await memory.page.screenshot({ path: resolve(output, "lantern-covered-768x1024.png"), fullPage: true, animations: "disabled" });
   await memory.page.click("[data-reveal-memory]");
   assert.equal(await memory.page.locator(".answer-list button").first().isDisabled(), true, "revealing again disables answers until the procession is covered");
   assert.equal(await memory.page.locator(".inscription").getAttribute("aria-label"), processionLabel, "replay shows the same authored procession");
@@ -676,6 +692,17 @@ try {
   assert.equal(await memory.page.evaluate(() => sessionStorage.getItem("nindova:house:active:v1")), null);
   await memory.context.close();
 
+  const lanternSurfaces = await openHouse({ width: 414, height: 896 });
+  await lanternSurfaces.page.evaluate(() => window.__house.start("lantern-ledger"));
+  assert.equal(await lanternSurfaces.page.evaluate(() => document.documentElement.scrollWidth), 414);
+  await lanternSurfaces.page.screenshot({ path: resolve(output, "lantern-ledger-414x896.png"), fullPage: true, animations: "disabled" });
+  await lanternSurfaces.page.setViewportSize({ width: 1_440, height: 900 });
+  const desktopInstrument = await lanternSurfaces.page.locator(".lantern-instrument").boundingBox();
+  assert.ok(desktopInstrument && desktopInstrument.y < 900 && desktopInstrument.width >= 440, "the Lantern instrument enters and uses the first desktop viewport");
+  assert.equal(await lanternSurfaces.page.evaluate(() => document.documentElement.scrollWidth), 1_440);
+  await lanternSurfaces.page.screenshot({ path: resolve(output, "lantern-ledger-1440x900.png"), fullPage: true, animations: "disabled" });
+  await lanternSurfaces.context.close();
+
   const stack = await openHouse({ width: 414, height: 896 });
   await stack.page.evaluate(() => window.__house.start("stack-architect"));
   assert.notEqual(
@@ -692,12 +719,31 @@ try {
   assert.ok(renderedDiscs[0].top < renderedDiscs[1].top, "top disc renders above the bottom disc");
   assert.ok(renderedDiscs[0].width < renderedDiscs[1].width, "top disc renders narrower than the bottom disc");
   await stack.page.click('[data-peg="0"]');
+  assert.equal(await stack.page.locator(".stack-board").getAttribute("data-stack-state"), "lifted");
+  assert.equal(await stack.page.locator('[data-peg="0"] .disc.is-lifted').getAttribute("data-disc"), "1", "only the movable top disc receives the lift treatment");
   await stack.page.click('[data-peg="1"]');
   assert.deepEqual(await stack.page.evaluate(() => window.__house.active?.pegs), [[2], [1], []]);
+  assert.equal(await stack.page.locator('.stack-move-trace[data-stack-from="0"][data-stack-to="1"]').count(), 1, "the visible traverse follows the actual legal move");
+  assert.notEqual(await stack.page.locator(".stack-move-trace b").evaluate((element) => getComputedStyle(element).animationName), "none", "the moved disc receives a bounded traverse response");
   assert.notEqual(await stack.page.locator('[data-peg="1"] .disc.is-placed').evaluate((element) => getComputedStyle(element).animationName), "none", "a placed Stack disc has a settle response");
+  await stack.page.waitForTimeout(300);
+  await stack.page.click('[data-peg="0"]');
+  await stack.page.click('[data-peg="2"]');
+  await stack.page.waitForTimeout(350);
+  await stack.page.click('[data-peg="1"]');
+  assert.equal(await stack.page.locator('.stack-move-trace[data-stack-from="0"][data-stack-to="2"]').count(), 1, "a prior move timer cannot erase a newer traverse during rapid legal play");
   await stack.page.click("[data-reset-stack]");
   assert.deepEqual(await stack.page.evaluate(() => window.__house.active?.pegs), [[2, 1], [], []], "reset affects only the current tower chapter");
   assert.equal(await stack.page.evaluate(() => window.__house.active?.chapter), 0);
+  await stack.page.click('[data-peg="0"]');
+  await stack.page.click('[data-peg="1"]');
+  await stack.page.waitForTimeout(650);
+  assert.equal(await stack.page.locator('.stack-move-trace[data-stack-from="0"][data-stack-to="1"]').count(), 0, "the current move trace retires from the DOM after its bounded presentation window");
+  assert.equal(await stack.page.locator(".disc.is-placed").count(), 0, "the settle class retires without waiting for another interaction");
+  assert.equal(await stack.page.locator(".stack-board").getAttribute("data-stack-state"), "ready");
+  await stack.page.click('[data-peg="0"]');
+  await stack.page.click('[data-peg="0"]');
+  await stack.page.click("[data-reset-stack]");
   await stack.page.click('[data-peg="0"]');
   await stack.page.click('[data-peg="1"]');
   await stack.page.click('[data-peg="0"]');
@@ -712,6 +758,32 @@ try {
   assert.equal(await stack.page.evaluate(() => window.__house.active?.chapter), 1, "reset preserves the higher authored chapter");
   assert.deepEqual(await stack.page.evaluate(() => window.__house.active?.pegs), [[3, 2, 1], [], []], "reset rebuilds only the current higher-chapter tower");
   await stack.context.close();
+
+  const quietStack = await openHouse({ width: 414, height: 896 });
+  await quietStack.page.emulateMedia({ reducedMotion: "reduce" });
+  await quietStack.page.evaluate(() => window.__house.start("stack-architect"));
+  await quietStack.page.click('[data-peg="0"]');
+  assert.equal(await quietStack.page.locator('[data-peg="0"] .disc.is-lifted').evaluate((element) => getComputedStyle(element).transform), "none", "reduced motion preserves selection without lifting the disc");
+  await quietStack.page.click('[data-peg="1"]');
+  assert.equal(await quietStack.page.locator(".stack-move-trace").evaluate((element) => getComputedStyle(element).display), "none", "reduced motion removes the traverse presentation");
+  assert.equal(await quietStack.page.locator('[data-peg="1"] .disc.is-placed').evaluate((element) => getComputedStyle(element).animationName), "none", "reduced motion removes the settle animation");
+  assert.deepEqual(await quietStack.page.evaluate(() => window.__house.active?.pegs), [[2], [1], []], "reduced motion never changes the legal move result");
+  await quietStack.context.close();
+
+  const desktopStack = await openHouse({ width: 1_440, height: 900 });
+  await desktopStack.page.evaluate(() => window.__house.start("stack-architect"));
+  const desktopStackGeometry = await desktopStack.page.locator(".stack-board").evaluate((board) => {
+    const box = board.getBoundingClientRect();
+    return { top: box.top, width: box.width, pageWidth: document.documentElement.scrollWidth };
+  });
+  assert.ok(desktopStackGeometry.top < 900, "the crafted Stack board enters the first desktop viewport");
+  assert.ok(desktopStackGeometry.width >= 720, "the desktop Stack board uses the wider cabinetmaker composition");
+  assert.equal(desktopStackGeometry.pageWidth, 1_440, "the desktop Stack composition creates no horizontal overflow");
+  await desktopStack.page.click('[data-peg="0"]');
+  await desktopStack.page.click('[data-peg="1"]');
+  assert.equal(await desktopStack.page.locator('.stack-move-trace[data-stack-from="0"][data-stack-to="1"]').count(), 1);
+  await desktopStack.page.screenshot({ path: resolve(output, "stack-architect-1440x900.png"), fullPage: true, animations: "disabled" });
+  await desktopStack.context.close();
 
   const runner = await openHouse({ width: 375, height: 812 }, {}, { manualRaf: true });
   await runner.page.evaluate(() => window.__house.start("sector-sprint"));
@@ -743,7 +815,7 @@ try {
     quality: canvas.dataset.quality,
     camera: canvas.dataset.camera,
     art: canvas.dataset.art,
-  })), { width: 960, height: 432, ratio: "1", logicalWidth: "960", logicalHeight: "432", quality: "balanced", camera: "portrait-close", art: "illustrated" });
+  })), { width: 960, height: 432, ratio: "1", logicalWidth: "960", logicalHeight: "432", quality: "quiet", camera: "portrait-close", art: "illustrated" }, "phones start in the stable visual tier before sustained headroom earns an upgrade");
   assert.ok((await runner.page.locator(".runner-canvas-window").boundingBox())?.height >= 250, "the portrait close camera keeps the illustrated action legible");
   assert.ok((await runner.page.locator(".runner-stage-frame").boundingBox())?.y < 812, "the moving miniature enters the first phone viewport");
   assert.deepEqual(await runner.page.evaluate(() => {
@@ -917,9 +989,20 @@ try {
   const sharpChapter = await sharpRunner.page.evaluate(() => window.__house.active?.chapter);
   await sharpRunner.page.setViewportSize({ width: 768, height: 1_024 });
   assert.equal(await sharpRunner.page.evaluate(() => window.__house.active?.chapter), sharpChapter, "a resize redraw cannot change the authored Act");
+  assert.equal(await sharpRunner.page.locator("#runnerCanvas").getAttribute("data-quality"), "high", "crossing the phone viewport boundary resets stale samples and chooses the new viewport's safe starting tier");
   await sharpRunner.page.evaluate(() => { document.documentElement.style.fontSize = "200%"; });
   assert.equal(await sharpRunner.page.evaluate(() => document.documentElement.scrollWidth), 768, "200% text scaling preserves horizontal reflow");
   await sharpRunner.context.close();
+
+  const qualityReset = await openHouse({ width: 768, height: 1_024 }, {}, { manualRaf: true });
+  await enterRunnerAction(qualityReset.page);
+  await qualityReset.page.evaluate(() => globalThis.__advanceHouseTestFrames(95, 45));
+  assert.equal(await qualityReset.page.locator("#runnerCanvas").getAttribute("data-quality"), "quiet", "a sustained missed budget degrades the current run");
+  const degradedRunId = await qualityReset.page.evaluate(() => window.__house.active?.runId);
+  await enterRunnerAction(qualityReset.page);
+  assert.notEqual(await qualityReset.page.evaluate(() => window.__house.active?.runId), degradedRunId);
+  assert.equal(await qualityReset.page.locator("#runnerCanvas").getAttribute("data-quality"), "high", "a fresh desktop run clears prior samples and its degraded quality ceiling");
+  await qualityReset.context.close();
 
   const recoveryScale = await openHouse({ width: 768, height: 1_024 }, {}, { manualRaf: true });
   await enterRunnerAction(recoveryScale.page);
