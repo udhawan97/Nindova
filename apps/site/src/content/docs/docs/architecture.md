@@ -46,6 +46,6 @@ The standalone Night HTML and installable Night PWA remain separate journeys. Ho
 
 ## Distribution boundary
 
-The `/house/` and `/play/` builds register separately scoped versioned workers. The House `v10` cache precaches its full hashed static asset graph; the Night standalone removes its manifest and worker registration during composition. None requires an account or third-party runtime service. A build-time QR generator still encodes the canonical direct `/play/` route and adds no runtime request.
+The `/house/` and `/play/` builds register separately scoped versioned workers. The House `nindova-house-v12` cache precaches its core hashed static graph; the optional Sector Sprint illustration is cached only after Action requests it and retains the vector fallback when unavailable. The Night standalone removes its manifest and worker registration during composition. None requires an account or third-party runtime service. A build-time QR generator still encodes the canonical direct `/play/` route and adds no runtime request.
 
 The deferred iOS Wall is a separate native boundary and is not implemented by the browser dismissal surface.

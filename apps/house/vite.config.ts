@@ -3,6 +3,8 @@ import { relative, resolve } from "node:path";
 import ts from "typescript";
 import { defineConfig, type Plugin } from "vite";
 
+const optionalRuntimeAsset = /^assets\/sector-sprint-characters-[^/]+\.png$/;
+
 async function emitTypedModule(source: string, output: string) {
   const code = await readFile(source, "utf8");
   const result = ts.transpileModule(code, {
@@ -40,7 +42,7 @@ function emitHouseArtifacts(): Plugin {
       const files = (await readdir(resolve("dist"), { recursive: true, withFileTypes: true }))
         .filter((entry) => entry.isFile())
         .map((entry) => relative(resolve("dist"), resolve(entry.parentPath, entry.name)).replaceAll("\\", "/"))
-        .filter((path) => path !== "sw.js")
+        .filter((path) => path !== "sw.js" && !optionalRuntimeAsset.test(path))
         .sort()
         .map((path) => `./${path}`);
       const workerTemplate = await readFile(resolve("public/sw.js"), "utf8");

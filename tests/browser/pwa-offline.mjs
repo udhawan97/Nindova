@@ -49,6 +49,17 @@ try {
     assert.equal(response?.ok(), true);
     await linkedPage.close();
   }
+  const houseWorkerSource = await (await context.request.get(`${prefix}house/sw.js`)).text();
+  const houseCacheName = houseWorkerSource.match(/const CACHE = "([^"]+)";/)?.[1];
+  assert.ok(houseCacheName, "the built House worker declares its cache name");
+  for (const slug of ["privacy-local-state", "architecture"]) {
+    const { page: docsPage } = await harness.page(context);
+    await docsPage.goto(`${prefix}docs/${slug}/`);
+    const docsCopy = await docsPage.locator("main").innerText();
+    assert.ok(docsCopy.includes(houseCacheName), `${slug} names the built House cache ${houseCacheName}`);
+    assert.match(docsCopy, /optional Sector Sprint illustration is cached only after Action requests it/i);
+    await docsPage.close();
+  }
   const { page: qrPage } = await harness.page(context);
   await qrPage.setContent(`<img id="qr" src="${new URL(`${rootPath}play-qr.svg`, prefix).href}" alt="">`);
   await qrPage.locator("#qr").waitFor({ state: "visible" });
@@ -67,8 +78,11 @@ try {
   const { page: housePage, errors: houseErrors, requests: houseRequests } = await harness.page(houseContext);
   await housePage.goto(prefix);
   await housePage.evaluate(async () => {
-    const legacy = await caches.open("nindova-house-v3");
-    await legacy.put(new Request(`${location.origin}/legacy-house-shell`), new Response("old"));
+    const legacy = await caches.open("nindova-house-v11");
+    await legacy.put(
+      new Request(`${location.origin}/house/assets/sector-sprint-characters-legacy.png`),
+      new Response("old"),
+    );
   });
   await housePage.goto(houseBase);
   await housePage.waitForFunction(() => Boolean(window.__house));
@@ -78,15 +92,15 @@ try {
   const houseRegistration = await housePage.evaluate(async () => {
     const ready = await navigator.serviceWorker.ready;
     const keys = await caches.keys();
-    const cache = await caches.open("nindova-house-v11");
+    const cache = await caches.open("nindova-house-v12");
     return { scope: ready.scope, keys, entries: (await cache.keys()).map((request) => request.url) };
   });
   assert.equal(houseRegistration.scope, houseBase);
-  assert.ok(houseRegistration.keys.includes("nindova-house-v11"));
-  assert.equal(houseRegistration.keys.includes("nindova-house-v3"), false);
+  assert.ok(houseRegistration.keys.includes("nindova-house-v12"));
+  assert.equal(houseRegistration.keys.includes("nindova-house-v11"), false);
   assert.ok(houseRegistration.entries.length > 0);
   const cachedRunnerSheet = houseRegistration.entries.find((url) => /sector-sprint-characters-.*\.png$/.test(url));
-  assert.ok(cachedRunnerSheet, "the original illustrated Sector Sprint sheet is precached");
+  assert.equal(cachedRunnerSheet, undefined, "optional Sector Sprint art stays out of the mandatory cold cache");
   assert.ok(houseRegistration.entries.every((url) => url.startsWith(houseBase) && !url.includes("assessment-readiness")));
   assert.equal((await houseContext.request.get(`${houseBase}assessment-readiness.js`)).status(), 404);
   assert.doesNotMatch(await (await houseContext.request.get(`${houseBase}sw.js`)).text(), /assessment-readiness/);
@@ -100,18 +114,33 @@ try {
   assert.equal(coldHouseResponse?.ok(), true);
   await coldHouse.waitForFunction(() => Boolean(window.__house));
   assert.equal(await coldHouse.locator(".game-door").count(), 5);
-  const offlineRunnerSheet = await coldHouse.evaluate((source) => new Promise((resolveImage) => {
-    const image = new Image();
-    image.onload = () => resolveImage({ width: image.naturalWidth, height: image.naturalHeight });
-    image.onerror = () => resolveImage({ width: 0, height: 0 });
-    image.src = source;
-  }), cachedRunnerSheet);
-  assert.deepEqual(offlineRunnerSheet, { width: 1_536, height: 1_024 }, "the illustrated character sheet decodes while fully offline");
+  await coldHouse.evaluate(() => window.__house.start("sector-sprint"));
+  await coldHouse.click('[data-runner-route="action"]');
+  await coldHouse.waitForSelector("#runnerCanvas");
+  await coldHouse.waitForFunction(() => document.querySelector("#runnerCanvas")?.dataset.art === "vector-fallback");
+  assert.equal(await coldHouse.locator("#runnerCanvas").isVisible(), true, "a first offline Action remains playable through the vector fallback");
+
+  await houseContext.setOffline(false);
+  await coldHouse.reload();
+  await coldHouse.waitForFunction(() => Boolean(window.__house));
   await coldHouse.evaluate(() => window.__house.start("sector-sprint"));
   await coldHouse.click('[data-runner-route="action"]');
   await coldHouse.waitForSelector("#runnerCanvas");
   await coldHouse.waitForFunction(() => document.querySelector("#runnerCanvas")?.dataset.art === "illustrated");
-  assert.equal(await coldHouse.locator("#runnerCanvas").isVisible(), true, "the offline House enters the action route");
+  const runtimeRunnerSheet = await coldHouse.evaluate(async () => {
+    const cache = await caches.open("nindova-house-v12");
+    return (await cache.keys()).map((request) => request.url).find((url) => /sector-sprint-characters-.*\.png$/.test(url));
+  });
+  assert.ok(runtimeRunnerSheet, "online Action caches its optional illustration on demand");
+
+  await houseContext.setOffline(true);
+  await coldHouse.reload();
+  await coldHouse.waitForFunction(() => Boolean(window.__house));
+  await coldHouse.evaluate(() => window.__house.start("sector-sprint"));
+  await coldHouse.click('[data-runner-route="action"]');
+  await coldHouse.waitForSelector("#runnerCanvas");
+  await coldHouse.waitForFunction(() => document.querySelector("#runnerCanvas")?.dataset.art === "illustrated");
+  assert.equal(await coldHouse.locator("#runnerCanvas").isVisible(), true, "a later offline Action reuses the runtime-cached illustration");
   assert.ok(houseRequests.every((url) => new URL(url).origin === new URL(houseBase).origin));
   assert.deepEqual(houseErrors, []);
   await houseContext.setOffline(false);

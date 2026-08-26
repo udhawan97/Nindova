@@ -80,6 +80,7 @@ export function createSectorSprintTable(options: TableOptions) {
   let renderSequence = 0;
   let paletteCache: RunnerPalette | null = null;
   let characterSheet: HTMLImageElement | null = null;
+  let characterSheetPending = false;
   let terminalOutcome: SectorSprintTerminal | null = null;
   let generation = 0;
   let statusMessage = "";
@@ -116,19 +117,29 @@ export function createSectorSprintTable(options: TableOptions) {
     options.terminal(outcome);
   }
 
-  function ensureCharacterSheet(): void {
+  async function ensureCharacterSheet(): Promise<void> {
     const currentGeneration = generation;
     if (characterSheet) {
       void characterSheet.decode().then(() => { if (currentGeneration === generation && !terminalOutcome) drawCurrentFrame(); }, () => undefined);
       return;
     }
-    const sheet = new Image();
-    sheet.decoding = "async";
-    const redraw = () => { if (currentGeneration === generation && !terminalOutcome) drawCurrentFrame(); };
-    sheet.addEventListener("load", redraw);
-    sheet.src = runnerCharacterSheetUrl;
-    characterSheet = sheet;
-    void sheet.decode().then(redraw, () => undefined);
+    if (characterSheetPending) return;
+    characterSheetPending = true;
+    try {
+      if (!navigator.onLine) {
+        if (!("caches" in globalThis) || !(await caches.match(runnerCharacterSheetUrl))) return;
+      }
+      if (currentGeneration !== generation || terminalOutcome) return;
+      const sheet = new Image();
+      sheet.decoding = "async";
+      const redraw = () => { if (currentGeneration === generation && !terminalOutcome) drawCurrentFrame(); };
+      sheet.addEventListener("load", redraw);
+      sheet.src = runnerCharacterSheetUrl;
+      characterSheet = sheet;
+      void sheet.decode().then(redraw, () => undefined);
+    } finally {
+      characterSheetPending = false;
+    }
   }
 
   function palette(): RunnerPalette {
@@ -382,7 +393,7 @@ export function createSectorSprintTable(options: TableOptions) {
     session = { gameId: "sector-sprint", chapter: 0, runId, memoryCovered: false, pegs: [], selectedPeg: null, resolving: false, storyBeat: route === "narrated" ? 0 : null, touched: false };
     runnerState = route === "action" ? createRunnerState(0) : null;
     statusMessage = route === "narrated" ? "The narrated city route is ready." : "The lane route begins gently. One architectural contact pauses this Action attempt.";
-    if (route === "action") ensureCharacterSheet();
+    if (route === "action") void ensureCharacterSheet();
     persistAndRender();
     mount();
     options.focus(route === "action" ? '[data-runner-action="up"]' : "[data-story-advance]");
