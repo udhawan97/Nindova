@@ -3,6 +3,7 @@ import { cp, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { createBrowserEvidenceHarness } from "./evidence-harness.mjs";
+import { collectBudgetFailures, summarizeTimeline } from "../helpers/sector-sprint-diagnostics.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const port = 4207;
@@ -24,20 +25,47 @@ const percentile = (values, amount) => {
 
 const { errors } = harness;
 
-async function openRunner(viewport, cpuRate = 1) {
+async function startTimeline(cdp) {
+  const completed = new Promise((resolveComplete) => cdp.once("Tracing.tracingComplete", resolveComplete));
+  await cdp.send("Tracing.start", {
+    categories: [
+      "blink.resource",
+      "devtools.timeline",
+      "disabled-by-default-blink.image_decoding",
+      "disabled-by-default-devtools.timeline",
+      "disabled-by-default-devtools.timeline.frame",
+    ].join(","),
+    transferMode: "ReturnAsStream",
+  });
+  return async () => {
+    await cdp.send("Tracing.end");
+    const { stream } = await completed;
+    let trace = "";
+    for (;;) {
+      const chunk = await cdp.send("IO.read", { handle: stream, size: 1_000_000 });
+      trace += chunk.data;
+      if (chunk.eof) break;
+    }
+    await cdp.send("IO.close", { handle: stream });
+    return summarizeTimeline(JSON.parse(trace).traceEvents);
+  };
+}
+
+async function openRunner(viewport, cpuRate = 1, { timeline = false } = {}) {
   const context = await harness.context({ viewport }, [() => localStorage.setItem("nindova:house:adult-audience:v1", "acknowledged")]);
   const { page } = await harness.page(context, { errorPrefix: "Sector Sprint: " });
+  const cdp = await context.newCDPSession(page);
   if (cpuRate > 1) {
-    const cdp = await context.newCDPSession(page);
     await cdp.send("Emulation.setCPUThrottlingRate", { rate: cpuRate });
   }
   await page.goto(`http://127.0.0.1:${port}/house/`, { waitUntil: "networkidle" });
+  const stopTimeline = timeline ? await startTimeline(cdp) : null;
   await page.evaluate(() => window.__house.start("sector-sprint"));
   await page.click('[data-runner-route="action"]');
   await page.waitForSelector("#runnerCanvas");
   await startAutopilot(page);
   await page.waitForFunction(() => Number(document.querySelector("#runnerCanvas")?.dataset.renderSequence ?? 0) > 1);
-  return { context, page };
+  return { context, page, stopTimeline };
 }
 
 async function measureAction(page, selector, allowedActions) {
@@ -127,33 +155,78 @@ async function sampleFrames(page, count) {
   }), count);
 }
 
+async function traceRunner(viewport, cpuRate = 1) {
+  const runner = await openRunner(viewport, cpuRate, { timeline: true });
+  try {
+    await runner.page.waitForFunction(() => (
+      (globalThis.__runnerAutopilotLatencies?.length ?? 0) >= 3
+      && window.__house.runner?.failed === false
+    ));
+    await sampleFrames(runner.page, 60);
+    return await runner.stopTimeline();
+  } finally {
+    await runner.context.close();
+  }
+}
+
 try {
   const throttled = await openRunner({ width: 375, height: 812 }, 4);
-  await throttled.page.waitForFunction(() => (
-    (globalThis.__runnerAutopilotLatencies?.length ?? 0) >= 3
-    && window.__house.runner?.failed === false
-  ));
-  const actionSamples = { laneMove: await throttled.page.evaluate(() => globalThis.__runnerAutopilotLatencies.slice(0, 3)) };
-  const throttledFrames = await sampleFrames(throttled.page, 120);
-  const throttledQuality = await throttled.page.locator("#runnerCanvas").getAttribute("data-quality");
+  let actionSamples;
+  let throttledFrames;
+  let throttledQuality;
+  let throttledRuntime;
+  try {
+    await throttled.page.waitForFunction(() => (
+      (globalThis.__runnerAutopilotLatencies?.length ?? 0) >= 3
+      && window.__house.runner?.failed === false
+    ));
+    actionSamples = { laneMove: await throttled.page.evaluate(() => globalThis.__runnerAutopilotLatencies.slice(0, 3)) };
+    throttledFrames = await sampleFrames(throttled.page, 120);
+    throttledQuality = await throttled.page.locator("#runnerCanvas").getAttribute("data-quality");
+    throttledRuntime = await throttled.page.evaluate(() => ({
+      userAgent: navigator.userAgent,
+      platform: navigator.userAgentData?.platform ?? navigator.platform,
+      hardwareConcurrency: navigator.hardwareConcurrency,
+      deviceMemoryGiB: navigator.deviceMemory ?? null,
+    }));
+  } finally {
+    await throttled.context.close();
+  }
   const actionMax = Object.fromEntries(Object.entries(actionSamples).map(([name, values]) => [name, Math.max(...values)]));
-  for (const [name, value] of Object.entries(actionMax)) assert.ok(value < 150, `${name} maximum ${value.toFixed(1)}ms across three observed moves must remain below 150ms under 4x CPU`);
-  assert.ok(percentile(throttledFrames, 0.95) <= 50, `375x812 4x CPU ${throttledQuality} p95 frame interval ${percentile(throttledFrames, 0.95).toFixed(1)}ms must remain <= 50ms`);
-  await throttled.context.close();
 
   const desktop = await openRunner({ width: 1440, height: 900 });
-  await desktop.page.waitForFunction(() => (window.__house.runner?.worldX ?? 0) > 700 && window.__house.runner?.failed === false);
-  const desktopFrames = await sampleFrames(desktop.page, 120);
-  assert.ok(percentile(desktopFrames, 0.95) <= 25, `1440x900 p95 frame interval ${percentile(desktopFrames, 0.95).toFixed(1)}ms must remain <= 25ms`);
-  await desktop.context.close();
+  let desktopFrames;
+  let desktopRuntime;
+  try {
+    await desktop.page.waitForFunction(() => (window.__house.runner?.worldX ?? 0) > 700 && window.__house.runner?.failed === false);
+    desktopFrames = await sampleFrames(desktop.page, 120);
+    desktopRuntime = await desktop.page.evaluate(() => ({
+      userAgent: navigator.userAgent,
+      platform: navigator.userAgentData?.platform ?? navigator.platform,
+      hardwareConcurrency: navigator.hardwareConcurrency,
+      deviceMemoryGiB: navigator.deviceMemory ?? null,
+    }));
+  } finally {
+    await desktop.context.close();
+  }
 
-  assert.deepEqual(errors, []);
-  console.log(JSON.stringify({
+  const phoneFrameP95Ms = percentile(throttledFrames, 0.95);
+  const desktopFrameP95Ms = percentile(desktopFrames, 0.95);
+  const throttledTimeline = await traceRunner({ width: 375, height: 812 }, 4);
+  const desktopTimeline = await traceRunner({ width: 1440, height: 900 });
+  const diagnostics = {
     profile: "Chromium · progressively faster lane route · 375x812 at 4x CPU · 3 lane-move samples · 120 frame samples",
+    node: process.version,
     actionMaxMs: Object.fromEntries(Object.entries(actionMax).map(([name, value]) => [name, Number(value.toFixed(2))])),
-    throttledFrameP95Ms: Number(percentile(throttledFrames, 0.95).toFixed(2)),
-    desktopFrameP95Ms: Number(percentile(desktopFrames, 0.95).toFixed(2)),
-  }));
+    throttledFrameP95Ms: Number(phoneFrameP95Ms.toFixed(2)),
+    desktopFrameP95Ms: Number(desktopFrameP95Ms.toFixed(2)),
+    runtime: { phone: throttledRuntime, desktop: desktopRuntime },
+    timeline: { phone: throttledTimeline, desktop: desktopTimeline },
+  };
+  const budgetFailures = collectBudgetFailures({ actionMaxMs: actionMax, phoneFrameP95Ms, phoneQuality: throttledQuality, desktopFrameP95Ms });
+  console.log(JSON.stringify({ ...diagnostics, budgetFailures }));
+  assert.deepEqual(errors, []);
+  assert.deepEqual(budgetFailures, [], budgetFailures.join("\n"));
 } finally {
   await harness.close();
 }
