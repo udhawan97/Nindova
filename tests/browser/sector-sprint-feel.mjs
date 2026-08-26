@@ -215,7 +215,10 @@ try {
   const throttledTimeline = await traceRunner({ width: 375, height: 812 }, 4);
   const desktopTimeline = await traceRunner({ width: 1440, height: 900 });
   const diagnostics = {
-    profile: "Chromium · progressively faster lane route · 375x812 at 4x CPU · 3 lane-move samples · 120 frame samples",
+    profiles: {
+      phone: { engine: "Chromium", viewport: "375x812", cpuThrottleRate: 4, laneMoveSamples: 3, frameSamples: 120 },
+      desktop: { engine: "Chromium", viewport: "1440x900", cpuThrottleRate: 1, frameSamples: 120 },
+    },
     node: process.version,
     actionMaxMs: Object.fromEntries(Object.entries(actionMax).map(([name, value]) => [name, Number(value.toFixed(2))])),
     throttledFrameP95Ms: Number(phoneFrameP95Ms.toFixed(2)),

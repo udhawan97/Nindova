@@ -95,8 +95,8 @@
     "semantic_hash": ""
   },
   "tests/browser/pwa-offline.mjs": {
-    "mtime": 1787703138.578811,
-    "ast_hash": "bce8caf44d00a4f3c00265e71253c25c",
+    "mtime": 1787704114.0148728,
+    "ast_hash": "6f31d071ec0986e76bf161dd7ed61a7d",
     "semantic_hash": ""
   },
   "tests/browser/seed-asserted.mjs": {
@@ -455,7 +455,7 @@
     "semantic_hash": "d82b998ec66d551fbdb0ae2215ebc8d1"
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1787703526.282795,
+    "mtime": 1787704470.1979356,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": "9557448d4a3c6237efa8fe2648d21fa0"
   },
@@ -875,8 +875,8 @@
     "semantic_hash": ""
   },
   "tests/browser/sector-sprint-feel.mjs": {
-    "mtime": 1787703226.699951,
-    "ast_hash": "fe23739cd2a6d91fa47ad55c3023eda7",
+    "mtime": 1787704209.7646961,
+    "ast_hash": "b8fe3734e679fabcb74522816344f73c",
     "semantic_hash": ""
   },
   "docs/testing/sector-sprint-game-feel.md": {
@@ -945,8 +945,8 @@
     "semantic_hash": "9267e46e490001aa6b469546c75b61fd"
   },
   "apps/house/src/sector-sprint-table.ts": {
-    "mtime": 1787702704.5385864,
-    "ast_hash": "249683488474e176086d80a89e713166",
+    "mtime": 1787704185.3882782,
+    "ast_hash": "7e57d73a8743c8d95562e9a35c7a6e18",
     "semantic_hash": ""
   },
   "apps/house/src/stack-architect.ts": {

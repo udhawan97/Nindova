@@ -133,7 +133,9 @@ export function createSectorSprintTable(options: TableOptions) {
       const sheet = new Image();
       sheet.decoding = "async";
       const redraw = () => { if (currentGeneration === generation && !terminalOutcome) drawCurrentFrame(); };
+      const resetFailedSheet = () => { if (characterSheet === sheet) characterSheet = null; };
       sheet.addEventListener("load", redraw);
+      sheet.addEventListener("error", resetFailedSheet, { once: true });
       sheet.src = runnerCharacterSheetUrl;
       characterSheet = sheet;
       void sheet.decode().then(redraw, () => undefined);
@@ -141,6 +143,10 @@ export function createSectorSprintTable(options: TableOptions) {
       characterSheetPending = false;
     }
   }
+
+  window.addEventListener("online", () => {
+    if (session?.storyBeat === null && !terminalOutcome) void ensureCharacterSheet();
+  });
 
   function palette(): RunnerPalette {
     if (paletteCache) return paletteCache;
@@ -404,6 +410,7 @@ export function createSectorSprintTable(options: TableOptions) {
     if (session.resolving) { resumeTransition(); startBoundaryTimer(); return; }
     stopLoop();
     if (session.storyBeat === null) {
+      void ensureCharacterSheet();
       if (!runnerState || runnerState.actIndex !== session.chapter) runnerState = createRunnerState(session.chapter);
       lastTimestamp = 0; drawCurrentFrame();
       if (runnerState.failed) startBoundaryTimer();

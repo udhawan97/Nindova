@@ -109,7 +109,7 @@ try {
   await houseCdp.send("Network.clearBrowserCache");
   await housePage.close();
   await houseContext.setOffline(true);
-  const { page: coldHouse } = await harness.page(houseContext);
+  const { page: coldHouse, requests: coldHouseRequests } = await harness.page(houseContext);
   const coldHouseResponse = await coldHouse.goto(houseBase);
   assert.equal(coldHouseResponse?.ok(), true);
   await coldHouse.waitForFunction(() => Boolean(window.__house));
@@ -121,11 +121,6 @@ try {
   assert.equal(await coldHouse.locator("#runnerCanvas").isVisible(), true, "a first offline Action remains playable through the vector fallback");
 
   await houseContext.setOffline(false);
-  await coldHouse.reload();
-  await coldHouse.waitForFunction(() => Boolean(window.__house));
-  await coldHouse.evaluate(() => window.__house.start("sector-sprint"));
-  await coldHouse.click('[data-runner-route="action"]');
-  await coldHouse.waitForSelector("#runnerCanvas");
   await coldHouse.waitForFunction(() => document.querySelector("#runnerCanvas")?.dataset.art === "illustrated");
   const runtimeRunnerSheet = await coldHouse.evaluate(async () => {
     const cache = await caches.open("nindova-house-v12");
@@ -141,7 +136,7 @@ try {
   await coldHouse.waitForSelector("#runnerCanvas");
   await coldHouse.waitForFunction(() => document.querySelector("#runnerCanvas")?.dataset.art === "illustrated");
   assert.equal(await coldHouse.locator("#runnerCanvas").isVisible(), true, "a later offline Action reuses the runtime-cached illustration");
-  assert.ok(houseRequests.every((url) => new URL(url).origin === new URL(houseBase).origin));
+  assert.ok([...houseRequests, ...coldHouseRequests].every((url) => new URL(url).origin === new URL(houseBase).origin));
   assert.deepEqual(houseErrors, []);
   await houseContext.setOffline(false);
   await houseContext.close();
