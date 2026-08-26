@@ -1804,8 +1804,8 @@
       "source_location": "L245",
       "_origin": "ast",
       "id": "apps_house_src_house_categorysigil",
-      "community": 67,
-      "community_name": "completeSalonChapter",
+      "community": 9,
+      "community_name": "house.ts",
       "norm_label": "categorysigil()"
     },
     {
@@ -1815,8 +1815,8 @@
       "source_location": "L249",
       "_origin": "ast",
       "id": "apps_house_src_house_render",
-      "community": 67,
-      "community_name": "completeSalonChapter",
+      "community": 9,
+      "community_name": "house.ts",
       "norm_label": "render()"
     },
     {
@@ -1826,8 +1826,8 @@
       "source_location": "L256",
       "_origin": "ast",
       "id": "apps_house_src_house_focuselement",
-      "community": 67,
-      "community_name": "completeSalonChapter",
+      "community": 9,
+      "community_name": "house.ts",
       "norm_label": "focuselement()"
     },
     {
@@ -1881,8 +1881,8 @@
       "source_location": "L303",
       "_origin": "ast",
       "id": "apps_house_src_house_renderhome",
-      "community": 67,
-      "community_name": "completeSalonChapter",
+      "community": 9,
+      "community_name": "house.ts",
       "norm_label": "renderhome()"
     },
     {
@@ -1903,8 +1903,8 @@
       "source_location": "L396",
       "_origin": "ast",
       "id": "apps_house_src_house_rendergallery",
-      "community": 67,
-      "community_name": "completeSalonChapter",
+      "community": 9,
+      "community_name": "house.ts",
       "norm_label": "rendergallery()"
     },
     {
@@ -1925,8 +1925,8 @@
       "source_location": "L460",
       "_origin": "ast",
       "id": "apps_house_src_house_renderrestoregate",
-      "community": 14,
-      "community_name": "escape",
+      "community": 10,
+      "community_name": "house-state.ts",
       "norm_label": "renderrestoregate()"
     },
     {
@@ -2024,8 +2024,8 @@
       "source_location": "L642",
       "_origin": "ast",
       "id": "apps_house_src_house_renderstack",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 14,
+      "community_name": "escape",
       "norm_label": "renderstack()"
     },
     {
@@ -2035,8 +2035,8 @@
       "source_location": "L664",
       "_origin": "ast",
       "id": "apps_house_src_house_describepeg",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 14,
+      "community_name": "escape",
       "norm_label": "describepeg()"
     },
     {
@@ -2046,8 +2046,8 @@
       "source_location": "L670",
       "_origin": "ast",
       "id": "apps_house_src_house_answerchoice",
-      "community": 67,
-      "community_name": "completeSalonChapter",
+      "community": 9,
+      "community_name": "house.ts",
       "norm_label": "answerchoice()"
     },
     {
@@ -2057,8 +2057,8 @@
       "source_location": "L690",
       "_origin": "ast",
       "id": "apps_house_src_house_completesalonchapter",
-      "community": 67,
-      "community_name": "completeSalonChapter",
+      "community": 9,
+      "community_name": "house.ts",
       "norm_label": "completesalonchapter()"
     },
     {
@@ -2101,8 +2101,8 @@
       "source_location": "L774",
       "_origin": "ast",
       "id": "apps_house_src_house_selectpeg",
-      "community": 67,
-      "community_name": "completeSalonChapter",
+      "community": 9,
+      "community_name": "house.ts",
       "norm_label": "selectpeg()"
     },
     {
@@ -2112,8 +2112,8 @@
       "source_location": "L787",
       "_origin": "ast",
       "id": "apps_house_src_house_resetstackchapter",
-      "community": 67,
-      "community_name": "completeSalonChapter",
+      "community": 9,
+      "community_name": "house.ts",
       "norm_label": "resetstackchapter()"
     },
     {
@@ -2123,8 +2123,8 @@
       "source_location": "L796",
       "_origin": "ast",
       "id": "apps_house_src_house_showcelebration",
-      "community": 67,
-      "community_name": "completeSalonChapter",
+      "community": 9,
+      "community_name": "house.ts",
       "norm_label": "showcelebration()"
     },
     {
@@ -2178,8 +2178,8 @@
       "source_location": "L835",
       "_origin": "ast",
       "id": "apps_house_src_house_playtonesequence",
-      "community": 79,
-      "community_name": "playChime",
+      "community": 9,
+      "community_name": "house.ts",
       "norm_label": "playtonesequence()"
     },
     {
@@ -2189,8 +2189,8 @@
       "source_location": "L864",
       "_origin": "ast",
       "id": "apps_house_src_house_playsectortone",
-      "community": 79,
-      "community_name": "playChime",
+      "community": 9,
+      "community_name": "house.ts",
       "norm_label": "playsectortone()"
     },
     {
@@ -2200,8 +2200,8 @@
       "source_location": "L881",
       "_origin": "ast",
       "id": "apps_house_src_house_playchime",
-      "community": 79,
-      "community_name": "playChime",
+      "community": 9,
+      "community_name": "house.ts",
       "norm_label": "playchime()"
     },
     {
@@ -2211,8 +2211,8 @@
       "source_location": "L1057",
       "_origin": "ast",
       "id": "apps_house_src_house_view",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 14,
+      "community_name": "escape",
       "norm_label": "view()"
     },
     {
@@ -2233,8 +2233,8 @@
       "source_location": "L1060",
       "_origin": "ast",
       "id": "apps_house_src_house_runner",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 14,
+      "community_name": "escape",
       "norm_label": "runner()"
     },
     {
@@ -2497,8 +2497,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "apps_house_src_salon_table_lifecycle",
-      "community": 10,
-      "community_name": "house-state.ts",
+      "community": 67,
+      "community_name": "salon-table-lifecycle.ts",
       "norm_label": "salon-table-lifecycle.ts"
     },
     {
@@ -2508,8 +2508,8 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "apps_house_src_salon_table_lifecycle_salontableview",
-      "community": 10,
-      "community_name": "house-state.ts",
+      "community": 67,
+      "community_name": "salon-table-lifecycle.ts",
       "norm_label": "salontableview"
     },
     {
@@ -2519,8 +2519,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "apps_house_src_salon_table_lifecycle_salontableinteraction",
-      "community": 10,
-      "community_name": "house-state.ts",
+      "community": 67,
+      "community_name": "salon-table-lifecycle.ts",
       "norm_label": "salontableinteraction"
     },
     {
@@ -2530,8 +2530,8 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "apps_house_src_salon_table_lifecycle_salontableeffect",
-      "community": 10,
-      "community_name": "house-state.ts",
+      "community": 67,
+      "community_name": "salon-table-lifecycle.ts",
       "norm_label": "salontableeffect"
     },
     {
@@ -2541,8 +2541,8 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "apps_house_src_salon_table_lifecycle_lifecycleoptions",
-      "community": 10,
-      "community_name": "house-state.ts",
+      "community": 67,
+      "community_name": "salon-table-lifecycle.ts",
       "norm_label": "lifecycleoptions"
     },
     {
@@ -2552,8 +2552,8 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "apps_house_src_salon_table_lifecycle_cloneactive",
-      "community": 10,
-      "community_name": "house-state.ts",
+      "community": 67,
+      "community_name": "salon-table-lifecycle.ts",
       "norm_label": "cloneactive()"
     },
     {
@@ -2563,8 +2563,8 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "apps_house_src_salon_table_lifecycle_initialsession",
-      "community": 10,
-      "community_name": "house-state.ts",
+      "community": 67,
+      "community_name": "salon-table-lifecycle.ts",
       "norm_label": "initialsession()"
     },
     {
@@ -2585,8 +2585,8 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "apps_house_src_salon_table_lifecycle_createsalontablelifecycle",
-      "community": 10,
-      "community_name": "house-state.ts",
+      "community": 67,
+      "community_name": "salon-table-lifecycle.ts",
       "norm_label": "createsalontablelifecycle()"
     },
     {
@@ -3718,8 +3718,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "apps_house_src_stack_architect",
-      "community": 10,
-      "community_name": "house-state.ts",
+      "community": 67,
+      "community_name": "salon-table-lifecycle.ts",
       "norm_label": "stack-architect.ts"
     },
     {
@@ -3729,8 +3729,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "apps_house_src_stack_architect_islegalstackmove",
-      "community": 10,
-      "community_name": "house-state.ts",
+      "community": 67,
+      "community_name": "salon-table-lifecycle.ts",
       "norm_label": "islegalstackmove()"
     },
     {
@@ -3740,8 +3740,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "apps_house_src_stack_architect_movestackdisc",
-      "community": 10,
-      "community_name": "house-state.ts",
+      "community": 67,
+      "community_name": "salon-table-lifecycle.ts",
       "norm_label": "movestackdisc()"
     },
     {
@@ -3751,8 +3751,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "apps_house_src_stack_architect_initialpegs",
-      "community": 10,
-      "community_name": "house-state.ts",
+      "community": 67,
+      "community_name": "salon-table-lifecycle.ts",
       "norm_label": "initialpegs()"
     },
     {
@@ -3762,8 +3762,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "apps_house_src_stack_architect_isvalidstackstate",
-      "community": 10,
-      "community_name": "house-state.ts",
+      "community": 67,
+      "community_name": "salon-table-lifecycle.ts",
       "norm_label": "isvalidstackstate()"
     },
     {
@@ -3773,8 +3773,8 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "apps_house_src_stack_architect_restorestackpegs",
-      "community": 10,
-      "community_name": "house-state.ts",
+      "community": 67,
+      "community_name": "salon-table-lifecycle.ts",
       "norm_label": "restorestackpegs()"
     },
     {
@@ -3784,8 +3784,8 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "apps_house_src_stack_architect_stacksolved",
-      "community": 10,
-      "community_name": "house-state.ts",
+      "community": 67,
+      "community_name": "salon-table-lifecycle.ts",
       "norm_label": "stacksolved()"
     },
     {
@@ -4001,7 +4001,7 @@
       "label": "emitTypedModule()",
       "file_type": "code",
       "source_file": "apps/house/vite.config.ts",
-      "source_location": "L6",
+      "source_location": "L8",
       "_origin": "ast",
       "id": "apps_house_vite_config_emittypedmodule",
       "community": 98,
@@ -4012,7 +4012,7 @@
       "label": "emitHouseArtifacts()",
       "file_type": "code",
       "source_file": "apps/house/vite.config.ts",
-      "source_location": "L21",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "apps_house_vite_config_emithouseartifacts",
       "community": 98,
@@ -4169,8 +4169,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "apps_session_src_active_session",
-      "community": 4,
-      "community_name": "night-core.ts",
+      "community": 49,
+      "community_name": "active-session.ts",
       "norm_label": "active-session.ts"
     },
     {
@@ -4180,8 +4180,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "apps_session_src_active_session_activesessionphase",
-      "community": 4,
-      "community_name": "night-core.ts",
+      "community": 49,
+      "community_name": "active-session.ts",
       "norm_label": "activesessionphase"
     },
     {
@@ -4191,8 +4191,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "apps_session_src_active_session_activesessionending",
-      "community": 4,
-      "community_name": "night-core.ts",
+      "community": 49,
+      "community_name": "active-session.ts",
       "norm_label": "activesessionending"
     },
     {
@@ -4202,8 +4202,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "apps_session_src_active_session_activesessionrejection",
-      "community": 4,
-      "community_name": "night-core.ts",
+      "community": 49,
+      "community_name": "active-session.ts",
       "norm_label": "activesessionrejection"
     },
     {
@@ -4213,8 +4213,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "apps_session_src_active_session_activesessionrecord",
-      "community": 4,
-      "community_name": "night-core.ts",
+      "community": 49,
+      "community_name": "active-session.ts",
       "norm_label": "activesessionrecord"
     },
     {
@@ -4224,8 +4224,8 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "apps_session_src_active_session_activesessionlimits",
-      "community": 4,
-      "community_name": "night-core.ts",
+      "community": 49,
+      "community_name": "active-session.ts",
       "norm_label": "activesessionlimits"
     },
     {
@@ -4235,8 +4235,8 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "apps_session_src_active_session_activesessiondecoded",
-      "community": 4,
-      "community_name": "night-core.ts",
+      "community": 49,
+      "community_name": "active-session.ts",
       "norm_label": "activesessiondecoded"
     },
     {
@@ -4246,8 +4246,8 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "apps_session_src_active_session_rejected",
-      "community": 4,
-      "community_name": "night-core.ts",
+      "community": 49,
+      "community_name": "active-session.ts",
       "norm_label": "rejected()"
     },
     {
@@ -4257,8 +4257,8 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "apps_session_src_active_session_isprofile",
-      "community": 4,
-      "community_name": "night-core.ts",
+      "community": 49,
+      "community_name": "active-session.ts",
       "norm_label": "isprofile()"
     },
     {
@@ -4268,8 +4268,8 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "apps_session_src_active_session_decodeactivesession",
-      "community": 4,
-      "community_name": "night-core.ts",
+      "community": 49,
+      "community_name": "active-session.ts",
       "norm_label": "decodeactivesession()"
     },
     {
@@ -4279,8 +4279,8 @@
       "source_location": "L73",
       "_origin": "ast",
       "id": "apps_session_src_active_session_decodestoredsession",
-      "community": 4,
-      "community_name": "night-core.ts",
+      "community": 49,
+      "community_name": "active-session.ts",
       "norm_label": "decodestoredsession()"
     },
     {
@@ -4290,8 +4290,8 @@
       "source_location": "L120",
       "_origin": "ast",
       "id": "apps_session_src_active_session_nindovaactivesession",
-      "community": 4,
-      "community_name": "night-core.ts",
+      "community": 49,
+      "community_name": "active-session.ts",
       "norm_label": "nindovaactivesession"
     },
     {
@@ -4301,8 +4301,8 @@
       "source_location": "L125",
       "_origin": "ast",
       "id": "apps_session_src_active_session_nindovaactivesessionapi",
-      "community": 4,
-      "community_name": "night-core.ts",
+      "community": 49,
+      "community_name": "active-session.ts",
       "norm_label": "nindovaactivesessionapi"
     },
     {
@@ -4313,7 +4313,7 @@
       "_origin": "ast",
       "id": "apps_session_src_contracts",
       "community": 37,
-      "community_name": "RasoiDebug",
+      "community_name": "contracts.ts",
       "norm_label": "contracts.ts"
     },
     {
@@ -4324,7 +4324,7 @@
       "_origin": "ast",
       "id": "apps_session_src_contracts_sessionstate",
       "community": 37,
-      "community_name": "RasoiDebug",
+      "community_name": "contracts.ts",
       "norm_label": "sessionstate"
     },
     {
@@ -4335,7 +4335,7 @@
       "_origin": "ast",
       "id": "apps_session_src_contracts_rasoitilesnapshot",
       "community": 37,
-      "community_name": "RasoiDebug",
+      "community_name": "contracts.ts",
       "norm_label": "rasoitilesnapshot"
     },
     {
@@ -4345,7 +4345,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "apps_session_src_contracts_rasoidebug",
-      "community": 37,
+      "community": 73,
       "community_name": "RasoiDebug",
       "norm_label": "rasoidebug"
     },
@@ -4356,7 +4356,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "apps_session_src_contracts_rasoidebug_selecttile",
-      "community": 37,
+      "community": 73,
       "community_name": "RasoiDebug",
       "norm_label": ".selecttile()"
     },
@@ -4367,7 +4367,7 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "apps_session_src_contracts_rasoidebug_hint",
-      "community": 37,
+      "community": 73,
       "community_name": "RasoiDebug",
       "norm_label": ".hint()"
     },
@@ -4378,7 +4378,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "apps_session_src_contracts_rasoidebug_finish",
-      "community": 37,
+      "community": 73,
       "community_name": "RasoiDebug",
       "norm_label": ".finish()"
     },
@@ -4389,7 +4389,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "apps_session_src_contracts_rasoidebug_advanceby",
-      "community": 37,
+      "community": 73,
       "community_name": "RasoiDebug",
       "norm_label": ".advanceby()"
     },
@@ -4400,7 +4400,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "apps_session_src_contracts_rasoidebug_setdawnnow",
-      "community": 37,
+      "community": 73,
       "community_name": "RasoiDebug",
       "norm_label": ".setdawnnow()"
     },
@@ -4411,7 +4411,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "apps_session_src_contracts_rasoidebug_setloopunsupported",
-      "community": 37,
+      "community": 73,
       "community_name": "RasoiDebug",
       "norm_label": ".setloopunsupported()"
     },
@@ -4422,7 +4422,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "apps_session_src_contracts_rasoidebug_opendawn",
-      "community": 37,
+      "community": 73,
       "community_name": "RasoiDebug",
       "norm_label": ".opendawn()"
     },
@@ -4434,7 +4434,7 @@
       "_origin": "ast",
       "id": "apps_session_src_contracts_window",
       "community": 37,
-      "community_name": "RasoiDebug",
+      "community_name": "contracts.ts",
       "norm_label": "window"
     },
     {
@@ -4686,8 +4686,8 @@
       "source_location": "L390",
       "_origin": "ast",
       "id": "apps_session_src_dawn_core_nindovadawn",
-      "community": 73,
-      "community_name": "NindovaDawn",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "nindovadawn"
     },
     {
@@ -4730,8 +4730,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "apps_session_src_night_core_nightcapture",
-      "community": 4,
-      "community_name": "night-core.ts",
+      "community": 49,
+      "community_name": "active-session.ts",
       "norm_label": "nightcapture"
     },
     {
@@ -5093,8 +5093,8 @@
       "source_location": "L281",
       "_origin": "ast",
       "id": "apps_session_src_night_core_nindovanight",
-      "community": 4,
-      "community_name": "night-core.ts",
+      "community": 84,
+      "community_name": "finishSession",
       "norm_label": "nindovanight"
     },
     {
@@ -5138,7 +5138,7 @@
       "_origin": "ast",
       "id": "apps_session_src_rasoi_core_rasoimotifid",
       "community": 37,
-      "community_name": "RasoiDebug",
+      "community_name": "contracts.ts",
       "norm_label": "rasoimotifid"
     },
     {
@@ -5148,8 +5148,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "apps_session_src_rasoi_core_rasoiprofileid",
-      "community": 4,
-      "community_name": "night-core.ts",
+      "community": 49,
+      "community_name": "active-session.ts",
       "norm_label": "rasoiprofileid"
     },
     {
@@ -5181,8 +5181,8 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "apps_session_src_rasoi_core_rasoiboard",
-      "community": 4,
-      "community_name": "night-core.ts",
+      "community": 49,
+      "community_name": "active-session.ts",
       "norm_label": "rasoiboard"
     },
     {
@@ -5479,7 +5479,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_boundary",
       "community": 37,
-      "community_name": "RasoiDebug",
+      "community_name": "contracts.ts",
       "norm_label": "session-boundary.ts"
     },
     {
@@ -5490,7 +5490,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_boundary_boundaryoutcome",
       "community": 37,
-      "community_name": "RasoiDebug",
+      "community_name": "contracts.ts",
       "norm_label": "boundaryoutcome"
     },
     {
@@ -5501,7 +5501,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_boundary_boundarythresholds",
       "community": 37,
-      "community_name": "RasoiDebug",
+      "community_name": "contracts.ts",
       "norm_label": "boundarythresholds"
     },
     {
@@ -5512,7 +5512,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_boundary_nindovaboundary",
       "community": 37,
-      "community_name": "RasoiDebug",
+      "community_name": "contracts.ts",
       "norm_label": "nindovaboundary"
     },
     {
@@ -5523,7 +5523,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_boundary_nindovaboundaryapi",
       "community": 37,
-      "community_name": "RasoiDebug",
+      "community_name": "contracts.ts",
       "norm_label": "nindovaboundaryapi"
     },
     {
@@ -5545,7 +5545,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_legacy_active_session_keys",
       "community": 84,
-      "community_name": "clearActiveSession",
+      "community_name": "finishSession",
       "norm_label": "legacy_active_session_keys"
     },
     {
@@ -5555,8 +5555,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "apps_session_src_session_element",
-      "community": 74,
-      "community_name": "finishSession",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "element()"
     },
     {
@@ -5764,8 +5764,8 @@
       "source_location": "L89",
       "_origin": "ast",
       "id": "apps_session_src_session_revoke",
-      "community": 73,
-      "community_name": "NindovaDawn",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "revoke()"
     },
     {
@@ -5776,7 +5776,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_safestorage",
       "community": 84,
-      "community_name": "clearActiveSession",
+      "community_name": "finishSession",
       "norm_label": "safestorage()"
     },
     {
@@ -5797,8 +5797,8 @@
       "source_location": "L103",
       "_origin": "ast",
       "id": "apps_session_src_session_showview",
-      "community": 74,
-      "community_name": "finishSession",
+      "community": 78,
+      "community_name": "restoreActiveSession",
       "norm_label": "showview()"
     },
     {
@@ -5808,8 +5808,8 @@
       "source_location": "L114",
       "_origin": "ast",
       "id": "apps_session_src_session_iconsvg",
-      "community": 0,
-      "community_name": "session.ts",
+      "community": 74,
+      "community_name": "enforceBoundary",
       "norm_label": "iconsvg()"
     },
     {
@@ -5875,7 +5875,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_clearactivesession",
       "community": 84,
-      "community_name": "clearActiveSession",
+      "community_name": "finishSession",
       "norm_label": "clearactivesession()"
     },
     {
@@ -5897,7 +5897,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_readactivesessionraw",
       "community": 84,
-      "community_name": "clearActiveSession",
+      "community_name": "finishSession",
       "norm_label": "readactivesessionraw()"
     },
     {
@@ -5995,7 +5995,7 @@
       "source_location": "L430",
       "_origin": "ast",
       "id": "apps_session_src_session_finishsession",
-      "community": 74,
+      "community": 84,
       "community_name": "finishSession",
       "norm_label": "finishsession()"
     },
@@ -6006,7 +6006,7 @@
       "source_location": "L456",
       "_origin": "ast",
       "id": "apps_session_src_session_renderpathnote",
-      "community": 74,
+      "community": 84,
       "community_name": "finishSession",
       "norm_label": "renderpathnote()"
     },
@@ -6018,7 +6018,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_nowms",
       "community": 74,
-      "community_name": "finishSession",
+      "community_name": "enforceBoundary",
       "norm_label": "nowms()"
     },
     {
@@ -6029,7 +6029,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_clearclosuretimers",
       "community": 74,
-      "community_name": "finishSession",
+      "community_name": "enforceBoundary",
       "norm_label": "clearclosuretimers()"
     },
     {
@@ -6040,7 +6040,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_enterrest",
       "community": 74,
-      "community_name": "finishSession",
+      "community_name": "enforceBoundary",
       "norm_label": "enterrest()"
     },
     {
@@ -6051,7 +6051,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_schedulerest",
       "community": 74,
-      "community_name": "finishSession",
+      "community_name": "enforceBoundary",
       "norm_label": "schedulerest()"
     },
     {
@@ -6061,8 +6061,8 @@
       "source_location": "L507",
       "_origin": "ast",
       "id": "apps_session_src_session_renderdrift",
-      "community": 0,
-      "community_name": "session.ts",
+      "community": 74,
+      "community_name": "enforceBoundary",
       "norm_label": "renderdrift()"
     },
     {
@@ -6073,7 +6073,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_enterdrift",
       "community": 74,
-      "community_name": "finishSession",
+      "community_name": "enforceBoundary",
       "norm_label": "enterdrift()"
     },
     {
@@ -6084,7 +6084,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_enforceboundary",
       "community": 74,
-      "community_name": "finishSession",
+      "community_name": "enforceBoundary",
       "norm_label": "enforceboundary()"
     },
     {
@@ -6095,7 +6095,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_advanceby",
       "community": 74,
-      "community_name": "finishSession",
+      "community_name": "enforceBoundary",
       "norm_label": "advanceby()"
     },
     {
@@ -6116,8 +6116,8 @@
       "source_location": "L563",
       "_origin": "ast",
       "id": "apps_session_src_session_currentdawneligibility",
-      "community": 73,
-      "community_name": "NindovaDawn",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "currentdawneligibility()"
     },
     {
@@ -6127,8 +6127,8 @@
       "source_location": "L567",
       "_origin": "ast",
       "id": "apps_session_src_session_updatedawnbutton",
-      "community": 73,
-      "community_name": "NindovaDawn",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "updatedawnbutton()"
     },
     {
@@ -6138,8 +6138,8 @@
       "source_location": "L572",
       "_origin": "ast",
       "id": "apps_session_src_session_setdawnnow",
-      "community": 73,
-      "community_name": "NindovaDawn",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "setdawnnow()"
     },
     {
@@ -6149,8 +6149,8 @@
       "source_location": "L580",
       "_origin": "ast",
       "id": "apps_session_src_session_renderdawnframe",
-      "community": 73,
-      "community_name": "NindovaDawn",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "renderdawnframe()"
     },
     {
@@ -6160,8 +6160,8 @@
       "source_location": "L584",
       "_origin": "ast",
       "id": "apps_session_src_session_opendawn",
-      "community": 74,
-      "community_name": "finishSession",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "opendawn()"
     },
     {
@@ -6171,8 +6171,8 @@
       "source_location": "L593",
       "_origin": "ast",
       "id": "apps_session_src_session_dawnstillblob",
-      "community": 73,
-      "community_name": "NindovaDawn",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "dawnstillblob()"
     },
     {
@@ -6182,8 +6182,8 @@
       "source_location": "L598",
       "_origin": "ast",
       "id": "apps_session_src_session_downloadblob",
-      "community": 73,
-      "community_name": "NindovaDawn",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "downloadblob()"
     },
     {
@@ -6193,8 +6193,8 @@
       "source_location": "L607",
       "_origin": "ast",
       "id": "apps_session_src_session_shareorexplain",
-      "community": 73,
-      "community_name": "NindovaDawn",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "shareorexplain()"
     },
     {
@@ -6204,8 +6204,8 @@
       "source_location": "L612",
       "_origin": "ast",
       "id": "apps_session_src_session_makeloop",
-      "community": 73,
-      "community_name": "NindovaDawn",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "makeloop()"
     },
     {
@@ -6215,8 +6215,8 @@
       "source_location": "L636",
       "_origin": "ast",
       "id": "apps_session_src_session_closedawn",
-      "community": 73,
-      "community_name": "NindovaDawn",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "closedawn()"
     },
     {
@@ -6226,8 +6226,8 @@
       "source_location": "L646",
       "_origin": "ast",
       "id": "apps_session_src_session_returntointake",
-      "community": 74,
-      "community_name": "finishSession",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "returntointake()"
     },
     {
@@ -8599,7 +8599,7 @@
       "label": "root",
       "file_type": "code",
       "source_file": "tests/browser/sector-sprint-feel.mjs",
-      "source_location": "L7",
+      "source_location": "L8",
       "_origin": "ast",
       "id": "tests_browser_sector_sprint_feel_root",
       "community": 45,
@@ -8610,7 +8610,7 @@
       "label": "percentile()",
       "file_type": "code",
       "source_file": "tests/browser/sector-sprint-feel.mjs",
-      "source_location": "L20",
+      "source_location": "L21",
       "_origin": "ast",
       "id": "tests_browser_sector_sprint_feel_percentile",
       "community": 45,
@@ -8618,10 +8618,21 @@
       "norm_label": "percentile()"
     },
     {
+      "label": "startTimeline()",
+      "file_type": "code",
+      "source_file": "tests/browser/sector-sprint-feel.mjs",
+      "source_location": "L28",
+      "_origin": "ast",
+      "id": "tests_browser_sector_sprint_feel_starttimeline",
+      "community": 45,
+      "community_name": "sector-sprint-feel.mjs",
+      "norm_label": "starttimeline()"
+    },
+    {
       "label": "openRunner()",
       "file_type": "code",
       "source_file": "tests/browser/sector-sprint-feel.mjs",
-      "source_location": "L27",
+      "source_location": "L54",
       "_origin": "ast",
       "id": "tests_browser_sector_sprint_feel_openrunner",
       "community": 45,
@@ -8632,7 +8643,7 @@
       "label": "measureAction()",
       "file_type": "code",
       "source_file": "tests/browser/sector-sprint-feel.mjs",
-      "source_location": "L43",
+      "source_location": "L71",
       "_origin": "ast",
       "id": "tests_browser_sector_sprint_feel_measureaction",
       "community": 45,
@@ -8643,7 +8654,7 @@
       "label": "startAutopilot()",
       "file_type": "code",
       "source_file": "tests/browser/sector-sprint-feel.mjs",
-      "source_location": "L72",
+      "source_location": "L100",
       "_origin": "ast",
       "id": "tests_browser_sector_sprint_feel_startautopilot",
       "community": 45,
@@ -8654,12 +8665,23 @@
       "label": "sampleFrames()",
       "file_type": "code",
       "source_file": "tests/browser/sector-sprint-feel.mjs",
-      "source_location": "L114",
+      "source_location": "L142",
       "_origin": "ast",
       "id": "tests_browser_sector_sprint_feel_sampleframes",
       "community": 45,
       "community_name": "sector-sprint-feel.mjs",
       "norm_label": "sampleframes()"
+    },
+    {
+      "label": "traceRunner()",
+      "file_type": "code",
+      "source_file": "tests/browser/sector-sprint-feel.mjs",
+      "source_location": "L158",
+      "_origin": "ast",
+      "id": "tests_browser_sector_sprint_feel_tracerunner",
+      "community": 45,
+      "community_name": "sector-sprint-feel.mjs",
+      "norm_label": "tracerunner()"
     },
     {
       "label": "seed-asserted.mjs",
@@ -8869,6 +8891,72 @@
       "community": 22,
       "community_name": "dawn.mjs",
       "norm_label": "recipetwocompletion"
+    },
+    {
+      "label": "sector-sprint-diagnostics.mjs",
+      "file_type": "code",
+      "source_file": "tests/helpers/sector-sprint-diagnostics.mjs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_helpers_sector_sprint_diagnostics",
+      "community": 45,
+      "community_name": "sector-sprint-feel.mjs",
+      "norm_label": "sector-sprint-diagnostics.mjs"
+    },
+    {
+      "label": "phaseEvents",
+      "file_type": "code",
+      "source_file": "tests/helpers/sector-sprint-diagnostics.mjs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_helpers_sector_sprint_diagnostics_phaseevents",
+      "community": 45,
+      "community_name": "sector-sprint-feel.mjs",
+      "norm_label": "phaseevents"
+    },
+    {
+      "label": "roundMs()",
+      "file_type": "code",
+      "source_file": "tests/helpers/sector-sprint-diagnostics.mjs",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "tests_helpers_sector_sprint_diagnostics_roundms",
+      "community": 45,
+      "community_name": "sector-sprint-feel.mjs",
+      "norm_label": "roundms()"
+    },
+    {
+      "label": "percentile()",
+      "file_type": "code",
+      "source_file": "tests/helpers/sector-sprint-diagnostics.mjs",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "tests_helpers_sector_sprint_diagnostics_percentile",
+      "community": 45,
+      "community_name": "sector-sprint-feel.mjs",
+      "norm_label": "percentile()"
+    },
+    {
+      "label": "collectBudgetFailures()",
+      "file_type": "code",
+      "source_file": "tests/helpers/sector-sprint-diagnostics.mjs",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "tests_helpers_sector_sprint_diagnostics_collectbudgetfailures",
+      "community": 45,
+      "community_name": "sector-sprint-feel.mjs",
+      "norm_label": "collectbudgetfailures()"
+    },
+    {
+      "label": "summarizeTimeline()",
+      "file_type": "code",
+      "source_file": "tests/helpers/sector-sprint-diagnostics.mjs",
+      "source_location": "L28",
+      "_origin": "ast",
+      "id": "tests_helpers_sector_sprint_diagnostics_summarizetimeline",
+      "community": 45,
+      "community_name": "sector-sprint-feel.mjs",
+      "norm_label": "summarizetimeline()"
     },
     {
       "label": "active-session.test.mjs",
@@ -9707,6 +9795,17 @@
       "norm_label": "create()"
     },
     {
+      "label": "sector-sprint-diagnostics.test.mjs",
+      "file_type": "code",
+      "source_file": "tests/unit/sector-sprint-diagnostics.test.mjs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_unit_sector_sprint_diagnostics_test",
+      "community": 45,
+      "community_name": "sector-sprint-feel.mjs",
+      "norm_label": "sector-sprint-diagnostics.test.mjs"
+    },
+    {
       "label": "sector-sprint.test.mjs",
       "file_type": "code",
       "source_file": "tests/unit/sector-sprint.test.mjs",
@@ -10065,8 +10164,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_board_contract",
-      "community": 144,
-      "community_name": "Board contract",
+      "community": 32,
+      "community_name": "Layered Rasoi plan",
       "norm_label": "board contract"
     },
     {
@@ -10076,8 +10175,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_geometry",
-      "community": 144,
-      "community_name": "Board contract",
+      "community": 32,
+      "community_name": "Layered Rasoi plan",
       "norm_label": "geometry"
     },
     {
@@ -10087,8 +10186,8 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_availability",
-      "community": 144,
-      "community_name": "Board contract",
+      "community": 32,
+      "community_name": "Layered Rasoi plan",
       "norm_label": "availability"
     },
     {
@@ -10098,8 +10197,8 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_solvability",
-      "community": 144,
-      "community_name": "Board contract",
+      "community": 32,
+      "community_name": "Layered Rasoi plan",
       "norm_label": "solvability"
     },
     {
@@ -10131,8 +10230,8 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_visual_system",
-      "community": 75,
-      "community_name": "Visual system",
+      "community": 32,
+      "community_name": "Layered Rasoi plan",
       "norm_label": "visual system"
     },
     {
@@ -10142,8 +10241,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_tokens",
-      "community": 75,
-      "community_name": "Visual system",
+      "community": 32,
+      "community_name": "Layered Rasoi plan",
       "norm_label": "tokens"
     },
     {
@@ -10153,8 +10252,8 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_phone_wireframe",
-      "community": 75,
-      "community_name": "Visual system",
+      "community": 32,
+      "community_name": "Layered Rasoi plan",
       "norm_label": "phone wireframe"
     },
     {
@@ -10164,8 +10263,8 @@
       "source_location": "L92",
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_desktop_wireframe",
-      "community": 75,
-      "community_name": "Visual system",
+      "community": 32,
+      "community_name": "Layered Rasoi plan",
       "norm_label": "desktop wireframe"
     },
     {
@@ -10175,8 +10274,8 @@
       "source_location": "L108",
       "_origin": "ast",
       "id": "docs_layered_rasoi_plan_self_critique",
-      "community": 75,
-      "community_name": "Visual system",
+      "community": 32,
+      "community_name": "Layered Rasoi plan",
       "norm_label": "self-critique"
     },
     {
@@ -10538,8 +10637,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "docs_adr_0019_group_the_grand_salon_and_add_classic_rule_studies",
-      "community": 64,
-      "community_name": "bedtime-game-evidence.md",
+      "community": 41,
+      "community_name": "Group the Grand Salon and add sourced classic rule studies",
       "norm_label": "0019-group-the-grand-salon-and-add-classic-rule-studies.md"
     },
     {
@@ -11297,8 +11396,8 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_2_evening_light_arousal_and_media_displacement",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 149,
+      "community_name": "2. Evening light, arousal, and media displacement",
       "norm_label": "2. evening light, arousal, and media displacement"
     },
     {
@@ -11308,8 +11407,8 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_light",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 149,
+      "community_name": "2. Evening light, arousal, and media displacement",
       "norm_label": "light"
     },
     {
@@ -11319,8 +11418,8 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_cognitive_and_emotional_arousal",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 149,
+      "community_name": "2. Evening light, arousal, and media displacement",
       "norm_label": "cognitive and emotional arousal"
     },
     {
@@ -11330,8 +11429,8 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_time_displacement_and_bedtime_boundaries",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 149,
+      "community_name": "2. Evening light, arousal, and media displacement",
       "norm_label": "time displacement and bedtime boundaries"
     },
     {
@@ -11418,8 +11517,8 @@
       "source_location": "L152",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_conservative_product_constraints",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 147,
+      "community_name": "Conservative product constraints",
       "norm_label": "conservative product constraints"
     },
     {
@@ -11429,8 +11528,8 @@
       "source_location": "L154",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_session_and_stopping",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 147,
+      "community_name": "Conservative product constraints",
       "norm_label": "session and stopping"
     },
     {
@@ -11440,8 +11539,8 @@
       "source_location": "L162",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_challenge",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 147,
+      "community_name": "Conservative product constraints",
       "norm_label": "challenge"
     },
     {
@@ -11451,8 +11550,8 @@
       "source_location": "L169",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_match_feedback",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 147,
+      "community_name": "Conservative product constraints",
       "norm_label": "match feedback"
     },
     {
@@ -11462,8 +11561,8 @@
       "source_location": "L176",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_light_and_transition_away_from_the_screen",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 147,
+      "community_name": "Conservative product constraints",
       "norm_label": "light and transition away from the screen"
     },
     {
@@ -11473,8 +11572,8 @@
       "source_location": "L183",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_accessibility_and_trust",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 147,
+      "community_name": "Conservative product constraints",
       "norm_label": "accessibility and trust"
     },
     {
@@ -11484,8 +11583,8 @@
       "source_location": "L192",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_claim_language",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 150,
+      "community_name": "Claim language",
       "norm_label": "claim language"
     },
     {
@@ -11495,8 +11594,8 @@
       "source_location": "L194",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_allowed_when_the_implementation_is_true",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 150,
+      "community_name": "Claim language",
       "norm_label": "allowed when the implementation is true"
     },
     {
@@ -11506,8 +11605,8 @@
       "source_location": "L203",
       "_origin": "ast",
       "id": "docs_research_bedtime_game_evidence_not_supported",
-      "community": 21,
-      "community_name": "Bedtime game evidence brief",
+      "community": 150,
+      "community_name": "Claim language",
       "norm_label": "not supported"
     },
     {
@@ -12347,6 +12446,61 @@
       "norm_label": "source nodes"
     },
     {
+      "label": "query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item.md",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item",
+      "community": 148,
+      "community_name": "Q: Implement all three audited Nindova tech-debt items: House optional art precache, Sector Sprint diagnostics, and public cache documentation drift",
+      "norm_label": "query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item.md"
+    },
+    {
+      "label": "Q: Implement all three audited Nindova tech-debt items: House optional art precache, Sector Sprint diagnostics, and public cache documentation drift",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item.md",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item_q_implement_all_three_audited_nindova_tech_debt_items_house_optional_art_precache_sector_sprint_diagnostics_and_public_cache_documentation_drift",
+      "community": 148,
+      "community_name": "Q: Implement all three audited Nindova tech-debt items: House optional art precache, Sector Sprint diagnostics, and public cache documentation drift",
+      "norm_label": "q: implement all three audited nindova tech-debt items: house optional art precache, sector sprint diagnostics, and public cache documentation drift"
+    },
+    {
+      "label": "Answer",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item_answer",
+      "community": 148,
+      "community_name": "Q: Implement all three audited Nindova tech-debt items: House optional art precache, Sector Sprint diagnostics, and public cache documentation drift",
+      "norm_label": "answer"
+    },
+    {
+      "label": "Outcome",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item_outcome",
+      "community": 148,
+      "community_name": "Q: Implement all three audited Nindova tech-debt items: House optional art precache, Sector Sprint diagnostics, and public cache documentation drift",
+      "norm_label": "outcome"
+    },
+    {
+      "label": "Source Nodes",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "graphify_out_memory_query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item_source_nodes",
+      "community": 148,
+      "community_name": "Q: Implement all three audited Nindova tech-debt items: House optional art precache, Sector Sprint diagnostics, and public cache documentation drift",
+      "norm_label": "source nodes"
+    },
+    {
       "label": "Nindova contributor guidance",
       "file_type": "document",
       "source_file": "AGENTS.md",
@@ -12937,7 +13091,7 @@
       "contributor": null,
       "community": 7,
       "norm_label": "session asset provenance",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Sector Sprint",
       "id": "apps_session_assets_readme_asset_provenance"
     },
     {
@@ -13047,9 +13201,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 49,
+      "community": 40,
       "norm_label": "kitchen dawn",
-      "community_name": "Night and Local State",
+      "community_name": "Rasoi Pairs Session Interface",
       "id": "apps_site_src_content_docs_docs_dawn_dawn"
     },
     {
@@ -13061,9 +13215,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 49,
+      "community": 40,
       "norm_label": "captured-zone dawn eligibility",
-      "community_name": "Night and Local State",
+      "community_name": "Rasoi Pairs Session Interface",
       "id": "apps_site_src_content_docs_docs_dawn_captured_zone_eligibility"
     },
     {
@@ -13076,9 +13230,9 @@
       "author": null,
       "contributor": null,
       "rationale": "Migrated v1 and v2 completions remain honestly viewable in their original window without pretending that a Vista completion was a Rasoi board.",
-      "community": 49,
+      "community": 40,
       "norm_label": "legacy vista dawn composition",
-      "community_name": "Night and Local State",
+      "community_name": "Rasoi Pairs Session Interface",
       "id": "apps_site_src_content_docs_docs_dawn_legacy_dawn_composition"
     },
     {
@@ -13133,9 +13287,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 49,
+      "community": 40,
       "norm_label": "night and local state",
-      "community_name": "Night and Local State",
+      "community_name": "Rasoi Pairs Session Interface",
       "id": "apps_site_src_content_docs_docs_night_and_local_state_night_and_local_state"
     },
     {
@@ -13147,9 +13301,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 49,
+      "community": 40,
       "norm_label": "immutable night id",
-      "community_name": "Night and Local State",
+      "community_name": "Rasoi Pairs Session Interface",
       "id": "apps_site_src_content_docs_docs_night_and_local_state_immutable_night_id"
     },
     {
@@ -13161,9 +13315,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 49,
+      "community": 40,
       "norm_label": "deterministic recipe version 2",
-      "community_name": "Night and Local State",
+      "community_name": "Rasoi Pairs Session Interface",
       "id": "apps_site_src_content_docs_docs_night_and_local_state_deterministic_recipe_v2"
     },
     {
@@ -13175,9 +13329,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 49,
+      "community": 40,
       "norm_label": "version 3 local night state",
-      "community_name": "Night and Local State",
+      "community_name": "Rasoi Pairs Session Interface",
       "id": "apps_site_src_content_docs_docs_night_and_local_state_version_3_state"
     },
     {
@@ -13190,9 +13344,9 @@
       "author": null,
       "contributor": null,
       "rationale": "Session storage may retain an unfinished board and absolute boundaries across same-tab reload while tab closure abandons the Session without creating Dawn completion history.",
-      "community": 49,
+      "community": 40,
       "norm_label": "ephemeral same-tab resume",
-      "community_name": "Night and Local State",
+      "community_name": "Rasoi Pairs Session Interface",
       "id": "apps_site_src_content_docs_docs_night_and_local_state_ephemeral_resume"
     },
     {
@@ -13204,7 +13358,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 79,
       "norm_label": "nindova research receipts",
       "community_name": "Nindova Research Receipts",
       "id": "apps_site_src_content_docs_docs_research_receipts_research_receipts"
@@ -13218,7 +13372,7 @@
       "captured_at": null,
       "author": "Hill et al.",
       "contributor": null,
-      "community": 7,
+      "community": 79,
       "norm_label": "hill et al. 2022 bedtime procrastination review",
       "community_name": "Nindova Research Receipts",
       "id": "apps_site_src_content_docs_docs_research_receipts_hill_2022"
@@ -13232,7 +13386,7 @@
       "captured_at": null,
       "author": "Brosnan et al.",
       "contributor": null,
-      "community": 7,
+      "community": 79,
       "norm_label": "brosnan et al. 2024 interactive screen use study",
       "community_name": "Nindova Research Receipts",
       "id": "apps_site_src_content_docs_docs_research_receipts_brosnan_2024"
@@ -13246,7 +13400,7 @@
       "captured_at": null,
       "author": "Hartstein et al.",
       "contributor": null,
-      "community": 7,
+      "community": 79,
       "norm_label": "hartstein et al. 2022 evening light study",
       "community_name": "Nindova Research Receipts",
       "id": "apps_site_src_content_docs_docs_research_receipts_hartstein_2022"
@@ -13260,7 +13414,7 @@
       "captured_at": null,
       "author": "American College of Physicians",
       "contributor": null,
-      "community": 7,
+      "community": 79,
       "norm_label": "american college of physicians cbt-i guideline",
       "community_name": "Nindova Research Receipts",
       "id": "apps_site_src_content_docs_docs_research_receipts_acp_cbt_i_guideline"
@@ -13275,7 +13429,7 @@
       "author": null,
       "contributor": null,
       "rationale": "The cited evidence motivates bounded stopping behavior and conservative positioning but does not show that Rasoi Pairs improves sleep, produces dopamine effects, or replaces evidence-based care.",
-      "community": 7,
+      "community": 79,
       "norm_label": "nonclinical claim boundary",
       "community_name": "Nindova Research Receipts",
       "id": "apps_site_src_content_docs_docs_research_receipts_nonclinical_claim_boundary"
@@ -14804,9 +14958,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 75,
       "norm_label": "nindova house",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Nindova House",
       "id": "context_nindova_house"
     },
     {
@@ -14820,7 +14974,7 @@
       "contributor": null,
       "community": 7,
       "norm_label": "grand salon",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Sector Sprint",
       "id": "context_grand_salon"
     },
     {
@@ -14834,7 +14988,7 @@
       "contributor": null,
       "community": 7,
       "norm_label": "sector sprint",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Sector Sprint",
       "id": "context_sector_sprint"
     },
     {
@@ -14846,9 +15000,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 75,
       "norm_label": "gallery",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Nindova House",
       "id": "context_gallery"
     },
     {
@@ -14860,9 +15014,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 144,
       "norm_label": "night room",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Night Room",
       "id": "context_night_room"
     },
     {
@@ -14874,9 +15028,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 144,
       "norm_label": "two-loop law",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Night Room",
       "id": "context_two_loop_law"
     },
     {
@@ -14902,9 +15056,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 144,
       "norm_label": "dawn",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Night Room",
       "id": "context_dawn"
     },
     {
@@ -14930,9 +15084,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 75,
       "norm_label": "nindova product overview",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Nindova House",
       "id": "readme_nindova_overview"
     },
     {
@@ -14972,9 +15126,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 144,
       "norm_label": "two deliberately separate loops",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Night Room",
       "id": "readme_separate_loops"
     },
     {
@@ -14986,9 +15140,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 75,
       "norm_label": "nindova house html shell",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Nindova House",
       "id": "apps_house_index_house_shell"
     },
     {
@@ -15002,7 +15156,7 @@
       "contributor": null,
       "community": 7,
       "norm_label": "adult audience boundary dialog",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Sector Sprint",
       "id": "apps_house_index_audience_boundary"
     },
     {
@@ -15016,7 +15170,7 @@
       "contributor": null,
       "community": 7,
       "norm_label": "unfinished table leave confirmation",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Sector Sprint",
       "id": "apps_house_index_leave_confirmation"
     },
     {
@@ -15028,9 +15182,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 75,
       "norm_label": "gallery clear confirmation",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Nindova House",
       "id": "apps_house_index_gallery_clear_confirmation"
     },
     {
@@ -15044,7 +15198,7 @@
       "contributor": null,
       "community": 7,
       "norm_label": "sector sprint character sprite sheet",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Sector Sprint",
       "id": "apps_house_src_assets_sector_sprint_characters_sprite_sheet"
     },
     {
@@ -15058,7 +15212,7 @@
       "contributor": null,
       "community": 7,
       "norm_label": "original character art provenance",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Sector Sprint",
       "id": "apps_house_src_assets_sector_sprint_characters_art_provenance"
     },
     {
@@ -15238,9 +15392,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 31,
+      "community": 30,
       "norm_label": "known evidence and product limits",
-      "community_name": "Rasoi Pairs Session Arc",
+      "community_name": "Nindova Documentation Index",
       "id": "apps_site_src_content_docs_docs_known_limitations_evidence_limits"
     },
     {
@@ -15266,9 +15420,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 75,
       "norm_label": "house local records",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Nindova House",
       "id": "apps_site_src_content_docs_docs_privacy_local_state_house_records"
     },
     {
@@ -15280,9 +15434,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 144,
       "norm_label": "night long-lived and same-tab records",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Night Room",
       "id": "apps_site_src_content_docs_docs_privacy_local_state_night_records"
     },
     {
@@ -15308,7 +15462,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 79,
       "norm_label": "night room two-loop law",
       "community_name": "Nindova Research Receipts",
       "id": "apps_site_src_content_docs_docs_product_contract_two_loop_law"
@@ -15324,7 +15478,7 @@
       "contributor": null,
       "community": 7,
       "norm_label": "grand salon contract",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Sector Sprint",
       "id": "apps_site_src_content_docs_docs_product_contract_grand_salon_contract"
     },
     {
@@ -15336,9 +15490,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 75,
       "norm_label": "night room contract",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Nindova House",
       "id": "apps_site_src_content_docs_docs_product_contract_night_room_contract"
     },
     {
@@ -15352,7 +15506,7 @@
       "contributor": null,
       "community": 7,
       "norm_label": "punjabi-inspired cultural direction",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Sector Sprint",
       "id": "apps_site_src_content_docs_docs_product_contract_cultural_direction"
     },
     {
@@ -15448,9 +15602,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 31,
+      "community": 30,
       "norm_label": "verified, source-proven, and untested evidence levels",
-      "community_name": "Rasoi Pairs Session Arc",
+      "community_name": "Nindova Documentation Index",
       "id": "apps_site_src_content_docs_docs_testing_evidence_levels"
     },
     {
@@ -15476,9 +15630,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 144,
       "norm_label": "delivery contract",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Night Room",
       "id": "docs_build_plan_delivery_contract"
     },
     {
@@ -15588,9 +15742,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 31,
+      "community": 30,
       "norm_label": "public-surface untested risk",
-      "community_name": "Rasoi Pairs Session Arc",
+      "community_name": "Nindova Documentation Index",
       "id": "docs_public_surface_evidence_untested_risk"
     },
     {
@@ -15604,7 +15758,7 @@
       "contributor": null,
       "community": 7,
       "norm_label": "adr 0015 bounded sector sprint",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Sector Sprint",
       "id": "docs_adr_0015_add_the_bounded_sector_sprint_bounded_sector_sprint"
     },
     {
@@ -15618,7 +15772,7 @@
       "contributor": null,
       "community": 7,
       "norm_label": "fixed route, privacy, and accessibility boundaries",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Sector Sprint",
       "id": "docs_adr_0015_add_the_bounded_sector_sprint_fixed_route_boundaries"
     },
     {
@@ -15632,7 +15786,7 @@
       "contributor": null,
       "community": 7,
       "norm_label": "adr 0016 flight and illustration deepening",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Sector Sprint",
       "id": "docs_adr_0016_deepen_sector_sprint_flight_and_illustration_flight_and_illustration"
     },
     {
@@ -15646,7 +15800,7 @@
       "contributor": null,
       "community": 7,
       "norm_label": "fixed-step foreground engine",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Sector Sprint",
       "id": "docs_adr_0016_deepen_sector_sprint_flight_and_illustration_fixed_step_engine"
     },
     {
@@ -15660,7 +15814,7 @@
       "contributor": null,
       "community": 7,
       "norm_label": "adaptive quality tiers",
-      "community_name": "Nindova Research Receipts",
+      "community_name": "Sector Sprint",
       "id": "docs_adr_0016_deepen_sector_sprint_flight_and_illustration_adaptive_quality"
     },
     {
@@ -23294,7 +23448,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/house/vite.config.ts",
-      "source_location": "L21",
+      "source_location": "L23",
       "weight": 1.0,
       "_origin": "ast",
       "source": "apps_house_vite_config",
@@ -23305,7 +23459,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/house/vite.config.ts",
-      "source_location": "L6",
+      "source_location": "L8",
       "weight": 1.0,
       "_origin": "ast",
       "source": "apps_house_vite_config",
@@ -30555,7 +30709,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/browser/sector-sprint-feel.mjs",
-      "source_location": "L43",
+      "source_location": "L71",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_browser_sector_sprint_feel",
@@ -30566,7 +30720,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/browser/sector-sprint-feel.mjs",
-      "source_location": "L27",
+      "source_location": "L54",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_browser_sector_sprint_feel",
@@ -30577,7 +30731,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/browser/sector-sprint-feel.mjs",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_browser_sector_sprint_feel",
@@ -30588,7 +30742,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/browser/sector-sprint-feel.mjs",
-      "source_location": "L7",
+      "source_location": "L8",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_browser_sector_sprint_feel",
@@ -30599,7 +30753,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/browser/sector-sprint-feel.mjs",
-      "source_location": "L114",
+      "source_location": "L142",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_browser_sector_sprint_feel",
@@ -30610,10 +30764,104 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/browser/sector-sprint-feel.mjs",
-      "source_location": "L72",
+      "source_location": "L100",
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_browser_sector_sprint_feel",
+      "target": "tests_browser_sector_sprint_feel_startautopilot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/sector-sprint-feel.mjs",
+      "source_location": "L28",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_sector_sprint_feel",
+      "target": "tests_browser_sector_sprint_feel_starttimeline",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/sector-sprint-feel.mjs",
+      "source_location": "L158",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_sector_sprint_feel",
+      "target": "tests_browser_sector_sprint_feel_tracerunner",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/sector-sprint-feel.mjs",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_sector_sprint_feel",
+      "target": "tests_helpers_sector_sprint_diagnostics",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/sector-sprint-feel.mjs",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_sector_sprint_feel",
+      "target": "tests_helpers_sector_sprint_diagnostics_collectbudgetfailures",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/sector-sprint-feel.mjs",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_sector_sprint_feel",
+      "target": "tests_helpers_sector_sprint_diagnostics_summarizetimeline",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/sector-sprint-feel.mjs",
+      "source_location": "L62",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_sector_sprint_feel_openrunner",
+      "target": "tests_browser_sector_sprint_feel_starttimeline",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/sector-sprint-feel.mjs",
+      "source_location": "L50",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_sector_sprint_feel_starttimeline",
+      "target": "tests_helpers_sector_sprint_diagnostics_summarizetimeline",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/sector-sprint-feel.mjs",
+      "source_location": "L66",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_sector_sprint_feel_openrunner",
       "target": "tests_browser_sector_sprint_feel_startautopilot",
       "confidence_score": 1.0
     },
@@ -30622,11 +30870,23 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/browser/sector-sprint-feel.mjs",
-      "source_location": "L38",
+      "source_location": "L159",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "tests_browser_sector_sprint_feel_openrunner",
-      "target": "tests_browser_sector_sprint_feel_startautopilot",
+      "source": "tests_browser_sector_sprint_feel_tracerunner",
+      "target": "tests_browser_sector_sprint_feel_openrunner",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/browser/sector-sprint-feel.mjs",
+      "source_location": "L165",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_browser_sector_sprint_feel_tracerunner",
+      "target": "tests_browser_sector_sprint_feel_sampleframes",
       "confidence_score": 1.0
     },
     {
@@ -30829,6 +31089,121 @@
       "_origin": "ast",
       "source": "tests_unit_night_core_test",
       "target": "tests_fixtures_recipe_two_recipetwocompletion",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/helpers/sector-sprint-diagnostics.mjs",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_helpers_sector_sprint_diagnostics",
+      "target": "tests_helpers_sector_sprint_diagnostics_collectbudgetfailures",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/helpers/sector-sprint-diagnostics.mjs",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_helpers_sector_sprint_diagnostics",
+      "target": "tests_helpers_sector_sprint_diagnostics_percentile",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/helpers/sector-sprint-diagnostics.mjs",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_helpers_sector_sprint_diagnostics",
+      "target": "tests_helpers_sector_sprint_diagnostics_phaseevents",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/helpers/sector-sprint-diagnostics.mjs",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_helpers_sector_sprint_diagnostics",
+      "target": "tests_helpers_sector_sprint_diagnostics_roundms",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/helpers/sector-sprint-diagnostics.mjs",
+      "source_location": "L28",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_helpers_sector_sprint_diagnostics",
+      "target": "tests_helpers_sector_sprint_diagnostics_summarizetimeline",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/unit/sector-sprint-diagnostics.test.mjs",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_unit_sector_sprint_diagnostics_test",
+      "target": "tests_helpers_sector_sprint_diagnostics",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/helpers/sector-sprint-diagnostics.mjs",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_helpers_sector_sprint_diagnostics_summarizetimeline",
+      "target": "tests_helpers_sector_sprint_diagnostics_roundms",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/helpers/sector-sprint-diagnostics.mjs",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_helpers_sector_sprint_diagnostics_summarizetimeline",
+      "target": "tests_helpers_sector_sprint_diagnostics_percentile",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/unit/sector-sprint-diagnostics.test.mjs",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_unit_sector_sprint_diagnostics_test",
+      "target": "tests_helpers_sector_sprint_diagnostics_collectbudgetfailures",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/unit/sector-sprint-diagnostics.test.mjs",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_unit_sector_sprint_diagnostics_test",
+      "target": "tests_helpers_sector_sprint_diagnostics_summarizetimeline",
       "confidence_score": 1.0
     },
     {
@@ -33848,6 +34223,50 @@
       "_origin": "ast",
       "source": "graphify_out_memory_query_20260813_231523_which_recently_changed_nindova_house_modules_have_q_which_recently_changed_nindova_house_modules_have_credible_deepening_candidates_excluding_already_deepened_architecture",
       "target": "graphify_out_memory_query_20260813_231523_which_recently_changed_nindova_house_modules_have_source_nodes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item",
+      "target": "graphify_out_memory_query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item_q_implement_all_three_audited_nindova_tech_debt_items_house_optional_art_precache_sector_sprint_diagnostics_and_public_cache_documentation_drift",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item_q_implement_all_three_audited_nindova_tech_debt_items_house_optional_art_precache_sector_sprint_diagnostics_and_public_cache_documentation_drift",
+      "target": "graphify_out_memory_query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item_q_implement_all_three_audited_nindova_tech_debt_items_house_optional_art_precache_sector_sprint_diagnostics_and_public_cache_documentation_drift",
+      "target": "graphify_out_memory_query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item_outcome",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item_q_implement_all_three_audited_nindova_tech_debt_items_house_optional_art_precache_sector_sprint_diagnostics_and_public_cache_documentation_drift",
+      "target": "graphify_out_memory_query_20260826_000158_implement_all_three_audited_nindova_tech_debt_item_source_nodes",
       "confidence_score": 1.0
     },
     {
@@ -36916,5 +37335,5 @@
       "source_file": "reference/nindova-master-brief.md"
     }
   ],
-  "built_at_commit": "25c1a1abe3b6e864c7dd03aac619f845f761c0bd"
+  "built_at_commit": "33493968fa98a06808000c2760bac885a004f216"
 }
