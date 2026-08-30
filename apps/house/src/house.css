@@ -1,5 +1,5 @@
-/* Hallmark · genre: atmospheric · macrostructure: Map / Diagram (House) + Component Playground lane theatre (Sector Sprint) · theme: custom Shahi Raat House · tone: restrained luxury · anchor hue: aged brass · audience: adults 18+ · use: choose an authored entertainment game · enrichment: code-drawn Canvas lane route · nav: N9 edge-aligned mission bar · footer: Ft2 · contrast: pass (40–41) · slop: pass (1–58) · honest: pass (46) · chrome: pass (47) · tokens: pass (48) · responsive: pass (49) · icons: pass (30) · mobile: pass (34, 49, 50–57) */
-/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 */
+/* Hallmark · genre: atmospheric · macrostructure: Split Studio interaction polish (game chambers) + existing Map / Diagram (House) · theme: custom Shahi Raat House · tone: restrained luxury · anchor hue: aged brass · audience: adults 18+ · use: choose an authored entertainment game · enrichment: tactile table feedback + existing code-drawn Canvas lane route · nav: N9 edge-aligned mission bar · footer: Ft2 · contrast: pass (40–41) · slop: pass (1–58) · honest: pass (46) · chrome: pass (47) · tokens: pass (48) · responsive: pass (49) · icons: pass (30) · mobile: pass (34, 49, 50–57) */
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V4 */
 
 * { box-sizing: border-box; }
 .sr-only { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
@@ -15,7 +15,6 @@ body {
 }
 button, a { font: inherit; }
 button { color: inherit; }
-button:active:not(:disabled) { transform: translateY(1px); }
 button:disabled { cursor: default; opacity: .55; }
 a { color: inherit; text-underline-offset: .25em; }
 :focus-visible { outline: 3px solid var(--color-focus); outline-offset: 4px; }
@@ -168,7 +167,7 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
 .gallery-ledger article { display: grid; grid-template-columns: 4rem 1fr auto; align-items: center; gap: var(--space-lg); padding-block: var(--space-lg); border-block-end: 1px solid var(--color-rule-strong); }
 .gallery-ledger h2 { margin: 0; font-size: var(--text-xl); }
 .gallery-ledger p { margin: var(--space-2xs) 0 0; color: var(--color-muted); }
-.gallery-ledger button, .quiet-action { min-height: 44px; padding-inline: var(--space-md); border: 1px solid var(--color-rule-strong); background: transparent; cursor: pointer; }
+.gallery-ledger button, .quiet-action { min-height: 44px; padding-inline: var(--space-md); border: 1px solid var(--color-rule-strong); background: transparent; cursor: pointer; touch-action: manipulation; transition: background var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out); }
 .privacy-note, .result-boundary { margin-block-start: var(--space-xl); color: var(--color-neutral); font-family: var(--font-mono); font-size: var(--text-xs); }
 .result-boundary-warning { max-width: 52ch; padding: var(--space-md); border: 1px solid var(--color-accent); background: color-mix(in oklch, var(--color-accent) 8%, transparent); color: var(--color-ink-soft); }
 .gallery-status { max-width: 62ch; padding: var(--space-md); border-inline-start: 2px solid var(--color-accent); background: color-mix(in oklch, var(--color-accent) 7%, transparent); color: var(--color-ink-soft); }
@@ -189,6 +188,7 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
 .game-view-stack-architect .game-title-block > p:last-child { grid-area: copy; margin: 0; padding-inline-start: var(--space-lg); border-inline-start: 1px solid var(--color-accent); font-family: var(--font-display); }
 .game-chamber { display: grid; position: relative; overflow: clip; max-width: 80rem; min-height: 31rem; grid-template-columns: minmax(0, 1.12fr) minmax(18rem, .88fr); margin-inline: auto; border: 1px solid var(--color-rule-strong); background: var(--color-paper-2); box-shadow: inset 0 0 5rem color-mix(in oklch, var(--color-jewel-sapphire) 8%, transparent), 0 2rem 6rem color-mix(in oklch, var(--color-paper) 38%, transparent); }
 .game-chamber::before { position: absolute; z-index: var(--z-base); inset: .65rem; border: 1px solid color-mix(in oklch, var(--color-accent) 14%, transparent); content: ""; pointer-events: none; }
+.game-chamber:focus-within::before { border-color: color-mix(in oklch, var(--color-focus) 52%, var(--color-accent)); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--color-paper-3) 72%, transparent); }
 .prompt-column, .answer-column { display: flex; min-width: 0; flex-direction: column; justify-content: center; padding: clamp(1.5rem, 5vw, 5rem); }
 .prompt-column { position: relative; z-index: var(--z-raised); align-items: center; border-inline-end: 1px solid var(--color-rule-strong); text-align: center; }
 .answer-column { position: relative; z-index: var(--z-raised); }
@@ -247,14 +247,16 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
 .reveal-action { margin-block-start: var(--space-lg); }
 .answer-column > p { color: var(--color-ink-soft); font-family: var(--font-display); font-size: var(--text-lg); }
 .answer-list { border-block-start: 1px solid var(--color-rule-strong); }
-.answer-list button { display: grid; width: 100%; min-height: 56px; grid-template-columns: 2.2rem 1fr; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; border: 0; border-block-end: 1px solid var(--color-rule-strong); background: transparent; cursor: pointer; text-align: start; transition: color var(--dur-short) var(--ease-out), background var(--dur-short) var(--ease-out), padding var(--dur-short) var(--ease-out); }
-.answer-list button:hover:not(:disabled) { padding-inline-start: var(--space-sm); background: color-mix(in oklch, var(--color-accent) 6%, transparent); color: var(--color-accent); }
+.answer-list button { display: grid; width: 100%; min-height: 56px; grid-template-columns: 2.2rem 1fr; align-items: center; gap: var(--space-sm); padding: var(--space-sm); border: 0; border-block-end: 1px solid var(--color-rule-strong); background: transparent; cursor: pointer; text-align: start; touch-action: manipulation; transition: color var(--dur-short) var(--ease-out), background var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out); }
+.answer-list button:focus-visible:not(:disabled) { background: color-mix(in oklch, var(--color-accent) 8%, transparent); box-shadow: inset 3px 0 0 var(--color-accent); color: var(--color-accent); }
+.answer-list button:active:not(:disabled) { transform: translateY(1px); }
 .answer-list button.is-wrong { color: var(--color-error); background: color-mix(in oklch, var(--color-error) 9%, transparent); animation: answer-check var(--dur-short) var(--ease-in-out) both; }
 .answer-list button.is-correct { padding-inline: var(--space-sm); background: color-mix(in oklch, var(--color-jewel-jade) 28%, transparent); color: var(--color-ink); animation: answer-confirm 520ms var(--ease-out) both; }
 .answer-list button:disabled { color: var(--color-neutral); cursor: default; opacity: .55; }
 .answer-list button span { color: var(--color-accent); font-family: var(--font-mono); font-size: var(--text-xs); }
 .answer-column.is-waiting { opacity: .52; }
-.primary-action { display: inline-flex; min-height: 52px; align-items: center; justify-content: center; padding-inline: var(--space-lg); border: 1px solid var(--color-accent); background: var(--color-accent); color: var(--color-accent-ink); cursor: pointer; font-weight: 760; }
+.primary-action { display: inline-flex; min-height: 52px; align-items: center; justify-content: center; padding-inline: var(--space-lg); border: 1px solid var(--color-accent); background: var(--color-accent); color: var(--color-accent-ink); cursor: pointer; font-weight: 760; touch-action: manipulation; transition: background var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out); }
+.primary-action:active:not(:disabled), .quiet-action:active:not(:disabled), .text-action:active:not(:disabled) { transform: translateY(1px); }
 .seal-action { margin-block-start: var(--space-2xl); }
 .game-status { min-height: 1.7rem; max-width: 80rem; margin: var(--space-md) auto 0; color: var(--color-accent); }
 
@@ -282,8 +284,9 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
 .board-point.is-tiger { border-radius: 22%; background: var(--color-jewel-ruby); transform: translate(-50%, -50%) rotate(45deg); }
 .board-point.is-goat { background: var(--color-paper-3); box-shadow: inset 0 0 0 3px var(--color-jewel-jade); }
 .board-point.is-selected-piece { outline: 3px double var(--color-accent); outline-offset: 5px; }
-.board-point.is-option { display: grid; z-index: var(--z-raised); width: clamp(2.8rem, 5vw, 3.1rem); place-items: center; border-color: var(--color-accent); background: color-mix(in oklch, var(--color-paper-3) 88%, var(--color-accent)); color: var(--color-ink); cursor: pointer; font-family: var(--font-mono); font-weight: 800; transition: background var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out), transform var(--dur-short) var(--ease-out); }
-.board-point.is-option:hover, .board-point.is-option:focus-visible { background: var(--color-accent); color: var(--color-accent-ink); box-shadow: 0 0 0 .4rem color-mix(in oklch, var(--color-accent) 20%, transparent); transform: translate(-50%, -50%) scale(1.08); }
+.board-point.is-option { display: grid; z-index: var(--z-raised); width: clamp(2.8rem, 5vw, 3.1rem); place-items: center; border-color: var(--color-accent); background: color-mix(in oklch, var(--color-paper-3) 88%, var(--color-accent)); color: var(--color-ink); cursor: pointer; touch-action: manipulation; font-family: var(--font-mono); font-weight: 800; transition: background var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out); }
+.board-point.is-option:focus-visible { background: var(--color-accent); color: var(--color-accent-ink); box-shadow: 0 0 0 .4rem color-mix(in oklch, var(--color-accent) 20%, transparent); }
+.board-point.is-option:active { transform: translate(-50%, -50%) scale(.96); }
 .board-point.is-option.is-wrong { background: color-mix(in oklch, var(--color-error) 35%, var(--color-paper-2)); animation: answer-check var(--dur-short) var(--ease-in-out) both; }
 .board-point.is-option.is-correct { background: color-mix(in oklch, var(--color-jewel-jade) 65%, var(--color-paper-2)); box-shadow: 0 0 0 .45rem color-mix(in oklch, var(--color-jewel-jade) 20%, transparent); }
 .aadu-board { aspect-ratio: 1 / .98; }
@@ -293,8 +296,9 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
 .pit-row { display: grid; min-width: 23rem; grid-template-columns: repeat(7, minmax(2.75rem, 1fr)); gap: clamp(.25rem, 1vw, .7rem); }
 .pit-row + .pit-row { margin-block-start: var(--space-sm); }
 .pallanguzhi-pit { display: grid; min-width: 2.75rem; min-height: clamp(4rem, 8vw, 5.8rem); place-items: center; gap: .15rem; padding: .25rem; border: 1px solid color-mix(in oklch, var(--color-accent) 48%, var(--color-rule-strong)); border-radius: 50%; background: color-mix(in oklch, var(--color-paper) 65%, transparent); color: var(--color-ink); }
-button.pallanguzhi-pit { cursor: pointer; }
-button.pallanguzhi-pit:hover, button.pallanguzhi-pit:focus-visible { border-color: var(--color-accent); background: color-mix(in oklch, var(--color-accent) 20%, var(--color-paper-3)); }
+button.pallanguzhi-pit { cursor: pointer; touch-action: manipulation; transition: border-color var(--dur-short) var(--ease-out), background var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out); }
+button.pallanguzhi-pit:focus-visible { border-color: var(--color-accent); background: color-mix(in oklch, var(--color-accent) 20%, var(--color-paper-3)); }
+button.pallanguzhi-pit:active { transform: translateY(1px); }
 .pallanguzhi-pit.is-wrong { background: color-mix(in oklch, var(--color-error) 24%, var(--color-paper-2)); animation: answer-check var(--dur-short) var(--ease-in-out) both; }
 .pallanguzhi-pit.is-correct { background: color-mix(in oklch, var(--color-jewel-jade) 48%, var(--color-paper-2)); }
 .seed-cup { display: flex; max-width: 2.2rem; flex-wrap: wrap; justify-content: center; gap: 2px; }
@@ -312,8 +316,9 @@ button.pallanguzhi-pit:hover, button.pallanguzhi-pit:focus-visible { border-colo
 .stack-action-rhythm i { font-style: normal; }
 .stack-action-rhythm b { height: 1px; flex: 1; background: linear-gradient(90deg, var(--color-accent), transparent); }
 .stack-board { display: grid; min-height: 22rem; grid-template-columns: repeat(3, 1fr); align-items: end; gap: var(--space-sm); margin-block-start: var(--space-xl); }
-.peg { display: grid; position: relative; min-width: 0; min-height: 19rem; grid-template-rows: 1fr auto; align-items: end; justify-items: center; padding: 0 var(--space-xs) var(--space-sm); border: 1px solid transparent; border-block-end-color: var(--color-rule-strong); background: transparent; cursor: pointer; }
-.peg:hover, .peg.is-selected { border-color: var(--color-accent); background: color-mix(in oklch, var(--color-accent) 5%, transparent); }
+.peg { display: grid; position: relative; min-width: 0; min-height: 19rem; grid-template-rows: 1fr auto; align-items: end; justify-items: center; padding: 0 var(--space-xs) var(--space-sm); border: 1px solid transparent; border-block-end-color: var(--color-rule-strong); background: transparent; cursor: pointer; touch-action: manipulation; transition: border-color var(--dur-short) var(--ease-out), background var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out); }
+.peg:focus-visible, .peg.is-selected { border-color: var(--color-accent); background: color-mix(in oklch, var(--color-accent) 5%, transparent); }
+.peg:active { transform: translateY(1px); }
 .peg-post { position: absolute; z-index: var(--z-base); inset: 18% auto 2.7rem; width: 5px; background: linear-gradient(90deg, color-mix(in oklch, var(--color-jewel-ruby) 65%, var(--color-paper)), var(--color-accent-soft), color-mix(in oklch, var(--color-jewel-ruby) 65%, var(--color-paper))); box-shadow: 0 0 0 1px color-mix(in oklch, var(--color-accent) 28%, transparent); }
 .discs { display: flex; z-index: var(--z-raised); width: 100%; flex-direction: column; justify-content: end; align-items: center; }
 .disc { display: block; width: calc(18% + var(--disc) * 11%); height: clamp(1.15rem, 3vw, 2rem); border: 1px solid var(--color-accent); border-radius: .15rem; background: linear-gradient(90deg, color-mix(in oklch, var(--color-jewel-ruby) 72%, var(--color-paper)), var(--color-accent-soft), color-mix(in oklch, var(--color-jewel-ruby) 72%, var(--color-paper))); box-shadow: inset 0 1px 0 color-mix(in oklch, var(--color-ink) 28%, transparent), 0 .3rem .65rem color-mix(in oklch, var(--color-paper) 30%, transparent); transition: transform var(--dur-short) var(--ease-out), filter var(--dur-short) var(--ease-out); }
@@ -422,7 +427,7 @@ button.pallanguzhi-pit:hover, button.pallanguzhi-pit:focus-visible { border-colo
 .peg + .peg { border-inline-start-color: color-mix(in oklch, var(--color-accent) 14%, transparent); }
 .peg::before { position: absolute; z-index: var(--z-base); inset: auto 7% 2.35rem; height: 1.05rem; border: 1px solid var(--color-accent); border-radius: 50% 50% 12% 12%; background-image: linear-gradient(180deg, color-mix(in oklch, var(--color-ink) 12%, var(--color-accent-soft)), color-mix(in oklch, var(--color-jewel-ruby) 70%, var(--color-paper))); box-shadow: inset 0 .18rem .25rem color-mix(in oklch, var(--color-ink) 12%, transparent), 0 .45rem .55rem color-mix(in oklch, var(--color-paper) 58%, transparent); content: ""; }
 .peg::after { position: absolute; z-index: -1; inset: 10% 8% 2.2rem; background: radial-gradient(ellipse at 50% 92%, color-mix(in oklch, var(--color-accent) 10%, transparent), transparent 62%); content: ""; pointer-events: none; }
-.peg:hover, .peg.is-selected { background: linear-gradient(180deg, color-mix(in oklch, var(--color-accent) 4%, transparent), color-mix(in oklch, var(--color-accent) 9%, transparent)); }
+.peg:focus-visible, .peg.is-selected { background: linear-gradient(180deg, color-mix(in oklch, var(--color-accent) 4%, transparent), color-mix(in oklch, var(--color-accent) 9%, transparent)); }
 .peg-post { width: 7px; border-radius: 999px 999px 0 0; background: linear-gradient(90deg, color-mix(in oklch, var(--color-paper) 48%, var(--color-jewel-ruby)), var(--color-accent-soft) 42%, color-mix(in oklch, var(--color-ink) 16%, var(--color-accent-soft)), var(--color-accent-soft)); box-shadow: inset 1px 0 0 color-mix(in oklch, var(--color-ink) 18%, transparent), 0 0 0 1px color-mix(in oklch, var(--color-accent) 44%, transparent), 0 .7rem 1rem color-mix(in oklch, var(--color-paper) 58%, transparent); }
 .disc { position: relative; height: clamp(1.35rem, 3.4vw, 2.2rem); border-width: 2px; border-radius: 50% / 24%; background: radial-gradient(ellipse at 50% 14%, color-mix(in oklch, var(--color-ink) 24%, var(--color-accent-soft)), transparent 33%), repeating-linear-gradient(94deg, color-mix(in oklch, var(--color-jewel-ruby) 20%, transparent) 0 .12rem, transparent .12rem .65rem), linear-gradient(180deg, var(--color-accent-soft), color-mix(in oklch, var(--color-jewel-ruby) 76%, var(--color-paper))); box-shadow: inset 0 .28rem .35rem color-mix(in oklch, var(--color-ink) 13%, transparent), inset 0 -.25rem .35rem color-mix(in oklch, var(--color-paper) 40%, transparent), 0 .35rem .45rem color-mix(in oklch, var(--color-paper) 62%, transparent); }
 .disc::after { position: absolute; inset: 44% 8% auto; height: 1px; background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--color-ink) 38%, transparent), transparent); content: ""; }
@@ -509,7 +514,7 @@ button.pallanguzhi-pit:hover, button.pallanguzhi-pit:focus-visible { border-colo
 .gate-sigil i { width: 3rem; height: 1px; background: var(--color-rule-strong); }
 .gate-sigil span { width: 1rem; aspect-ratio: 1; border: 1px solid var(--color-accent); transform: rotate(45deg); }
 .gate-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-sm); margin-block-start: var(--space-lg); }
-.text-action { min-height: 44px; padding-inline: var(--space-sm); border: 0; border-block-end: 1px solid var(--color-rule-strong); background: transparent; color: var(--color-muted); cursor: pointer; }
+.text-action { min-height: 44px; padding-inline: var(--space-sm); border: 0; border-block-end: 1px solid var(--color-rule-strong); background: transparent; color: var(--color-muted); cursor: pointer; touch-action: manipulation; transition: background var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out); }
 .gate-note { max-width: 68ch; margin: var(--space-xl) 0 0; color: var(--color-neutral); font-family: var(--font-mono); font-size: var(--text-xs); }
 .route-miniature { display: flex; position: relative; overflow: clip; width: min(36rem, 78vw); height: 7rem; align-items: end; justify-content: center; gap: .45rem; margin-block-end: var(--space-xl); border-block-end: 1px solid var(--color-accent); }
 .route-miniature i { display: block; width: clamp(2rem, 7vw, 4.6rem); height: calc(24% + var(--sigil-index, 1) * 8%); border: 1px solid var(--color-rule-strong); border-block-end: 0; background: linear-gradient(180deg, color-mix(in oklch, var(--color-jewel-sapphire) 54%, var(--color-paper-3)), var(--color-paper-2)); }
@@ -520,12 +525,25 @@ button.pallanguzhi-pit:hover, button.pallanguzhi-pit:focus-visible { border-colo
 .route-miniature i:nth-child(5) { height: 54%; }
 .route-miniature span { position: absolute; inset: auto auto .55rem 12%; width: 1.2rem; aspect-ratio: 1; border: 2px solid var(--color-accent); border-radius: 50%; box-shadow: -1.15rem .65rem 0 -.35rem var(--color-accent), 1.15rem .65rem 0 -.35rem var(--color-accent); animation: route-arrive 760ms var(--ease-out) both; }
 .route-choices { display: grid; width: min(52rem, 100%); grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-sm); margin-block-start: var(--space-xl); }
-.route-choice { display: grid; min-height: 9rem; align-content: center; gap: var(--space-2xs); padding: var(--space-lg); border: 1px solid var(--color-rule-strong); background: color-mix(in oklch, var(--color-paper-3) 82%, transparent); cursor: pointer; color: var(--color-ink); text-align: start; transition: border-color var(--dur-short) var(--ease-out), background var(--dur-short) var(--ease-out), transform var(--dur-short) var(--ease-out); }
+.route-choice { display: grid; min-height: 9rem; align-content: center; gap: var(--space-2xs); padding: var(--space-lg); border: 1px solid var(--color-rule-strong); background: color-mix(in oklch, var(--color-paper-3) 82%, transparent); cursor: pointer; touch-action: manipulation; color: var(--color-ink); text-align: start; transition: border-color var(--dur-short) var(--ease-out), background var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out); }
 .route-choice span { color: var(--color-accent); font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: .11em; text-transform: uppercase; }
 .route-choice strong { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 540; }
 .route-choice small { color: var(--color-muted); }
 .route-choice-action { background: linear-gradient(135deg, color-mix(in oklch, var(--color-paper-3) 76%, var(--color-jewel-sapphire)), color-mix(in oklch, var(--color-paper-2) 88%, var(--color-jewel-ruby))); }
-.route-choice:hover { border-color: var(--color-accent); background: color-mix(in oklch, var(--color-paper-3) 76%, var(--color-jewel-sapphire)); transform: translateY(-2px); }
+.route-choice:focus-visible { border-color: var(--color-accent); background: color-mix(in oklch, var(--color-paper-3) 76%, var(--color-jewel-sapphire)); }
+.route-choice:active { transform: translateY(1px); }
+
+@media (hover: hover) and (pointer: fine) {
+  .answer-list button:hover:not(:disabled) { background: color-mix(in oklch, var(--color-accent) 8%, transparent); box-shadow: inset 3px 0 0 var(--color-accent); color: var(--color-accent); }
+  .primary-action:hover:not(:disabled) { border-color: var(--color-focus); background: var(--color-focus); }
+  .quiet-action:hover:not(:disabled), .text-action:hover:not(:disabled) { border-color: var(--color-accent); background: color-mix(in oklch, var(--color-accent) 8%, transparent); color: var(--color-ink); }
+  .board-point.is-option:hover { background: var(--color-accent); color: var(--color-accent-ink); box-shadow: 0 0 0 .4rem color-mix(in oklch, var(--color-accent) 20%, transparent); transform: translate(-50%, -50%) scale(1.06); }
+  button.pallanguzhi-pit:hover { border-color: var(--color-accent); background: color-mix(in oklch, var(--color-accent) 20%, var(--color-paper-3)); }
+  .peg:hover { border-color: var(--color-accent); background: linear-gradient(180deg, color-mix(in oklch, var(--color-accent) 4%, transparent), color-mix(in oklch, var(--color-accent) 9%, transparent)); }
+  .route-choice:hover { border-color: var(--color-accent); background: color-mix(in oklch, var(--color-paper-3) 76%, var(--color-jewel-sapphire)); transform: translateY(-2px); }
+  .board-point.is-option:active { transform: translate(-50%, -50%) scale(.96); }
+  button.pallanguzhi-pit:active, .peg:active, .route-choice:active { transform: translateY(1px); }
+}
 
 .curtain-call { display: grid; min-height: calc(100dvh - 5.2rem); place-content: center; justify-items: center; padding-block: var(--space-4xl); text-align: center; }
 .curtain-call h1 { max-width: 13ch; }
@@ -713,6 +731,8 @@ button.pallanguzhi-pit:hover, button.pallanguzhi-pit:focus-visible { border-colo
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .00001ms !important; animation-iteration-count: 1 !important; transition-duration: .00001ms !important; }
   .game-door:hover { transform: none; }
   .game-door, .game-sigil, .game-sigil i, .category-sigil, .category-sigil i, .category-aperture, .pattern-row span, .mirror-ring, .mirror-orbit, .mirror-orbit span, .lantern, .lantern-body, .lantern-flame, .lantern-even-glow, .lantern-veil, .lantern-veil-panel, .lantern-veil-clasp, .disc, .disc.is-lifted, .route-miniature span, .route-choice:hover { animation: none !important; filter: none !important; transition: none !important; }
+  .answer-list button, .primary-action, .quiet-action, .text-action, button.pallanguzhi-pit, .peg, .route-choice, .runner-controls button { transform: none !important; }
+  .board-point.is-option:hover, .board-point.is-option:focus-visible, .board-point.is-option:active { transform: translate(-50%, -50%); }
   .disc.is-lifted, .route-choice:hover { transform: none; }
   .stack-move-trace { display: none; }
 }

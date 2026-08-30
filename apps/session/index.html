@@ -11,8 +11,8 @@
   <link rel="manifest" href="./manifest.webmanifest" data-portable-remove>
   <title>Nindova — Masala Mound</title>
   <style>
-    /* Hallmark · genre: atmospheric · macrostructure: Workbench · theme: Shahi Raat Atelier · Dawn variant: First-light Gallery (light / classical-serif / warm) · tone: quiet luxury · anchor hue: aged brass · designed-as-app · contrast: pass (40–41) · slop: pass (42–49) · mobile: pass (34, 49, 50–57) */
-    /* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 */
+    /* Hallmark · genre: atmospheric · macrostructure: Split Studio interaction polish + existing Workbench · theme: Shahi Raat Atelier · Dawn variant: First-light Gallery (light / classical-serif / warm) · tone: quiet luxury · anchor hue: aged brass · designed-as-app · contrast: pass (40–41) · slop: pass (1–58) · mobile: pass (34, 49, 50–57) */
+    /* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V4 */
     :root {
       color-scheme: dark;
 
@@ -585,6 +585,7 @@
       background: radial-gradient(circle at 50% 26%, var(--color-brass), transparent 46%);
       transition: opacity 700ms var(--ease-in-out);
     }
+    .board-shell:focus-within { border-color: var(--color-brass-light); }
     .court-canopy {
       position: absolute;
       inset: var(--space-sm) var(--space-md) auto;
@@ -720,6 +721,9 @@
     }
     .tile.is-covered svg { opacity: 0.5; }
     .tile.is-side-blocked svg { opacity: 0.68; }
+    .tile:not(:disabled):focus-visible {
+      transform: translateY(calc(var(--space-2xs) * -1));
+    }
     .tile.is-selected {
       z-index: 60 !important;
       outline: 3px double var(--color-focus);
@@ -1031,6 +1035,9 @@
       .tile:not(:disabled):hover {
         transform: translateY(calc(var(--space-2xs) * -1));
       }
+      .tile:not(:disabled):active {
+        transform: translateY(1px) scale(0.985);
+      }
     }
     @media (hover: none) and (pointer: coarse) {
       .tile:not(:disabled):active {
@@ -1163,6 +1170,10 @@
         transform: none !important;
       }
       .pair-bloom { display: none; }
+      .tile:not(:disabled):hover,
+      .tile:not(:disabled):focus-visible,
+      .tile:not(:disabled):active,
+      .tile.is-selected { transform: none !important; }
     }
   </style>
 </head>
