@@ -49,6 +49,7 @@ try {
     await assertReachable(page, "#notNowBtn", viewport);
     await page.click("#beginBtn");
     await page.waitForFunction(() => window.__ct.state === "play");
+    assert.equal(await page.evaluate(() => document.activeElement?.id), "playTitle", `${viewport.width}px play entry focuses the visible title`);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), viewport.width);
     const freeBoxes = await page.locator(".tile:not(:disabled)").evaluateAll((buttons) => buttons.map((button) => {
       const box = button.getBoundingClientRect();

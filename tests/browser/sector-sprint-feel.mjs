@@ -196,10 +196,21 @@ try {
 
   const desktop = await openRunner({ width: 1440, height: 900 });
   let desktopFrames;
+  let desktopSurface;
   let desktopRuntime;
   try {
     await desktop.page.waitForFunction(() => (window.__house.runner?.worldX ?? 0) > 700 && window.__house.runner?.failed === false);
     desktopFrames = await sampleFrames(desktop.page, 120);
+    desktopSurface = await desktop.page.locator("#runnerCanvas").evaluate((canvas) => {
+      const bounds = canvas.getBoundingClientRect();
+      return {
+        quality: canvas.dataset.quality,
+        cssWidth: Math.round(bounds.width),
+        cssHeight: Math.round(bounds.height),
+        pixelWidth: canvas.width,
+        pixelHeight: canvas.height,
+      };
+    });
     desktopRuntime = await desktop.page.evaluate(() => ({
       userAgent: navigator.userAgent,
       platform: navigator.userAgentData?.platform ?? navigator.platform,
@@ -223,6 +234,7 @@ try {
     actionMaxMs: Object.fromEntries(Object.entries(actionMax).map(([name, value]) => [name, Number(value.toFixed(2))])),
     throttledFrameP95Ms: Number(phoneFrameP95Ms.toFixed(2)),
     desktopFrameP95Ms: Number(desktopFrameP95Ms.toFixed(2)),
+    desktopSurface,
     runtime: { phone: throttledRuntime, desktop: desktopRuntime },
     timeline: { phone: throttledTimeline, desktop: desktopTimeline },
   };

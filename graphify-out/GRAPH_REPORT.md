@@ -1,16 +1,16 @@
-# Graph Report - nindova-main-cleanup.pw9slH  (2026-08-26)
+# Graph Report - Nindova  (2026-08-30)
 
 ## Corpus Check
-- 154 files · ~194,579 words
+- 154 files · ~195,104 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1347 nodes · 1834 edges · 136 communities (102 shown, 34 thin omitted)
+- 1347 nodes · 1835 edges · 136 communities (102 shown, 34 thin omitted)
 - Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 137 edges (avg confidence: 0.73)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `9a5e0d72`
+- Built from commit: `5ead9bb1`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -89,19 +89,21 @@
 - Nindova v0.4.1 — House Continuity
 - Nindova v0.4.2 — Clean Return
 - completeSalonChapter
-- finishSession
+- enforceBoundary
 - Night and Local State
 - Nindova v0.4.3 — Held Boundaries
 - Deepen House boundaries and browser evidence
-- selectTile
+- beginSession
+- Visual system
 - RasoiDebug
 - browser-evidence-harness.test.mjs
 - salon-table-lifecycle.test.mjs
 - public-surface.mjs
-- Conservative product constraints
+- Board contract
 - serve.mjs
 - seed-asserted.mjs
 - sector-sprint.test.mjs
+- playChime
 - First-Light Kitchen Setting
 - active-session.test.mjs
 - session-architecture.test.mjs
@@ -138,9 +140,7 @@
 - drawRunnerObstacles
 - Board profiles
 - runnerInterpolatedFrame
-- 2. Evening light, arousal, and media displacement
-- restoreActiveSession
-- Claim language
+- finishSession
 - createHouseNavigation
 
 ## God Nodes (most connected - your core abstractions)
@@ -188,7 +188,7 @@
 
 ### Community 0 - "session.ts"
 Cohesion: 0.08
-Nodes (33): NindovaDawn, boardElement, boardShell, boardStatus, closeDawn(), currentDawnEligibility(), dawnButton, dawnCanvas (+25 more)
+Nodes (36): NindovaDawn, boardElement, boardShell, boardStatus, closeDawn(), currentDawnEligibility(), dawnButton, dawnCanvas (+28 more)
 
 ### Community 1 - "rasoi-core.ts"
 Cohesion: 0.12
@@ -255,8 +255,8 @@ Cohesion: 0.07
 Nodes (25): HistoryMode, HouseDestination, HouseNavigationState, HouseView, HouseViewOptions, NavigationOptions, PendingDestination, ChoiceChapter (+17 more)
 
 ### Community 17 - "finishCompletedGame"
-Cohesion: 0.13
-Nodes (21): clearChapterTransition(), closeHouseAudio(), destinationForView(), finishCompletedGame(), gameSigil(), getDoorCategory, getGame, handleSectorTerminal() (+13 more)
+Cohesion: 0.16
+Nodes (18): clearChapterTransition(), closeHouseAudio(), destinationForView(), finishCompletedGame(), gameSigil(), getDoorCategory, getGame, handleSectorTerminal() (+10 more)
 
 ### Community 18 - "Nindova game quality plan"
 Cohesion: 0.10
@@ -271,8 +271,8 @@ Cohesion: 0.15
 Nodes (8): completeRunnerStory(), completeStackGame(), enterRunnerNarrated(), externalRequests, hanoiMoves(), output, publishedHouseText, root
 
 ### Community 21 - "Bedtime game evidence brief"
-Cohesion: 0.14
-Nodes (14): 0. Why sleep matters—and how to say it without fear, 1. Interactive screen games and sleepiness, 3. Cognitive distraction and serial diverse imagining, 4. Memory evidence: pair matching is not general memory improvement, 5. Why “dopamine effect” is not supportable, 6. Why rankings, streaks and weekly performance are the wrong layer, 7. Candidate post-board transitions, 8. Open-source reference-product scan (+6 more)
+Cohesion: 0.07
+Nodes (27): 0. Why sleep matters—and how to say it without fear, 1. Interactive screen games and sleepiness, 2. Evening light, arousal, and media displacement, 3. Cognitive distraction and serial diverse imagining, 4. Memory evidence: pair matching is not general memory improvement, 5. Why “dopamine effect” is not supportable, 6. Why rankings, streaks and weekly performance are the wrong layer, 7. Candidate post-board transitions (+19 more)
 
 ### Community 22 - "dawn.mjs"
 Cohesion: 0.16
@@ -311,8 +311,8 @@ Cohesion: 0.17
 Nodes (12): Rasoi Legality Kernel, Known Evidence and Product Limits, Universal 343-state Board Guarantee, Voluntary Pair-removal Session Path, Mahjong-solitaire Rule Inspiration, Rasoi Pairs Session Arc, Semantic Safe-pair Hint, Twelve-minute Settle and Fifteen-minute Ceiling (+4 more)
 
 ### Community 32 - "Layered Rasoi plan"
-Cohesion: 0.12
-Nodes (17): Acceptance gates, Availability, Board contract, Desktop wireframe, Experience sequence, Explicitly out, Feedback contract, Geometry (+9 more)
+Cohesion: 0.25
+Nodes (8): Acceptance gates, Experience sequence, Explicitly out, Feedback contract, Layered Rasoi plan, Open access, Outcome, Rest and replay contract
 
 ### Community 33 - "Quiet Depth plan"
 Cohesion: 0.18
@@ -347,7 +347,7 @@ Cohesion: 0.22
 Nodes (9): First-Light Dawn Surface, Browser Dismissal Surface, Voluntary Intake Surface, Quiet End Card, Rasoi Pairs Session Interface, Semantic Rasoi Board, Local Dawn Keepsake Exports, Deferred iOS Wall (+1 more)
 
 ### Community 41 - "Group the Grand Salon and add sourced classic rule studies"
-Cohesion: 0.22
+Cohesion: 0.25
 Nodes (8): Aadu Puli Aattam, Deferred candidates, Evidence boundary, Group the Grand Salon and add sourced classic rule studies, Navakankari, Pallanguzhi, Product and state constraints, Selected rulesets and boundaries
 
 ### Community 42 - "Nindova Asset Manifest"
@@ -379,8 +379,8 @@ Cohesion: 0.36
 Nodes (8): Sector Sprint Illustrated Action Route Capture, Lit Architectural Gate Corridor, Fixed Authored Route, Hold Lane Instruction, Illustrated Punjabi Traveler, Act-Local Phone Flare Tool, Sabzi Load Complication, Sector 22 Route
 
 ### Community 49 - "active-session.ts"
-Cohesion: 0.18
-Nodes (15): ActiveSessionDecoded, ActiveSessionEnding, ActiveSessionLimits, ActiveSessionPhase, ActiveSessionRecord, ActiveSessionRejection, decodeActiveSession(), decodeStoredSession() (+7 more)
+Cohesion: 0.17
+Nodes (16): ActiveSessionDecoded, ActiveSessionEnding, ActiveSessionLimits, ActiveSessionPhase, ActiveSessionRecord, ActiveSessionRejection, decodeActiveSession(), decodeStoredSession() (+8 more)
 
 ### Community 50 - "Nindova Rasoi Diamond Favicon"
 Cohesion: 0.33
@@ -431,7 +431,7 @@ Cohesion: 0.33
 Nodes (5): Grand Salon table materials, Masala Mound silhouettes, Motion and provenance, Phulkari lattice, Shahi Raat palette
 
 ### Community 64 - "bedtime-game-evidence.md"
-Cohesion: 0.25
+Cohesion: 0.22
 Nodes (3): Add the adult Nindova House while preserving the Night Room, Add a fail-closed assessment-readiness contract, Third-party notices
 
 ### Community 65 - "0017-make-sector-sprint-a-one-hit-jetpack-gauntlet.md"
@@ -470,9 +470,9 @@ Nodes (4): Evidence boundary, Files, Highlights, Nindova v0.4.2 — Clean Return
 Cohesion: 0.22
 Nodes (11): answerChoice(), categorySigil(), clearStackMove(), completeSalonChapter(), focusElement(), render(), renderGallery(), renderHome() (+3 more)
 
-### Community 74 - "finishSession"
-Cohesion: 0.22
-Nodes (15): advanceBy(), clearClosureTimers(), element(), enforceBoundary(), enterDrift(), enterRest(), finishSession(), iconSvg() (+7 more)
+### Community 74 - "enforceBoundary"
+Cohesion: 0.28
+Nodes (9): advanceBy(), clearClosureTimers(), enforceBoundary(), enterDrift(), enterRest(), iconSvg(), nowMs(), renderDrift() (+1 more)
 
 ### Community 75 - "Night and Local State"
 Cohesion: 0.25
@@ -486,13 +486,17 @@ Nodes (4): Evidence boundary, Highlights, Nindova v0.4.3 — Held Boundaries, Re
 Cohesion: 0.50
 Nodes (3): Deepen House boundaries and browser evidence, Evidence boundary, Preserved product constraints
 
-### Community 78 - "selectTile"
-Cohesion: 0.38
-Nodes (12): NindovaRasoi, animatePair(), beginSession(), createBoardDom(), hint(), persistActiveSession(), selectTile(), setStatus() (+4 more)
+### Community 78 - "beginSession"
+Cohesion: 0.31
+Nodes (15): NindovaRasoi, anchorSessionClock(), animatePair(), beginSession(), createBoardDom(), hint(), persistActiveSession(), restoreActiveSession() (+7 more)
 
-### Community 84 - "Conservative product constraints"
-Cohesion: 0.33
-Nodes (6): Accessibility and trust, Challenge, Conservative product constraints, Light and transition away from the screen, Match feedback, Session and stopping
+### Community 79 - "Visual system"
+Cohesion: 0.40
+Nodes (5): Desktop wireframe, Phone wireframe, Self-critique, Tokens, Visual system
+
+### Community 84 - "Board contract"
+Cohesion: 0.50
+Nodes (4): Availability, Board contract, Geometry, Solvability
 
 ### Community 85 - "serve.mjs"
 Cohesion: 0.40
@@ -501,6 +505,10 @@ Nodes (4): mime, port, root, server
 ### Community 86 - "seed-asserted.mjs"
 Cohesion: 0.50
 Nodes (3): output, root, states
+
+### Community 88 - "playChime"
+Cohesion: 1.00
+Nodes (3): playChime(), playSectorTone(), playToneSequence()
 
 ### Community 89 - "First-Light Kitchen Setting"
 Cohesion: 0.50
@@ -542,17 +550,9 @@ Nodes (4): Board profiles, Deeper stack, Gentle stack, Shared proof
 Cohesion: 1.00
 Nodes (3): interpolateCountdown(), interpolateNumber(), runnerInterpolatedFrame()
 
-### Community 149 - "2. Evening light, arousal, and media displacement"
-Cohesion: 0.50
-Nodes (4): 2. Evening light, arousal, and media displacement, Cognitive and emotional arousal, Light, Time displacement and bedtime boundaries
-
-### Community 150 - "restoreActiveSession"
-Cohesion: 0.33
-Nodes (7): NindovaActiveSession, anchorSessionClock(), clearActiveSession(), LEGACY_ACTIVE_SESSION_KEYS, readActiveSessionRaw(), restoreActiveSession(), safeStorage()
-
-### Community 152 - "Claim language"
-Cohesion: 0.67
-Nodes (3): Allowed when the implementation is true, Claim language, Not supported
+### Community 150 - "finishSession"
+Cohesion: 0.40
+Nodes (6): clearActiveSession(), finishSession(), LEGACY_ACTIVE_SESSION_KEYS, readActiveSessionRaw(), renderPathNote(), safeStorage()
 
 ### Community 153 - "createHouseNavigation"
 Cohesion: 0.33
@@ -566,16 +566,16 @@ Nodes (5): createHouseNavigation(), errors, page, state(), back()
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `createHouseNavigation()` connect `createHouseNavigation` to `salon-catalog.ts`, `house.ts`, `selectTile`?**
+- **Why does `createHouseNavigation()` connect `createHouseNavigation` to `salon-catalog.ts`, `house.ts`, `beginSession`?**
   _High betweenness centrality (0.094) - this node is a cross-community bridge._
-- **Why does `settle()` connect `selectTile` to `session.ts`, `createHouseNavigation`, `finishSession`, `restoreActiveSession`?**
+- **Why does `settle()` connect `beginSession` to `session.ts`, `createHouseNavigation`, `enforceBoundary`, `finishSession`?**
   _High betweenness centrality (0.083) - this node is a cross-community bridge._
 - **Why does `back()` connect `createHouseNavigation` to `house-navigation.test.mjs`?**
   _High betweenness centrality (0.011) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `license` to the rest of the system?**
   _584 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `session.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.07777777777777778 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._
 - **Should `rasoi-core.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.12315270935960591 - nodes in this community are weakly interconnected._
 - **Should `classic-studies.ts` be split into smaller, more focused modules?**

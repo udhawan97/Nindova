@@ -297,6 +297,7 @@ function beginSession(profile: RasoiProfileId = chosenProfile()) {
   createBoardDom();
   setStatus("Open-side tiles sit above the quiet layers.");
   persistActiveSession();
+  element<HTMLElement>("playTitle").focus({ preventScroll: true });
 }
 
 async function playPairSound(layer: number) {
@@ -654,7 +655,10 @@ function setLoopUnsupported(value: boolean) {
 }
 
 element<HTMLButtonElement>("beginBtn").addEventListener("click", () => beginSession());
-element<HTMLButtonElement>("notNowBtn").addEventListener("click", () => showView("dismissed"));
+element<HTMLButtonElement>("notNowBtn").addEventListener("click", () => {
+  showView("dismissed");
+  element<HTMLElement>("dismissedTitle").focus({ preventScroll: true });
+});
 element<HTMLButtonElement>("returnBtn").addEventListener("click", returnToIntake);
 element<HTMLButtonElement>("hintBtn").addEventListener("click", hint);
 muteButton.addEventListener("click", () => { audioEnabled = !audioEnabled; updateMuteButton(); });

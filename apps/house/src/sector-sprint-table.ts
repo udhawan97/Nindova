@@ -51,7 +51,7 @@ type TableOptions = {
   readonly renderShell: () => void;
   readonly celebrate: (message: string, chapter: number) => void;
   readonly terminal: (outcome: SectorSprintTerminal) => void;
-  readonly focus: (selector: string) => void;
+  readonly focus: (selector: string, options?: { readonly reveal?: boolean }) => void;
 };
 
 function escape(value: string): string {
@@ -85,6 +85,8 @@ export function createSectorSprintTable(options: TableOptions) {
   let transitionCallback: (() => void) | null = null;
   let renderSequence = 0;
   let paletteCache: RunnerPalette | null = null;
+  let preparedCanvas: HTMLCanvasElement | null = null;
+  let preparedContext: CanvasRenderingContext2D | null = null;
   let characterSheet: HTMLImageElement | null = null;
   let characterSheetPendingGeneration: number | null = null;
   let terminalOutcome: SectorSprintTerminal | null = null;
@@ -145,13 +147,17 @@ export function createSectorSprintTable(options: TableOptions) {
     if (characterSheetPendingGeneration === currentGeneration) return;
     characterSheetPendingGeneration = currentGeneration;
     try {
-      let source = runnerCharacterSheetUrl;
-      if (!navigator.onLine) {
-        if (!("caches" in globalThis)) return;
-        const cached = await caches.match(runnerCharacterSheetUrl);
-        if (!cached) return;
-        source = await cachedImageSource(cached);
+      let response = "caches" in globalThis ? await caches.match(runnerCharacterSheetUrl) : undefined;
+      if (!response) {
+        if (!navigator.onLine) return;
+        try {
+          response = await fetch(runnerCharacterSheetUrl);
+        } catch {
+          return;
+        }
+        if (!response.ok) return;
       }
+      const source = await cachedImageSource(response);
       if (currentGeneration !== generation || terminalOutcome) return;
       const sheet = new Image();
       sheet.decoding = "async";
@@ -186,7 +192,16 @@ export function createSectorSprintTable(options: TableOptions) {
   }
 
   function prepareCanvas(canvas: HTMLCanvasElement): CanvasRenderingContext2D | null {
-    const ratio = Math.min(RUNNER_DPR_CAP, Math.max(1, window.devicePixelRatio || 1));
+    if (preparedCanvas !== canvas) {
+      preparedCanvas = canvas;
+      preparedContext = canvas.getContext("2d", { alpha: false, desynchronized: true });
+    }
+    const qualityScale = renderQuality === "high" ? 1 : renderQuality === "balanced" ? 0.78 : 0.58;
+    const displayScale = (canvas.clientWidth || RUNNER_WIDTH) / RUNNER_WIDTH;
+    const ratio = Math.min(
+      RUNNER_DPR_CAP,
+      Math.max(0.5, displayScale * Math.max(1, window.devicePixelRatio || 1) * qualityScale),
+    );
     const pixelWidth = Math.round(RUNNER_WIDTH * ratio);
     const pixelHeight = Math.round(RUNNER_HEIGHT * ratio);
     if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
@@ -195,10 +210,9 @@ export function createSectorSprintTable(options: TableOptions) {
     }
     canvas.dataset.logicalWidth = String(RUNNER_WIDTH);
     canvas.dataset.logicalHeight = String(RUNNER_HEIGHT);
-    canvas.dataset.pixelRatio = String(ratio);
-    const context = canvas.getContext("2d");
-    context?.setTransform(ratio, 0, 0, ratio, 0, 0);
-    return context;
+    canvas.dataset.pixelRatio = ratio.toFixed(3);
+    preparedContext?.setTransform(ratio, 0, 0, ratio, 0, 0);
+    return preparedContext;
   }
 
   function drawCurrentFrame(renderState: RunnerState | null = runnerState): void {
@@ -349,7 +363,7 @@ export function createSectorSprintTable(options: TableOptions) {
       const renderState = renderPreviousState ? runnerInterpolatedFrame(renderPreviousState, runnerState, frameAlpha) : runnerState;
       drawCurrentFrame(renderState); updateApproach(); updateHud(); updateLive(runnerState.message);
       if (runnerState.failed) {
-        stopLoop(); options.audio.suspend(); options.renderShell(); options.focus(retryAvailable() ? "[data-runner-retry]" : "[data-runner-story]"); return;
+        stopLoop(); options.audio.suspend(); options.renderShell(); options.focus(retryAvailable() ? "[data-runner-retry]" : "[data-runner-story]", { reveal: true }); return;
       }
       if (runnerState.finished) { completeAct(); return; }
     }
@@ -493,6 +507,7 @@ export function createSectorSprintTable(options: TableOptions) {
     if (elapsedMs >= RUNNER_SESSION_SECONDS * 1_000) { emitTerminal("boundary-closed"); return; }
     options.audio.close();
     session.storyBeat = 0; runnerState = null; paused = false;
+    statusMessage = `The narrated route continues from Act ${session.chapter + 1}.`;
     persistAndRender("[data-story-advance]");
     mount();
   }
@@ -557,6 +572,7 @@ export function createSectorSprintTable(options: TableOptions) {
   function destroy(optionsForDestroy: { abandon?: boolean } = {}): void {
     if (optionsForDestroy.abandon && session && !terminalOutcome) emitTerminal("abandoned");
     generation += 1; stopLoop(); clearTransition(); session = null; runnerState = null; renderPreviousState = null; terminalOutcome = null; characterSheet = null; characterSheetPendingGeneration = null;
+    statusMessage = "";
     frameIntervals = []; qualityUpgradeWindows = 0; qualityCeiling = "high"; qualityViewportIsNarrow = null;
   }
 

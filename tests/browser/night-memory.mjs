@@ -26,10 +26,12 @@ try {
 
   await page.click("#notNowBtn");
   assert.equal(await page.locator("#dismissed").isVisible(), true);
+  assert.equal(await page.evaluate(() => document.activeElement?.id), "dismissedTitle", "Not now announces the newly visible dismissal context");
   await page.click("#returnBtn");
   assert.equal(await page.locator("#beginBtn").isVisible(), true);
 
   await page.click("#beginBtn");
+  assert.equal(await page.evaluate(() => document.activeElement?.id), "playTitle", "entering the kitchen announces the newly visible play context");
   const started = await page.evaluate(() => ({ night: window.__ct.night, board: window.__ct.board }));
   const firstPair = await page.evaluate(() => window.__ct.legalPairs[0]);
   await page.evaluate((pair) => { window.__ct.selectTile(pair[0]); window.__ct.selectTile(pair[1]); }, firstPair);

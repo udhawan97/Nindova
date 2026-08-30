@@ -610,6 +610,12 @@ try {
       assert.ok(bounds.every((row) => row.firstLeft >= row.promptLeft - 0.5 && row.lastRight <= row.promptRight + 0.5), `${label} keeps every required Pattern token inside the visible prompt column: ${JSON.stringify(bounds)}`);
     };
     await patternBounds.page.evaluate(() => window.__house.start("pattern-court"));
+    const mastheadLines = await patternBounds.page.locator('[data-history-back="category"]').evaluate((button) => {
+      const range = document.createRange();
+      range.selectNodeContents(button);
+      return new Set([...range.getClientRects()].filter((rect) => rect.width > 0).map((rect) => Math.round(rect.top))).size;
+    });
+    assert.equal(mastheadLines, 1, `${viewport.width}px keeps the full game destination on one visible line`);
     await patternBounds.page.click('[data-answer="0"]');
     await patternBounds.page.waitForFunction(() => window.__house.active?.chapter === 1);
     await patternBounds.page.waitForTimeout(700);
@@ -815,7 +821,7 @@ try {
     quality: canvas.dataset.quality,
     camera: canvas.dataset.camera,
     art: canvas.dataset.art,
-  })), { width: 960, height: 432, ratio: "1", logicalWidth: "960", logicalHeight: "432", quality: "quiet", camera: "portrait-close", art: "illustrated" }, "phones start in the stable visual tier before sustained headroom earns an upgrade");
+  })), { width: 480, height: 216, ratio: "0.500", logicalWidth: "960", logicalHeight: "432", quality: "quiet", camera: "portrait-close", art: "illustrated" }, "phones start with a display-sized backing store in the stable visual tier before sustained headroom earns an upgrade");
   assert.ok((await runner.page.locator(".runner-canvas-window").boundingBox())?.height >= 250, "the portrait close camera keeps the illustrated action legible");
   assert.ok((await runner.page.locator(".runner-stage-frame").boundingBox())?.y < 812, "the moving miniature enters the first phone viewport");
   assert.deepEqual(await runner.page.evaluate(() => {
@@ -908,6 +914,18 @@ try {
   })), { failed: true, reason: "corridor", chapter: 0, storedFailure: false });
   assert.equal(await runner.page.locator(".runner-controls").count(), 0, "underlying Action controls disappear after a wipeout");
   assert.equal(await runner.page.evaluate(() => document.activeElement?.matches("[data-runner-retry]")), true, "recovery moves focus to the first available action");
+  const recoveryVisibility = await runner.page.evaluate(() => {
+    const heading = document.querySelector("#runnerRecoveryTitle")?.getBoundingClientRect();
+    const retry = document.querySelector("[data-runner-retry]")?.getBoundingClientRect();
+    return {
+      scrollY,
+      headingVisible: Boolean(heading && heading.top >= 0 && heading.bottom <= innerHeight),
+      retryVisible: Boolean(retry && retry.top >= 0 && retry.bottom <= innerHeight),
+    };
+  });
+  assert.equal(recoveryVisibility.headingVisible, true, `recovery heading enters the phone viewport (${JSON.stringify(recoveryVisibility)})`);
+  assert.equal(recoveryVisibility.retryVisible, true, `focused recovery decision enters the phone viewport (${JSON.stringify(recoveryVisibility)})`);
+  assert.ok(recoveryVisibility.scrollY > 0, "recovery reveal moves the viewport from the runner masthead to the new decision");
   assert.match(await runner.page.locator(".runner-recovery").innerText(), /No life, score, checkpoint, or failure history is kept/i);
   const recoveryLayout = await runner.page.locator(".runner-recovery").evaluate((panel) => {
     const heading = panel.querySelector("h3");
@@ -932,12 +950,27 @@ try {
   await runner.context.close();
 
   for (const viewport of [{ width: 320, height: 568 }, { width: 1280, height: 800 }]) {
-    const runnerVisual = await openHouse(viewport);
+    const runnerVisual = await openHouse(viewport, {}, { manualRaf: viewport.width === 320 });
     await enterRunnerAction(runnerVisual.page);
     assert.equal(await runnerVisual.page.evaluate(() => document.documentElement.scrollWidth), viewport.width);
     assert.equal(await runnerVisual.page.locator("#runnerCanvas").isVisible(), true);
     assert.ok(Number.parseFloat(await runnerVisual.page.locator("#runnerApproach strong").evaluate((element) => getComputedStyle(element).fontSize)) >= 18);
     await runnerVisual.page.screenshot({ path: resolve(output, `sector-sprint-${viewport.width}x${viewport.height}.png`), fullPage: true, animations: "disabled" });
+    if (viewport.width === 320) {
+      await runnerVisual.page.evaluate(() => globalThis.__advanceHouseTestFrames(700, 17));
+      await runnerVisual.page.waitForSelector(".runner-recovery");
+      const compactRecovery = await runnerVisual.page.evaluate(() => {
+        const heading = document.querySelector("#runnerRecoveryTitle")?.getBoundingClientRect();
+        const retry = document.querySelector("[data-runner-retry]")?.getBoundingClientRect();
+        return {
+          active: document.activeElement?.matches("[data-runner-retry]"),
+          headingVisible: Boolean(heading && heading.top >= 0 && heading.bottom <= innerHeight),
+          retryVisible: Boolean(retry && retry.top >= 0 && retry.bottom <= innerHeight),
+        };
+      });
+      assert.deepEqual(compactRecovery, { active: true, headingVisible: true, retryVisible: true }, `320×568 reveals the complete focused recovery decision (${JSON.stringify(compactRecovery)})`);
+      await runnerVisual.page.screenshot({ path: resolve(output, "sector-sprint-recovery-320x568.png"), animations: "disabled" });
+    }
     await runnerVisual.context.close();
   }
 
@@ -981,14 +1014,17 @@ try {
 
   const sharpRunner = await openHouse({ width: 414, height: 896 }, { deviceScaleFactor: 3 });
   await enterRunnerAction(sharpRunner.page);
-  assert.deepEqual(await sharpRunner.page.locator("#runnerCanvas").evaluate((canvas) => ({
+  const sharpSurface = await sharpRunner.page.locator("#runnerCanvas").evaluate((canvas) => ({
     width: canvas.width,
-    height: canvas.height,
-    ratio: canvas.dataset.pixelRatio,
-  })), { width: 1_920, height: 864, ratio: "2" }, "the Canvas honors high-density displays with a bounded DPR");
+    cssWidth: canvas.getBoundingClientRect().width,
+    ratio: Number(canvas.dataset.pixelRatio),
+  }));
+  assert.ok(sharpSurface.width >= sharpSurface.cssWidth, "the quiet phone tier keeps at least one backing pixel per rendered CSS pixel");
+  assert.ok(sharpSurface.ratio <= 2, "the Canvas keeps high-density backing work within the DPR cap");
   const sharpChapter = await sharpRunner.page.evaluate(() => window.__house.active?.chapter);
   await sharpRunner.page.setViewportSize({ width: 768, height: 1_024 });
   assert.equal(await sharpRunner.page.evaluate(() => window.__house.active?.chapter), sharpChapter, "a resize redraw cannot change the authored Act");
+  await sharpRunner.page.waitForFunction(() => document.querySelector("#runnerCanvas")?.dataset.quality === "high");
   assert.equal(await sharpRunner.page.locator("#runnerCanvas").getAttribute("data-quality"), "high", "crossing the phone viewport boundary resets stale samples and chooses the new viewport's safe starting tier");
   await sharpRunner.page.evaluate(() => { document.documentElement.style.fontSize = "200%"; });
   assert.equal(await sharpRunner.page.evaluate(() => document.documentElement.scrollWidth), 768, "200% text scaling preserves horizontal reflow");
@@ -1029,7 +1065,18 @@ try {
   await lateRetry.page.click("[data-runner-story]");
   await lateRetry.page.waitForSelector(".runner-story");
   assert.equal(await lateRetry.page.evaluate(() => window.__house.active?.chapter), 0, "Narrated continues from the current failed Act");
+  assert.equal((await lateRetry.page.locator("#gameStatus").innerText()).trim(), "The narrated route continues from Act 1.", "switching routes announces the new narrated context immediately");
   await lateRetry.context.close();
+
+  const freshRunnerStatus = await openHouse({ width: 375, height: 812 }, {}, { manualRaf: true });
+  await enterRunnerAction(freshRunnerStatus.page);
+  await freshRunnerStatus.page.evaluate(() => globalThis.__advanceHouseTestFrames(700, 17));
+  await freshRunnerStatus.page.waitForSelector(".runner-recovery");
+  await freshRunnerStatus.page.click("[data-runner-abandon]");
+  await freshRunnerStatus.page.waitForFunction(() => window.__house.active === null);
+  await freshRunnerStatus.page.evaluate(() => window.__house.start("sector-sprint"));
+  assert.equal((await freshRunnerStatus.page.locator("#gameStatus").innerText()).trim(), "", "a fresh route choice inherits no status from the abandoned run");
+  await freshRunnerStatus.context.close();
 
   const failureVisibility = await openHouse({ width: 375, height: 812 }, {}, { fakeClock: true, controllableVisibility: true });
   await enterRunnerAction(failureVisibility.page);

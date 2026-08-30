@@ -261,8 +261,13 @@ function render() {
   else renderGame();
 }
 
-function focusElement(selector: string) {
-  requestAnimationFrame(() => document.querySelector<HTMLElement>(selector)?.focus({ preventScroll: true }));
+function focusElement(selector: string, options: { readonly reveal?: boolean } = {}) {
+  requestAnimationFrame(() => {
+    const target = document.querySelector<HTMLElement>(selector);
+    if (!target) return;
+    if (options.reveal) target.closest<HTMLElement>(".runner-recovery")?.scrollIntoView({ block: "start", inline: "nearest", behavior: "auto" });
+    target.focus({ preventScroll: true });
+  });
 }
 
 function clearChapterTransition() {
