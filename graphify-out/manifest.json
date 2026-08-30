@@ -1,8 +1,8 @@
 {
   ".hallmark/log.json": {
-    "mtime": 1788066916.8487058,
-    "ast_hash": "9945d508c956ec40525d2691e9569824",
-    "semantic_hash": "9945d508c956ec40525d2691e9569824"
+    "mtime": 1788077194.1101267,
+    "ast_hash": "742e81a8e7722b1f53e1909f644ab07e",
+    "semantic_hash": ""
   },
   ".hallmark/preflight.json": {
     "mtime": 1788066916.8490024,
@@ -150,8 +150,8 @@
     "semantic_hash": ""
   },
   "apps/session/index.html": {
-    "mtime": 1788067129.0068264,
-    "ast_hash": "c3834c4c25a5453f830ff72dcb0fda86",
+    "mtime": 1788077194.110701,
+    "ast_hash": "580575543b27dc0f6a2095b4510521c1",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/accessibility.md": {
