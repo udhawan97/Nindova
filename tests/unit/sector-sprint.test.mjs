@@ -144,3 +144,23 @@ test("spring pads bounce and grounded crates stop travel without erasing progres
   assert.ok(s.bumpMs > 0);
   assert.deepEqual(s.bag, ["sketch"]);
 });
+
+const worldSource = await readFile(new URL('../../apps/house/src/sector-sprint-world.ts', import.meta.url), 'utf8');
+const frames = await readFile(new URL('../../apps/house/src/assets/gurpreet-frames.json', import.meta.url), 'utf8');
+const worldCode = ts.transpileModule(worldSource, {
+  compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 },
+}).outputText
+  .replace(/import characterFrames from "[^"]+";/, `const characterFrames = ${frames};`)
+  .replace('"./sector-sprint.js"', JSON.stringify(`data:text/javascript;base64,${Buffer.from(code).toString('base64')}`));
+const { cameraFor } = await import(`data:text/javascript;base64,${Buffer.from(worldCode).toString('base64')}`);
+test('camera fills short wide windows without extending beyond the painted world', () => {
+  for (const [width, height] of [[1228, 430], [2500, 400], [1300, 610], [360, 570]]) {
+    for (const position of [{x: 0, y: 0}, {x: 720, y: 600}, {x: 1500, y: 990}]) {
+      const camera = cameraFor(position, width, height);
+      assert.ok(camera.x >= 0 && camera.y >= 0);
+      assert.ok(camera.x + camera.width <= G.WORLD_WIDTH + 1e-8);
+      assert.ok(camera.y + camera.height <= G.WORLD_HEIGHT + 1e-8);
+      assert.ok(Math.abs(camera.width / camera.height - width / height) < 1e-8);
+    }
+  }
+});

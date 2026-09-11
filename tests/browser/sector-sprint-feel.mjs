@@ -47,6 +47,7 @@ async function talk(page, id) {
 try {
   for (const viewport of [
     { width: 1440, height: 900 },
+    { width: 1280, height: 720 },
     { width: 375, height: 812 },
     { width: 320, height: 568 },
   ]) {
@@ -61,6 +62,10 @@ try {
       await page.evaluate(() => document.documentElement.scrollWidth),
       viewport.width,
     );
+    const edgePixel = await page.locator("#runnerCanvas").evaluate(canvas =>
+      [...canvas.getContext("2d").getImageData(canvas.width - 20, Math.floor(canvas.height / 2), 1, 1).data],
+    );
+    assert.ok(edgePixel[0] + edgePixel[1] + edgePixel[2] > 0, "the city fills the wide canvas instead of leaving an unpainted strip");
     const idle = await page.evaluate(() => window.__house.runner);
     await page.waitForTimeout(250);
     assert.equal(await page.evaluate(() => window.__house.runner.x), idle.x);

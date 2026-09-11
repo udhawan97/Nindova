@@ -19,7 +19,7 @@ export function cameraFor(
   reduced = false,
 ): Camera {
   const ratio = width / height;
-  const h = ratio < 1 ? 570 : 580;
+  const h = Math.min(ratio < 1 ? 570 : 580, WORLD_WIDTH / ratio);
   const w = h * ratio;
   const x = Math.max(0, Math.min(WORLD_WIDTH - w, state.x - w / 2));
   const y = Math.max(0, Math.min(WORLD_HEIGHT - h, state.y - h * 0.58));

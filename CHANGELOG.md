@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.1 — 2026-09-11
+
+- Fit the Chandigarh camera to short, wide windows so the painted city fills the canvas without an empty strip. Add a rendered 1280×720 regression and camera-bound checks.
+
 ## 0.6.0 — 2026-09-11
 
 - Rebuild Sector Sprint as a connected Chandigarh playground with deliberate walking, jump/dash courses, spring pads, moving obstacles, three traversal power-ups, a temporary errand bag, and a homecoming with Harjit.

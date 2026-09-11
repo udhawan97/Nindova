@@ -69,6 +69,14 @@
       "output_tokens": 0,
       "mode": "host_semantic_incremental",
       "accounting_note": "Unmetered host tokens; zeros are numeric placeholders."
+    },
+    {
+      "date": "2026-09-11T05:58:14.698689+00:00",
+      "files": 2,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "mode": "host_semantic_incremental",
+      "accounting_note": "Unmetered host tokens; zeros are numeric placeholders."
     }
   ],
   "total_input_tokens": 560,
