@@ -58,7 +58,7 @@ try {
     await docsPage.goto(`${prefix}docs/${slug}/`);
     const docsCopy = await docsPage.locator("main").innerText();
     assert.ok(docsCopy.includes(houseCacheName), `${slug} names the built House cache ${houseCacheName}`);
-    assert.match(docsCopy, /optional Sector Sprint illustration is cached only after Action requests it/i);
+    assert.match(docsCopy, /full original Chandigarh world and character atlas are (included|precached)/i);
     await docsPage.close();
   }
   const { page: qrPage } = await harness.page(context);
@@ -79,7 +79,7 @@ try {
   const { page: housePage, errors: houseErrors, requests: houseRequests } = await harness.page(houseContext);
   await housePage.goto(prefix);
   await housePage.evaluate(async () => {
-    const legacy = await caches.open("nindova-house-v11");
+    const legacy = await caches.open("nindova-house-v13");
     await legacy.put(
       new Request(`${location.origin}/house/assets/sector-sprint-characters-legacy.png`),
       new Response("old"),
@@ -93,15 +93,18 @@ try {
   const houseRegistration = await housePage.evaluate(async () => {
     const ready = await navigator.serviceWorker.ready;
     const keys = await caches.keys();
-    const cache = await caches.open("nindova-house-v12");
+    const cache = await caches.open("nindova-house-v14");
     return { scope: ready.scope, keys, entries: (await cache.keys()).map((request) => request.url) };
   });
   assert.equal(houseRegistration.scope, houseBase);
-  assert.ok(houseRegistration.keys.includes("nindova-house-v12"));
-  assert.equal(houseRegistration.keys.includes("nindova-house-v11"), false);
+  assert.ok(houseRegistration.keys.includes("nindova-house-v14"));
+  assert.equal(houseRegistration.keys.includes("nindova-house-v13"), false);
   assert.ok(houseRegistration.entries.length > 0);
-  const cachedRunnerSheet = houseRegistration.entries.find((url) => /sector-sprint-characters-.*\.png$/.test(url));
-  assert.equal(cachedRunnerSheet, undefined, "optional Sector Sprint art stays out of the mandatory cold cache");
+  for (const selector of ['.wordmark-logo', 'link[rel="apple-touch-icon"]']) {
+    const iconUrl = await housePage.locator(selector).evaluate((element) => element.src || element.href);
+    assert.ok(houseRegistration.entries.includes(iconUrl), `${selector} is included in the cold House cache`);
+  }
+  assert.ok(houseRegistration.entries.some(url => /chandigarh-world-.*\.webp$/.test(url)), 'the complete Chandigarh artwork is precached for the first offline walk');
   assert.ok(houseRegistration.entries.every((url) => url.startsWith(houseBase) && !url.includes("assessment-readiness")));
   assert.equal((await houseContext.request.get(`${houseBase}assessment-readiness.js`)).status(), 404);
   assert.doesNotMatch(await (await houseContext.request.get(`${houseBase}sw.js`)).text(), /assessment-readiness/);
@@ -115,28 +118,19 @@ try {
   assert.equal(coldHouseResponse?.ok(), true);
   await coldHouse.waitForFunction(() => Boolean(window.__house));
   assert.equal(await coldHouse.locator(".game-door").count(), 5);
+  await coldHouse.locator('.wordmark-logo').evaluate((image) => image.decode());
+  assert.equal(await coldHouse.locator('.wordmark-logo').evaluate((image) => image.naturalWidth > 0), true);
   await coldHouse.evaluate(() => window.__house.start("sector-sprint"));
   await coldHouse.click('[data-runner-route="action"]');
   await coldHouse.waitForSelector("#runnerCanvas");
-  await coldHouse.waitForFunction(() => document.querySelector("#runnerCanvas")?.dataset.art === "vector-fallback");
-  assert.equal(await coldHouse.locator("#runnerCanvas").isVisible(), true, "a first offline Action remains playable through the vector fallback");
+  await coldHouse.waitForFunction(() => document.querySelector('#runnerCanvas')?.dataset.art === 'illustrated');
+  await coldHouse.waitForFunction(() => document.querySelector('#runnerCanvas')?.dataset.character === 'atlas');
+  assert.equal(await coldHouse.locator('#runnerCanvas').isVisible(), true, 'the first offline walk uses the full precached city and character atlas');
+  await coldHouse.click('[data-map]');
+  await coldHouse.click('[data-visit="market"]');
+  await coldHouse.waitForFunction(() => window.__house.runner?.walking);
+  assert.equal(await coldHouse.locator('.journey-dialog').count(), 0);
 
-  await houseContext.setOffline(false);
-  await coldHouse.waitForFunction(() => document.querySelector("#runnerCanvas")?.dataset.art === "illustrated");
-  const runtimeRunnerSheet = await coldHouse.evaluate(async () => {
-    const cache = await caches.open("nindova-house-v12");
-    return (await cache.keys()).map((request) => request.url).find((url) => /sector-sprint-characters-.*\.png$/.test(url));
-  });
-  assert.ok(runtimeRunnerSheet, "online Action caches its optional illustration on demand");
-
-  await houseContext.setOffline(true);
-  await coldHouse.reload();
-  await coldHouse.waitForFunction(() => Boolean(window.__house));
-  await coldHouse.evaluate(() => window.__house.start("sector-sprint"));
-  await coldHouse.click('[data-runner-route="action"]');
-  await coldHouse.waitForSelector("#runnerCanvas");
-  await coldHouse.waitForFunction(() => document.querySelector("#runnerCanvas")?.dataset.art === "illustrated");
-  assert.equal(await coldHouse.locator("#runnerCanvas").isVisible(), true, "a later offline Action reuses the runtime-cached illustration");
   assert.ok([...houseRequests, ...coldHouseRequests].every((url) => new URL(url).origin === new URL(houseBase).origin));
   assert.deepEqual(houseErrors, []);
   await houseContext.setOffline(false);
@@ -203,6 +197,9 @@ try {
   await portable.goto(`${prefix}nindova.html?review=1`);
   await portable.waitForFunction(() => Boolean(window.__ct));
   assert.equal(await portable.locator('link[rel="manifest"]').count(), 0);
+  assert.equal(await portable.locator('link[rel="apple-touch-icon"]').count(), 0, "portable branding retains no install-icon dependency");
+  assert.match(await portable.locator('.wordmark-logo').getAttribute('src'), /^data:image\/svg\+xml,/);
+  await portable.locator('.wordmark-logo').evaluate((image) => image.decode());
   assert.equal(await portable.evaluate(() => navigator.serviceWorker.controller), null);
   assert.equal(await portable.evaluate(() => Boolean(window.NindovaNight && window.NindovaDawn && window.NindovaRasoi)), true);
   await portable.click("#beginBtn");

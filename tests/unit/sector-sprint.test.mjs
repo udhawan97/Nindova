@@ -1,384 +1,146 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
 import test from "node:test";
 import ts from "typescript";
-
-const root = resolve(import.meta.dirname, "../..");
-const source = await readFile(resolve(root, "apps/house/src/sector-sprint.ts"), "utf8");
-const emitted = ts.transpileModule(source, {
-  fileName: "sector-sprint.ts",
-  reportDiagnostics: true,
-  compilerOptions: { target: ts.ScriptTarget.ES2024, module: ts.ModuleKind.ES2022 },
+import { readFile } from "node:fs/promises";
+const source = await readFile(
+  new URL("../../apps/house/src/sector-sprint.ts", import.meta.url),
+  "utf8",
+);
+const code = ts.transpileModule(source, {
+  compilerOptions: {
+    target: ts.ScriptTarget.ES2022,
+    module: ts.ModuleKind.ES2022,
+  },
+}).outputText;
+const G = await import(
+  `data:text/javascript;base64,${Buffer.from(code).toString("base64")}`
+);
+test("standing still never advances the character or animates walking", () => {
+  let s = G.createJourney();
+  for (let i = 0; i < 600; i++) s = G.stepJourney(s, { x: 0, y: 0 }, 16.67);
+  assert.equal(s.x, 720);
+  assert.equal(s.y, 600);
+  assert.equal(s.walking, false);
+  assert.equal(s.stride, 0);
 });
-assert.deepEqual(emitted.diagnostics?.filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error) ?? [], []);
-const Runner = await import(`data:text/javascript;base64,${Buffer.from(emitted.outputText).toString("base64")}`);
-
-function runAct(actIndex, warningDelayMs = 0) {
-  let state = Runner.createRunnerState(actIndex);
-  let laneInputs = 0;
-  const frames = Runner.RUNNER_ACT_SECONDS * 60 + 4;
-  for (let frame = 0; frame < frames && !state.failed && !state.finished; frame += 1) {
-    const instruction = Runner.runnerUpcomingInstruction(state);
-    let input = {};
-    if (instruction && instruction.timeToContactMs <= Runner.RUNNER_ACTS[actIndex].obstacles.find((obstacle) => obstacle.id === instruction.obstacleId).warningMs - warningDelayMs) {
-      const obstacle = Runner.RUNNER_ACTS[actIndex].obstacles.find((candidate) => candidate.id === instruction.obstacleId);
-      if (obstacle.safeLane !== state.targetLane) {
-        input = { laneDelta: obstacle.safeLane < state.targetLane ? -1 : 1 };
-        laneInputs += 1;
-      }
+test("all authored destinations are connected and paths stay on the walk mesh", () => {
+  for (const from of G.PLACES)
+    for (const to of G.PLACES) {
+      const route = G.routeTo(from.point, to.point);
+      assert.ok(route.length, `${from.id} to ${to.id}`);
+      assert.ok(route.every((p) => G.walkable(p.x, p.y)));
+      assert.ok(
+        Math.hypot(route.at(-1).x - to.point.x, route.at(-1).y - to.point.y) <
+          18,
+      );
     }
-    state = Runner.stepRunner(state, input, Runner.RUNNER_FIXED_STEP_MS);
-  }
-  return { state, laneInputs };
-}
-
-function elapsedForWorldDistance(actIndex, distance) {
-  let low = 0;
-  let high = Runner.RUNNER_ACT_SECONDS * 1_000;
-  for (let iteration = 0; iteration < 32; iteration += 1) {
-    const middle = (low + high) / 2;
-    if (Runner.runnerWorldDistanceAt(actIndex, middle) < distance) low = middle;
-    else high = middle;
-  }
-  return (low + high) / 2;
-}
-
-test("Sector Sprint uses discrete lanes and progressive speed instead of input hammering", () => {
-  assert.doesNotMatch(source, /thrustHeld|RUNNER_GRAVITY|RUNNER_THRUST_ACCELERATION/);
-  assert.deepEqual(Runner.RUNNER_ACTS.map((act) => act.obstacles.length), [5, 6, 7, 8, 9]);
-  assert.deepEqual(Runner.RUNNER_SPEED_RANGES, [
-    { start: 94, end: 104 },
-    { start: 104, end: 116 },
-    { start: 116, end: 130 },
-    { start: 130, end: 146 },
-    { start: 146, end: 164 },
-  ]);
-  assert.deepEqual(Runner.RUNNER_LANE_TRANSITION_MS, [260, 240, 220, 200, 180]);
-  assert.deepEqual(Runner.RUNNER_WARNING_SECONDS, [1.8, 1.6, 1.4, 1.15, 0.95]);
 });
-
-test("five fixed Acts keep deterministic adjacent routes and fair warning", () => {
-  assert.equal(Runner.RUNNER_ACTS.length, 5);
-  assert.equal(Runner.RUNNER_ACT_SECONDS, 32);
-  assert.equal(Runner.RUNNER_SESSION_SECONDS, 240);
-  assert.equal(
-    Runner.RUNNER_ACTION_ROUTE_MINIMUM_MS,
-    (32_000 + Runner.RUNNER_FIXED_STEP_MS * Runner.RUNNER_MAX_CATCH_UP_STEPS) * 5 + 720 * 5 + 1,
+test("a commanded walk arrives, stops, and manual input cancels its route", () => {
+  let s = G.createJourney();
+  s = { ...s, route: G.routeTo(s, G.place("market").point) };
+  for (let i = 0; i < 3000 && s.route.length; i++)
+    s = G.stepJourney(s, { x: 0, y: 0 }, 16.67);
+  assert.equal(s.route.length, 0);
+  assert.equal(G.nearby(s)?.id, "market");
+  s = G.stepJourney(s, { x: 0, y: 0 }, 16.67);
+  assert.equal(s.walking, false);
+  s = { ...s, route: G.routeTo(s, G.place("home").point) };
+  s = G.stepJourney(s, { x: 1, y: 0 }, 16.67);
+  assert.equal(s.route.length, 0);
+});
+test("buildings, rose beds and lake are solid; diagonal travel has no speed bonus", () => {
+  assert.equal(G.walkable(1350, 100), false);
+  assert.equal(G.walkable(810, 520), false);
+  assert.equal(G.walkable(800, 380), false);
+  const s = G.createJourney();
+  const straight = G.stepJourney(s, { x: 1, y: 0 }, 16);
+  const diagonal = G.stepJourney(s, { x: 1, y: 1 }, 16);
+  assert.ok(
+    Math.abs(
+      Math.hypot(diagonal.x - s.x, diagonal.y - s.y) - (straight.x - s.x),
+    ) < 0.001,
   );
-  assert.deepEqual(Runner.RUNNER_ACTS.map((act) => act.sign), ["SECTOR 22", "SECTOR 26", "SECTOR 17", "MADHYA MARG", "GHAR THIS WAY"]);
-  const obstacleIds = Runner.RUNNER_ACTS.flatMap((act) => act.obstacles.map((obstacle) => obstacle.id));
-  assert.equal(new Set(obstacleIds).size, obstacleIds.length);
-  for (const [actIndex, act] of Runner.RUNNER_ACTS.entries()) {
-    assert.equal(act.storyBeats.length, 3);
-    assert.equal(act.targets.length, 5 + actIndex);
-    assert.equal(act.pickups.length, 1);
-    assert.equal(act.complications.length, 1);
-    assert.equal(act.obstacles[0].safeLane, 1, `${act.id} opens in the middle lane`);
-    assert.ok(act.obstacles.every((obstacle) => obstacle.gapHeight / Runner.RUNNER_PLAYER_HITBOX.height >= 1.8));
-    assert.ok(act.obstacles.every((obstacle) => obstacle.warningMs >= 950));
-    assert.ok(32_000 - act.obstacles.at(-1).contactMs >= 3_000, `${act.id} leaves a closing clearance`);
-    for (let index = 1; index < act.obstacles.length; index += 1) {
-      assert.ok(Math.abs(act.obstacles[index].safeLane - act.obstacles[index - 1].safeLane) <= 1, `${act.id} gate ${index + 1} takes at most one move`);
-      assert.ok(act.obstacles[index].contactMs > act.obstacles[index - 1].contactMs);
+});
+test("three errands work in every order; meeting Ma is gated and props are idempotent", () => {
+  for (const order of [
+    ["market", "roses", "craft"],
+    ["craft", "market", "roses"],
+    ["roses", "craft", "market"],
+  ]) {
+    let s = G.createJourney();
+    assert.equal(G.acceptEncounter(s, "lake", 0), s);
+    for (const id of order) {
+      s = G.acceptEncounter(s, id, 1);
+      assert.equal(G.acceptEncounter(s, id, 0), s);
     }
+    assert.equal(s.bag.length, 3);
+    s = G.acceptEncounter(s, "lake", 0);
+    assert.equal(s.companion, true);
+    s = G.acceptEncounter(s, "home", 0);
+    assert.equal(G.completedJourney(s), true);
+    assert.equal(s.finished, true);
+    assert.equal(G.stepJourney(s, { x: 1, y: 0 }, 50), s);
   }
-  assert.equal(Runner.RUNNER_DPR_CAP, 2);
-  assert.ok(Math.abs(Runner.RUNNER_FIXED_STEP_MS - 1_000 / 60) < 0.001);
-  assert.equal(Runner.RUNNER_MAX_CATCH_UP_STEPS, 120);
-  assert.ok(Runner.RUNNER_EFFECT_PARTICLE_CAP <= 24);
-  assert.ok(Runner.RUNNER_PROJECTILE_CAP <= 6);
-  assert.ok(Runner.RUNNER_CAMERA_SHAKE_CAP <= 6);
-  assert.doesNotMatch(source, /Math\.random/);
 });
-
-test("speed rises within every Act and stays continuous across Act boundaries", () => {
-  for (let actIndex = 0; actIndex < Runner.RUNNER_ACTS.length; actIndex += 1) {
-    const start = Runner.runnerWorldSpeedAt(actIndex, 0);
-    const middle = Runner.runnerWorldSpeedAt(actIndex, 16_000);
-    const end = Runner.runnerWorldSpeedAt(actIndex, 32_000);
-    assert.ok(start < middle && middle < end);
-    assert.ok(Runner.runnerWorldDistanceAt(actIndex, 8_000) < Runner.runnerWorldDistanceAt(actIndex, 24_000));
-    if (actIndex < Runner.RUNNER_ACTS.length - 1) {
-      assert.equal(end, Runner.runnerWorldSpeedAt(actIndex + 1, 0));
-      assert.ok(Runner.runnerWorldSpeedAt(actIndex, 31_999) < Runner.runnerWorldSpeedAt(actIndex + 1, 1));
+test("early home does not claim a full journey; long frames are bounded", () => {
+  let s = G.acceptEncounter(G.createJourney(), "home", 0);
+  assert.equal(s.finished, true);
+  assert.equal(G.completedJourney(s), false);
+  s = G.stepJourney(G.createJourney(), { x: 1, y: 0 }, 20000);
+  assert.ok(s.x - 720 <= G.WALK_SPEED * 0.05 + 0.001);
+  assert.equal(G.JOURNEY_BOUNDARY_MS, 600000);
+});
+test("power-ups change jump height, air time and dash reach", () => {
+  function flight(power) {
+    let s = { ...G.createJourney(), power, x: 700, y: 600 };
+    s = G.stepJourney(s, { x: 0, y: 0, jump: true }, 16);
+    let peak = s.z,
+      frames = 1;
+    while (s.z > 0 && frames < 400) {
+      s = G.stepJourney(s, { x: 0, y: 0 }, 16);
+      peak = Math.max(peak, s.z);
+      frames++;
     }
+    return { peak, frames };
   }
-});
-
-test("one fresh lane request moves one adjacent lane with eased simulation motion", () => {
-  const start = Runner.createRunnerState(0);
-  const moving = Runner.stepRunner(start, { laneDelta: -1 }, Runner.RUNNER_FIXED_STEP_MS);
-  assert.equal(moving.lane, 1);
-  assert.equal(moving.targetLane, 0);
-  assert.ok(moving.y < start.y && moving.y > Runner.RUNNER_LANE_Y[0]);
-  assert.equal(moving.lastAction, "lane-change");
-  let settled = moving;
-  for (let frame = 0; frame < 20; frame += 1) settled = Runner.stepRunner(settled, {}, Runner.RUNNER_FIXED_STEP_MS);
-  assert.equal(settled.lane, 0);
-  assert.equal(settled.targetLane, 0);
-  assert.equal(settled.y, Runner.RUNNER_LANE_Y[0]);
-  assert.equal(settled.pendingLaneDelta, null);
-  assert.ok(settled.landingMs > 0 && settled.landingMs <= 240);
-  assert.equal(Runner.runnerAuthoredPoseIndex(settled), 4);
-});
-
-test("one buffered fresh request is consumed exactly once after settlement", () => {
-  let state = Runner.stepRunner(Runner.createRunnerState(0), { laneDelta: -1 }, Runner.RUNNER_FIXED_STEP_MS);
-  state = Runner.stepRunner(state, { laneDelta: 1 }, Runner.RUNNER_FIXED_STEP_MS);
-  assert.equal(state.pendingLaneDelta, 1);
-  for (let frame = 0; frame < 40; frame += 1) state = Runner.stepRunner(state, {}, Runner.RUNNER_FIXED_STEP_MS);
-  assert.equal(state.lane, 1);
-  assert.equal(state.targetLane, 1);
-  assert.equal(state.pendingLaneDelta, null);
-  assert.equal(state.y, Runner.RUNNER_LANE_Y[1]);
-});
-
-test("a low-input deterministic controller clears every Act with timing tolerance", () => {
-  for (const warningDelayMs of [0, 100, 300]) {
-    for (let actIndex = 0; actIndex < Runner.RUNNER_ACTS.length; actIndex += 1) {
-      const { state, laneInputs } = runAct(actIndex, warningDelayMs);
-      assert.equal(state.failed, false, `Act ${actIndex + 1} clears with ${warningDelayMs}ms delay`);
-      assert.equal(state.finished, true, `Act ${actIndex + 1} reaches its fixed curtain`);
-      assert.equal(state.elapsedMs, 32_000);
-      assert.equal(laneInputs, 4 + actIndex);
-    }
-  }
-});
-
-test("Act V remains fair when the move starts near the latest valid warning point", () => {
-  const { state, laneInputs } = runAct(4, 770);
-  assert.equal(state.failed, false);
-  assert.equal(state.finished, true);
-  assert.equal(laneInputs, 8);
-});
-
-test("interactive lane mode without input eventually contacts an authored face", () => {
-  let state = Runner.createRunnerState(0);
-  for (let frame = 0; frame < Runner.RUNNER_ACT_SECONDS * 60 && !state.failed; frame += 1) {
-    state = Runner.stepRunner(state, {}, Runner.RUNNER_FIXED_STEP_MS);
-  }
-  assert.equal(state.failed, true);
-  assert.equal(state.failureReason, "corridor");
-  assert.ok(state.elapsedMs > Runner.RUNNER_ACTS[0].obstacles[0].contactMs);
-  assert.ok(state.elapsedMs < Runner.RUNNER_ACT_SECONDS * 1_000);
-});
-
-test("swept collision catches a lane face and failure is idempotent", () => {
-  const obstacle = Runner.RUNNER_ACTS[4].obstacles[1];
-  const unsafeLane = obstacle.safeLane === 0 ? 1 : 0;
-  const before = {
-    ...Runner.createRunnerState(4),
-    elapsedMs: obstacle.contactMs - 50,
-    worldX: Runner.runnerWorldDistanceAt(4, obstacle.contactMs - 50),
-    lane: unsafeLane,
-    targetLane: unsafeLane,
-    y: Runner.RUNNER_LANE_Y[unsafeLane],
-    laneFromY: Runner.RUNNER_LANE_Y[unsafeLane],
-  };
-  const hit = Runner.stepRunner(before, {}, 50);
-  assert.equal(hit.failed, true);
-  assert.equal(hit.failureReason, "corridor");
-  assert.equal(hit.failedObstacleId, obstacle.id);
-  assert.equal(hit.projectiles.length, 0);
-  assert.equal(hit.pendingLaneDelta, null);
-  assert.deepEqual(Runner.stepRunner(hit, { laneDelta: 1, toolPressed: true }, 2_000), hit);
-});
-
-test("road, upper edge, targets, pickups, and complications remain harmless", () => {
-  for (const y of [-120, 350]) {
-    const elapsedMs = 1_000;
-    const state = {
-      ...Runner.createRunnerState(0),
-      elapsedMs,
-      worldX: Runner.runnerWorldDistanceAt(0, elapsedMs),
-      y,
-      laneFromY: y,
+  const plain = flight(null),
+    spring = flight("spring"),
+    glide = flight("glide");
+  assert.ok(spring.peak > plain.peak * 1.6);
+  assert.ok(glide.frames > plain.frames * 1.7);
+  function dash(power) {
+    let s = {
+      ...G.createJourney(),
+      power,
+      x: 700,
+      y: 600,
+      facing: { x: 1, y: 0 },
     };
-    assert.equal(Runner.stepRunner(state, {}, Runner.RUNNER_FIXED_STEP_MS).failed, false);
+    s = G.stepJourney(s, { x: 1, y: 0, dash: true }, 16);
+    for (let i = 0; i < 18; i++) s = G.stepJourney(s, { x: 1, y: 0 }, 16);
+    return s.x;
   }
-
-  const act = Runner.RUNNER_ACTS[0];
-  for (const candidate of [act.targets[2], act.pickups[0], act.complications[0]]) {
-    const desiredWorldX = candidate.x - Runner.RUNNER_PLAYER_SCREEN_X;
-    const elapsedMs = elapsedForWorldDistance(0, desiredWorldX);
-    const state = {
-      ...Runner.createRunnerState(0),
-      elapsedMs,
-      worldX: Runner.runnerWorldDistanceAt(0, elapsedMs),
-    };
-    assert.equal(Runner.stepRunner(state, {}, Runner.RUNNER_FIXED_STEP_MS).failed, false, `${candidate.id} cannot fail Action`);
+  assert.ok(dash("dash") > dash(null) + 30);
+});
+test("airborne marks require a jump and completed courses put one real errand prop in the bag", () => {
+  let s = G.createJourney();
+  for (const mark of G.COURSE_MARKS.filter((m) => m.owner === "market")) {
+    s = { ...s, x: mark.point.x, y: mark.point.y, z: 0, vz: 0, route: [] };
+    s = G.stepJourney(s, { x: 0, y: 0 }, 16);
+    assert.equal(s.marks.includes(mark.id), false);
+    s = G.stepJourney(s, { x: 0, y: 0, jump: true }, 16);
+    for (let i = 0; i < 65; i++) s = G.stepJourney(s, { x: 0, y: 0 }, 16);
+    assert.ok(s.marks.includes(mark.id));
   }
+  assert.deepEqual(s.bag, ["sabzi"]);
+  assert.ok(s.visited.includes("market"));
 });
-
-test("warning instruction uses text and direction before each contact", () => {
-  const state = Runner.createRunnerState(2);
-  const obstacle = Runner.RUNNER_ACTS[2].obstacles[1];
-  const warning = Runner.runnerUpcomingInstruction({ ...state, elapsedMs: obstacle.contactMs - obstacle.warningMs, targetLane: 1 });
-  assert.equal(warning.obstacleId, obstacle.id);
-  assert.equal(warning.direction, obstacle.safeLane < 1 ? "up" : "down");
-  assert.match(warning.label, /^Move (up|down)$/);
-});
-
-test("render quality never changes simulation state", () => {
-  assert.equal(Runner.runnerRenderQualityForIntervals(Array(90).fill(16)), "high");
-  assert.equal(Runner.runnerRenderQualityForIntervals([...Array(85).fill(16), ...Array(5).fill(25)]), "balanced");
-  assert.equal(Runner.runnerRenderQualityForIntervals([...Array(85).fill(16), ...Array(5).fill(45)]), "quiet");
-  const state = Runner.createRunnerState(2);
-  const expected = Runner.stepRunner(state, { laneDelta: -1 }, Runner.RUNNER_FIXED_STEP_MS);
-  for (const tier of ["high", "balanced", "quiet"]) {
-    assert.deepEqual(Runner.stepRunner(state, { laneDelta: -1 }, Runner.RUNNER_FIXED_STEP_MS), expected, `${tier} cannot enter game state`);
-  }
-});
-
-test("render quality degrades immediately and upgrades only after sustained headroom", () => {
-  assert.deepEqual(Runner.runnerRenderQualityDecision("high", "quiet", 2), { quality: "quiet", upgradeWindows: 0, ceiling: "quiet" });
-  assert.deepEqual(Runner.runnerRenderQualityDecision("quiet", "balanced", 2), { quality: "quiet", upgradeWindows: 0, ceiling: "high" });
-  assert.deepEqual(Runner.runnerRenderQualityDecision("quiet", "high", 0), { quality: "quiet", upgradeWindows: 1, ceiling: "high" });
-  assert.deepEqual(Runner.runnerRenderQualityDecision("quiet", "high", 1), { quality: "quiet", upgradeWindows: 2, ceiling: "high" });
-  assert.deepEqual(Runner.runnerRenderQualityDecision("quiet", "high", 2), { quality: "balanced", upgradeWindows: 0, ceiling: "high" });
-  assert.deepEqual(Runner.runnerRenderQualityDecision("balanced", "high", 2), { quality: "high", upgradeWindows: 0, ceiling: "high" });
-
-  let decision = Runner.runnerRenderQualityDecision("high", "balanced", 0, "high");
-  assert.deepEqual(decision, { quality: "balanced", upgradeWindows: 0, ceiling: "balanced" });
-  for (let window = 0; window < 6; window += 1) {
-    decision = Runner.runnerRenderQualityDecision(decision.quality, "high", decision.upgradeWindows, decision.ceiling);
-  }
-  assert.deepEqual(decision, { quality: "balanced", upgradeWindows: 0, ceiling: "balanced" }, "a degraded run cannot oscillate back into the tier that missed its budget");
-});
-
-test("display interpolation smooths continuous values without changing simulation truth", () => {
-  const previous = Runner.createRunnerState(1);
-  const current = Runner.stepRunner(previous, { laneDelta: 1, toolPressed: true }, Runner.RUNNER_FIXED_STEP_MS);
-  const currentSnapshot = structuredClone(current);
-  const halfway = Runner.runnerInterpolatedFrame(previous, current, 0.5);
-  assert.ok(halfway.worldX > previous.worldX && halfway.worldX < current.worldX);
-  assert.ok(halfway.y > previous.y && halfway.y < current.y);
-  assert.equal(halfway.worldX, previous.worldX + (current.worldX - previous.worldX) * 0.5);
-  assert.equal(halfway.failed, current.failed);
-  assert.equal(halfway.targetLane, current.targetLane);
-  assert.deepEqual(current, currentSnapshot, "render projection cannot mutate the fixed-step snapshot");
-  const clampedStart = Runner.runnerInterpolatedFrame(previous, current, -1);
-  assert.equal(clampedStart.worldX, previous.worldX);
-  assert.equal(clampedStart.y, previous.y);
-  assert.equal(clampedStart.targetLane, current.targetLane, "semantic state always comes from the current fixed step");
-  assert.deepEqual(Runner.runnerInterpolatedFrame(previous, current, 2), current);
-
-  const failed = { ...current, failed: true, failureReason: "corridor" };
-  assert.equal(Runner.runnerInterpolatedFrame(current, failed, 0.5), failed, "failure feedback is immediate, not blended");
-
-  const first = { id: "shot-a", x: 10, y: 20, velocityX: 1, velocityY: 0, ageMs: 10, ttlMs: 100, radius: 4, tool: "bargain-burst", pierce: false };
-  const second = { ...first, id: "shot-b", x: 50 };
-  const shifted = { ...second, x: 70, ageMs: 20 };
-  const beforeRemoval = { ...previous, projectiles: [first, second] };
-  const afterRemoval = { ...current, projectiles: [shifted] };
-  assert.equal(Runner.runnerInterpolatedFrame(beforeRemoval, afterRemoval, 0.5).projectiles[0].x, 60, "projectiles interpolate by stable identity after a sibling is removed");
-});
-
-test("all lead variants share lane lean and stable pose blends", () => {
-  assert.deepEqual(Runner.RUNNER_ACTS.map((act) => act.lead), ["son", "mother", "duo", "duo", "duo"]);
-  const start = Runner.createRunnerState(0);
-  const movingUp = Runner.stepRunner(start, { laneDelta: -1 }, Runner.RUNNER_FIXED_STEP_MS);
-  const movingDown = Runner.stepRunner(start, { laneDelta: 1 }, Runner.RUNNER_FIXED_STEP_MS);
-  assert.ok(Runner.runnerLanePitch(movingUp) < 0);
-  assert.ok(Runner.runnerLanePitch(movingDown) > 0);
-  assert.equal(Runner.runnerLanePitch({ ...start, failed: true }), 0.09);
-  const movingBlend = Runner.runnerAuthoredPoseBlend({ ...movingUp, elapsedMs: 80 });
-  assert.equal(movingBlend.from, 0);
-  assert.ok(movingBlend.mix > 0 && movingBlend.mix <= 0.38);
-  const failedBlend = Runner.runnerAuthoredPoseBlend({ ...start, failed: true, impactMs: 420 });
-  assert.equal(failedBlend.mix, 0);
-});
-
-test("duo riders share one compact formation around the collision hull", () => {
-  const duo = Runner.runnerLeadFormation("duo");
-  assert.deepEqual(duo.map(({ role }) => role), ["mother", "son"]);
-  assert.ok(Math.max(...duo.map(({ offsetX }) => offsetX)) - Math.min(...duo.map(({ offsetX }) => offsetX)) <= 20);
-  assert.ok(duo.every(({ offsetY }) => offsetY >= 0 && offsetY <= 6));
-  assert.deepEqual(Runner.runnerLeadFormation("mother"), [{ role: "mother", offsetX: 0, offsetY: 0, scale: 1.05 }]);
-});
-
-test("five harmless Act tools retain distinct deterministic grammars and hard caps", () => {
-  const signatures = Runner.RUNNER_ACTS.map((act, actIndex) => {
-    const fired = Runner.stepRunner(Runner.createRunnerState(actIndex), { toolPressed: true }, 0);
-    assert.ok(fired.projectiles.length > 0 && fired.projectiles.length <= Runner.RUNNER_PROJECTILE_CAP);
-    assert.ok(fired.projectiles.every((shot) => shot.tool === act.tool));
-    assert.equal(new Set(fired.projectiles.map((shot) => shot.id)).size, fired.projectiles.length, "a real multi-shot launch assigns stable unique identities");
-    return fired.projectiles.map((shot) => [shot.velocityX, shot.velocityY, shot.radius, shot.pierce]);
-  });
-  assert.equal(new Set(signatures.map((signature) => JSON.stringify(signature))).size, 5);
-
-  let refired = Runner.stepRunner(Runner.createRunnerState(1), { toolPressed: true }, 0);
-  const firstIds = refired.projectiles.map((shot) => shot.id);
-  for (let frame = 0; frame < 17; frame += 1) refired = Runner.stepRunner(refired, {}, Runner.RUNNER_FIXED_STEP_MS);
-  refired = Runner.stepRunner(refired, { toolPressed: true }, 0);
-  const allIds = refired.projectiles.map((shot) => shot.id);
-  assert.ok(allIds.length > firstIds.length);
-  assert.equal(new Set(allIds).size, allIds.length, "refiring never reuses a live projectile identity");
-});
-
-test("pause freezes the engine and a fresh Act has no failure or buffered move", () => {
-  const paused = { ...Runner.createRunnerState(2), paused: true, pendingLaneDelta: -1 };
-  assert.deepEqual(Runner.stepRunner(paused, { laneDelta: 1, toolPressed: true }, 1_000), paused);
-  const fresh = Runner.createRunnerState(2);
-  assert.equal(fresh.failed, false);
-  assert.equal(fresh.failureReason, null);
-  assert.equal(fresh.failedObstacleId, null);
-  assert.equal(fresh.pendingLaneDelta, null);
-});
-
-test("authored and shipped engine copy avoids comparisons and obsolete controls", () => {
-  const shippedCopy = JSON.stringify(Runner.RUNNER_ACTS).toLowerCase();
-  assert.doesNotMatch(shippedCopy, /contra|subway surfers|flappy|chrome dino/);
-  assert.doesNotMatch(shippedCopy, /\bpulse\b|\bglide\b|\bthrust\b|\bgravity\b|\bceiling\b|\bflight\b|\baerial\b|rise and fall/);
-  assert.doesNotMatch(shippedCopy, /\bleaderboard\b|\bhigh score\b|\bbest score\b|\bkill\b|\benemy\b|\bgun\b|\bbullet\b/);
-});
-
-test("scenery is reused between frames and releases old backing stores on Act, quality, or size changes", () => {
-  const allocated = [];
-  let allocationsDenied = false;
-  const fakeContext = (canvas) => new Proxy({ canvas }, {
-    get(target, key) {
-      if (key in target) return target[key];
-      if (key === "createLinearGradient" || key === "createRadialGradient") return () => ({ addColorStop() {} });
-      if (key === "measureText") return () => ({ width: 12 });
-      return () => {};
-    },
-  });
-  const ownerDocument = {
-    createElement() {
-      const canvas = { width: 0, height: 0, getContext: () => allocationsDenied ? null : fakeContext(canvas) };
-      allocated.push(canvas);
-      return canvas;
-    },
-  };
-  const canvas = { width: 1920, height: 864, ownerDocument };
-  const context = fakeContext(canvas);
-  const palette = Object.fromEntries(["paper", "paper2", "paper3", "rule", "neutral", "muted", "ink", "inkSoft", "accent", "accentSoft", "ruby", "sapphire", "jade"].map(key => [key, "#b99b6b"]));
-  Object.assign(palette, { fontDisplay: "serif", fontBody: "sans-serif", fontMono: "monospace" });
-  const state = Runner.createRunnerState(0);
-  const original = structuredClone(state);
-  Runner.drawRunnerFrame(context, state, palette);
-  assert.equal(allocated.length, 4);
-  assert.ok(allocated.reduce((bytes, surface) => bytes + surface.width * surface.height * 4, 0) < 25 * 1024 * 1024, "the four high-DPI surfaces stay below 25 MiB");
-  for (let frame = 0; frame < 120; frame++) {
-    Runner.drawRunnerFrame(context, { ...state, worldX: frame * 20 }, palette);
-  }
-  assert.equal(allocated.length, 4, "camera travel, including strip wrapping, allocates no new surfaces");
-  assert.deepEqual(state, original, "rendering cannot mutate simulation state");
-  Runner.drawRunnerFrame(context, Runner.createRunnerState(1), palette);
-  assert.ok(allocated.slice(0, 4).every(surface => surface.width === 0 && surface.height === 0));
-  assert.equal(allocated.length, 8);
-  Runner.drawRunnerFrame(context, Runner.createRunnerState(1), palette, true, null, "quiet");
-  assert.ok(allocated.slice(4, 8).every(surface => surface.width === 0));
-  assert.equal(allocated.length, 12);
-  canvas.width = 960;
-  Runner.drawRunnerFrame(context, Runner.createRunnerState(1), palette, true, null, "quiet");
-  assert.ok(allocated.slice(8, 12).every(surface => surface.width === 0));
-  assert.equal(allocated.length, 16);
-  allocationsDenied = true;
-  assert.doesNotThrow(() => Runner.drawRunnerFrame(context, Runner.createRunnerState(2), palette), "direct painting remains available when an offscreen context is unavailable");
-  const deniedCount = allocated.length;
-  Runner.drawRunnerFrame(context, Runner.createRunnerState(2), palette);
-  assert.equal(allocated.length, deniedCount, "allocation failure does not trigger repeated allocation attempts");
+test("spring pads bounce and grounded crates stop travel without erasing progress", () => {
+  let s = { ...G.createJourney(), x: 745, y: 583 };
+  s = G.stepJourney(s, { x: 0, y: 0 }, 16);
+  assert.ok(s.vz > 300);
+  s = { ...G.createJourney(), x: 1173, y: 682, bag: ["sketch"] };
+  s = G.stepJourney(s, { x: 1, y: 0 }, 50);
+  assert.ok(s.bumpMs > 0);
+  assert.deepEqual(s.bag, ["sketch"]);
 });

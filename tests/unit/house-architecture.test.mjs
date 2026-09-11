@@ -13,9 +13,9 @@ test("the House shell composes Sector Sprint without owning its engine lifecycle
   assert.doesNotMatch(shell, /\b(?:stepRunner|drawRunnerFrame|createRunnerState|requestAnimationFrame\(runRunnerFrame)/);
   assert.match(shell, /createSectorSprintTable/);
   assert.match(table, /type SectorSprintTerminal[\s\S]*"completed"[\s\S]*"boundary-closed"[\s\S]*"abandoned"/);
-  assert.match(table, /if \(elapsedMs >= RUNNER_SESSION_SECONDS \* 1_000\) \{ emitTerminal\("boundary-closed"\); return; \}/);
+  assert.match(table, /elapsedMs\s*>=\s*JOURNEY_BOUNDARY_MS/);
   assert.match(table, /generation/);
-  assert.match(table, /if \(!session \|\| terminalOutcome\) return/);
+  assert.match(table, /if\s*\(!session\s*\|\|\s*terminalOutcome\)\s*return/);
   assert.doesNotMatch(shell, /sectorTable\.(?:queueAction|pointerDown|pointerEnd|setPaused|chooseNarrated|retry|abandon|suspend|resume|orientationChanged|draw|audioGesture|canRetry|isPaused)/);
   assert.match(table, /document\.addEventListener\("pointerdown"/);
   assert.match(table, /document\.addEventListener\("visibilitychange"/);

@@ -17,6 +17,11 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "Nindova",
+      logo: {
+        light: "./public/brand/nindova-logo-horizontal-light.svg",
+        dark: "./public/brand/nindova-logo-horizontal.svg",
+        replacesTitle: true,
+      },
       description: "Product and implementation notes for Nindova House, its Grand Salon games, and the bounded Night Room.",
       customCss: ["./src/styles/global.css"],
       social: [

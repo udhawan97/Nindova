@@ -1,6 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.6.0 — 2026-09-11
+
+- Rebuild Sector Sprint as a connected Chandigarh playground with deliberate walking, jump/dash courses, spring pads, moving obstacles, three traversal power-ups, a temporary errand bag, and a homecoming with Harjit.
+- Add original city and directional character art, compact controls, an optional map, guided help and a complete narrated route. Preserve the separate Night Room and local-only state; use a ten-minute foreground boundary with honest incomplete closure.
+
+- Replaced the House’s text-letter emblem with the canonical Nindova lattice and drawn wordmark used in the README; synchronized House dialogs, footer, Night Room, documentation, and Apple touch icons.
+- Gave each category its own illustrated entrance and tightened header, table-card, and footer layouts without adding animation loops to those surfaces.
 
 ## 0.5.0 — 2026-09-10
 

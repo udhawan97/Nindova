@@ -99,15 +99,10 @@ try {
   await housePage.locator('[data-runner-route="action"]').click();
   await housePage.locator("#runnerCanvas").waitFor({ state: "visible" });
   await housePage.waitForFunction(() => {
-    const canvas = document.querySelector("#runnerCanvas");
-    return Number(canvas?.dataset.renderSequence ?? 0) > 8
-      && canvas?.dataset.nextMaterial === "sandstone"
-      && (window.__house.runner?.elapsedMs ?? 0) > 4_100;
+    const canvas = document.querySelector('#runnerCanvas');
+    return canvas?.dataset.art === 'illustrated' && canvas?.dataset.character === 'atlas';
   });
-  await housePage.locator(".runner-stage-frame").screenshot({
-    path: resolve("apps/site/public/media/sector-sprint.png"),
-    animations: "disabled",
-  });
+  await housePage.locator('.journey-shell').screenshot({path:resolve('apps/site/public/media/sector-sprint.png'),animations:'disabled'});
   await houseContext.close();
 } finally {
   await browser?.close();

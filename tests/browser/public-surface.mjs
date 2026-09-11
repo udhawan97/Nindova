@@ -66,7 +66,7 @@ try {
     const sectorGuideResponse = await page.goto(`${previewRoot}docs/sector-sprint/`);
     assert.equal(sectorGuideResponse?.ok(), true);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), viewport.width);
-    const guidePlayLink = page.getByRole("link", { name: "Open Sector Sprint" });
+    const guidePlayLink = page.getByRole("link", { name: "Step into Chandigarh" });
     assert.deepEqual(await guidePlayLink.evaluate((link) => {
       const url = new URL(link.href);
       return { pathname: url.pathname, hash: url.hash };

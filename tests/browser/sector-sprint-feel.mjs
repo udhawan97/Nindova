@@ -1,247 +1,292 @@
 import assert from "node:assert/strict";
-import { cp, mkdtemp, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { mkdir, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import { createBrowserEvidenceHarness } from "./evidence-harness.mjs";
-import { collectBudgetFailures, summarizeTimeline } from "../helpers/sector-sprint-diagnostics.mjs";
-
-const root = resolve(import.meta.dirname, "../..");
-const port = 4207;
-const previewRoot = await mkdtemp(join(tmpdir(), "nindova-sector-feel-"));
-await cp(resolve(root, "dist"), previewRoot, { recursive: true });
-
+const root = resolve(import.meta.dirname, "../.."),
+  output = resolve(root, "artifacts/chandigarh-redesign");
+await mkdir(output, { recursive: true });
 const harness = await createBrowserEvidenceHarness({
   root,
-  previewRoot,
-  port,
+  previewRoot: resolve(root, "dist"),
+  port: 4199,
   launchOptions: { headless: true },
-  cleanup: [() => rm(previewRoot, { recursive: true, force: true })],
 });
-
-const percentile = (values, amount) => {
-  const ordered = [...values].sort((left, right) => left - right);
-  return ordered[Math.max(0, Math.ceil(ordered.length * amount) - 1)];
-};
-
-const { errors } = harness;
-
-async function startTimeline(cdp) {
-  const completed = new Promise((resolveComplete) => cdp.once("Tracing.tracingComplete", resolveComplete));
-  await cdp.send("Tracing.start", {
-    categories: [
-      "blink.resource",
-      "devtools.timeline",
-      "disabled-by-default-blink.image_decoding",
-      "disabled-by-default-devtools.timeline",
-      "disabled-by-default-devtools.timeline.frame",
-    ].join(","),
-    transferMode: "ReturnAsStream",
+const external = [];
+const results = [];
+async function open(viewport, { narrated = false, clock = false } = {}) {
+  const context = await harness.context({
+    viewport,
+    reducedMotion: narrated ? "reduce" : "no-preference",
   });
-  return async () => {
-    await cdp.send("Tracing.end");
-    const { stream } = await completed;
-    let trace = "";
-    for (;;) {
-      const chunk = await cdp.send("IO.read", { handle: stream, size: 1_000_000 });
-      trace += chunk.data;
-      if (chunk.eof) break;
-    }
-    await cdp.send("IO.close", { handle: stream });
-    return summarizeTimeline(JSON.parse(trace).traceEvents);
-  };
-}
-
-async function openRunner(viewport, cpuRate = 1, { timeline = false } = {}) {
-  const context = await harness.context({ viewport }, [() => localStorage.setItem("nindova:house:adult-audience:v1", "acknowledged")]);
-  const { page } = await harness.page(context, { errorPrefix: "Sector Sprint: " });
-  const cdp = await context.newCDPSession(page);
-  if (cpuRate > 1) {
-    await cdp.send("Emulation.setCPUThrottlingRate", { rate: cpuRate });
-  }
-  await page.goto(`http://127.0.0.1:${port}/house/`, { waitUntil: "networkidle" });
-  const stopTimeline = timeline ? await startTimeline(cdp) : null;
-  await page.evaluate(() => window.__house.start("sector-sprint"));
-  await page.click('[data-runner-route="action"]');
-  await page.waitForSelector("#runnerCanvas");
-  await startAutopilot(page);
-  await page.waitForFunction(() => Number(document.querySelector("#runnerCanvas")?.dataset.renderSequence ?? 0) > 1);
-  return { context, page, stopTimeline };
-}
-
-async function measureAction(page, selector, allowedActions) {
-  return page.evaluate(({ selector: actionSelector, allowed }) => new Promise((resolveMeasure, rejectMeasure) => {
-    const button = document.querySelector(actionSelector);
-    const canvas = document.querySelector("#runnerCanvas");
-    if (!(button instanceof HTMLElement) || !(canvas instanceof HTMLCanvasElement)) {
-      rejectMeasure(new Error(`Missing action surface: ${actionSelector}`));
-      return;
-    }
-    const beforeSequence = Number(canvas.dataset.renderSequence ?? 0);
-    let inputAt = 0;
-    const timeout = setTimeout(() => {
-      observer.disconnect();
-      rejectMeasure(new Error(`No visibly changed action frame for ${actionSelector}`));
-    }, 1_000);
-    const observer = new MutationObserver(() => {
-      const sequence = Number(canvas.dataset.renderSequence ?? 0);
-      if (inputAt > 0 && sequence > beforeSequence && allowed.includes(canvas.dataset.lastAction ?? "")) {
-        clearTimeout(timeout);
-        observer.disconnect();
-        resolveMeasure(performance.now() - inputAt);
-      }
-    });
-    observer.observe(canvas, { attributes: true, attributeFilter: ["data-render-sequence", "data-last-action"] });
-    button.addEventListener("pointerdown", () => { inputAt = performance.now(); }, { once: true });
-    button.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, pointerId: 41, pointerType: "touch", isPrimary: true }));
-    setTimeout(() => button.dispatchEvent(new PointerEvent("pointerup", { bubbles: true, pointerId: 41, pointerType: "touch", isPrimary: true })), 34);
-  }), { selector, allowed: allowedActions });
-}
-
-async function startAutopilot(page) {
-  await page.evaluate(() => {
-    let inputAt = 0;
-    let beforeSequence = 0;
-    globalThis.__runnerAutopilotLatencies = [];
-    const canvas = document.querySelector("#runnerCanvas");
-    const observer = new MutationObserver(() => {
-      const sequence = Number(canvas?.dataset.renderSequence ?? 0);
-      if (inputAt > 0 && sequence > beforeSequence) {
-        globalThis.__runnerAutopilotLatencies.push(performance.now() - inputAt);
-        inputAt = 0;
-      }
-    });
-    if (canvas) observer.observe(canvas, { attributes: true, attributeFilter: ["data-render-sequence"] });
-    globalThis.__stopRunnerAutopilot = () => {
-      cancelAnimationFrame(globalThis.__runnerAutopilotTimer);
-      observer.disconnect();
-    };
-    const control = () => {
-      const state = window.__house.runner;
-      const canvas = document.querySelector("#runnerCanvas");
-      if (!state || state.failed || !(canvas instanceof HTMLCanvasElement)) {
-        return;
-      }
-      if (!state.finished && !window.__house.active?.resolving) {
-        const safeLane = Number(canvas.dataset.nextSafeLane ?? state.targetLane);
-        if (safeLane !== state.targetLane) {
-          const key = safeLane < state.targetLane ? "ArrowUp" : "ArrowDown";
-          if (inputAt === 0) {
-            beforeSequence = Number(canvas.dataset.renderSequence ?? 0);
-            inputAt = performance.now();
-          }
-          document.body.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true, repeat: false }));
-          document.body.dispatchEvent(new KeyboardEvent("keyup", { key, bubbles: true }));
-        }
-      }
-      globalThis.__runnerAutopilotTimer = requestAnimationFrame(control);
-    };
-    globalThis.__runnerAutopilotTimer = requestAnimationFrame(control);
+  await context.addInitScript(() =>
+    localStorage.setItem("nindova:house:adult-audience:v1", "acknowledged"),
+  );
+  const { page } = await harness.page(context);
+  page.on("request", (r) => {
+    if (
+      !r.url().startsWith("http://127.0.0.1:4199") &&
+      !r.url().startsWith("data:")
+    )
+      external.push(r.url());
   });
-}
-
-async function sampleFrames(page, count) {
-  return page.evaluate((sampleCount) => new Promise((resolveFrames) => {
-    const intervals = [];
-    let previous = 0;
-    let warmup = 20;
-    const frame = (timestamp) => {
-      if (previous && warmup <= 0) intervals.push(timestamp - previous);
-      else if (warmup > 0) warmup -= 1;
-      previous = timestamp;
-      if (intervals.length >= sampleCount) resolveFrames(intervals);
-      else requestAnimationFrame(frame);
-    };
-    requestAnimationFrame(frame);
-  }), count);
-}
-
-async function traceRunner(viewport, cpuRate = 1) {
-  const runner = await openRunner(viewport, cpuRate, { timeline: true });
-  try {
-    await runner.page.waitForFunction(() => (
-      (globalThis.__runnerAutopilotLatencies?.length ?? 0) >= 3
-      && window.__house.runner?.failed === false
-    ));
-    await sampleFrames(runner.page, 60);
-    return await runner.stopTimeline();
-  } finally {
-    await runner.context.close();
+  if (clock) await page.clock.install();
+  await page.goto("http://127.0.0.1:4199/house/#game/sector-sprint");
+  await page.waitForFunction(() => Boolean(window.__house));
+  if (!narrated) await page.click('[data-runner-route="action"]');
+  if (narrated) {
+    await page.click('[data-encounter-choice="0"]');
+    await page.click("[data-dialog-close]");
   }
+  return { context, page };
 }
-
+async function talk(page, id) {
+  await page.click(`[data-visit="${id}"]`);
+  await page.click('[data-encounter-choice="1"]');
+  await page.click("[data-dialog-close]");
+}
 try {
-  const throttled = await openRunner({ width: 375, height: 812 }, 4);
-  let actionSamples;
-  let throttledFrames;
-  let throttledQuality;
-  let throttledRuntime;
-  try {
-    await throttled.page.waitForFunction(() => (
-      (globalThis.__runnerAutopilotLatencies?.length ?? 0) >= 3
-      && window.__house.runner?.failed === false
-    ));
-    actionSamples = { laneMove: await throttled.page.evaluate(() => globalThis.__runnerAutopilotLatencies.slice(0, 3)) };
-    throttledFrames = await sampleFrames(throttled.page, 120);
-    throttledQuality = await throttled.page.locator("#runnerCanvas").getAttribute("data-quality");
-    throttledRuntime = await throttled.page.evaluate(() => ({
-      userAgent: navigator.userAgent,
-      platform: navigator.userAgentData?.platform ?? navigator.platform,
-      hardwareConcurrency: navigator.hardwareConcurrency,
-      deviceMemoryGiB: navigator.deviceMemory ?? null,
-    }));
-  } finally {
-    await throttled.context.close();
-  }
-  const actionMax = Object.fromEntries(Object.entries(actionSamples).map(([name, values]) => [name, Math.max(...values)]));
-
-  const desktop = await openRunner({ width: 1440, height: 900 });
-  let desktopFrames;
-  let desktopSurface;
-  let desktopRuntime;
-  try {
-    await desktop.page.waitForFunction(() => (window.__house.runner?.worldX ?? 0) > 700 && window.__house.runner?.failed === false);
-    desktopFrames = await sampleFrames(desktop.page, 120);
-    desktopSurface = await desktop.page.locator("#runnerCanvas").evaluate((canvas) => {
-      const bounds = canvas.getBoundingClientRect();
-      return {
-        quality: canvas.dataset.quality,
-        cssWidth: Math.round(bounds.width),
-        cssHeight: Math.round(bounds.height),
-        pixelWidth: canvas.width,
-        pixelHeight: canvas.height,
-      };
+  for (const viewport of [
+    { width: 1440, height: 900 },
+    { width: 375, height: 812 },
+    { width: 320, height: 568 },
+  ]) {
+    const { context, page } = await open(viewport);
+    await page.waitForFunction(
+      () =>
+        document.querySelector("#runnerCanvas")?.dataset.art ===
+          "illustrated" &&
+        document.querySelector("#runnerCanvas")?.dataset.character === "atlas",
+    );
+    assert.equal(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+      viewport.width,
+    );
+    const idle = await page.evaluate(() => window.__house.runner);
+    await page.waitForTimeout(250);
+    assert.equal(await page.evaluate(() => window.__house.runner.x), idle.x);
+    assert.equal(
+      await page.evaluate(() => window.__house.runner.walking),
+      false,
+    );
+    await page.locator("#runnerCanvas").focus();
+    await page.keyboard.down("ArrowRight");
+    await page.waitForTimeout(200);
+    await page.keyboard.up("ArrowRight");
+    await page.waitForTimeout(50);
+    const stopped = await page.evaluate(() => window.__house.runner);
+    assert.ok(stopped.x > idle.x);
+    assert.equal(stopped.walking, false);
+    await page.waitForTimeout(150);
+    assert.equal(await page.evaluate(() => window.__house.runner.x), stopped.x);
+    await page.screenshot({
+      path: resolve(output, `world-${viewport.width}.png`),
+      fullPage: true,
     });
-    desktopRuntime = await desktop.page.evaluate(() => ({
-      userAgent: navigator.userAgent,
-      platform: navigator.userAgentData?.platform ?? navigator.platform,
-      hardwareConcurrency: navigator.hardwareConcurrency,
-      deviceMemoryGiB: navigator.deviceMemory ?? null,
+    const box = await page.locator('[data-walk="ArrowLeft"]').boundingBox();
+    assert.ok(box.width >= 44 && box.height >= 44);
+    await page.locator('[data-walk="ArrowLeft"]').dispatchEvent("pointerdown", {
+      pointerId: 13,
+      pointerType: "touch",
+      bubbles: true,
+    });
+    await page.waitForTimeout(150);
+    await page
+      .locator('[data-walk="ArrowLeft"]')
+      .dispatchEvent("pointercancel", {
+        pointerId: 13,
+        pointerType: "touch",
+        bubbles: true,
+      });
+    await page.waitForTimeout(50);
+    assert.equal(
+      await page.evaluate(() => window.__house.runner.walking),
+      false,
+    );
+    // Rebuilding the canvas for overlays must preserve the active power label.
+    const powerLabel = await page.locator("[data-power-name]").innerText();
+    await page.click("[data-map]");
+    assert.equal(await page.locator("[data-power-name]").innerText(), powerLabel);
+    await page.click("[data-close-panel]");
+    await page.click(".journey-controls [data-runner-pause]");
+    assert.equal(await page.locator("[data-power-name]").innerText(), powerLabel);
+    await page.click(".journey-controls [data-runner-pause]");
+    const cdp = await context.newCDPSession(page);
+    await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
+    await page.locator("#runnerCanvas").focus();
+    const startPosition = await page.evaluate(() => ({
+      x: window.__house.runner.x,
+      y: window.__house.runner.y,
     }));
-  } finally {
-    await desktop.context.close();
+    await page.keyboard.press("Shift+Tab");
+    await page.waitForTimeout(100);
+    assert.deepEqual(
+      await page.evaluate(() => ({
+        x: window.__house.runner.x,
+        y: window.__house.runner.y,
+      })),
+      startPosition,
+    );
+    assert.equal(await page.evaluate(() => window.__house.runner.dashMs), 0);
+    const frameSamples = [];
+    const sampleP95 = [];
+    for (let run = 0; run < 3; run++) {
+      await page.locator("#runnerCanvas").focus();
+      const direction = run % 2 === 0 ? "ArrowRight" : "ArrowLeft";
+      await page.keyboard.down(direction);
+      await page.keyboard.press("Space");
+      await page.keyboard.press("k");
+      const intervals = await page.evaluate(
+        () => new Promise((resolve) => {
+          const times = [];
+          let last = 0;
+          const sample = (t) => {
+            if (last) times.push(t - last);
+            last = t;
+            if (times.length < 120) requestAnimationFrame(sample);
+            else resolve(times);
+          };
+          requestAnimationFrame(sample);
+        }),
+      );
+      await page.keyboard.up(direction);
+      frameSamples.push(intervals);
+      const sorted = [...intervals].sort((a, b) => a - b);
+      sampleP95.push(sorted[Math.ceil(sorted.length * 0.95) - 1]);
+    }
+    assert.equal(await page.locator("#runnerCanvas").getAttribute("data-character"), "atlas");
+    const p95 = [...sampleP95].sort((a, b) => a - b)[1];
+    results.push({
+      viewport,
+      p95,
+      sampleP95,
+      worstSampleP95: Math.max(...sampleP95),
+      frameSamples,
+      activity: "three active movement/jump/dash samples, character atlas loaded",
+      quality: await page.locator("#runnerCanvas").getAttribute("data-quality"),
+    });
+    await writeFile(resolve(output, "performance.json"), JSON.stringify(results, null, 2));
+    assert.ok(p95 < 35, `4x CPU median sampled p95 ${p95}ms at ${viewport.width}; samples ${sampleP95.join(", ")}`);
+    await cdp.send("Emulation.setCPUThrottlingRate", { rate: 1 });
+    if (viewport.width === 1440) {
+      // Play every course with real movement and jump input; no state teleports or item injection.
+      for (const id of ["craft", "roses", "market"]) {
+        for (let ribbon = 0; ribbon < 3; ribbon++) {
+          await page.click("[data-map]");
+          await page.click(`[data-visit="${id}"]`);
+          await page.waitForFunction(
+            () => window.__house.runner?.route.length === 0,
+            null,
+            { timeout: 35000 },
+          );
+          await page.locator("#runnerCanvas").focus();
+          await page.keyboard.press("Space");
+          await page.waitForFunction(
+            (expected) => window.__house.runner?.marks.length >= expected,
+            ribbon + 1 + (id === "craft" ? 0 : id === "roses" ? 3 : 6),
+          );
+          await page.waitForFunction(() => window.__house.runner?.z === 0);
+        }
+        await page.screenshot({
+          path: resolve(output, `course-${id}.png`),
+          fullPage: true,
+        });
+      }
+      for (const id of ["lake", "home"]) {
+        await page.click("[data-map]");
+        await page.click(`[data-visit="${id}"]`);
+        await page.waitForFunction(
+          () => window.__house.runner?.route.length === 0,
+          null,
+          { timeout: 35000 },
+        );
+        await page.click("[data-interact]");
+        await page.click('[data-encounter-choice="0"]');
+        await page.screenshot({
+          path: resolve(output, `encounter-${id}.png`),
+          fullPage: true,
+        });
+        await page.click("[data-dialog-close]");
+      }
+      await page.waitForSelector(".curtain-call");
+      const result = await page.evaluate(
+        () => window.__house.memory.latestByGame["sector-sprint"],
+      );
+      assert.equal(result.gameVersion, "2.0.0");
+      assert.equal(result.completionFacts.finalChapter, "Ghar wapsi");
+      assert.doesNotMatch(
+        await page.evaluate(() => localStorage.getItem("nindova:house:v2")),
+        /\"(?:bag|visited|x|y|elapsedMs|choices)\"/,
+      );
+    }
+    await context.close();
   }
-
-  const phoneFrameP95Ms = percentile(throttledFrames, 0.95);
-  const desktopFrameP95Ms = percentile(desktopFrames, 0.95);
-  const throttledTimeline = await traceRunner({ width: 375, height: 812 }, 4);
-  const desktopTimeline = await traceRunner({ width: 1440, height: 900 });
-  const diagnostics = {
-    profiles: {
-      phone: { engine: "Chromium", viewport: "375x812", cpuThrottleRate: 4, laneMoveSamples: 3, frameSamples: 120 },
-      desktop: { engine: "Chromium", viewport: "1440x900", cpuThrottleRate: 1, frameSamples: 120 },
-    },
-    node: process.version,
-    actionMaxMs: Object.fromEntries(Object.entries(actionMax).map(([name, value]) => [name, Number(value.toFixed(2))])),
-    throttledFrameP95Ms: Number(phoneFrameP95Ms.toFixed(2)),
-    desktopFrameP95Ms: Number(desktopFrameP95Ms.toFixed(2)),
-    desktopSurface,
-    runtime: { phone: throttledRuntime, desktop: desktopRuntime },
-    timeline: { phone: throttledTimeline, desktop: desktopTimeline },
-  };
-  const budgetFailures = collectBudgetFailures({ actionMaxMs: actionMax, phoneFrameP95Ms, phoneQuality: throttledQuality, desktopFrameP95Ms });
-  console.log(JSON.stringify({ ...diagnostics, budgetFailures }));
-  assert.deepEqual(errors, []);
-  assert.deepEqual(budgetFailures, [], budgetFailures.join("\n"));
+  // Same encounters and choices without motion; Pause holds time without disabling reading.
+  const story = await open(
+    { width: 375, height: 812 },
+    { narrated: true, clock: true },
+  );
+  await story.page.click("[data-runner-pause]");
+  await story.page.clock.fastForward(700000);
+  for (const id of ["roses", "market", "craft", "lake", "home"])
+    await talk(story.page, id);
+  await story.page.waitForSelector(".curtain-call");
+  assert.equal(await story.page.locator("#runnerCanvas").count(), 0);
+  await story.context.close();
+  const capped = await open(
+    { width: 375, height: 812 },
+    { narrated: true, clock: true },
+  );
+  await capped.page.clock.fastForward(600001);
+  await capped.page.waitForSelector(".curtain-call");
+  assert.equal(
+    await capped.page.evaluate(
+      () => window.__house.memory.latestByGame["sector-sprint"],
+    ),
+    undefined,
+  );
+  await capped.context.close();
+  const early = await open({ width: 375, height: 812 }, { narrated: true });
+  await talk(early.page, "home");
+  assert.equal(
+    await early.page.evaluate(
+      () => window.__house.memory.latestByGame["sector-sprint"],
+    ),
+    undefined,
+  );
+  await early.context.close();
+  const reload = await open({ width: 375, height: 812 });
+  await reload.page.reload();
+  await reload.page.waitForSelector(".runner-restore-banner");
+  assert.equal(await reload.page.evaluate(() => window.__house.active), null);
+  await reload.context.close();
+  const blur = await open({ width: 375, height: 812 });
+  await blur.page.click("[data-map]");
+  await blur.page.click('[data-visit="market"]');
+  await blur.page.waitForFunction(() => window.__house.runner.walking);
+  await blur.page.evaluate(() => window.dispatchEvent(new Event("blur")));
+  const before = await blur.page.evaluate(() => window.__house.runner);
+  await blur.page.waitForTimeout(150);
+  assert.equal(
+    await blur.page.evaluate(() => window.__house.runner.x),
+    before.x,
+  );
+  await blur.page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await blur.page.waitForTimeout(150);
+  assert.equal(
+    await blur.page.evaluate(() => window.__house.runner.walking),
+    false,
+  );
+  await blur.context.close();
+  assert.deepEqual(external, []);
+  assert.deepEqual(harness.errors, []);
+  await writeFile(
+    resolve(output, "performance.json"),
+    JSON.stringify(results, null, 2),
+  );
+  console.log(
+    "Chandigarh exploration, all destinations, idle/release/cancel/blur, completion, early home, cap, narrated equivalence, phone layouts and 4x CPU frames passed.",
+    JSON.stringify(results.map(({ frameSamples, ...result }) => result)),
+  );
 } finally {
   await harness.close();
 }

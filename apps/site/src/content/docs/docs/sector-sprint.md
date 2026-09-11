@@ -1,29 +1,28 @@
 ---
 title: Sector Sprint
-description: Play the complete five-Act Action or Narrated route without scores, lives, precision dependence, or an endless loop.
+description: Explore an original Chandigarh playground, find power-ups, and take the long way home.
 ---
 
-Sector Sprint is Table V behind the House's **Motion & Route** door. It is one authored Chandigarh journey told across five fixed Acts. [Open Sector Sprint](../../house/#game/sector-sprint), then choose the route that fits.
+Sector Sprint lives behind the House's **Motion & Route** door. [Step into Chandigarh](../../house/#game/sector-sprint) or choose the complete narrated homecoming.
 
-## Action route
+## Play the city
 
-The street advances automatically through three discrete lanes. Read the next marker and use **Move up**, **Move down**, or **Hold lane**. Every safe gate is at most one adjacent move from the previous safe lane; holding a key or repeating it does not chain extra movement.
+- **Move:** WASD or arrows. Release to stop. Tap a path to travel there; Escape stops the route.
+- **Jump:** Space or J, or the Jump button. Your shadow shows where you land.
+- **Dash:** Shift or K, or the Dash button.
+- **Talk:** E or Enter near a neighbor, or the context button.
+- **Find your way:** City map takes you to a course or meeting place. The Bag shows only this afternoon's objects.
 
-The current Action theatre draws illuminated lane bands, denser city windows, curb reflections, perspective rails, and a clearer rider silhouette through the existing quiet, balanced, and high render-quality tiers. These layers are visual only: authored gates, three-lane collision geometry, timing, speed, order, and outcome remain identical across quality tiers.
+Spring juttis give you a higher jump. The monsoon scarf extends your dash. The paper-wing pin lets you float longer. Find them on the paths and experiment with spring pads, crates and moving rollers. A bump loses no progress.
 
-- Touch or click the native **Move up** and **Move down** controls.
-- Use <kbd>↑</kbd>/<kbd>W</kbd> and <kbd>↓</kbd>/<kbd>S</kbd> from the stage.
-- Use the named Act tool button, or <kbd>J</kbd>, <kbd>K</kbd>, or <kbd>X</kbd>, for harmless visual comedy. Tools do not affect completion.
-- **Pause city** freezes route and boundary progress until you resume.
+Jump for the market ribbons, garden petals and courtyard chimes, in whichever order you choose. Finishing a course puts an errand item in your bag. You can also ask its neighbor for guided help. When the three errands are ready, meet Harjit on the Sukhna promenade and walk home together. You can always head home early; an unfinished journey adds nothing to the Gallery.
 
-One contact with a lit architectural face pauses that Action attempt. Retry is offered only while all five Acts can still fit inside the original table boundary; **Continue narrated** remains available without requiring another precision action. There are no lives, health, checkpoints, score, failure history, or persistent inventory.
+## Read the city
 
-## Narrated route
+The narrated route has the same people, objects and homecoming. It needs no timing, precision, sound, motion or visual interpretation. Reduced motion starts here. You can switch to it during exploration without losing completed errands. Pause holds the foreground clock while conversations remain available.
 
-The Narrated route carries the same five Acts and curtain call through three text beats per Act. It has no timed response, precision, sound, animation, or visual-interpretation requirement. Reduced-motion visitors enter this route directly. Pause holds the boundary while the next text beat remains available.
+## A bounded, private afternoon
 
-## Ending and privacy
+The table closes after ten foreground-active minutes. Pause, a hidden tab, window blur and an exit confirmation suspend time and movement. Reload closes the current journey without claiming completion. Only a completed five-encounter journey may replace the latest local Gallery reading. Positions, power-ups, ribbons, choices, bag contents and timing are never stored.
 
-Both routes share one foreground-only 240-second boundary and the same local entertainment provenance. Completing all five Acts may replace Sector Sprint's latest local Gallery reading. Contact, retry, abandoning the table, reloading an unfinished Action route, or reaching the boundary never creates a false completion.
-
-The deterministic engine and browser pilot clear all five Action Acts. That proves the shipped controls can reach the authored curtain call; it does not establish representative human difficulty, enjoyment, or physical-device performance.
+The geography, neighbors and activities are fictional. Familiar Chandigarh settings informed the original artwork, but distances and paths are compressed and are not a navigation guide. No other game's characters or assets are used. The full scene and character art are precached for the first offline walk.

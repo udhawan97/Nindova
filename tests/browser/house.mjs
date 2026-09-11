@@ -17,7 +17,7 @@ const publishedHouseText = (await Promise.all(publishedHouseFiles
   .filter((path) => /\.(?:html|js|css|webmanifest)$/.test(String(path)))
   .map((path) => readFile(resolve(previewRoot, "house", String(path)), "utf8")))).join("\n");
 assert.doesNotMatch(publishedHouseText, /\b(?:Contra|Subway Surfers|Flappy Bird)\b/i, "the shipped game remains an original work");
-assert.doesNotMatch(publishedHouseText, /\b(?:Pulse|Glide|thrust|gravity|flight|aerial)\b|rise and fall/i, "the shipped controls contain no obsolete altitude language");
+assert.doesNotMatch(publishedHouseText, /Hold lane|progressively faster three-lane/i, "the obsolete lane runner is not shipped beside the new game");
 const harness = await createBrowserEvidenceHarness({
   root,
   previewRoot,
@@ -202,32 +202,6 @@ async function enterRunnerAction(page) {
   await page.waitForSelector("#runnerCanvas");
 }
 
-async function captureRunnerCanvas(page, filename) {
-  const dataUrl = await page.locator("#runnerCanvas").evaluate((canvas) => canvas.toDataURL("image/png"));
-  await writeFile(resolve(output, filename), Buffer.from(dataUrl.split(",")[1], "base64"));
-}
-
-async function startRunnerAutopilot(page) {
-  await page.evaluate(() => {
-    const control = () => {
-      const state = window.__house.runner;
-      const canvas = document.querySelector("#runnerCanvas");
-      if (!state || state.failed || state.finished || window.__house.active?.resolving || !(canvas instanceof HTMLCanvasElement)) {
-        globalThis.__houseVisualPilot = requestAnimationFrame(control);
-        return;
-      }
-      const safeLane = Number(canvas.dataset.nextSafeLane ?? state.targetLane);
-      if (safeLane !== state.targetLane) {
-        const key = safeLane < state.targetLane ? "ArrowUp" : "ArrowDown";
-        document.body.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true, repeat: false }));
-        document.body.dispatchEvent(new KeyboardEvent("keyup", { key, bubbles: true }));
-      }
-      globalThis.__houseVisualPilot = requestAnimationFrame(control);
-    };
-    globalThis.__houseVisualPilot = requestAnimationFrame(control);
-  });
-}
-
 async function enterRunnerNarrated(page) {
   await page.evaluate(() => window.__house.start("sector-sprint"));
   const routeChoice = page.locator('[data-runner-route="narrated"]');
@@ -241,23 +215,15 @@ async function enterRunnerNarrated(page) {
 
 async function completeRunnerStory(page) {
   await enterRunnerNarrated(page);
-  await page.click("[data-runner-pause]");
-  assert.equal(await page.locator("[data-runner-pause]").getAttribute("aria-pressed"), "true");
-  assert.equal(await page.locator("[data-story-advance]").isEnabled(), true, "Pause holds boundary time without blocking narrated completion");
-  for (let act = 0; act < 5; act += 1) {
-    assert.equal(await page.evaluate(() => window.__house.active?.storyBeat), 0);
-    for (let beat = 0; beat < 3; beat += 1) {
-      await page.click("[data-story-advance]");
-      if (beat < 2) {
-        await page.waitForFunction((next) => window.__house.active?.storyBeat === next, beat + 1);
-      } else if (act < 4) {
-        await page.waitForFunction((next) => window.__house.active?.chapter === next && window.__house.active?.storyBeat === 0, act + 1);
-        assert.equal(await page.locator("[data-runner-pause]").getAttribute("aria-pressed"), "true", "narrated Pause persists between Acts");
-      } else {
-        await page.waitForSelector(".curtain-call");
-      }
-    }
+  await page.click('[data-encounter-choice="0"]');
+  await page.click('[data-dialog-close]');
+  await page.click('[data-runner-pause]');
+  for (const id of ['market','roses','craft','lake','home']) {
+    await page.click(`[data-visit="${id}"]`);
+    await page.click('[data-encounter-choice="0"]');
+    await page.click('[data-dialog-close]');
   }
+  await page.waitForSelector('.curtain-call');
 }
 
 async function keyboardActivate(page, selector) {
@@ -791,360 +757,7 @@ try {
   await desktopStack.page.screenshot({ path: resolve(output, "stack-architect-1440x900.png"), fullPage: true, animations: "disabled" });
   await desktopStack.context.close();
 
-  const runner = await openHouse({ width: 375, height: 812 }, {}, { manualRaf: true });
-  await runner.page.evaluate(() => window.__house.start("sector-sprint"));
-  assert.equal(await runner.page.evaluate(() => window.__house.active), null, "route choice creates no run before consent");
-  assert.equal(await runner.page.evaluate(() => sessionStorage.getItem("nindova:house:active:v1")), null, "route choice starts no persisted boundary");
-  assert.equal(await runner.page.locator("#runnerCanvas").count(), 0, "route choice mounts no moving Canvas before consent");
-  assert.equal(await runner.page.locator('[data-runner-route="action"]').isVisible(), true);
-  assert.equal(await runner.page.locator('[data-runner-route="narrated"]').isVisible(), true);
-  await runner.page.screenshot({ path: resolve(output, "sector-sprint-prelude-375x812.png"), fullPage: true });
-  await runner.page.click('[data-runner-route="action"]');
-  await runner.page.waitForSelector("#runnerCanvas");
-  await runner.page.waitForFunction(
-    () => document.querySelector("#runnerCanvas")?.dataset.art === "illustrated",
-    null,
-    { polling: 50 },
-  ).catch(async (cause) => {
-    const evidence = await runner.page.evaluate(() => ({
-      canvas: { ...document.querySelector("#runnerCanvas")?.dataset },
-      sheetRequests: performance.getEntriesByType("resource").filter((entry) => entry.name.includes("sector-sprint-characters")).map((entry) => entry.name),
-    }));
-    throw new Error(`Sector Sprint character sheet did not become ready: ${JSON.stringify({ evidence, errors })}`, { cause });
-  });
-  assert.deepEqual(await runner.page.locator("#runnerCanvas").evaluate((canvas) => ({
-    width: canvas.width,
-    height: canvas.height,
-    ratio: canvas.dataset.pixelRatio,
-    logicalWidth: canvas.dataset.logicalWidth,
-    logicalHeight: canvas.dataset.logicalHeight,
-    quality: canvas.dataset.quality,
-    camera: canvas.dataset.camera,
-    art: canvas.dataset.art,
-  })), { width: 480, height: 216, ratio: "0.500", logicalWidth: "960", logicalHeight: "432", quality: "quiet", camera: "portrait-close", art: "illustrated" }, "phones start with a display-sized backing store in the stable visual tier before sustained headroom earns an upgrade");
-  assert.ok((await runner.page.locator(".runner-canvas-window").boundingBox())?.height >= 250, "the portrait close camera keeps the illustrated action legible");
-  assert.ok((await runner.page.locator(".runner-stage-frame").boundingBox())?.y < 812, "the moving miniature enters the first phone viewport");
-  assert.deepEqual(await runner.page.evaluate(() => {
-    const saved = JSON.parse(sessionStorage.getItem("nindova:house:active:v1") ?? "{}");
-    return { keys: Object.keys(saved).sort(), value: saved };
-  }), {
-    keys: ["chapter", "gameId", "runId", "storyBeat"],
-    value: {
-      gameId: "sector-sprint",
-      chapter: 0,
-      runId: await runner.page.evaluate(() => window.__house.active?.runId),
-      storyBeat: null,
-    },
-  });
-  for (const control of await runner.page.locator(".runner-controls button").all()) {
-    const box = await control.boundingBox();
-    assert.ok(box && box.width >= 44 && box.height >= 44, "runner controls remain operable by touch");
-  }
-  await runner.page.screenshot({ path: resolve(output, "sector-sprint-375x812.png"), fullPage: true, animations: "disabled" });
-  await runner.page.click('[data-runner-action="tool"]');
-  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(2, 17));
-  assert.ok(await runner.page.evaluate(() => (window.__house.runner?.projectiles.length ?? 0) > 0), "the harmless Act tool remains available");
-  await runner.page.locator('[data-runner-action="up"]').focus();
-  await runner.page.keyboard.down("w");
-  await runner.page.locator('[data-runner-action="up"]').dispatchEvent("keydown", { key: "w", repeat: true });
-  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(1, 17));
-  await runner.page.waitForFunction(() => window.__house.runner?.targetLane === 0);
-  await captureRunnerCanvas(runner.page, "sector-sprint-motion-up.png");
-  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(15, 17));
-  assert.ok(await runner.page.evaluate(() => (window.__house.runner?.landingMs ?? 0) > 0), "lane arrival activates the shared settlement state");
-  await captureRunnerCanvas(runner.page, "sector-sprint-motion-settlement.png");
-  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(15, 17));
-  assert.deepEqual(await runner.page.evaluate(() => ({ lane: window.__house.runner?.lane, target: window.__house.runner?.targetLane, pending: window.__house.runner?.pendingLaneDelta })), { lane: 0, target: 0, pending: null }, "held and repeated letter input produces exactly one adjacent move");
-  await runner.page.keyboard.up("w");
-  await runner.page.locator('[data-runner-action="down"]').focus();
-  await runner.page.keyboard.down("Enter");
-  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(1, 17));
-  await runner.page.waitForFunction(() => window.__house.runner?.targetLane === 1);
-  for (let repeat = 0; repeat < 3; repeat += 1) {
-    await runner.page.locator('[data-runner-action="down"]').dispatchEvent("keydown", { key: "Enter", repeat: true });
-  }
-  await captureRunnerCanvas(runner.page, "sector-sprint-motion-down.png");
-  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(30, 17));
-  assert.deepEqual(await runner.page.evaluate(() => ({ lane: window.__house.runner?.lane, target: window.__house.runner?.targetLane, pending: window.__house.runner?.pendingLaneDelta })), { lane: 1, target: 1, pending: null }, "held Enter on a native lane button cannot chain into the far lane");
-  await runner.page.keyboard.up("Enter");
-  await runner.page.locator('[data-runner-action="up"]').dispatchEvent("pointerdown", { pointerId: 7, pointerType: "touch", isPrimary: true });
-  await runner.page.locator("body").dispatchEvent("pointercancel", { pointerId: 7, pointerType: "touch", isPrimary: true });
-  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(1, 17));
-  assert.deepEqual(await runner.page.evaluate(() => ({ lane: window.__house.runner?.lane, target: window.__house.runner?.targetLane, pending: window.__house.runner?.pendingLaneDelta })), { lane: 1, target: 1, pending: null }, "pointer cancellation before the next frame discards the queued move");
-  assert.equal(await runner.page.locator('[data-runner-action="up"]').getAttribute("data-pressed"), null, "a cancelled pointer leaves no stuck pressed state");
-  await runner.page.locator('[data-runner-action="up"]').dispatchEvent("pointerdown", { pointerId: 9, pointerType: "touch", isPrimary: true });
-  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(2, 17));
-  await runner.page.waitForFunction(() => window.__house.runner?.targetLane === 0);
-  const projectilesBeforeSecondaryPointer = await runner.page.evaluate(() => window.__house.runner?.projectiles.length);
-  await runner.page.locator('[data-runner-action="tool"]').dispatchEvent("pointerdown", { pointerId: 8, pointerType: "touch", isPrimary: false });
-  await runner.page.locator("body").dispatchEvent("pointerup", { pointerId: 8, pointerType: "touch", isPrimary: false });
-  await runner.page.waitForTimeout(50);
-  assert.equal(await runner.page.evaluate(() => window.__house.runner?.targetLane), 0, "an unrelated secondary pointer cannot replace the primary lane request");
-  assert.notEqual(await runner.page.evaluate(() => window.__house.runner?.lastAction), "tool", "an unrelated secondary pointer cannot replace the primary action");
-  assert.equal(await runner.page.evaluate(() => window.__house.runner?.projectiles.length), projectilesBeforeSecondaryPointer, "an unrelated secondary pointer cannot queue the Act tool");
-  await runner.page.locator("body").dispatchEvent("pointercancel", { pointerId: 9, pointerType: "touch", isPrimary: true });
-  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(30, 17));
-  assert.equal(await runner.page.evaluate(() => window.__house.runner?.pendingLaneDelta), null, "pointer cancellation clears any buffered lane request");
-  assert.equal(await runner.page.locator('[data-runner-action="up"]').getAttribute("data-pressed"), null, "a cancelled pointer leaves no stuck pressed state");
-  await runner.page.locator('[data-runner-action="down"]').dispatchEvent("pointerdown", { pointerId: 10, pointerType: "touch", isPrimary: true });
-  await runner.page.evaluate(() => window.dispatchEvent(new Event("orientationchange")));
-  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(1, 17));
-  assert.deepEqual(await runner.page.evaluate(() => ({ lane: window.__house.runner?.lane, target: window.__house.runner?.targetLane, pending: window.__house.runner?.pendingLaneDelta })), { lane: 0, target: 0, pending: null }, "orientation change before the next frame discards the queued move");
-  assert.equal(await runner.page.locator('[data-runner-action="down"]').getAttribute("data-pressed"), null, "orientation change leaves no stuck pressed state");
-  await runner.page.evaluate(() => document.querySelector("#houseMain")?.focus());
-  await runner.page.keyboard.press("ArrowDown");
-  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(1, 17));
-  await runner.page.waitForFunction(() => window.__house.runner?.lastAction === "lane-change", null, { timeout: 2_000 });
-  await runner.page.click("[data-runner-pause]");
-  assert.equal(await runner.page.locator("[data-runner-pause]").getAttribute("aria-pressed"), "true");
-  const pausedFrame = await runner.page.locator("#runnerCanvas").evaluate((canvas) => canvas.toDataURL());
-  const pausedMessage = await runner.page.locator("#runnerLive").innerText();
-  assert.equal(await runner.page.locator("#runnerCanvas").evaluate((canvas) => canvas.toDataURL()), pausedFrame, "the paused city remains still");
-  await runner.page.click("[data-runner-pause]");
-  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(2, 17));
-  assert.notEqual(await runner.page.locator("#runnerCanvas").evaluate((canvas) => canvas.toDataURL()), pausedFrame, "the city resumes from the paused scene");
-  await runner.page.evaluate(() => globalThis.__advanceHouseTestFrames(700, 17));
-  await runner.page.waitForSelector(".runner-recovery");
-  await captureRunnerCanvas(runner.page, "sector-sprint-motion-impact.png");
-  assert.deepEqual(await runner.page.evaluate(() => ({
-    failed: window.__house.runner?.failed,
-    reason: window.__house.runner?.failureReason,
-    chapter: window.__house.active?.chapter,
-    storedFailure: sessionStorage.getItem("nindova:house:active:v1")?.includes("failure"),
-  })), { failed: true, reason: "corridor", chapter: 0, storedFailure: false });
-  assert.equal(await runner.page.locator(".runner-controls").count(), 0, "underlying Action controls disappear after a wipeout");
-  assert.equal(await runner.page.evaluate(() => document.activeElement?.matches("[data-runner-retry]")), true, "recovery moves focus to the first available action");
-  const recoveryVisibility = await runner.page.evaluate(() => {
-    const heading = document.querySelector("#runnerRecoveryTitle")?.getBoundingClientRect();
-    const retry = document.querySelector("[data-runner-retry]")?.getBoundingClientRect();
-    return {
-      scrollY,
-      headingVisible: Boolean(heading && heading.top >= 0 && heading.bottom <= innerHeight),
-      retryVisible: Boolean(retry && retry.top >= 0 && retry.bottom <= innerHeight),
-    };
-  });
-  assert.equal(recoveryVisibility.headingVisible, true, `recovery heading enters the phone viewport (${JSON.stringify(recoveryVisibility)})`);
-  assert.equal(recoveryVisibility.retryVisible, true, `focused recovery decision enters the phone viewport (${JSON.stringify(recoveryVisibility)})`);
-  assert.ok(recoveryVisibility.scrollY > 0, "recovery reveal moves the viewport from the runner masthead to the new decision");
-  assert.match(await runner.page.locator(".runner-recovery").innerText(), /No life, score, checkpoint, or failure history is kept/i);
-  const recoveryLayout = await runner.page.locator(".runner-recovery").evaluate((panel) => {
-    const heading = panel.querySelector("h3");
-    const children = [...panel.children];
-    return {
-      columns: getComputedStyle(panel).gridTemplateColumns.split(" ").length,
-      headingWidth: Math.round(heading?.getBoundingClientRect().width ?? 0),
-      textFits: children.every((child) => child.scrollWidth <= child.clientWidth + 1),
-    };
-  });
-  assert.equal(recoveryLayout.columns, 1, "phone recovery uses one column");
-  assert.ok(recoveryLayout.headingWidth >= 220, "the recovery heading keeps a readable line length");
-  assert.equal(recoveryLayout.textFits, true, "recovery copy does not bleed or clip");
-  await runner.page.screenshot({ path: resolve(output, "sector-sprint-recovery-375x812.png"), fullPage: true, animations: "disabled" });
-  const runIdBeforeRetry = await runner.page.evaluate(() => window.__house.active?.runId);
-  await runner.page.click("[data-runner-retry]");
-  assert.deepEqual(await runner.page.evaluate(() => ({
-    chapter: window.__house.active?.chapter,
-    failed: window.__house.runner?.failed,
-    runId: window.__house.active?.runId,
-  })), { chapter: 0, failed: false, runId: runIdBeforeRetry }, "retry restarts Act I without creating a new table");
-  await runner.context.close();
-
-  for (const viewport of [{ width: 320, height: 568 }, { width: 1280, height: 800 }]) {
-    const runnerVisual = await openHouse(viewport, {}, { manualRaf: viewport.width === 320 });
-    await enterRunnerAction(runnerVisual.page);
-    assert.equal(await runnerVisual.page.evaluate(() => document.documentElement.scrollWidth), viewport.width);
-    assert.equal(await runnerVisual.page.locator("#runnerCanvas").isVisible(), true);
-    assert.ok(Number.parseFloat(await runnerVisual.page.locator("#runnerApproach strong").evaluate((element) => getComputedStyle(element).fontSize)) >= 18);
-    await runnerVisual.page.screenshot({ path: resolve(output, `sector-sprint-${viewport.width}x${viewport.height}.png`), fullPage: true, animations: "disabled" });
-    if (viewport.width === 320) {
-      await runnerVisual.page.evaluate(() => globalThis.__advanceHouseTestFrames(700, 17));
-      await runnerVisual.page.waitForSelector(".runner-recovery");
-      const compactRecovery = await runnerVisual.page.evaluate(() => {
-        const heading = document.querySelector("#runnerRecoveryTitle")?.getBoundingClientRect();
-        const retry = document.querySelector("[data-runner-retry]")?.getBoundingClientRect();
-        return {
-          active: document.activeElement?.matches("[data-runner-retry]"),
-          headingVisible: Boolean(heading && heading.top >= 0 && heading.bottom <= innerHeight),
-          retryVisible: Boolean(retry && retry.top >= 0 && retry.bottom <= innerHeight),
-        };
-      });
-      assert.deepEqual(compactRecovery, { active: true, headingVisible: true, retryVisible: true }, `320×568 reveals the complete focused recovery decision (${JSON.stringify(compactRecovery)})`);
-      await runnerVisual.page.screenshot({ path: resolve(output, "sector-sprint-recovery-320x568.png"), animations: "disabled" });
-    }
-    await runnerVisual.context.close();
-  }
-
-  for (const viewport of [{ width: 320, height: 568 }, { width: 375, height: 812 }, { width: 414, height: 896 }]) {
-    const warningRunner = await openHouse(viewport, {}, { manualRaf: true });
-    await enterRunnerAction(warningRunner.page);
-    await warningRunner.page.evaluate(() => globalThis.__advanceHouseTestFrames(250, 17));
-    assert.equal((await warningRunner.page.locator("#runnerApproach strong").innerText()).trim(), "Hold lane", `${viewport.width}px exposes the non-color gate instruction`);
-    await warningRunner.page.evaluate(() => { document.documentElement.style.fontSize = "200%"; });
-    assert.equal(await warningRunner.page.evaluate(() => document.documentElement.scrollWidth), viewport.width, `${viewport.width}px warning reflows at 200%`);
-    assert.equal(await warningRunner.page.locator("#runnerApproach strong").isVisible(), true);
-    await warningRunner.context.close();
-  }
-
-  const materialRunner = await openHouse({ width: 1280, height: 800 }, {}, { acceleratedRaf: 100, reviewMode: true });
-  await enterRunnerAction(materialRunner.page);
-  await startRunnerAutopilot(materialRunner.page);
-  for (const [actIndex, material] of ["sandstone", "market-timber", "hammered-brass", "wet-terrazzo", "phulkari-inlay"].entries()) {
-    await materialRunner.page.waitForFunction(({ expectedAct, expectedMaterial }) => (
-      window.__house.runner?.failed === true
-      || (window.__house.active?.chapter ?? 0) > expectedAct
-      || (
-        window.__house.active?.chapter === expectedAct
-        && (window.__house.runner?.worldX ?? 0) > 100
-        && document.querySelector("#runnerCanvas")?.dataset.nextMaterial === expectedMaterial
-      )
-    ), { expectedAct: actIndex, expectedMaterial: material }, { timeout: 120_000 });
-    const materialState = await materialRunner.page.evaluate(() => ({ active: window.__house.active, runner: window.__house.runner }));
-    assert.equal(materialState.runner?.failed, false, `Act ${actIndex + 1} evidence pilot failed: ${JSON.stringify(materialState.runner)}`);
-    assert.equal(materialState.active?.chapter, actIndex, `Act ${actIndex + 1} evidence checkpoint was skipped`);
-    if (actIndex > 0) await materialRunner.page.locator("#celebration").waitFor({ state: "hidden" });
-    assert.equal(await materialRunner.page.locator("#runnerCanvas").getAttribute("data-quality"), "high", "review compression preserves the full material treatment");
-    await materialRunner.page.locator(".runner-stage-frame").screenshot({
-      path: resolve(output, `sector-sprint-act-${actIndex + 1}-${material}.png`),
-    });
-  }
-  assert.equal(await materialRunner.page.evaluate(() => window.__house.runner?.failed), false, "the evidence pilot clears every authored material corridor");
-  await materialRunner.page.waitForSelector(".curtain-call", { timeout: 120_000 });
-  assert.equal(await materialRunner.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]?.completionFacts.finalChapter), "Roti Relay", "the real Action route clears all five Acts and records its authored curtain call");
-  await materialRunner.context.close();
-
-  const sharpRunner = await openHouse({ width: 414, height: 896 }, { deviceScaleFactor: 3 });
-  await enterRunnerAction(sharpRunner.page);
-  const sharpSurface = await sharpRunner.page.locator("#runnerCanvas").evaluate((canvas) => ({
-    width: canvas.width,
-    cssWidth: canvas.getBoundingClientRect().width,
-    ratio: Number(canvas.dataset.pixelRatio),
-  }));
-  assert.ok(sharpSurface.width >= sharpSurface.cssWidth, "the quiet phone tier keeps at least one backing pixel per rendered CSS pixel");
-  assert.ok(sharpSurface.ratio <= 2, "the Canvas keeps high-density backing work within the DPR cap");
-  const sharpChapter = await sharpRunner.page.evaluate(() => window.__house.active?.chapter);
-  await sharpRunner.page.setViewportSize({ width: 768, height: 1_024 });
-  assert.equal(await sharpRunner.page.evaluate(() => window.__house.active?.chapter), sharpChapter, "a resize redraw cannot change the authored Act");
-  await sharpRunner.page.waitForFunction(() => document.querySelector("#runnerCanvas")?.dataset.quality === "high");
-  assert.equal(await sharpRunner.page.locator("#runnerCanvas").getAttribute("data-quality"), "high", "crossing the phone viewport boundary resets stale samples and chooses the new viewport's safe starting tier");
-  await sharpRunner.page.evaluate(() => { document.documentElement.style.fontSize = "200%"; });
-  assert.equal(await sharpRunner.page.evaluate(() => document.documentElement.scrollWidth), 768, "200% text scaling preserves horizontal reflow");
-  await sharpRunner.context.close();
-
-  const qualityReset = await openHouse({ width: 768, height: 1_024 }, {}, { manualRaf: true });
-  await enterRunnerAction(qualityReset.page);
-  await qualityReset.page.evaluate(() => globalThis.__advanceHouseTestFrames(95, 45));
-  assert.equal(await qualityReset.page.locator("#runnerCanvas").getAttribute("data-quality"), "quiet", "a sustained missed budget degrades the current run");
-  const degradedRunId = await qualityReset.page.evaluate(() => window.__house.active?.runId);
-  await enterRunnerAction(qualityReset.page);
-  assert.notEqual(await qualityReset.page.evaluate(() => window.__house.active?.runId), degradedRunId);
-  assert.equal(await qualityReset.page.locator("#runnerCanvas").getAttribute("data-quality"), "high", "a fresh desktop run clears prior samples and its degraded quality ceiling");
-  await qualityReset.context.close();
-
-  const recoveryScale = await openHouse({ width: 768, height: 1_024 }, {}, { manualRaf: true });
-  await enterRunnerAction(recoveryScale.page);
-  await recoveryScale.page.evaluate(() => globalThis.__advanceHouseTestFrames(700, 17));
-  await recoveryScale.page.waitForSelector(".runner-recovery");
-  await recoveryScale.page.evaluate(() => { document.documentElement.style.fontSize = "200%"; });
-  assert.equal(await recoveryScale.page.evaluate(() => document.documentElement.scrollWidth), 768, "recovery reflows at 200% without horizontal clipping");
-  assert.equal(await recoveryScale.page.locator("[data-runner-story]").isVisible(), true);
-  await recoveryScale.context.close();
-
-  const lateRetry = await openHouse({ width: 414, height: 896 }, {}, { fakeClock: true });
-  await enterRunnerAction(lateRetry.page);
-  await lateRetry.page.clock.fastForward(12_000);
-  await lateRetry.page.waitForSelector(".runner-recovery");
-  assert.equal(await lateRetry.page.locator("[data-runner-retry]").isEnabled(), true);
-  await lateRetry.page.clock.fastForward(64_000);
-  assert.equal(await lateRetry.page.locator("[data-runner-retry]").isEnabled(), true, "retry remains available with the full five-Act catch-up reserve intact");
-  await lateRetry.page.clock.fastForward(1_000);
-  await lateRetry.page.click("[data-runner-retry]");
-  assert.equal(await lateRetry.page.locator("[data-runner-retry]").isDisabled(), true, "retry eligibility is recomputed atomically at activation");
-  assert.equal(await lateRetry.page.evaluate(() => window.__house.runner?.failed), true, "a stale retry cannot reset Act I after its completion budget is gone");
-  assert.match(await lateRetry.page.locator(".runner-recovery").innerText(), /boundary is too near/i);
-  assert.equal(await lateRetry.page.evaluate(() => document.activeElement?.matches("[data-runner-story]")), true);
-  await lateRetry.page.click("[data-runner-story]");
-  await lateRetry.page.waitForSelector(".runner-story");
-  assert.equal(await lateRetry.page.evaluate(() => window.__house.active?.chapter), 0, "Narrated continues from the current failed Act");
-  assert.equal((await lateRetry.page.locator("#gameStatus").innerText()).trim(), "The narrated route continues from Act 1.", "switching routes announces the new narrated context immediately");
-  await lateRetry.context.close();
-
-  const freshRunnerStatus = await openHouse({ width: 375, height: 812 }, {}, { manualRaf: true });
-  await enterRunnerAction(freshRunnerStatus.page);
-  await freshRunnerStatus.page.evaluate(() => globalThis.__advanceHouseTestFrames(700, 17));
-  await freshRunnerStatus.page.waitForSelector(".runner-recovery");
-  await freshRunnerStatus.page.click("[data-runner-abandon]");
-  await freshRunnerStatus.page.waitForFunction(() => window.__house.active === null);
-  await freshRunnerStatus.page.evaluate(() => window.__house.start("sector-sprint"));
-  assert.equal((await freshRunnerStatus.page.locator("#gameStatus").innerText()).trim(), "", "a fresh route choice inherits no status from the abandoned run");
-  await freshRunnerStatus.context.close();
-
-  const failureVisibility = await openHouse({ width: 375, height: 812 }, {}, { fakeClock: true, controllableVisibility: true });
-  await enterRunnerAction(failureVisibility.page);
-  await failureVisibility.page.clock.fastForward(12_000);
-  await failureVisibility.page.waitForSelector(".runner-recovery");
-  await failureVisibility.page.evaluate(() => globalThis.__setHouseTestHidden(true));
-  await failureVisibility.page.clock.fastForward(240_000);
-  assert.equal(await failureVisibility.page.evaluate(() => window.__house.active?.gameId), "sector-sprint", "background time does not consume the failure boundary");
-  await failureVisibility.page.evaluate(() => globalThis.__setHouseTestHidden(false));
-  await failureVisibility.page.clock.fastForward(240_000);
-  await failureVisibility.page.waitForSelector(".curtain-call");
-  assert.match(await failureVisibility.page.locator(".curtain-call").innerText(), /No completion reading was recorded/i);
-  assert.equal(await failureVisibility.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]), undefined);
-  await failureVisibility.context.close();
-
-  const reloadedBoundary = await openHouse({ width: 375, height: 812 }, {}, { fakeClock: true });
-  await enterRunnerNarrated(reloadedBoundary.page);
-  await reloadedBoundary.page.clock.fastForward(239_000);
-  assert.equal(await reloadedBoundary.page.evaluate(() => window.__house.active?.gameId), "sector-sprint");
-  await reloadedBoundary.page.reload();
-  await reloadedBoundary.page.waitForFunction(() => Boolean(window.__house));
-  assert.equal(await reloadedBoundary.page.evaluate(() => window.__house.active), null, "reload cannot reset and extend the runner boundary");
-  assert.equal(await reloadedBoundary.page.evaluate(() => sessionStorage.getItem("nindova:house:active:v1")), null);
-  assert.equal(await reloadedBoundary.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]), undefined);
-  assert.match(await reloadedBoundary.page.locator(".runner-restore-banner").innerText(), /closed on reload/i);
-  const restoreBannerBox = await reloadedBoundary.page.locator(".runner-restore-banner").boundingBox();
-  assert.ok(restoreBannerBox && restoreBannerBox.y < 812, "runner reload settlement is visible before the House hero");
-  assert.equal(await reloadedBoundary.page.locator('.runner-restore-banner [data-browse-salon]').isVisible(), true);
-  await reloadedBoundary.context.close();
-
-  const boundedStory = await openHouse({ width: 375, height: 812 }, {}, { fakeClock: true });
-  await enterRunnerNarrated(boundedStory.page);
-  await boundedStory.page.clock.fastForward(240_000);
-  await boundedStory.page.waitForSelector(".curtain-call");
-  assert.match(await boundedStory.page.locator(".curtain-call").innerText(), /No completion reading was recorded/i);
-  assert.equal(await boundedStory.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]), undefined, "the absolute boundary cannot create a false five-Act result");
-  assert.equal(await boundedStory.page.evaluate(() => sessionStorage.getItem("nindova:house:active:v1")), null);
-  await boundedStory.page.reload();
-  await boundedStory.page.waitForFunction(() => Boolean(window.__house));
-  assert.equal(await boundedStory.page.evaluate(() => window.__house.active), null, "a boundary exit cannot revive as a completed or active route after reload");
-  assert.equal(await boundedStory.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]), undefined);
-  await boundedStory.context.close();
-
-  const finalTransitionBoundary = await openHouse({ width: 375, height: 812 }, {}, { fakeClock: true });
-  const routeStartedAt = await finalTransitionBoundary.page.evaluate(() => {
-    window.__house.start("sector-sprint");
-    const narratedRoute = document.querySelector('[data-runner-route="narrated"]');
-    if (!(narratedRoute instanceof HTMLButtonElement)) throw new Error("Narrated route choice was not rendered");
-    narratedRoute.click();
-    return performance.now();
-  });
-  await finalTransitionBoundary.page.waitForSelector(".runner-story");
-  await finalTransitionBoundary.page.clock.pauseAt(await finalTransitionBoundary.page.evaluate(() => Date.now()));
-  for (let act = 0; act < 4; act += 1) {
-    for (let beat = 0; beat < 3; beat += 1) await finalTransitionBoundary.page.locator("[data-story-advance]").dispatchEvent("click");
-    await finalTransitionBoundary.page.clock.fastForward(720);
-    assert.equal(await finalTransitionBoundary.page.evaluate(() => window.__house.active?.chapter), act + 1);
-  }
-  await finalTransitionBoundary.page.locator("[data-story-advance]").dispatchEvent("click");
-  await finalTransitionBoundary.page.locator("[data-story-advance]").dispatchEvent("click");
-  const routeElapsedMs = await finalTransitionBoundary.page.evaluate((startedAt) => performance.now() - startedAt, routeStartedAt);
-  await finalTransitionBoundary.page.clock.fastForward(Math.max(0, 239_600 - routeElapsedMs));
-  await finalTransitionBoundary.page.locator("[data-story-advance]").dispatchEvent("click");
-  await finalTransitionBoundary.page.clock.fastForward(720);
-  await finalTransitionBoundary.page.waitForSelector(".curtain-call");
-  assert.match(await finalTransitionBoundary.page.locator(".curtain-call").innerText(), /No completion reading was recorded/i);
-  assert.equal(await finalTransitionBoundary.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]), undefined, "the boundary outranks final-Act transition completion");
-  await finalTransitionBoundary.context.close();
+  // Exploration, suspension, boundary and movement acceptance live in sector-sprint-feel.mjs.
 
   const keyboard = await openHouse({ width: 768, height: 1024 }, { reducedMotion: "reduce" });
   await keyboard.page.evaluate(() => document.querySelector("#houseMain")?.focus());
@@ -1206,7 +819,7 @@ try {
   assert.equal(await catalog.page.evaluate(() => window.__house.memory.latestByGame["stack-architect"]?.completionFacts.authoredChapters), 5);
   await catalog.page.click('[data-route="home"]');
   await completeRunnerStory(catalog.page);
-  assert.equal(await catalog.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]?.completionFacts.finalChapter), "Roti Relay");
+  assert.equal(await catalog.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]?.completionFacts.finalChapter), "Ghar wapsi");
   await catalog.page.click('[data-route="gallery"]');
   assert.equal(await catalog.page.locator(".gallery-ledger article").filter({ hasText: "authored chapters completed" }).count(), 4);
   assert.equal(await catalog.page.locator(".gallery-ledger article").filter({ hasText: "authored studies completed" }).count(), 3);
@@ -1295,54 +908,6 @@ try {
   assert.equal(await reduced.page.locator("#runnerCanvas").count(), 0);
   await reduced.page.screenshot({ path: resolve(output, "sector-sprint-reduced-motion-narrated.png"), fullPage: true, animations: "disabled" });
   await reduced.context.close();
-
-  const restoredReduced = await openHouse({ width: 375, height: 812 });
-  await enterRunnerAction(restoredReduced.page);
-  await restoredReduced.page.emulateMedia({ reducedMotion: "reduce" });
-  await restoredReduced.page.waitForSelector(".runner-story");
-  await restoredReduced.page.evaluate(() => {
-    const saved = JSON.parse(sessionStorage.getItem("nindova:house:active:v1"));
-    saved.storyBeat = null;
-    sessionStorage.setItem("nindova:house:active:v1", JSON.stringify(saved));
-  });
-  await restoredReduced.page.reload();
-  await restoredReduced.page.waitForFunction(() => Boolean(window.__house));
-  assert.equal(await restoredReduced.page.evaluate(() => window.__house.active), null, "a restored action route fails closed when reduced motion is now preferred");
-  assert.equal(await restoredReduced.page.locator("#runnerCanvas").count(), 0);
-  assert.equal(await restoredReduced.page.locator(".runner-restore-banner").isVisible(), true);
-  await restoredReduced.context.close();
-
-  const activeRunnerSound = await openHouse({ width: 375, height: 812 }, {}, { audioProbe: true });
-  await activeRunnerSound.page.click("#soundButton");
-  await enterRunnerAction(activeRunnerSound.page);
-  await activeRunnerSound.page.click('[data-runner-action="up"]');
-  await activeRunnerSound.page.waitForFunction(() => globalThis.__houseAudioContexts === 1);
-  await activeRunnerSound.page.click("[data-runner-pause]");
-  await activeRunnerSound.page.waitForFunction(() => globalThis.__houseAudioSuspends === 1);
-  assert.equal(await activeRunnerSound.page.evaluate(() => globalThis.__houseAudioCloses), 0, "pause suspends rather than destroying optional audio");
-  await activeRunnerSound.page.click("[data-runner-pause]");
-  await activeRunnerSound.page.waitForFunction(() => globalThis.__houseAudioResumes === 1);
-  assert.equal(await activeRunnerSound.page.evaluate(() => globalThis.__houseAudioContexts), 1, "resume never queues or invents a sound");
-  await activeRunnerSound.context.close();
-
-  const failedRunnerSound = await openHouse({ width: 375, height: 812 }, {}, { audioProbe: true, manualRaf: true });
-  await failedRunnerSound.page.click("#soundButton");
-  await enterRunnerAction(failedRunnerSound.page);
-  await failedRunnerSound.page.click('[data-runner-action="up"]');
-  await failedRunnerSound.page.evaluate(() => globalThis.__advanceHouseTestFrames(400, 17));
-  await failedRunnerSound.page.waitForSelector(".runner-recovery");
-  assert.equal(await failedRunnerSound.page.evaluate(() => globalThis.__houseAudioSuspends), 1, "a wipeout releases optional audio before idle recovery");
-  assert.equal(await failedRunnerSound.page.evaluate(() => globalThis.__houseAudioCloses), 0, "retry can resume the same optional audio context");
-  await failedRunnerSound.context.close();
-
-  const pausedRunnerSound = await openHouse({ width: 375, height: 812 }, { reducedMotion: "reduce" }, { audioProbe: true });
-  await pausedRunnerSound.page.click("#soundButton");
-  await pausedRunnerSound.page.evaluate(() => window.__house.start("sector-sprint"));
-  await pausedRunnerSound.page.click("[data-runner-pause]");
-  for (let beat = 0; beat < 3; beat += 1) await pausedRunnerSound.page.click("[data-story-advance]");
-  await pausedRunnerSound.page.waitForFunction(() => window.__house.active?.chapter === 1);
-  assert.equal(await pausedRunnerSound.page.evaluate(() => globalThis.__houseAudioContexts), 0, "paused narration never plays an optional chime");
-  await pausedRunnerSound.context.close();
 
   const sound = await openHouse({ width: 375, height: 812 }, { reducedMotion: "reduce" }, { audioProbe: true });
   await sound.page.evaluate(() => window.__house.start("pattern-court"));

@@ -37,6 +37,38 @@
       "input_tokens": 560,
       "output_tokens": 760,
       "files": 6
+    },
+    {
+      "date": "2026-09-11T05:13:13.048141+00:00",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "files": 22,
+      "mode": "host_semantic_incremental",
+      "accounting_note": "Actual host-agent semantic token usage is unmetered; numeric zeros are placeholders, not zero cost."
+    },
+    {
+      "date": "2026-09-11T05:39:04.009175+00:00",
+      "files": 5,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "mode": "host_semantic_incremental",
+      "accounting_note": "Unmetered host tokens; zeros are numeric placeholders."
+    },
+    {
+      "date": "2026-09-11T05:44:30.453602+00:00",
+      "files": 2,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "mode": "host_semantic_incremental",
+      "accounting_note": "Unmetered host tokens; zeros are numeric placeholders."
+    },
+    {
+      "date": "2026-09-11T05:44:52.903659+00:00",
+      "files": 2,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "mode": "host_semantic_incremental",
+      "accounting_note": "Unmetered host tokens; zeros are numeric placeholders."
     }
   ],
   "total_input_tokens": 560,

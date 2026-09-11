@@ -11,7 +11,7 @@ export type EntertainmentResult = {
   schemaVersion: 1 | typeof HOUSE_SCHEMA_VERSION;
   mode: "entertainment";
   gameId: GameId;
-  gameVersion: "1.0.0";
+  gameVersion: "1.0.0" | "2.0.0";
   rulesetVersion: typeof HOUSE_RULESET_VERSION;
   runId: string;
   completedAt: string;
@@ -59,7 +59,7 @@ function isResult(value: unknown): value is EntertainmentResult {
   return (result.schemaVersion === 1 || result.schemaVersion === HOUSE_SCHEMA_VERSION)
     && result.mode === "entertainment"
     && GRAND_SALON.hasGame(result.gameId)
-    && result.gameVersion === "1.0.0"
+    && (result.gameVersion === "1.0.0" || (result.gameId === "sector-sprint" && result.gameVersion === "2.0.0"))
     && result.rulesetVersion === HOUSE_RULESET_VERSION
     && typeof result.runId === "string"
     && typeof result.completedAt === "string"

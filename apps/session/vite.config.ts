@@ -62,6 +62,7 @@ function emitPortableHtml(): Plugin {
       await rm(modulePath);
       const portable = installable
         .replace('<link rel="manifest" href="./manifest.webmanifest">', "")
+        .replace(/<link\b[^>]*data-portable-remove[^>]*>/g, "")
         .replace(/<script data-portable-remove>[\s\S]*?<\/script>/, "");
       if (portable.includes("manifest.webmanifest") || portable.includes("serviceWorker.register")) throw new Error("Portable artifact retained PWA dependencies");
       await writeFile(resolve("dist/nindova.html"), portable);

@@ -50,7 +50,7 @@ function initialSession(gameId: GameId, runId: string): ActiveGame {
   };
 }
 
-function preferredFocus(active: ActiveGame | null, runnerFocus = '[data-runner-action="up"]'): string {
+function preferredFocus(active: ActiveGame | null, runnerFocus = '#runnerCanvas'): string {
   if (!active) return runnerFocus;
   const game = GRAND_SALON.game(active.gameId);
   if (game.kind === "runner") return runnerFocus;
@@ -63,7 +63,7 @@ export function createSalonTableLifecycle(options: LifecycleOptions) {
   let active = cloneActive(options.initial);
   let restoreDecisionPending = Boolean(active);
   let pendingRunnerChoice = false;
-  let runnerFocus = '[data-runner-action="up"]';
+  let runnerFocus = '#runnerCanvas';
 
   function view(): SalonTableView {
     return {

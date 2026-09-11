@@ -17,7 +17,7 @@ type GameBase = {
   readonly title: string;
   readonly houseLine: string;
   readonly description: string;
-  readonly version: "1.0.0";
+  readonly version: "1.0.0" | "2.0.0";
 };
 
 export type ChoiceGameDefinition = GameBase & {
@@ -76,7 +76,7 @@ export const DOOR_CATEGORIES: readonly DoorCategory[] = [
   { id: "turn-trap", number: "II", title: "Turn & Trap", houseLine: "Change a bearing, then read a board's safe passage.", description: "Mirror Forge and an Aadu Puli Aattam movement study.", gameIds: ["mirror-forge", "aadu-puli-attam"] },
   { id: "count-carry", number: "III", title: "Count & Carry", houseLine: "Move by a fixed law and leave every piece accountable.", description: "Stack Architect and a one-turn Pallanguzhi sowing study.", gameIds: ["stack-architect", "pallanguzhi"] },
   { id: "memory-sequence", number: "IV", title: "Memory & Sequence", houseLine: "Hold a procession without haste or judgment.", description: "Lantern Ledger's five visible, replayable sequences.", gameIds: ["lantern-ledger"] },
-  { id: "motion-route", number: "V", title: "Motion & Route", houseLine: "Follow a route through Chandigarh's changing street theatre.", description: "Sector Sprint in Action or narrated form.", gameIds: ["sector-sprint"] },
+  { id: "motion-route", number: "V", title: "Motion & Route", houseLine: "Take the long way home through Chandigarh.", description: "Explore the city or follow an equivalent narrated homecoming.", gameIds: ["sector-sprint"] },
 ] as const;
 
 const PATTERN_CHAPTERS: readonly ChoiceChapter[] = [
@@ -111,7 +111,7 @@ export const GAMES: readonly GameDefinition[] = [
   { id: "stack-architect", categoryId: "count-carry", number: "III.A", title: "Stack Architect", houseLine: "Move the tower by law, one disc at a time.", description: "Five handcrafted towers. Never place a larger disc on a smaller one.", kind: "stack", format: "house-original", version: "1.0.0", diskCounts: [2, 3, 4, 5, 6], chapterTitles: ["2-disc tower", "3-disc tower", "4-disc tower", "5-disc tower", "6-disc tower"] },
   { id: "pallanguzhi", categoryId: "count-carry", number: "III.B", title: "Pallanguzhi", houseLine: "Lift, sow, relay, and gather through one bounded turn.", description: "Five authored turns on a two-by-seven pit board—not a full multi-round traditional match.", kind: "classic", format: "authored-rule-study", classicStudyId: "pallanguzhi", version: "1.0.0", chapterTitles: ["First carry", "Around the corner", "Relay hand", "Four-seed taking", "Beyond the empty pit"] },
   { id: "lantern-ledger", categoryId: "memory-sequence", number: "IV", title: "Lantern Ledger", houseLine: "Hold an ordered procession of light.", description: "Five visible sequences. Close the screen when ready, then choose the line you held.", kind: "memory", format: "house-original", version: "1.0.0", chapters: LANTERN_CHAPTERS },
-  { id: "sector-sprint", categoryId: "motion-route", number: "V", title: "Sector Sprint", houseLine: "Run Chandigarh’s long way home.", description: "Five progressively faster lane routes with expressive riders, textured architecture, one-contact Action pauses, harmless Act tools, and a clean narrated route.", kind: "runner", format: "house-original", version: "1.0.0", chapterTitles: ["Ghar Wapsi", "Sabzi Command", "Baraat Detour", "Monsoon Protocol", "Roti Relay"] },
+  { id: "sector-sprint", categoryId: "motion-route", number: "V", title: "Sector Sprint", houseLine: "Bring a little of Chandigarh home.", description: "Jump, dash and explore Chandigarh: spring juttis, garden paths, playful errands, and Ma waiting by Sukhna.", kind: "runner", format: "house-original", version: "2.0.0", chapterTitles: ["The city opens", "Something to carry", "Made by hand", "By the water", "Ghar wapsi"] },
 ] as const;
 
 function gameUnit(game: GameDefinition): Pick<SalonPart, "unit" | "unitPlural"> {

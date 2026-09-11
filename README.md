@@ -46,17 +46,17 @@ Every table has five fixed chapters, studies, or Acts and a designed curtain cal
 | Turn & Trap | Mirror Forge · Aadu Puli Aattam | Bearing changes and one documented goat-and-tiger passage |
 | Count & Carry | Stack Architect · Pallanguzhi | Three-plinth law and one-turn sowing studies |
 | Memory & Sequence | Lantern Ledger | One fixed procession of light |
-| Motion & Route | Sector Sprint | Five progressively faster Chandigarh lane routes or complete narration |
+| Motion & Route | Sector Sprint | A Chandigarh playground with jumping, dashing, power-ups and a narrated homecoming |
 
 The three classic additions are explicitly labeled authored tactical rule studies. Each names its source and documented scope and discloses the full-match rules it omits; Nindova does not present them as definitive or complete traditional matches.
 
 The current source gives each table its own physical stage without making decoration part of the rules: geometric inlay for Pattern Court, smoked glass and brass for Mirror Forge, carved line and pit boards for the three classic studies, a velvet lantern procession, and a rosewood tower table. Every required action remains a native control with the same text and nonvisual state.
 
-Sector Sprint offers an Action route with discrete Up/Down lane movement, optional harmless Act tools, and explicit Hold/Up/Down markers. The Narrated route reaches the same five-Act curtain call without timing, sound, precision movement, or visual interpretation. One architectural contact ends an Action attempt; it creates no life count, checkpoint, failure history, or completion.
+Sector Sprint is now a connected Chandigarh playground. Walk, jump and dash through market ribbons, garden petals and courtyard chimes. Spring juttis, a monsoon scarf and a paper-wing pin change how you move. Meet the neighbors, bring useful things home, and find Ma by Sukhna. The first three courses can be explored in any order; a city map, guided help and a complete narrated route keep the journey approachable.
 
-Its current code-drawn theatre adds illuminated lane bands, layered city windows, curb reflections, perspective rails, and a clearer rider silhouette behind the existing three-lane route. Those details adapt through the existing render-quality tiers; authored gates, collision geometry, speed, order, and outcome do not change.
+The original painted world, directional character animation, moving obstacles, spring pads and water accents stay local and work offline. This is a fictional, compressed Chandigarh, grounded in [official setting research](./docs/research/chandigarh-homecoming.md). The bag and power-ups are temporary. No score, lives, random rewards, persistent collection or third-party runtime service. Early homecoming and the ten-minute foreground boundary never claim an unfinished completion.
 
-![Sector Sprint's current illustrated three-lane route with an authored sandstone gate and Hold Lane marker](./apps/site/public/media/sector-sprint.png)
+![Sector Sprint's Chandigarh playground with original city scenery and jump/dash controls](./apps/site/public/media/sector-sprint.png)
 
 The Salon has no score, streak, randomized reward, social comparison, or assessment output. Its Gallery may keep only the latest completion fact for each game, and the whole Gallery can be cleared from the interface.
 

@@ -2,6 +2,8 @@
 
 **Status:** Historical browser-first baseline, completed. The experience-specific arc is superseded by [ADR 0010](./adr/0010-replace-the-vista-arc-with-rasoi-pairs.md) and the [Rasoi Pairs redesign plan](./REDESIGN-PLAN.md). [ADR 0013](./adr/0013-add-the-adult-nindova-house.md) adds the adult entertainment House while preserving and regression-testing the Night Room's two immutable core lines, privacy boundary, accessibility floor, Two-Loop Law, and fifteen-minute maximum; adult-audience framing is appended. [ADR 0014](./adr/0014-add-a-fail-closed-assessment-readiness-contract.md) adds source-only validation gates without authorizing data collection or a public assessment result. [ADR 0018](./adr/0018-replace-sector-sprint-altitude-control-with-progressive-lanes.md) supersedes ADR 0017's continuous altitude controls with a progressively faster three-lane route while preserving one-contact stakes, the fixed five-Act route, narrated alternative, foreground boundary, privacy, and Night Room contract.
 
+[ADR 0021](./adr/0021-rebuild-sector-sprint-as-a-chandigarh-playground.md) supersedes the Sector Sprint runner with the owner-requested Chandigarh exploration playground, action power-ups, and ten-minute foreground boundary. The Night Room remains unchanged. The owner explicitly authorized the v0.6.0 integration and release.
+
 ## Delivery boundary
 
 This build ships the browser, installable PWA, public website, documentation, and local return system. The iOS Wall is deliberately deferred by [ADR 0007](./adr/0007-ship-browser-and-pwa-before-the-ios-wall.md); this build must not present it as implemented or verified.

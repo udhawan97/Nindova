@@ -9,7 +9,7 @@ Nindova's mark is a nine-diamond lattice: four mirrored color pairs around one s
 
 The drawn wordmark has no font dependency. Do not retype, stretch, rotate, outline, or rearrange it. The cream pair swaps to night ink on light backgrounds so all nine shapes remain legible.
 
-The landing-page and README lockups use one authored seven-second stitch loop: mirrored diamonds arrive in four pairs, saffron closes the center, and a soft glow breathes behind a long completed-mark rest before the sequence repeats. Static lockups remain the default for footers, favicons, product controls, and any context where motion would distract.
+The landing-page and README lockups use one authored seven-second stitch loop: mirrored diamonds arrive in four pairs, saffron closes the center, and a soft glow breathes behind a long completed-mark rest before the sequence repeats. The House, Night Room, documentation header, and footers use the canonical static drawn lockup. Dialogs use the nine-diamond mark, installable icons use its dark tile, and browser favicons retain the five-diamond small-size variant. The standalone Night file embeds its branding so it remains independent of a web server.
 
 The current public promise—**Every room knows when to close**—connects the finite House and bounded Night Room without collapsing their separate loops. The source-generated social card uses that promise beside the real House plan and names eight authored endings plus one bounded Night Room. It is product orientation, not a claim about therapeutic or cognitive outcomes.
 
@@ -30,7 +30,7 @@ The nine 48×48 silhouettes cover belan, chakla, tawa, chimta, katori, tiffin, m
 
 ## Grand Salon table materials
 
-The eight Salon games share the Shahi Raat palette but not one generic board treatment. Pattern Court uses geometric inlay; Mirror Forge uses smoked glass and brass; Navakankari and Aadu Puli Aattam sit on carved line boards; Pallanguzhi uses recessed wooden pits; Lantern Ledger uses a velvet procession; Stack Architect uses rosewood plinths; and Sector Sprint uses a layered Chandigarh lane theatre. These surfaces are decorative presentations of deterministic state. Text, native controls, focus order, nonvisual descriptions, and outcomes remain authoritative.
+The eight Salon games share the Shahi Raat palette but not one generic board treatment. Pattern Court uses geometric inlay; Mirror Forge uses smoked glass and brass; Navakankari and Aadu Puli Aattam sit on carved line boards; Pallanguzhi uses recessed wooden pits; Lantern Ledger uses a velvet procession; Stack Architect uses rosewood plinths; and Sector Sprint uses a painted Chandigarh playground with directional character animation, jump courses and traversal power-ups. These surfaces are decorative presentations of deterministic state. Text, native controls, focus order, nonvisual descriptions, and outcomes remain authoritative.
 
 ## Motion and provenance
 

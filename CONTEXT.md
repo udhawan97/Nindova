@@ -16,8 +16,8 @@ _Avoid_: test center, leaderboard, daily challenge
 
 **Sector Sprint**
 
-The original, fixed five-Act Chandigarh route in the Grand Salon, led by Gurpreet and his mother Harjit. Three discrete travel lanes replace continuous altitude control: one fresh Up or Down press moves one adjacent lane, while automatic forward speed rises smoothly from the opening Act through the home approach. Five-to-nine deterministic material gates provide generous warnings and never require more than one move from the previous safe lane. One touch on a lit architectural face pauses the Action attempt; comic targets, tools, pickups, and complications remain harmless choreography. Recovery may retry Act I only inside the same remaining table boundary, continue Narrated from the current Act, or return to the Salon. Failure, timing, and input history never persist. The complete Narrated route requires no timed response, sound, sight, or precision, and the absolute foreground boundary still closes the table without recording an unfinished completion.
-_Avoid_: endless runner, shooter, score attack, lives, health, clone language, sleep inducer
+An original Chandigarh homecoming playground. Explore a connected fictional city, jump and dash through three small courses in any order, find power-ups, bring useful things home, meet Harjit by Sukhna, and walk home together. Arrow/WASD movement stops on release; tap-to-walk is explicit. Guided help and the complete narrated route preserve the same story and objects without precision, motion, sound or visual interpretation. Power-ups and the errand bag belong only to this bounded journey. Ten foreground minutes close an unfinished table without claiming completion; pause, hide, blur and exit suspend it, and reload fails closed. The latest completed five-encounter provenance is the only retained result. See ADR 0021.
+_Avoid_: endless runner, score attack, lives, health, franchise clone, sleep inducer
 
 **Gallery**
 

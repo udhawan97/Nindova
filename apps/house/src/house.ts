@@ -229,7 +229,7 @@ function startGame(gameId: GameId, options: ViewOptions = {}) {
   if (game.kind === "runner") {
     if (opened.runnerRoute) {
       sectorTable.start(opened.runnerRoute, crypto.randomUUID());
-      navigation.settle({ focusSelector: "[data-story-advance]" });
+      navigation.settle({ focusSelector: "[data-encounter-choice]" });
     }
     return;
   }
@@ -239,7 +239,7 @@ function beginRunnerRoute(routeChoice: "action" | "narrated") {
   if (!pendingRunnerChoice && active) return;
   tableLifecycle.chooseRunnerRoute();
   sectorTable.start(routeChoice, crypto.randomUUID());
-  navigation.settle({ focusSelector: routeChoice === "action" ? '[data-runner-action="up"]' : "[data-story-advance]" });
+  navigation.settle({ focusSelector: routeChoice === "action" ? "#runnerCanvas" : "[data-encounter-choice]" });
 }
 
 function escape(value: string): string {
@@ -349,7 +349,6 @@ function renderHome() {
               <span class="game-enter">Open door · ${category.gameIds.length} ${category.gameIds.length === 1 ? "table" : "tables"}</span>
             </button>
           `).join("")}
-          <div class="salon-compass" aria-hidden="true"><span>N</span><i></i></div>
         </div>
       </div>
       <button class="room room-gallery" type="button" data-route="gallery">
@@ -381,11 +380,11 @@ function renderCategory() {
         <button class="back-link" type="button" data-history-back="home"><span aria-hidden="true">←</span> Grand Salon</button>
         <span class="category-door-mark">Door ${category.number}</span>
       </header>
-      <div class="category-aperture" aria-hidden="true"><i></i><i></i><i></i><i></i><span></span></div>
       <div class="category-heading">
-        <p class="kicker">Door ${category.number}</p>
+        <div class="category-heading-copy"><p class="kicker">Door ${category.number}</p>
         <h1 id="categoryTitle" tabindex="-1">${escape(category.title)}</h1>
-        <p class="house-lede">${escape(category.description)}</p>
+        <p class="house-lede">${escape(category.description)}</p></div>
+        <div class="category-portrait" aria-hidden="true">${doorArt(category.id)}</div>
       </div>
       <div class="category-tables">
         ${games.map((game) => `
@@ -442,7 +441,7 @@ function renderGame() {
     <section class="game-view game-view-${game.id}" aria-labelledby="gameTitle">
       <header class="game-masthead">
         <button class="back-link" type="button" data-history-back="category"><span aria-hidden="true">←</span> ${escape(getDoorCategory(game.categoryId).title)}</button>
-        <div class="chapter-mark"><span>${pendingRunnerChoice ? "Before Act I" : `${authoredUnit} ${chapter + 1}`}</span><i aria-hidden="true"></i><span>${pendingRunnerChoice ? "Route choice" : "of 5"}</span></div>
+        <div class="chapter-mark" ${game.kind === "runner" ? 'hidden' : ''}><span>${pendingRunnerChoice ? "Before Act I" : `${authoredUnit} ${chapter + 1}`}</span><i aria-hidden="true"></i><span>${pendingRunnerChoice ? "Route choice" : "of 5"}</span></div>
       </header>
       <div class="game-title-block ${game.kind === "runner" ? "game-title-block-runner" : ""}">
         <p class="kicker">Table ${game.number} · ${escape(chapterTitle ?? authoredUnit)}</p>
@@ -488,23 +487,7 @@ function renderRestoreGate(game: GameDefinition): string {
 }
 
 function renderRunnerPrelude(): string {
-  return `
-    <section class="table-gate runner-prelude" aria-labelledby="runnerPreludeTitle">
-      <div class="route-miniature" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><span></span></div>
-      <p class="kicker">Choose how the city moves</p>
-      <h2 id="runnerPreludeTitle">One route. Two ways through.</h2>
-      <p>Action starts a progressively faster three-lane route. Follow each marker: Hold lane, Move up, or Move down. Every gate requires at most one adjacent move across five authored Acts. Narrated follows the same city with text controls and no precision requirement. Both remain inside the same fixed table boundary.</p>
-      <div class="route-choices">
-        <button class="route-choice route-choice-action" type="button" data-runner-route="action">
-          <span>Action route</span><strong>Enter the lane route</strong><small>Keyboard or touch · follow each lane marker</small>
-        </button>
-        <button class="route-choice" type="button" data-runner-route="narrated">
-          <span>Narrated route</span><strong>Read the city</strong><small>No motion, precision, sight, or sound required</small>
-        </button>
-      </div>
-      <p class="gate-note">The authored foreground boundary begins only after you choose a route. Reloading an active Sector Sprint still closes it without recording a completion.</p>
-    </section>
-  `;
+  return `<section class="table-gate journey-prelude" aria-labelledby="runnerPreludeTitle"><div class="journey-prelude-art" aria-hidden="true"></div><p class="kicker">A Chandigarh homecoming</p><h2 id="runnerPreludeTitle">The long way home.</h2><p>Spring over crates. Dash through the courtyard chimes. Float through the garden petals. Find playful power-ups, bring a little of Chandigarh home, and meet Ma by Sukhna.</p><div class="route-choices"><button class="route-choice route-choice-action" type="button" data-runner-route="action"><span>Explore the city</span><strong>Step into Chandigarh</strong><small>Move · jump · dash · explore</small></button><button class="route-choice" type="button" data-runner-route="narrated"><span>Narrated homecoming</span><strong>Read the city</strong><small>The same objects and ending, without movement</small></button></div><p class="gate-note">An original fictional walk through a compressed Chandigarh. Your bag belongs only to this afternoon. You can always head home. The table closes after ten foreground minutes; pause whenever you need.</p></section>`;
 }
 
 function renderChoice(game: ChoiceGameDefinition | MemoryGameDefinition): string {
@@ -778,10 +761,10 @@ function renderRunnerBoundary() {
   celebration.hidden = true;
   main.innerHTML = `
     <section class="curtain-call" aria-labelledby="curtainTitle">
-      <p class="kicker">The quiet boundary</p>
+      <p class="kicker">The afternoon closes</p>
       <div class="curtain-ornament" aria-hidden="true"><span></span><i></i><span></span></div>
       <h1 id="curtainTitle">Sector Sprint<br><em>has closed.</em></h1>
-      <p>The city route reached its authored boundary before all five Acts were completed. No completion reading was recorded.</p>
+      <p>The afternoon has come to a close. The rest of the city can wait. No completed journey was added to the Gallery.</p>
       <p class="result-boundary">Entertainment boundary · private by design · nothing added to the Gallery</p>
       <div class="curtain-actions">
         <button class="primary-action" type="button" data-route="home">Return to the Grand Salon</button>

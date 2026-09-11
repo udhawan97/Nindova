@@ -7,7 +7,8 @@
   <meta name="application-name" content="Nindova">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath d='M24 2 31 9 24 16 17 9Z' fill='%239A3A42'/%3E%3Cpath d='M24 32 31 39 24 46 17 39Z' fill='%239A3A42'/%3E%3Cpath d='M9 17 16 24 9 31 2 24Z' fill='%233A4A9E'/%3E%3Cpath d='M39 17 46 24 39 31 32 24Z' fill='%233A4A9E'/%3E%3Cpath d='M24 17 31 24 24 31 17 24Z' fill='%23E0A64B'/%3E%3C/svg%3E" type="image/svg+xml">
+  <link rel="icon" href="../site/public/brand/favicon.svg?inline" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../site/public/brand/apple-touch-icon.png" data-portable-remove>
   <link rel="manifest" href="./manifest.webmanifest" data-portable-remove>
   <title>Nindova — Masala Mound</title>
   <style>
@@ -158,55 +159,8 @@
       border-block-end: 1px solid color-mix(in oklch, var(--color-brass) 22%, transparent);
       background: color-mix(in oklch, var(--color-night) 94%, transparent);
     }
-    .wordmark {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-sm);
-      color: var(--color-ivory);
-      font-family: var(--font-display);
-      font-size: var(--text-md);
-      letter-spacing: 0.01em;
-    }
-    .wordmark-mark {
-      width: 1.85rem;
-      height: 1.85rem;
-      overflow: visible;
-    }
-    .wordmark-mark .mark-diamond {
-      opacity: 0;
-      transform-box: fill-box;
-      transform-origin: center;
-      animation: mark-stitch-in var(--dur-long) steps(5, end) both;
-    }
-    .wordmark-mark .mark-north { --from-x: 0px; --from-y: -7px; animation-delay: 80ms; }
-    .wordmark-mark .mark-south { --from-x: 0px; --from-y: 7px; animation-delay: 80ms; }
-    .wordmark-mark .mark-west { --from-x: -7px; --from-y: 0px; animation-delay: 240ms; }
-    .wordmark-mark .mark-east { --from-x: 7px; --from-y: 0px; animation-delay: 240ms; }
-    .wordmark-mark .mark-north-east { --from-x: 5px; --from-y: -5px; animation-delay: 400ms; }
-    .wordmark-mark .mark-south-west { --from-x: -5px; --from-y: 5px; animation-delay: 400ms; }
-    .wordmark-mark .mark-north-west { --from-x: -5px; --from-y: -5px; animation-delay: 560ms; }
-    .wordmark-mark .mark-south-east { --from-x: 5px; --from-y: 5px; animation-delay: 560ms; }
-    .wordmark-mark .mark-center {
-      opacity: 0;
-      transform-box: fill-box;
-      transform-origin: center;
-      animation: mark-center-settle var(--dur-long) steps(4, end) 740ms both;
-    }
-    .wordmark-label {
-      opacity: 0;
-      animation: mark-label-reveal var(--dur-long) var(--ease-out) 900ms both;
-    }
-    @keyframes mark-stitch-in {
-      0% { opacity: 0; transform: translate(var(--from-x), var(--from-y)) scale(0.62); }
-      66% { opacity: 1; transform: translate(0, 0) scale(1.08); }
-      100% { opacity: 1; transform: translate(0, 0) scale(1); }
-    }
-    @keyframes mark-center-settle {
-      0% { opacity: 0; transform: scale(0.4) rotate(45deg); }
-      70% { opacity: 1; transform: scale(1.12) rotate(0); }
-      100% { opacity: 1; transform: scale(1) rotate(0); }
-    }
-    @keyframes mark-label-reveal { to { opacity: 1; } }
+    .wordmark { display: inline-flex; align-items: center; flex: none; }
+    .wordmark-logo { display: block; width: clamp(8.8rem, 20vw, 10.6rem); height: auto; }
 
     .top-actions,
     .entry-actions,
@@ -1168,13 +1122,6 @@
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
       }
-      .wordmark-mark .mark-diamond,
-      .wordmark-mark .mark-center,
-      .wordmark-label {
-        animation: none !important;
-        opacity: 1 !important;
-        transform: none !important;
-      }
       .tile.is-pairing.is-removed {
         animation-name: pair-fade !important;
         transform: none !important;
@@ -1191,14 +1138,7 @@
   <main class="shell" id="app">
     <header class="topbar">
       <div class="wordmark">
-        <svg class="wordmark-mark" viewBox="0 0 48 48" aria-hidden="true">
-          <path class="mark-diamond mark-north" d="M24 3.4 29 8.4 24 13.4 19 8.4Z" fill="var(--color-madder)"/><path class="mark-diamond mark-south" d="M24 34.6 29 39.6 24 44.6 19 39.6Z" fill="var(--color-madder)"/>
-          <path class="mark-diamond mark-west" d="M8.4 19 13.4 24 8.4 29 3.4 24Z" fill="var(--color-sapphire)"/><path class="mark-diamond mark-east" d="M39.6 19 44.6 24 39.6 29 34.6 24Z" fill="var(--color-sapphire)"/>
-          <path class="mark-diamond mark-north-east" d="M31.8 11.2 36.8 16.2 31.8 21.2 26.8 16.2Z" fill="var(--color-gulabi)"/><path class="mark-diamond mark-south-west" d="M16.2 26.8 21.2 31.8 16.2 36.8 11.2 31.8Z" fill="var(--color-gulabi)"/>
-          <path class="mark-diamond mark-north-west" d="M16.2 11.2 21.2 16.2 16.2 21.2 11.2 16.2Z" fill="var(--color-ivory)"/><path class="mark-diamond mark-south-east" d="M31.8 26.8 36.8 31.8 31.8 36.8 26.8 31.8Z" fill="var(--color-ivory)"/>
-          <path class="mark-center" d="M24 19 29 24 24 29 19 24Z" fill="var(--color-brass)"/>
-        </svg>
-        <span class="wordmark-label">Nindova</span>
+        <img class="wordmark-logo" src="../site/public/brand/nindova-logo-horizontal.svg?inline" width="202" height="64" alt="Nindova">
       </div>
       <div class="top-actions">
         <button class="quiet-button" id="muteBtn" type="button" aria-pressed="false">sound off</button>
