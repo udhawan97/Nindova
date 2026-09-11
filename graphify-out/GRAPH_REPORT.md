@@ -1,16 +1,16 @@
 # Graph Report - Nindova  (2026-09-10)
 
 ## Corpus Check
-- 170 files · ~199,759 words
+- 171 files · ~200,283 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1428 nodes · 1907 edges · 152 communities (118 shown, 34 thin omitted)
+- 1433 nodes · 1911 edges · 153 communities (119 shown, 34 thin omitted)
 - Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 137 edges (avg confidence: 0.73)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d4a22b7b`
+- Built from commit: `885be71b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -88,8 +88,8 @@
 - Nindova v0.4.0 — Five Doors
 - Nindova v0.4.1 — House Continuity
 - Nindova v0.4.2 — Clean Return
-- house-navigation.ts
-- finishSession
+- completeSalonChapter
+- enforceBoundary
 - Nindova House
 - Nindova v0.4.3 — Held Boundaries
 - Deepen House boundaries and browser evidence
@@ -156,8 +156,9 @@
 - runnerInterpolatedFrame
 - Q: Implement all three audited Nindova tech-debt items: House optional art precache, Sector Sprint diagnostics, and public cache documentation drift
 - Q: How is Sector Sprint's runner state, input, Canvas renderer, audio loop, mobile performance, and reduced-motion route structured?
-- restoreActiveSession
-- state
+- finishSession
+- Nindova v0.5.0 — Illustrated House
+- createHouseNavigation
 
 ## God Nodes (most connected - your core abstractions)
 1. `scripts` - 29 edges
@@ -200,15 +201,15 @@
 - **Rasoi Dawn Visual Composition** — apps_site_public_media_rasoi_dawn_rasoi_dawn_image, apps_site_public_media_rasoi_dawn_first_light_kitchen, apps_site_public_media_rasoi_dawn_brass_plate_arrangement, apps_site_public_media_rasoi_dawn_warm_dawn_palette [INFERRED 0.95]
 - **Bounded Session Decision and Proof** — reference_nindova_master_brief_two_loop_law, reference_nindova_demo_fixed_session_state_arc, docs_adr_0005_cap_the_real_session_at_fifteen_minutes_fifteen_minute_session_cap [INFERRED 0.95]
 
-## Communities (152 total, 34 thin omitted)
+## Communities (153 total, 34 thin omitted)
 
 ### Community 0 - "session.ts"
-Cohesion: 0.07
-Nodes (35): NindovaDawn, boardElement, boardShell, boardStatus, closeDawn(), currentDawnEligibility(), dawnButton, dawnCanvas (+27 more)
+Cohesion: 0.08
+Nodes (36): NindovaDawn, boardElement, boardShell, boardStatus, closeDawn(), currentDawnEligibility(), dawnButton, dawnCanvas (+28 more)
 
 ### Community 1 - "rasoi-core.ts"
 Cohesion: 0.12
-Nodes (29): activeTiles(), availabilityReason(), BoardVerification, createBoard(), createPrng(), DEEPER_LAYOUT, freeTiles(), GENTLE_LAYOUT (+21 more)
+Nodes (28): activeTiles(), availabilityReason(), BoardVerification, createBoard(), createPrng(), DEEPER_LAYOUT, freeTiles(), GENTLE_LAYOUT (+20 more)
 
 ### Community 2 - "classic-studies.ts"
 Cohesion: 0.07
@@ -220,7 +221,7 @@ Nodes (41): Rasoi Pairs, ADR 0010 Replace the Vista Arc with Rasoi Pairs, Legacy
 
 ### Community 4 - "night-core.ts"
 Cohesion: 0.12
-Nodes (32): addCivilDays(), captureNight(), completeState(), decodeState(), emptyState(), isText(), LEGACY_HARBOR, LEGACY_MEADOW (+24 more)
+Nodes (31): addCivilDays(), captureNight(), completeState(), decodeState(), emptyState(), isText(), LEGACY_HARBOR, LEGACY_MEADOW (+23 more)
 
 ### Community 5 - "site/package.json"
 Cohesion: 0.10
@@ -239,12 +240,12 @@ Cohesion: 0.06
 Nodes (33): ACT_GRADES, firstLethalContact(), OBSTACLE_COLORS, OBSTACLE_CONTACT_SECONDS, OBSTACLE_GAPS, OBSTACLE_MATERIALS, OBSTACLE_SAFE_LANES, overlaps() (+25 more)
 
 ### Community 9 - "house.ts"
-Cohesion: 0.05
-Nodes (55): answerChoice(), audienceDialog, cancelGalleryClearButton, celebration, clearChapterTransition(), clearStackMove(), closeHouseAudio(), completeSalonChapter() (+47 more)
+Cohesion: 0.06
+Nodes (31): audienceDialog, cancelGalleryClearButton, celebration, confirmGalleryClearButton, DebugHouse, describePeg(), enterHouseButton, galleryClearCount (+23 more)
 
 ### Community 10 - "house-state.ts"
 Cohesion: 0.12
-Nodes (23): HOUSE_ACTIVE_SESSION_CODEC, validBase(), ActiveDecodeResult, ActiveGame, ActiveSessionCodec, createHouseStateStore(), emptyHouseState(), EntertainmentResult (+15 more)
+Nodes (25): HOUSE_ACTIVE_SESSION_CODEC, validBase(), ActiveDecodeResult, ActiveGame, ActiveSessionCodec, completeEntertainmentGame(), createHouseStateStore(), emptyHouseState() (+17 more)
 
 ### Community 11 - "Nindova Master Brief"
 Cohesion: 0.09
@@ -259,20 +260,20 @@ Cohesion: 0.09
 Nodes (23): 41 Plus Pure Unit Assertions, 722.289 Internal Elapsed Seconds, 722.330 Wall Seconds to End, 900.000-second Ceiling Observation, Responsive Semantic Accessibility Evidence, Automated Release Gates, Corrected Production Release Build, Dawn PWA and Standalone Evidence (+15 more)
 
 ### Community 14 - "escape"
-Cohesion: 0.22
-Nodes (15): describePeg(), escape(), renderAaduStudy(), renderBoardLines(), renderChoice(), renderChoiceVisual(), renderClassicStudy(), renderGame() (+7 more)
+Cohesion: 0.16
+Nodes (21): destinationForView(), escape(), finishCompletedGame(), gameSigil(), getDoorCategory, getGame, handleSectorTerminal(), openCategory() (+13 more)
 
 ### Community 15 - "drawRunnerFrame"
 Cohesion: 0.16
 Nodes (23): drawActSetting(), drawCinematicGrade(), drawCityLayers(), drawComplicationAura(), drawComplicationGate(), drawDiamond(), drawFlourish(), drawForeground() (+15 more)
 
 ### Community 16 - "salon-catalog.ts"
-Cohesion: 0.09
-Nodes (20): doorArt(), renderHome(), ChoiceChapter, ChoiceGameDefinition, ClassicGameDefinition, ClassicStudyId, DOOR_CATEGORIES, DoorCategory (+12 more)
+Cohesion: 0.07
+Nodes (28): doorArt(), HistoryMode, HouseDestination, HouseNavigationState, HouseView, HouseViewOptions, NavigationOptions, PendingDestination (+20 more)
 
 ### Community 17 - "salon-table-lifecycle.ts"
-Cohesion: 0.18
-Nodes (16): runner(), view(), cloneActive(), createSalonTableLifecycle(), initialSession(), LifecycleOptions, preferredFocus(), SalonTableEffect (+8 more)
+Cohesion: 0.23
+Nodes (13): cloneActive(), createSalonTableLifecycle(), initialSession(), LifecycleOptions, SalonTableEffect, SalonTableInteraction, SalonTableView, initialPegs() (+5 more)
 
 ### Community 18 - "Nindova game quality plan"
 Cohesion: 0.10
@@ -280,7 +281,7 @@ Nodes (20): 1. Input and motion, 2. Visual hierarchy, 3. Intrinsic feedback, 4. 
 
 ### Community 19 - "dawn-core.ts"
 Cohesion: 0.12
-Nodes (18): chooseLoopType(), DAWN_PALETTE, DawnEligibility, DawnLocalParts, drawCanvasMotif(), drawDawnLattice(), drawDawnPlate(), eligibility() (+10 more)
+Nodes (19): chooseLoopType(), DAWN_PALETTE, DawnEligibility, DawnLocalParts, drawCanvasMotif(), drawDawnLattice(), drawDawnPlate(), eligibility() (+11 more)
 
 ### Community 20 - "house.mjs"
 Cohesion: 0.15
@@ -395,8 +396,8 @@ Cohesion: 0.36
 Nodes (8): Sector Sprint Illustrated Action Route Capture, Lit Architectural Gate Corridor, Fixed Authored Route, Hold Lane Instruction, Illustrated Punjabi Traveler, Act-Local Phone Flare Tool, Sabzi Load Complication, Sector 22 Route
 
 ### Community 49 - "active-session.ts"
-Cohesion: 0.20
-Nodes (14): ActiveSessionDecoded, ActiveSessionEnding, ActiveSessionLimits, ActiveSessionPhase, ActiveSessionRecord, ActiveSessionRejection, decodeActiveSession(), decodeStoredSession() (+6 more)
+Cohesion: 0.17
+Nodes (16): ActiveSessionDecoded, ActiveSessionEnding, ActiveSessionLimits, ActiveSessionPhase, ActiveSessionRecord, ActiveSessionRejection, decodeActiveSession(), decodeStoredSession() (+8 more)
 
 ### Community 50 - "Nindova Rasoi Diamond Favicon"
 Cohesion: 0.33
@@ -482,13 +483,13 @@ Nodes (4): Evidence boundary, Files, Highlights, Nindova v0.4.1 — House Contin
 Cohesion: 0.40
 Nodes (4): Evidence boundary, Files, Highlights, Nindova v0.4.2 — Clean Return
 
-### Community 73 - "house-navigation.ts"
-Cohesion: 0.18
-Nodes (9): createHouseNavigation(), HistoryMode, HouseDestination, HouseNavigationState, HouseView, HouseViewOptions, NavigationOptions, PendingDestination (+1 more)
+### Community 73 - "completeSalonChapter"
+Cohesion: 0.16
+Nodes (18): answerChoice(), clearChapterTransition(), clearStackMove(), closeHouseAudio(), completeSalonChapter(), focusElement(), playChime(), playSectorTone() (+10 more)
 
-### Community 74 - "finishSession"
-Cohesion: 0.27
-Nodes (13): advanceBy(), clearClosureTimers(), element(), enforceBoundary(), enterDrift(), enterRest(), finishSession(), nowMs() (+5 more)
+### Community 74 - "enforceBoundary"
+Cohesion: 0.28
+Nodes (9): advanceBy(), clearClosureTimers(), enforceBoundary(), enterDrift(), enterRest(), iconSvg(), nowMs(), renderDrift() (+1 more)
 
 ### Community 75 - "Nindova House"
 Cohesion: 0.29
@@ -503,8 +504,8 @@ Cohesion: 0.50
 Nodes (3): Deepen House boundaries and browser evidence, Evidence boundary, Preserved product constraints
 
 ### Community 78 - "beginSession"
-Cohesion: 0.38
-Nodes (12): NindovaRasoi, animatePair(), beginSession(), createBoardDom(), hint(), persistActiveSession(), selectTile(), setStatus() (+4 more)
+Cohesion: 0.31
+Nodes (15): NindovaRasoi, anchorSessionClock(), animatePair(), beginSession(), createBoardDom(), hint(), persistActiveSession(), restoreActiveSession() (+7 more)
 
 ### Community 79 - "Visual system"
 Cohesion: 0.40
@@ -630,16 +631,20 @@ Nodes (4): Answer, Outcome, Q: Implement all three audited Nindova tech-debt ite
 Cohesion: 0.50
 Nodes (3): Answer, Outcome, Q: How is Sector Sprint's runner state, input, Canvas renderer, audio loop, mobile performance, and reduced-motion route structured?
 
-### Community 150 - "restoreActiveSession"
-Cohesion: 0.33
-Nodes (7): NindovaActiveSession, anchorSessionClock(), clearActiveSession(), LEGACY_ACTIVE_SESSION_KEYS, readActiveSessionRaw(), restoreActiveSession(), safeStorage()
+### Community 150 - "finishSession"
+Cohesion: 0.40
+Nodes (6): clearActiveSession(), finishSession(), LEGACY_ACTIVE_SESSION_KEYS, readActiveSessionRaw(), renderPathNote(), safeStorage()
 
-### Community 153 - "state"
-Cohesion: 0.50
-Nodes (3): errors, page, state()
+### Community 151 - "Nindova v0.5.0 — Illustrated House"
+Cohesion: 0.40
+Nodes (4): Highlights, Nindova v0.5.0 — Illustrated House, Release files, Verification
+
+### Community 153 - "createHouseNavigation"
+Cohesion: 0.33
+Nodes (5): createHouseNavigation(), errors, page, state(), back()
 
 ## Knowledge Gaps
-- **630 isolated node(s):** `name`, `version`, `license`, `private`, `type` (+625 more)
+- **633 isolated node(s):** `name`, `version`, `license`, `private`, `type` (+628 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **34 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -660,17 +665,17 @@ Nodes (3): errors, page, state()
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `createHouseNavigation()` connect `house-navigation.ts` to `house.ts`, `state`, `beginSession`?**
+- **Why does `createHouseNavigation()` connect `createHouseNavigation` to `salon-catalog.ts`, `house.ts`, `beginSession`?**
   _High betweenness centrality (0.091) - this node is a cross-community bridge._
-- **Why does `settle()` connect `beginSession` to `session.ts`, `house-navigation.ts`, `finishSession`, `restoreActiveSession`?**
+- **Why does `settle()` connect `beginSession` to `session.ts`, `createHouseNavigation`, `enforceBoundary`, `finishSession`?**
   _High betweenness centrality (0.078) - this node is a cross-community bridge._
-- **Why does `back()` connect `house-navigation.ts` to `house-navigation.test.mjs`?**
+- **Why does `back()` connect `createHouseNavigation` to `house-navigation.test.mjs`?**
   _High betweenness centrality (0.014) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `license` to the rest of the system?**
-  _630 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _633 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `session.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.07396870554765292 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._
 - **Should `rasoi-core.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.11724137931034483 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.12315270935960591 - nodes in this community are weakly interconnected._
 - **Should `classic-studies.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.07308970099667775 - nodes in this community are weakly interconnected._

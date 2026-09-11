@@ -1034,8 +1034,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "apps_house_src_house_navigation_ts_apps_house_src_house_navigation",
-      "community": 73,
-      "community_name": "house-navigation.ts",
+      "community": 16,
+      "community_name": "salon-catalog.ts",
       "norm_label": "house-navigation.ts"
     },
     {
@@ -1045,8 +1045,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "apps_house_src_house_navigation_houseview",
-      "community": 73,
-      "community_name": "house-navigation.ts",
+      "community": 16,
+      "community_name": "salon-catalog.ts",
       "norm_label": "houseview"
     },
     {
@@ -1056,8 +1056,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "apps_house_src_house_navigation_historymode",
-      "community": 73,
-      "community_name": "house-navigation.ts",
+      "community": 16,
+      "community_name": "salon-catalog.ts",
       "norm_label": "historymode"
     },
     {
@@ -1067,8 +1067,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "apps_house_src_house_navigation_houseviewoptions",
-      "community": 73,
-      "community_name": "house-navigation.ts",
+      "community": 16,
+      "community_name": "salon-catalog.ts",
       "norm_label": "houseviewoptions"
     },
     {
@@ -1078,8 +1078,8 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "apps_house_src_house_navigation_housedestination",
-      "community": 73,
-      "community_name": "house-navigation.ts",
+      "community": 16,
+      "community_name": "salon-catalog.ts",
       "norm_label": "housedestination"
     },
     {
@@ -1089,8 +1089,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "apps_house_src_house_navigation_housenavigationstate",
-      "community": 73,
-      "community_name": "house-navigation.ts",
+      "community": 16,
+      "community_name": "salon-catalog.ts",
       "norm_label": "housenavigationstate"
     },
     {
@@ -1100,8 +1100,8 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "apps_house_src_house_navigation_navigationoptions",
-      "community": 73,
-      "community_name": "house-navigation.ts",
+      "community": 16,
+      "community_name": "salon-catalog.ts",
       "norm_label": "navigationoptions"
     },
     {
@@ -1111,8 +1111,8 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "apps_house_src_house_navigation_pendingdestination",
-      "community": 73,
-      "community_name": "house-navigation.ts",
+      "community": 16,
+      "community_name": "salon-catalog.ts",
       "norm_label": "pendingdestination"
     },
     {
@@ -1122,8 +1122,8 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "apps_house_src_house_navigation_destinationkey",
-      "community": 73,
-      "community_name": "house-navigation.ts",
+      "community": 16,
+      "community_name": "salon-catalog.ts",
       "norm_label": "destinationkey()"
     },
     {
@@ -1133,8 +1133,8 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "apps_house_src_house_navigation_createhousenavigation",
-      "community": 73,
-      "community_name": "house-navigation.ts",
+      "community": 153,
+      "community_name": "createHouseNavigation",
       "norm_label": "createhousenavigation()"
     },
     {
@@ -1375,8 +1375,8 @@
       "source_location": "L123",
       "_origin": "ast",
       "id": "apps_house_src_house_state_completeentertainmentgame",
-      "community": 14,
-      "community_name": "escape",
+      "community": 10,
+      "community_name": "house-state.ts",
       "norm_label": "completeentertainmentgame()"
     },
     {
@@ -1441,8 +1441,8 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "apps_house_src_house_getgame",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 14,
+      "community_name": "escape",
       "norm_label": "getgame"
     },
     {
@@ -1452,8 +1452,8 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "apps_house_src_house_getdoorcategory",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 14,
+      "community_name": "escape",
       "norm_label": "getdoorcategory"
     },
     {
@@ -1694,8 +1694,8 @@
       "source_location": "L107",
       "_origin": "ast",
       "id": "apps_house_src_house_clearstackmove",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 73,
+      "community_name": "completeSalonChapter",
       "norm_label": "clearstackmove()"
     },
     {
@@ -1749,8 +1749,8 @@
       "source_location": "L188",
       "_origin": "ast",
       "id": "apps_house_src_house_destinationforview",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 14,
+      "community_name": "escape",
       "norm_label": "destinationforview()"
     },
     {
@@ -1760,8 +1760,8 @@
       "source_location": "L201",
       "_origin": "ast",
       "id": "apps_house_src_house_route",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 14,
+      "community_name": "escape",
       "norm_label": "route()"
     },
     {
@@ -1771,8 +1771,8 @@
       "source_location": "L205",
       "_origin": "ast",
       "id": "apps_house_src_house_requestroute",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 14,
+      "community_name": "escape",
       "norm_label": "requestroute()"
     },
     {
@@ -1793,8 +1793,8 @@
       "source_location": "L213",
       "_origin": "ast",
       "id": "apps_house_src_house_opencategory",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 14,
+      "community_name": "escape",
       "norm_label": "opencategory()"
     },
     {
@@ -1804,8 +1804,8 @@
       "source_location": "L218",
       "_origin": "ast",
       "id": "apps_house_src_house_startgame",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 73,
+      "community_name": "completeSalonChapter",
       "norm_label": "startgame()"
     },
     {
@@ -1837,8 +1837,8 @@
       "source_location": "L249",
       "_origin": "ast",
       "id": "apps_house_src_house_gamesigil",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 14,
+      "community_name": "escape",
       "norm_label": "gamesigil()"
     },
     {
@@ -1848,8 +1848,8 @@
       "source_location": "L254",
       "_origin": "ast",
       "id": "apps_house_src_house_render",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 73,
+      "community_name": "completeSalonChapter",
       "norm_label": "render()"
     },
     {
@@ -1859,8 +1859,8 @@
       "source_location": "L261",
       "_origin": "ast",
       "id": "apps_house_src_house_focuselement",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 73,
+      "community_name": "completeSalonChapter",
       "norm_label": "focuselement()"
     },
     {
@@ -1870,8 +1870,8 @@
       "source_location": "L270",
       "_origin": "ast",
       "id": "apps_house_src_house_clearchaptertransition",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 73,
+      "community_name": "completeSalonChapter",
       "norm_label": "clearchaptertransition()"
     },
     {
@@ -1892,8 +1892,8 @@
       "source_location": "L286",
       "_origin": "ast",
       "id": "apps_house_src_house_resumechaptertransition",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 73,
+      "community_name": "completeSalonChapter",
       "norm_label": "resumechaptertransition()"
     },
     {
@@ -1903,8 +1903,8 @@
       "source_location": "L302",
       "_origin": "ast",
       "id": "apps_house_src_house_schedulechaptertransition",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 73,
+      "community_name": "completeSalonChapter",
       "norm_label": "schedulechaptertransition()"
     },
     {
@@ -1925,8 +1925,8 @@
       "source_location": "L374",
       "_origin": "ast",
       "id": "apps_house_src_house_rendercategory",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 14,
+      "community_name": "escape",
       "norm_label": "rendercategory()"
     },
     {
@@ -1936,8 +1936,8 @@
       "source_location": "L407",
       "_origin": "ast",
       "id": "apps_house_src_house_rendergallery",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 73,
+      "community_name": "completeSalonChapter",
       "norm_label": "rendergallery()"
     },
     {
@@ -2057,8 +2057,8 @@
       "source_location": "L660",
       "_origin": "ast",
       "id": "apps_house_src_house_renderstack",
-      "community": 14,
-      "community_name": "escape",
+      "community": 9,
+      "community_name": "house.ts",
       "norm_label": "renderstack()"
     },
     {
@@ -2068,8 +2068,8 @@
       "source_location": "L692",
       "_origin": "ast",
       "id": "apps_house_src_house_describepeg",
-      "community": 14,
-      "community_name": "escape",
+      "community": 9,
+      "community_name": "house.ts",
       "norm_label": "describepeg()"
     },
     {
@@ -2079,8 +2079,8 @@
       "source_location": "L698",
       "_origin": "ast",
       "id": "apps_house_src_house_answerchoice",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 73,
+      "community_name": "completeSalonChapter",
       "norm_label": "answerchoice()"
     },
     {
@@ -2090,8 +2090,8 @@
       "source_location": "L718",
       "_origin": "ast",
       "id": "apps_house_src_house_completesalonchapter",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 73,
+      "community_name": "completeSalonChapter",
       "norm_label": "completesalonchapter()"
     },
     {
@@ -2101,8 +2101,8 @@
       "source_location": "L741",
       "_origin": "ast",
       "id": "apps_house_src_house_finishcompletedgame",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 14,
+      "community_name": "escape",
       "norm_label": "finishcompletedgame()"
     },
     {
@@ -2112,8 +2112,8 @@
       "source_location": "L774",
       "_origin": "ast",
       "id": "apps_house_src_house_renderrunnerboundary",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 73,
+      "community_name": "completeSalonChapter",
       "norm_label": "renderrunnerboundary()"
     },
     {
@@ -2123,8 +2123,8 @@
       "source_location": "L796",
       "_origin": "ast",
       "id": "apps_house_src_house_handlesectorterminal",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 14,
+      "community_name": "escape",
       "norm_label": "handlesectorterminal()"
     },
     {
@@ -2134,8 +2134,8 @@
       "source_location": "L802",
       "_origin": "ast",
       "id": "apps_house_src_house_selectpeg",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 73,
+      "community_name": "completeSalonChapter",
       "norm_label": "selectpeg()"
     },
     {
@@ -2145,8 +2145,8 @@
       "source_location": "L823",
       "_origin": "ast",
       "id": "apps_house_src_house_resetstackchapter",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 73,
+      "community_name": "completeSalonChapter",
       "norm_label": "resetstackchapter()"
     },
     {
@@ -2156,8 +2156,8 @@
       "source_location": "L832",
       "_origin": "ast",
       "id": "apps_house_src_house_showcelebration",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 73,
+      "community_name": "completeSalonChapter",
       "norm_label": "showcelebration()"
     },
     {
@@ -2189,8 +2189,8 @@
       "source_location": "L853",
       "_origin": "ast",
       "id": "apps_house_src_house_closehouseaudio",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 73,
+      "community_name": "completeSalonChapter",
       "norm_label": "closehouseaudio()"
     },
     {
@@ -2211,8 +2211,8 @@
       "source_location": "L871",
       "_origin": "ast",
       "id": "apps_house_src_house_playtonesequence",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 73,
+      "community_name": "completeSalonChapter",
       "norm_label": "playtonesequence()"
     },
     {
@@ -2222,8 +2222,8 @@
       "source_location": "L900",
       "_origin": "ast",
       "id": "apps_house_src_house_playsectortone",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 73,
+      "community_name": "completeSalonChapter",
       "norm_label": "playsectortone()"
     },
     {
@@ -2233,8 +2233,8 @@
       "source_location": "L917",
       "_origin": "ast",
       "id": "apps_house_src_house_playchime",
-      "community": 9,
-      "community_name": "house.ts",
+      "community": 73,
+      "community_name": "completeSalonChapter",
       "norm_label": "playchime()"
     },
     {
@@ -2244,8 +2244,8 @@
       "source_location": "L1093",
       "_origin": "ast",
       "id": "apps_house_src_house_view",
-      "community": 17,
-      "community_name": "salon-table-lifecycle.ts",
+      "community": 9,
+      "community_name": "house.ts",
       "norm_label": "view()"
     },
     {
@@ -2266,8 +2266,8 @@
       "source_location": "L1096",
       "_origin": "ast",
       "id": "apps_house_src_house_runner",
-      "community": 17,
-      "community_name": "salon-table-lifecycle.ts",
+      "community": 9,
+      "community_name": "house.ts",
       "norm_label": "runner()"
     },
     {
@@ -2288,8 +2288,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "apps_house_src_salon_catalog_gameid",
-      "community": 10,
-      "community_name": "house-state.ts",
+      "community": 16,
+      "community_name": "salon-catalog.ts",
       "norm_label": "gameid"
     },
     {
@@ -2519,8 +2519,8 @@
       "source_location": "L143",
       "_origin": "ast",
       "id": "apps_house_src_salon_catalog_grand_salon",
-      "community": 14,
-      "community_name": "escape",
+      "community": 10,
+      "community_name": "house-state.ts",
       "norm_label": "grand_salon"
     },
     {
@@ -2607,8 +2607,8 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "apps_house_src_salon_table_lifecycle_preferredfocus",
-      "community": 17,
-      "community_name": "salon-table-lifecycle.ts",
+      "community": 10,
+      "community_name": "house-state.ts",
       "norm_label": "preferredfocus()"
     },
     {
@@ -4411,8 +4411,8 @@
       "source_location": "L120",
       "_origin": "ast",
       "id": "apps_session_src_active_session_nindovaactivesession",
-      "community": 150,
-      "community_name": "restoreActiveSession",
+      "community": 49,
+      "community_name": "active-session.ts",
       "norm_label": "nindovaactivesession"
     },
     {
@@ -4884,8 +4884,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "apps_session_src_night_core_nightcompletion",
-      "community": 4,
-      "community_name": "night-core.ts",
+      "community": 19,
+      "community_name": "dawn-core.ts",
       "norm_label": "nightcompletion"
     },
     {
@@ -5269,8 +5269,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "apps_session_src_rasoi_core_rasoiprofileid",
-      "community": 1,
-      "community_name": "rasoi-core.ts",
+      "community": 49,
+      "community_name": "active-session.ts",
       "norm_label": "rasoiprofileid"
     },
     {
@@ -5666,7 +5666,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_legacy_active_session_keys",
       "community": 150,
-      "community_name": "restoreActiveSession",
+      "community_name": "finishSession",
       "norm_label": "legacy_active_session_keys"
     },
     {
@@ -5676,8 +5676,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "apps_session_src_session_element",
-      "community": 74,
-      "community_name": "finishSession",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "element()"
     },
     {
@@ -5897,7 +5897,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_safestorage",
       "community": 150,
-      "community_name": "restoreActiveSession",
+      "community_name": "finishSession",
       "norm_label": "safestorage()"
     },
     {
@@ -5918,8 +5918,8 @@
       "source_location": "L103",
       "_origin": "ast",
       "id": "apps_session_src_session_showview",
-      "community": 74,
-      "community_name": "finishSession",
+      "community": 78,
+      "community_name": "beginSession",
       "norm_label": "showview()"
     },
     {
@@ -5929,8 +5929,8 @@
       "source_location": "L114",
       "_origin": "ast",
       "id": "apps_session_src_session_iconsvg",
-      "community": 0,
-      "community_name": "session.ts",
+      "community": 74,
+      "community_name": "enforceBoundary",
       "norm_label": "iconsvg()"
     },
     {
@@ -5996,7 +5996,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_clearactivesession",
       "community": 150,
-      "community_name": "restoreActiveSession",
+      "community_name": "finishSession",
       "norm_label": "clearactivesession()"
     },
     {
@@ -6006,8 +6006,8 @@
       "source_location": "L225",
       "_origin": "ast",
       "id": "apps_session_src_session_anchorsessionclock",
-      "community": 150,
-      "community_name": "restoreActiveSession",
+      "community": 78,
+      "community_name": "beginSession",
       "norm_label": "anchorsessionclock()"
     },
     {
@@ -6018,7 +6018,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_readactivesessionraw",
       "community": 150,
-      "community_name": "restoreActiveSession",
+      "community_name": "finishSession",
       "norm_label": "readactivesessionraw()"
     },
     {
@@ -6028,8 +6028,8 @@
       "source_location": "L238",
       "_origin": "ast",
       "id": "apps_session_src_session_restoreactivesession",
-      "community": 150,
-      "community_name": "restoreActiveSession",
+      "community": 78,
+      "community_name": "beginSession",
       "norm_label": "restoreactivesession()"
     },
     {
@@ -6116,7 +6116,7 @@
       "source_location": "L431",
       "_origin": "ast",
       "id": "apps_session_src_session_finishsession",
-      "community": 74,
+      "community": 150,
       "community_name": "finishSession",
       "norm_label": "finishsession()"
     },
@@ -6127,7 +6127,7 @@
       "source_location": "L457",
       "_origin": "ast",
       "id": "apps_session_src_session_renderpathnote",
-      "community": 74,
+      "community": 150,
       "community_name": "finishSession",
       "norm_label": "renderpathnote()"
     },
@@ -6139,7 +6139,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_nowms",
       "community": 74,
-      "community_name": "finishSession",
+      "community_name": "enforceBoundary",
       "norm_label": "nowms()"
     },
     {
@@ -6150,7 +6150,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_clearclosuretimers",
       "community": 74,
-      "community_name": "finishSession",
+      "community_name": "enforceBoundary",
       "norm_label": "clearclosuretimers()"
     },
     {
@@ -6161,7 +6161,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_enterrest",
       "community": 74,
-      "community_name": "finishSession",
+      "community_name": "enforceBoundary",
       "norm_label": "enterrest()"
     },
     {
@@ -6172,7 +6172,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_schedulerest",
       "community": 74,
-      "community_name": "finishSession",
+      "community_name": "enforceBoundary",
       "norm_label": "schedulerest()"
     },
     {
@@ -6182,8 +6182,8 @@
       "source_location": "L508",
       "_origin": "ast",
       "id": "apps_session_src_session_renderdrift",
-      "community": 0,
-      "community_name": "session.ts",
+      "community": 74,
+      "community_name": "enforceBoundary",
       "norm_label": "renderdrift()"
     },
     {
@@ -6194,7 +6194,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_enterdrift",
       "community": 74,
-      "community_name": "finishSession",
+      "community_name": "enforceBoundary",
       "norm_label": "enterdrift()"
     },
     {
@@ -6205,7 +6205,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_enforceboundary",
       "community": 74,
-      "community_name": "finishSession",
+      "community_name": "enforceBoundary",
       "norm_label": "enforceboundary()"
     },
     {
@@ -6216,7 +6216,7 @@
       "_origin": "ast",
       "id": "apps_session_src_session_advanceby",
       "community": 74,
-      "community_name": "finishSession",
+      "community_name": "enforceBoundary",
       "norm_label": "advanceby()"
     },
     {
@@ -6281,8 +6281,8 @@
       "source_location": "L585",
       "_origin": "ast",
       "id": "apps_session_src_session_opendawn",
-      "community": 74,
-      "community_name": "finishSession",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "opendawn()"
     },
     {
@@ -6347,8 +6347,8 @@
       "source_location": "L647",
       "_origin": "ast",
       "id": "apps_session_src_session_returntointake",
-      "community": 74,
-      "community_name": "finishSession",
+      "community": 0,
+      "community_name": "session.ts",
       "norm_label": "returntointake()"
     },
     {
@@ -7800,7 +7800,7 @@
       "_origin": "ast",
       "id": "reference_test_demo",
       "community": 153,
-      "community_name": "state",
+      "community_name": "createHouseNavigation",
       "norm_label": "test-demo.mjs"
     },
     {
@@ -7811,7 +7811,7 @@
       "_origin": "ast",
       "id": "reference_test_demo_errors",
       "community": 153,
-      "community_name": "state",
+      "community_name": "createHouseNavigation",
       "norm_label": "errors"
     },
     {
@@ -7822,7 +7822,7 @@
       "_origin": "ast",
       "id": "reference_test_demo_page",
       "community": 153,
-      "community_name": "state",
+      "community_name": "createHouseNavigation",
       "norm_label": "page"
     },
     {
@@ -7833,7 +7833,7 @@
       "_origin": "ast",
       "id": "reference_test_demo_state",
       "community": 153,
-      "community_name": "state",
+      "community_name": "createHouseNavigation",
       "norm_label": "state()"
     },
     {
@@ -9658,8 +9658,8 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "tests_unit_house_navigation_test_back",
-      "community": 73,
-      "community_name": "house-navigation.ts",
+      "community": 153,
+      "community_name": "createHouseNavigation",
       "norm_label": "back()"
     },
     {
@@ -11685,6 +11685,61 @@
       "community": 102,
       "community_name": "Nindova v0.4.4 \u2014 Kept Nights",
       "norm_label": "notes"
+    },
+    {
+      "label": "v0.5.0.md",
+      "file_type": "document",
+      "source_file": "docs/releases/v0.5.0.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_releases_v0_5_0",
+      "community": 151,
+      "community_name": "Nindova v0.5.0 \u2014 Illustrated House",
+      "norm_label": "v0.5.0.md"
+    },
+    {
+      "label": "Nindova v0.5.0 \u2014 Illustrated House",
+      "file_type": "document",
+      "source_file": "docs/releases/v0.5.0.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_releases_v0_5_0_nindova_v0_5_0_illustrated_house",
+      "community": 151,
+      "community_name": "Nindova v0.5.0 \u2014 Illustrated House",
+      "norm_label": "nindova v0.5.0 \u2014 illustrated house"
+    },
+    {
+      "label": "Highlights",
+      "file_type": "document",
+      "source_file": "docs/releases/v0.5.0.md",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "docs_releases_v0_5_0_highlights",
+      "community": 151,
+      "community_name": "Nindova v0.5.0 \u2014 Illustrated House",
+      "norm_label": "highlights"
+    },
+    {
+      "label": "Verification",
+      "file_type": "document",
+      "source_file": "docs/releases/v0.5.0.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "docs_releases_v0_5_0_verification",
+      "community": 151,
+      "community_name": "Nindova v0.5.0 \u2014 Illustrated House",
+      "norm_label": "verification"
+    },
+    {
+      "label": "Release files",
+      "file_type": "document",
+      "source_file": "docs/releases/v0.5.0.md",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "docs_releases_v0_5_0_release_files",
+      "community": 151,
+      "community_name": "Nindova v0.5.0 \u2014 Illustrated House",
+      "norm_label": "release files"
     },
     {
       "label": "bedtime-game-evidence.md",
@@ -34177,6 +34232,50 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "docs/releases/v0.5.0.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_releases_v0_5_0",
+      "target": "docs_releases_v0_5_0_nindova_v0_5_0_illustrated_house",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/releases/v0.5.0.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_releases_v0_5_0_nindova_v0_5_0_illustrated_house",
+      "target": "docs_releases_v0_5_0_highlights",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/releases/v0.5.0.md",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_releases_v0_5_0_nindova_v0_5_0_illustrated_house",
+      "target": "docs_releases_v0_5_0_release_files",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/releases/v0.5.0.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_releases_v0_5_0_nindova_v0_5_0_illustrated_house",
+      "target": "docs_releases_v0_5_0_verification",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "docs/research/bedtime-game-evidence.md",
       "source_location": "L1",
       "weight": 1.0,
@@ -38241,5 +38340,5 @@
       "source_file": "reference/nindova-master-brief.md"
     }
   ],
-  "built_at_commit": "d4a22b7b70f1ef94f1974976108116e2a68efd64"
+  "built_at_commit": "885be71b93958baff0106656d3b7cf5a3fb85145"
 }

@@ -72,8 +72,8 @@
   "70": "Nindova v0.4.0 — Five Doors",
   "71": "Nindova v0.4.1 — House Continuity",
   "72": "Nindova v0.4.2 — Clean Return",
-  "73": "house-navigation.ts",
-  "74": "finishSession",
+  "73": "completeSalonChapter",
+  "74": "enforceBoundary",
   "75": "Nindova House",
   "76": "Nindova v0.4.3 — Held Boundaries",
   "77": "Deepen House boundaries and browser evidence",
@@ -149,6 +149,7 @@
   "147": "runnerInterpolatedFrame",
   "148": "Q: Implement all three audited Nindova tech-debt items: House optional art precache, Sector Sprint diagnostics, and public cache documentation drift",
   "149": "Q: How is Sector Sprint's runner state, input, Canvas renderer, audio loop, mobile performance, and reduced-motion route structured?",
-  "150": "restoreActiveSession",
-  "153": "state"
+  "150": "finishSession",
+  "151": "Nindova v0.5.0 — Illustrated House",
+  "153": "createHouseNavigation"
 }
