@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Illustrated the House entrance with an original lantern-lit courtyard and gave each Salon door a distinct vector miniature. The artwork is local, resolution-independent, and has no continuous animation loop.
+- Added warmer brass controls, dimensional Pattern Court pieces, a deeper Mirror Forge setting, and a carved Rasoi tray with nine detailed kitchen motifs and ivory tile edges.
+- Deepened Sector Sprint scenery with layered foothills, lunar detail, and recessed Chandigarh shopfronts. Cached the sky and three parallax strips, bounded to the current Act, quality tier, and viewport scale, with explicit backing-store release and a direct-paint fallback.
+- Preserved authored routes, collision geometry, reduced-motion alternatives, keyboard controls, optional sound, local-only state, and the Night Room ending.
+
 ## 0.4.4 — 2026-08-20
 
 ### Changed

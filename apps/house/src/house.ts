@@ -2,6 +2,7 @@ import "@fontsource-variable/newsreader";
 import "@fontsource-variable/geist";
 import "../../../tokens.css";
 import "./house.css";
+import { courtyardArt, doorArt } from "./house-art";
 import {
   createHouseStateStore,
   type ActiveGame,
@@ -250,10 +251,6 @@ function gameSigil(gameId: GameId): string {
   return `<span class="game-sigil game-sigil-${gameId}" aria-hidden="true">${Array.from({ length: pieces }, (_, index) => `<i style="--sigil-index:${index}"></i>`).join("")}</span>`;
 }
 
-function categorySigil(categoryId: DoorCategoryId): string {
-  return `<span class="category-sigil category-sigil-${categoryId}" aria-hidden="true">${Array.from({ length: 5 }, (_, index) => `<i style="--sigil-index:${index}"></i>`).join("")}</span>`;
-}
-
 function render() {
   if (view === "home") renderHome();
   else if (view === "category") renderCategory();
@@ -324,16 +321,17 @@ function renderHome() {
       </section>
     ` : ""}
     <section class="house-intro" aria-labelledby="houseTitle">
-      <p class="kicker">A private house of authored games</p>
+      <div class="house-intro-copy"><p class="kicker">A private house of authored games</p>
       <h1 id="houseTitle" tabindex="-1">Choose a room.<br><em>Stay for the pleasure of solving.</em></h1>
       <button class="primary-action house-browse" type="button" data-browse-salon>Browse five doors</button>
-      <p class="house-lede">Five doors hold eight games, each arranged in five deliberate chapters or studies. Nothing is ranked, broadcast, or compared with other people.</p>
+      <p class="house-lede">Five doors hold eight games, each arranged in five deliberate chapters or studies. Nothing is ranked, broadcast, or compared with other people.</p></div>
+      ${courtyardArt}
     </section>
     <section class="floor-plan" aria-label="Nindova House rooms">
       <a class="room room-night" href="../play/">
         <span class="room-number">North wing</span>
         <span class="room-title">The Night Room</span>
-        <span class="room-copy">Masala Mound keeps its bounded Night contract, protected by the full regression suite.</span>
+        <span class="room-copy">Find familiar kitchen pairs on a carved tray, then let the room settle into quiet.</span>
         <span class="room-enter">Enter the Night Room <span aria-hidden="true">→</span></span>
       </a>
       <div class="room room-salon">
@@ -344,7 +342,7 @@ function renderHome() {
         <div class="salon-plan">
           ${DOOR_CATEGORIES.map((category) => `
             <button class="game-door category-door category-door-${escape(category.id)}" type="button" data-category="${escape(category.id)}">
-              ${categorySigil(category.id)}
+              ${doorArt(category.id)}
               <span class="game-number">${category.number}</span>
               <span class="game-title">${escape(category.title)}</span>
               <span class="game-line">${escape(category.houseLine)}</span>

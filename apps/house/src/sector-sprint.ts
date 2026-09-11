@@ -1591,7 +1591,56 @@ function drawPerson(
   }
 }
 
+type SceneryCache = { key: string; surfaces: Map<string, HTMLCanvasElement | null> };
+const sceneryCaches = new WeakMap<CanvasRenderingContext2D, SceneryCache>();
+
+/** At most four surfaces for the current Act/tier/size. Old backing stores are
+ * released on a change; the WeakMap cannot retain a departed game canvas. */
+function scenerySurface(
+  context: CanvasRenderingContext2D,
+  state: RunnerState,
+  palette: RunnerPalette,
+  quality: RunnerRenderQuality,
+  name: string,
+  width: number,
+  paint: (surface: CanvasRenderingContext2D) => void,
+): HTMLCanvasElement | null {
+  const owner = context.canvas?.ownerDocument;
+  if (!owner) return null;
+  const scale = Math.min(RUNNER_DPR_CAP, Math.max(0.5, context.canvas.width / RUNNER_WIDTH));
+  const key = `${state.actIndex}:${quality}:${scale}:${palette.inkSoft}`;
+  let cache = sceneryCaches.get(context);
+  if (!cache || cache.key !== key) {
+    cache?.surfaces.forEach((surface) => { if (surface) { surface.width = 0; surface.height = 0; } });
+    cache = { key, surfaces: new Map() };
+    sceneryCaches.set(context, cache);
+  }
+  const existing = cache.surfaces.get(name);
+  if (cache.surfaces.has(name)) return existing ?? null;
+  const surface = owner.createElement("canvas");
+  surface.width = Math.ceil(width * scale);
+  surface.height = Math.ceil(FLOOR_Y * scale);
+  const painter = surface.getContext("2d");
+  if (!painter) {
+    surface.width = 0;
+    surface.height = 0;
+    cache.surfaces.set(name, null);
+    return null;
+  }
+  painter.scale(surface.width / width, surface.height / FLOOR_Y);
+  paint(painter);
+  cache.surfaces.set(name, surface);
+  return surface;
+}
+
 function drawSky(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette, reducedMotion: boolean, quality: RunnerRenderQuality) {
+  const sky = scenerySurface(context, state, palette, quality, "sky", RUNNER_WIDTH,
+    (surface) => paintSky(surface, state, palette, true, quality));
+  if (sky) context.drawImage(sky, 0, 0, RUNNER_WIDTH, FLOOR_Y);
+  else paintSky(context, state, palette, reducedMotion, quality);
+}
+
+function paintSky(context: CanvasRenderingContext2D, state: RunnerState, palette: RunnerPalette, reducedMotion: boolean, quality: RunnerRenderQuality) {
   const grade = ACT_GRADES[state.actIndex];
   const gradient = context.createLinearGradient(0, 0, 0, FLOOR_Y);
   gradient.addColorStop(0, grade.sky);
@@ -1634,20 +1683,43 @@ function drawSky(context: CanvasRenderingContext2D, state: RunnerState, palette:
     context.globalAlpha = 1;
   }
 
-  const hillDrift = reducedMotion ? 0 : (state.worldX * 0.12) % 180;
-  context.fillStyle = "#081426";
-  context.globalAlpha = state.actIndex === 1 ? 0.32 : 0.58;
-  context.beginPath();
-  context.moveTo(0, 190);
-  for (let x = -180; x <= RUNNER_WIDTH + 180; x += 180) {
-    const peak = x - hillDrift;
-    context.lineTo(peak + 90, 74 + ((x / 180 + state.actIndex) % 3) * 24);
-    context.lineTo(peak + 180, 190);
+  // Layered foothills, fine cloud bands, and lunar surface are painted once.
+  for (let ridge = 0; ridge < 3; ridge += 1) {
+    context.fillStyle = ["#304459", "#20394c", "#122d40"][ridge];
+    context.globalAlpha = 0.55 + ridge * 0.12;
+    context.beginPath();
+    context.moveTo(0, 230);
+    for (let x = 0; x <= RUNNER_WIDTH + 40; x += 40) {
+      const y = 138 + ridge * 27 + Math.sin(x * .007 + ridge * 2 + state.actIndex) * 25
+        + Math.sin(x * .019 + ridge) * 9;
+      context.lineTo(x, y);
+    }
+    context.lineTo(RUNNER_WIDTH, FLOOR_Y);
+    context.lineTo(0, FLOOR_Y);
+    context.fill();
   }
-  context.lineTo(RUNNER_WIDTH, 250);
-  context.lineTo(0, 250);
-  context.closePath();
-  context.fill();
+  if (quality !== "quiet") {
+    context.globalAlpha = .12;
+    context.fillStyle = grade.glow;
+    for (let cloud = 0; cloud < 5; cloud += 1) {
+      const x = 180 + cloud * 154;
+      const y = 53 + (cloud % 3) * 23;
+      context.beginPath();
+      context.ellipse(x, y, 100 + cloud * 8, 2.5, -.04, 0, Math.PI * 2);
+      context.fill();
+    }
+    if (state.actIndex === 0 || state.actIndex === 4) {
+      context.fillStyle = "#63585d";
+      context.globalAlpha = .18;
+      for (let crater = 0; crater < 9; crater += 1) {
+        const angle = crater * 2.4;
+        const radius = 4 + (crater % 3) * 6;
+        context.beginPath();
+        context.arc(820 + Math.cos(angle) * radius, 72 + Math.sin(angle) * radius, 2 + crater % 4, 0, Math.PI * 2);
+        context.fill();
+      }
+    }
+  }
   context.globalAlpha = 1;
 }
 
@@ -1660,55 +1732,140 @@ function drawCityLayers(
 ) {
   const grade = ACT_GRADES[state.actIndex];
   const layers = [
-    { speed: 0.08, spacing: 118, y: 172, color: "#10243d", alpha: 0.42 },
-    { speed: 0.19, spacing: 152, y: 204, color: "#0b1c31", alpha: 0.72 },
-    { speed: 0.36, spacing: 196, y: 236, color: "#071523", alpha: 0.94 },
+    { speed: 0.08, spacing: 118, y: 172, color: "#29485c", alpha: 0.42 },
+    { speed: 0.19, spacing: 152, y: 204, color: "#1d3b4b", alpha: 0.72 },
+    { speed: 0.36, spacing: 196, y: 236, color: "#162f3d", alpha: 0.94 },
   ];
   layers.forEach((layer, layerIndex) => {
-    const offset = reducedMotion ? 0 : (state.worldX * layer.speed) % layer.spacing;
-    context.globalAlpha = layer.alpha;
-    for (let index = -1; index < Math.ceil(RUNNER_WIDTH / layer.spacing) + 2; index += 1) {
-      const x = index * layer.spacing - offset;
-      const seed = hashText(`${state.actIndex}-${layerIndex}-${index}`);
-      const height = 70 + (seed % (62 + layerIndex * 18));
-      const buildingWidth = layer.spacing - 20 - (seed % 22);
-      context.fillStyle = layer.color;
-      context.beginPath();
-      context.roundRect(x, layer.y - height, buildingWidth, height + FLOOR_Y - layer.y, layerIndex === 2 ? 3 : 1);
-      context.fill();
-      context.fillStyle = `${grade.glow}${layerIndex === 2 ? "45" : "26"}`;
-      context.fillRect(x + 8, layer.y - height + 7, buildingWidth - 16, layerIndex === 2 ? 3 : 2);
-      const rows = quality === "high" ? 3 : quality === "balanced" ? 2 : 1;
-      for (let row = 0; row < rows; row += 1) {
-        for (let windowIndex = 0; windowIndex < 5; windowIndex += 1) {
-          const lit = (windowIndex + row + index + state.actIndex) % 3 === 0;
-          const windowX = x + 14 + windowIndex * Math.max(18, buildingWidth / 6);
-          const windowY = layer.y - height + 24 + row * 22;
-          if (windowY > layer.y - 14) continue;
-          pixelRect(context, windowX, windowY, 7, 10, lit ? `${grade.glow}${layerIndex === 2 ? "96" : "68"}` : "#17283a");
-        }
-      }
-      const showFullFacade = quality === "high" && layerIndex === 2 && index % 2 === 0;
-      const showFacadeBand = quality === "balanced" && layerIndex === 2 && index % 3 === 0;
-      if (showFullFacade || showFacadeBand) {
-        const facadeTop = layer.y - height + 16;
-        const facadeHeight = Math.max(22, Math.min(66, height - 34));
-        context.globalAlpha = layer.alpha * (showFullFacade ? 0.62 : 0.42);
-        context.fillStyle = `${grade.energy}${showFullFacade ? "72" : "46"}`;
-        context.fillRect(x + 10, facadeTop, Math.max(12, buildingWidth - 20), 1.5);
-        context.fillRect(x + 10, facadeTop + facadeHeight, Math.max(12, buildingWidth - 20), 1.5);
-        if (showFullFacade) {
-          for (let fin = x + 24; fin < x + buildingWidth - 12; fin += 32) {
-            context.fillRect(fin, facadeTop, 1.5, facadeHeight);
+    const stripWidth = Math.ceil(RUNNER_WIDTH / layer.spacing + 1) * layer.spacing;
+    const paintLayer = (context: CanvasRenderingContext2D) => {
+      context.globalAlpha = layer.alpha;
+      for (let index = 0; index < stripWidth / layer.spacing; index += 1) {
+        const x = index * layer.spacing;
+        const seed = hashText(`${state.actIndex}-${layerIndex}-${index}`);
+        const height = 70 + (seed % (62 + layerIndex * 18));
+        const buildingWidth = layer.spacing - 20 - (seed % 22);
+        context.fillStyle = layer.color;
+        context.beginPath();
+        context.roundRect(x, layer.y - height, buildingWidth, height + FLOOR_Y - layer.y, layerIndex === 2 ? 3 : 1);
+        context.fill();
+        context.fillStyle = `${grade.glow}${layerIndex === 2 ? "45" : "26"}`;
+        context.fillRect(x + 8, layer.y - height + 7, buildingWidth - 16, layerIndex === 2 ? 3 : 2);
+        const rows = quality === "high" ? 3 : quality === "balanced" ? 2 : 1;
+        for (let row = 0; row < rows; row += 1) {
+          for (let windowIndex = 0; windowIndex < 5; windowIndex += 1) {
+            const lit = (windowIndex + row + index + state.actIndex) % 3 === 0;
+            const windowX = x + 14 + windowIndex * Math.max(18, buildingWidth / 6);
+            const windowY = layer.y - height + 24 + row * 22;
+            if (windowY > layer.y - 14) continue;
+            pixelRect(context, windowX, windowY, 7, 10, lit ? `${grade.glow}${layerIndex === 2 ? "96" : "68"}` : "#17283a");
           }
         }
-        context.fillStyle = "#050e19";
-        context.fillRect(x + 14, layer.y - 12, 7, FLOOR_Y - layer.y + 12);
-        context.fillRect(x + buildingWidth - 21, layer.y - 12, 7, FLOOR_Y - layer.y + 12);
-        context.globalAlpha = layer.alpha;
+        if (layerIndex === 2 && quality !== "quiet") {
+          // Chandigarh shopfronts: recessed bays, stone fins and striped awnings.
+          const top = layer.y - height;
+          context.fillStyle = "#6d8285";
+          context.fillRect(x - 3, top - 4, buildingWidth + 6, 4);
+          context.fillStyle = "#030d19";
+          context.fillRect(x + buildingWidth - 5, top, 5, height);
+          for (let bay = 0; bay < 3; bay += 1) {
+            const bx = x + 12 + bay * (buildingWidth - 18) / 3;
+            context.fillStyle = "#081520";
+            context.fillRect(bx, layer.y - 42, 26, 42);
+            context.fillStyle = `${grade.glow}88`;
+            context.fillRect(bx + 3, layer.y - 36, 9, 24);
+            context.fillStyle = bay % 2 ? "#537e7e" : "#93565a";
+            context.fillRect(bx - 3, layer.y - 46, 32, 6);
+            context.fillStyle = "#d6bd8e";
+            context.fillRect(bx, layer.y - 46, 3, 6);
+            context.fillRect(bx + 12, layer.y - 46, 3, 6);
+          }
+          context.strokeStyle = "#8da0a044";
+          context.lineWidth = .8;
+          context.strokeRect(x + 8, top + 17, buildingWidth - 16, Math.max(16, height - 72));
+        }
+        if (layerIndex === 2 && quality !== "quiet") {
+          const shopY = FLOOR_Y - 78;
+          const bays = 3;
+          const bayWidth = (buildingWidth - 18) / bays;
+          for (let bay = 0; bay < bays; bay += 1) {
+            const bx = x + 9 + bay * bayWidth;
+            const glass = context.createLinearGradient(bx, shopY, bx, FLOOR_Y);
+            glass.addColorStop(0, "#9a745d");
+            glass.addColorStop(.35, "#625744");
+            glass.addColorStop(1, "#152c37");
+            context.fillStyle = "#081720";
+            context.fillRect(bx, shopY, bayWidth - 4, 76);
+            context.fillStyle = glass;
+            context.fillRect(bx + 3, shopY + 5, bayWidth - 10, 57);
+            context.fillStyle = "#d9bb8966";
+            context.fillRect(bx + 4, shopY + 6, 2, 53);
+            context.fillStyle = "#182c33";
+            context.fillRect(bx + bayWidth * .48, shopY + 4, 3, 59);
+            context.fillRect(bx + 2, shopY + 36, bayWidth - 8, 3);
+            context.fillStyle = "#b69565";
+            context.fillRect(bx + bayWidth * .38, shopY + 40, 2, 8);
+            context.fillStyle = bay % 2 ? "#47757a" : "#9c6461";
+            context.beginPath();
+            context.moveTo(bx - 2, shopY - 6);
+            context.lineTo(bx + bayWidth - 1, shopY - 6);
+            context.lineTo(bx + bayWidth + 3, shopY + 4);
+            context.lineTo(bx - 6, shopY + 4);
+            context.fill();
+            context.fillStyle = "#ddc5a0";
+            context.fillRect(bx - 6, shopY + 4, bayWidth + 9, 2);
+            for (let stripe = 0; stripe < 3; stripe += 1) {
+              context.fillStyle = "#ddc5a066";
+              context.fillRect(bx + stripe * bayWidth / 3, shopY - 5, 3, 9);
+            }
+          }
+          // Fine stone joints and jali vents read as material, never lane signals.
+          context.strokeStyle = "#9bb2ad22";
+          context.lineWidth = .65;
+          for (let joint = layer.y + 7; joint < shopY - 7; joint += 9) {
+            context.beginPath(); context.moveTo(x + 4, joint); context.lineTo(x + buildingWidth - 4, joint); context.stroke();
+          }
+          const lampX = x + buildingWidth - 8;
+          const light = context.createRadialGradient(lampX, shopY - 12, 1, lampX, shopY - 12, 45);
+          light.addColorStop(0, "#f8cb8144"); light.addColorStop(1, "#f8cb8100");
+          context.fillStyle = light; context.fillRect(lampX - 45, shopY - 57, 90, 90);
+          context.fillStyle = "#152632"; context.fillRect(lampX - 3, shopY - 21, 6, 13);
+          context.fillStyle = "#e6c89a"; context.fillRect(lampX - 1, shopY - 19, 2, 8);
+        }
+        const showFullFacade = quality === "high" && layerIndex === 2 && index % 2 === 0;
+        const showFacadeBand = quality === "balanced" && layerIndex === 2 && index % 3 === 0;
+        if (showFullFacade || showFacadeBand) {
+          const facadeTop = layer.y - height + 16;
+          const facadeHeight = Math.max(22, Math.min(66, height - 34));
+          context.globalAlpha = layer.alpha * (showFullFacade ? 0.62 : 0.42);
+          context.fillStyle = `${grade.energy}${showFullFacade ? "72" : "46"}`;
+          context.fillRect(x + 10, facadeTop, Math.max(12, buildingWidth - 20), 1.5);
+          context.fillRect(x + 10, facadeTop + facadeHeight, Math.max(12, buildingWidth - 20), 1.5);
+          if (showFullFacade) {
+            for (let fin = x + 24; fin < x + buildingWidth - 12; fin += 32) {
+              context.fillRect(fin, facadeTop, 1.5, facadeHeight);
+            }
+          }
+          context.fillStyle = "#050e19";
+          context.fillRect(x + 14, layer.y - 12, 7, FLOOR_Y - layer.y + 12);
+          context.fillRect(x + buildingWidth - 21, layer.y - 12, 7, FLOOR_Y - layer.y + 12);
+          context.globalAlpha = layer.alpha;
+        }
       }
+      context.globalAlpha = 1;
+    };
+    const strip = scenerySurface(context, state, palette, quality, `city-${layerIndex}`, stripWidth, paintLayer);
+    const offset = reducedMotion ? 0 : (state.worldX * layer.speed) % stripWidth;
+    if (strip) {
+      context.drawImage(strip, -offset, 0, stripWidth, FLOOR_Y);
+      if (offset + RUNNER_WIDTH > stripWidth) context.drawImage(strip, stripWidth - offset, 0, stripWidth, FLOOR_Y);
+    } else {
+      context.save();
+      context.translate(-offset, 0);
+      paintLayer(context);
+      if (offset + RUNNER_WIDTH > stripWidth) { context.translate(stripWidth, 0); paintLayer(context); }
+      context.restore();
     }
-    context.globalAlpha = 1;
   });
 
   if (quality === "high") {

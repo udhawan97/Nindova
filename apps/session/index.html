@@ -301,6 +301,10 @@
       box-shadow: 0 var(--space-lg) var(--space-2xl) color-mix(in oklch, var(--color-shadow) 68%, transparent);
       text-align: center;
     }
+    .intro-card {
+      background: radial-gradient(ellipse at 50% 0, #b8925133, transparent 58%), linear-gradient(150deg, #243a40, #201d30 65%);
+      border-color: #a68856;
+    }
     .intro-card::before,
     .dismissed-card::before,
     .end-card::before,
@@ -555,8 +559,11 @@
       overflow: hidden;
       border: 1px solid var(--color-brass-dark);
       border-radius: var(--radius-inlay);
-      background: linear-gradient(145deg, var(--color-lacquer-raised), var(--color-night-soft));
-      box-shadow: 0 var(--space-lg) var(--space-2xl) color-mix(in oklch, var(--color-shadow) 72%, transparent);
+      background:
+        radial-gradient(ellipse at 50% 15%, #5c817033, transparent 68%),
+        repeating-linear-gradient(91deg, #cc9a6710 0 1px, transparent 1px 9px),
+        linear-gradient(135deg, #604238, #242432 22%, #172f32 50%, #242432 78%, #614739);
+      box-shadow: inset 0 0 0 4px #906d4544, inset 0 0 0 7px #100f2088, inset 0 0 60px #090f2055, 0 22px 45px #06091088;
       transition:
         filter var(--dur-long) var(--ease-in-out),
         opacity var(--dur-long) var(--ease-in-out);
@@ -652,11 +659,14 @@
       border-radius: var(--radius-tile);
       color: var(--color-ink);
       background:
-        linear-gradient(135deg, transparent 0 58%, color-mix(in oklch, var(--color-ivory) 22%, transparent) 59% 62%, transparent 63%),
-        linear-gradient(180deg, var(--color-tile-high), var(--color-tile));
+        radial-gradient(ellipse at 25% 10%, #fff9e9, transparent 65%),
+        linear-gradient(145deg, var(--color-tile-high), #e7d3af 80%, #d4b88f);
       box-shadow:
-        var(--space-3xs) var(--space-2xs) 0 var(--color-tile-edge),
-        0 var(--space-sm) var(--space-lg) color-mix(in oklch, var(--color-shadow) 44%, transparent);
+        inset 0 1px 0 #fff8e7,
+        inset -1px -2px 0 #bda078,
+        1px 3px 0 #96724e,
+        2px 5px 0 #4b3834,
+        3px 9px 12px #060b1655;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       -webkit-user-select: none;
@@ -686,8 +696,8 @@
       mask-image: linear-gradient(135deg, var(--color-night), transparent 32% 68%, var(--color-night));
     }
     .tile svg {
-      width: 70%;
-      height: 60%;
+      width: 85%;
+      height: 85%;
       color: var(--motif);
       overflow: visible;
     }
@@ -711,8 +721,8 @@
       cursor: default;
       filter: saturate(0.62) brightness(0.82);
     }
-    .tile.is-covered { opacity: 0.76; }
-    .tile.is-side-blocked { opacity: 0.84; }
+    .tile.is-covered { opacity: 1; filter: saturate(.48) brightness(.67); }
+    .tile.is-side-blocked { opacity: 1; filter: saturate(.62) brightness(.8); }
     .tile.is-covered::before {
       background: color-mix(in oklch, var(--color-night) 22%, transparent);
     }

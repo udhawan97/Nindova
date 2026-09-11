@@ -333,3 +333,52 @@ test("authored and shipped engine copy avoids comparisons and obsolete controls"
   assert.doesNotMatch(shippedCopy, /\bpulse\b|\bglide\b|\bthrust\b|\bgravity\b|\bceiling\b|\bflight\b|\baerial\b|rise and fall/);
   assert.doesNotMatch(shippedCopy, /\bleaderboard\b|\bhigh score\b|\bbest score\b|\bkill\b|\benemy\b|\bgun\b|\bbullet\b/);
 });
+
+test("scenery is reused between frames and releases old backing stores on Act, quality, or size changes", () => {
+  const allocated = [];
+  let allocationsDenied = false;
+  const fakeContext = (canvas) => new Proxy({ canvas }, {
+    get(target, key) {
+      if (key in target) return target[key];
+      if (key === "createLinearGradient" || key === "createRadialGradient") return () => ({ addColorStop() {} });
+      if (key === "measureText") return () => ({ width: 12 });
+      return () => {};
+    },
+  });
+  const ownerDocument = {
+    createElement() {
+      const canvas = { width: 0, height: 0, getContext: () => allocationsDenied ? null : fakeContext(canvas) };
+      allocated.push(canvas);
+      return canvas;
+    },
+  };
+  const canvas = { width: 1920, height: 864, ownerDocument };
+  const context = fakeContext(canvas);
+  const palette = Object.fromEntries(["paper", "paper2", "paper3", "rule", "neutral", "muted", "ink", "inkSoft", "accent", "accentSoft", "ruby", "sapphire", "jade"].map(key => [key, "#b99b6b"]));
+  Object.assign(palette, { fontDisplay: "serif", fontBody: "sans-serif", fontMono: "monospace" });
+  const state = Runner.createRunnerState(0);
+  const original = structuredClone(state);
+  Runner.drawRunnerFrame(context, state, palette);
+  assert.equal(allocated.length, 4);
+  assert.ok(allocated.reduce((bytes, surface) => bytes + surface.width * surface.height * 4, 0) < 25 * 1024 * 1024, "the four high-DPI surfaces stay below 25 MiB");
+  for (let frame = 0; frame < 120; frame++) {
+    Runner.drawRunnerFrame(context, { ...state, worldX: frame * 20 }, palette);
+  }
+  assert.equal(allocated.length, 4, "camera travel, including strip wrapping, allocates no new surfaces");
+  assert.deepEqual(state, original, "rendering cannot mutate simulation state");
+  Runner.drawRunnerFrame(context, Runner.createRunnerState(1), palette);
+  assert.ok(allocated.slice(0, 4).every(surface => surface.width === 0 && surface.height === 0));
+  assert.equal(allocated.length, 8);
+  Runner.drawRunnerFrame(context, Runner.createRunnerState(1), palette, true, null, "quiet");
+  assert.ok(allocated.slice(4, 8).every(surface => surface.width === 0));
+  assert.equal(allocated.length, 12);
+  canvas.width = 960;
+  Runner.drawRunnerFrame(context, Runner.createRunnerState(1), palette, true, null, "quiet");
+  assert.ok(allocated.slice(8, 12).every(surface => surface.width === 0));
+  assert.equal(allocated.length, 16);
+  allocationsDenied = true;
+  assert.doesNotThrow(() => Runner.drawRunnerFrame(context, Runner.createRunnerState(2), palette), "direct painting remains available when an offscreen context is unavailable");
+  const deniedCount = allocated.length;
+  Runner.drawRunnerFrame(context, Runner.createRunnerState(2), palette);
+  assert.equal(allocated.length, deniedCount, "allocation failure does not trigger repeated allocation attempts");
+});

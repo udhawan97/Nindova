@@ -1,0 +1,16 @@
+import courtyardUrl from "./assets/courtyard.svg";
+import type { DoorCategoryId } from "./salon-catalog";
+
+/** Static vector art: no animation loop, decoding dependency, or external request. */
+export const courtyardArt = `<figure class="courtyard-art" aria-hidden="true"><img src="${courtyardUrl}" width="800" height="760" alt="" decoding="async"><figcaption><span>INDIGO · BRASS · FIRST LIGHT</span><i></i><span>NINDOVA HOUSE</span></figcaption></figure>`;
+
+export function doorArt(category: DoorCategoryId): string {
+  const motifs: Record<DoorCategoryId, string> = {
+    "pattern-line": `<g transform="translate(82 74) rotate(-12 78 38)">${Array.from({ length: 6 }, (_, i) => `<g transform="translate(${(i % 3) * 48} ${Math.floor(i / 3) * 52})"><rect x="2" y="5" width="38" height="43" rx="5" fill="#766145"/><rect width="38" height="43" rx="5" fill="#ecddbc"/><path d="m19 9 11 12-11 12L8 21Z" fill="${i % 2 ? "#3b6571" : "#974b53"}"/><path d="m19 14 6 7-6 7-6-7Z" fill="#ecddbc"/></g>`).join("")}</g>`,
+    "turn-trap": `<g transform="translate(160 125)"><circle r="67" fill="#112c3b" stroke="#b99460" stroke-width="5"/><circle r="57" stroke="#627977"/><circle r="46" stroke="#c2a974" stroke-width="2"/><path d="M-70 0H70M0-70V70" stroke="#897653"/><path d="m0-44 10 40-10 16-10-16Z" fill="#e7c38a" transform="rotate(35)"/><path d="m0 45 10-40-10-16-10 16Z" fill="#9a5158" transform="rotate(35)"/><circle r="8" fill="#e4c592"/></g>`,
+    "count-carry": `<path d="M63 183h190v12H63Z" fill="#795840"/><path d="M154 55h9v125h-9" fill="#c5a170"/>${[0, 1, 2, 3].map(i => `<g><ellipse cx="159" cy="${169 - i * 27}" rx="${76 - i * 15}" ry="13" fill="#17232b"/><rect x="${83 + i * 15}" y="${156 - i * 27}" width="${152 - i * 30}" height="13" fill="${i % 2 ? "#34616b" : "#9b575a"}"/><ellipse cx="159" cy="${156 - i * 27}" rx="${76 - i * 15}" ry="12" fill="${i % 2 ? "#6c9292" : "#c08b73"}"/><ellipse cx="159" cy="${155 - i * 27}" rx="${67 - i * 15}" ry="8" stroke="#d6b27c" opacity=".7"/></g>`).join("")}`,
+    "memory-sequence": [0, 1, 2].map(i => `<g transform="translate(${97 + i * 62} ${69 + (i % 2) * 20})"><path d="M0-45V0" stroke="#a79065"/><ellipse cy="49" rx="38" ry="58" fill="#d4a363" opacity=".07"/><path d="m-16 14 7-12H9l7 12v55l-7 12H-9l-7-12Z" fill="#806445"/><rect x="-11" y="17" width="22" height="47" rx="4" fill="${i % 2 ? "#a9c5b3" : "#e8c78d"}"/><path d="M0 17v47M-16 67h32M-16 14h32" stroke="#8b704a" stroke-width="2"/></g>`).join(""),
+    "motion-route": `<circle cx="232" cy="52" r="22" fill="#e4be88" opacity=".8"/><path d="M38 145V98h45V72h55v73h24V87h49v58h22V111h47v78H38Z" fill="#345666"/><path d="M44 145v-36h75v36h52v-42h79v42" stroke="#b18d61" stroke-width="3"/><g fill="#e9b97b">${[0, 1, 2, 3, 4, 5, 6, 7].map(i => `<rect x="${52 + i * 27}" y="120" width="8" height="12"/>`).join("")}</g><path d="m25 204 99-49h50l118 49" fill="#142a3b" stroke="#b59667"/><path d="m158 164 0 30" stroke="#e0c28d" stroke-width="3" stroke-dasharray="10 8"/>`,
+  };
+  return `<svg class="door-art" viewBox="0 0 320 240" fill="none" aria-hidden="true"><path d="M26 230V105Q26 22 160 13q134 9 134 92v125" stroke="#c5a571" stroke-opacity=".28"/><path d="M39 230V107Q39 38 160 28q121 10 121 79v123" stroke="#c5a571" stroke-opacity=".12"/>${motifs[category]}</svg>`;
+}

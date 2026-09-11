@@ -124,11 +124,6 @@ h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); letter-spacing: -.035em; line-height
 .category-door-count-carry { grid-area: stack; }
 .category-door-memory-sequence { grid-area: lantern; }
 .category-door-motion-route { grid-area: sector; justify-content: center; background: color-mix(in oklch, var(--color-paper-3) 88%, var(--color-jewel-sapphire)); }
-.category-sigil { display: grid; position: absolute; z-index: -1; inset: var(--space-lg) var(--space-lg) auto auto; width: clamp(3.8rem, 7vw, 6rem); aspect-ratio: 1; place-items: center; opacity: .38; transition: opacity var(--dur-short) var(--ease-out), transform var(--dur-long) var(--ease-out); }
-.category-sigil i { position: absolute; width: calc(1rem + var(--sigil-index) * .55rem); aspect-ratio: 1; border: 1px solid var(--color-accent); transform: rotate(calc(45deg + var(--sigil-index) * 9deg)); transition: transform var(--dur-long) var(--ease-out), background var(--dur-short) var(--ease-out); }
-.category-door:hover .category-sigil, .category-door:focus-visible .category-sigil { opacity: .86; transform: rotate(20deg) scale(1.04); }
-.category-door-pattern-line .category-sigil i:nth-child(even), .category-door-count-carry .category-sigil i:nth-child(odd) { background: color-mix(in oklch, var(--color-accent) 20%, transparent); }
-.category-door-motion-route .category-sigil { transform: rotate(45deg); }
 .salon-compass { display: none; grid-area: compass; position: relative; place-items: center; color: var(--color-accent); font-family: var(--font-display); }
 .salon-compass i { position: absolute; width: 4.5rem; aspect-ratio: 1; border: 1px solid var(--color-rule-strong); transform: rotate(45deg); }
 
@@ -735,4 +730,86 @@ button.pallanguzhi-pit:active { transform: translateY(1px); }
   .board-point.is-option:hover, .board-point.is-option:focus-visible, .board-point.is-option:active { transform: translate(-50%, -50%); }
   .disc.is-lifted, .route-choice:hover { transform: none; }
   .stack-move-trace { display: none; }
+}
+
+/* The illuminated courtyard: static vector craft, with one finite entrance. */
+.house-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  align-items: center;
+  gap: clamp(1rem, 4vw, 4rem);
+  max-width: 104rem;
+  margin-inline: auto;
+  padding-block: clamp(2rem, 5vw, 5rem);
+}
+.house-intro-copy { position: relative; z-index: 1; padding-block: var(--space-xl); }
+.house-intro h1 { font-size: clamp(3.5rem, 6.2vw, 6.8rem); line-height: .95; letter-spacing: -.048em; }
+.house-intro h1 em { display: inline-block; margin-block-start: .35em; font-size: .66em; line-height: 1.06; text-decoration: none; }
+.house-intro .house-lede { max-width: 38ch; font-family: var(--font-body); font-size: clamp(.94rem, 1.15vw, 1.08rem); line-height: 1.8; }
+.courtyard-art { position: relative; min-width: 0; margin: 0; animation: courtyard-arrive 900ms var(--ease-out) both; }
+.courtyard-art img { display: block; width: 100%; height: auto; border-radius: 46% 46% 2px 2px / 28% 28% 2px 2px; }
+.courtyard-art figcaption { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-block-start: 1rem; color: var(--color-neutral); font-family: var(--font-mono); font-size: .56rem; letter-spacing: .16em; }
+.courtyard-art figcaption i { flex: 1; height: 1px; background: var(--color-rule-strong); opacity: .55; }
+.house-header { backdrop-filter: none; background: var(--color-paper); }
+.primary-action { background: linear-gradient(115deg, #e5b96e, #f2d297 40%, #c79751); color: #17202c; border-color: #e8c17c; box-shadow: inset 0 1px 0 #ffe4b6, 0 3px 0 #6b4c31, 0 8px 20px #0003; }
+.floor-plan { border-block: 0; gap: 1rem; padding-bottom: 1rem; }
+.room { border: 1px solid var(--color-rule-strong); background: radial-gradient(ellipse at 20% 5%, #35566455, transparent 65%), var(--color-paper-2); }
+.room-night { background: radial-gradient(ellipse at 82% 18%, #b1835a22, transparent 55%), linear-gradient(150deg, #263445, #161c31 70%); }
+.room-gallery { background: radial-gradient(ellipse at 20% 10%, #5f49403b, transparent 70%), var(--color-paper-2); }
+.room-number { color: var(--color-accent); }
+.room-copy { line-height: 1.8; }
+.salon-heading { background: linear-gradient(110deg, #29434b44, transparent); }
+.salon-plan { gap: .8rem; padding: 1rem; }
+.category-door { min-height: 22rem; padding: 1.4rem; background: radial-gradient(ellipse at 50% 18%, #3d62724a, transparent 58%), linear-gradient(160deg, #182e3e, #0c1a2d 80%); }
+.category-door-turn-trap { background: radial-gradient(ellipse at 50% 18%, #9366593b, transparent 58%), linear-gradient(160deg, #292a38, #0c1a2d 80%); }
+.category-door-count-carry { background: radial-gradient(ellipse at 50% 18%, #9b714b33, transparent 58%), linear-gradient(160deg, #2c3036, #0c1a2d 80%); }
+.category-door-memory-sequence { background: radial-gradient(ellipse at 50% 18%, #b49a6333, transparent 58%), linear-gradient(160deg, #223b3d, #0c1a2d 80%); }
+.category-door-motion-route { justify-content: flex-end; background: radial-gradient(ellipse at 50% 22%, #52708755, transparent 60%), linear-gradient(160deg, #1d314a, #101c31 80%); }
+.category-door::before { border-radius: 48% 48% 0 0 / 20% 20% 0 0; border-color: #bd9b643b; }
+.door-art { position: absolute; z-index: -1; top: .7rem; left: 50%; width: min(100%, 18rem); height: auto; transform: translateX(-50%); opacity: .94; pointer-events: none; transition: transform 420ms var(--ease-out); }
+.category-door-motion-route .door-art { top: 16%; width: 120%; max-width: 20rem; }
+.category-door .game-line { font-size: .8rem; line-height: 1.65; }
+.category-door .game-title { font-size: clamp(1.5rem, 2.1vw, 2.2rem); }
+.category-door .game-number { margin-block-end: .3rem; }
+.category-table { background: radial-gradient(ellipse at 85% 5%, #49647233, transparent 65%), var(--color-paper-2); }
+.category-aperture { background: radial-gradient(circle, #e5c38620, transparent 66%); }
+.category-aperture i { border-color: #b99865; box-shadow: inset 0 0 1.5rem #a4825310; }
+.game-chamber { box-shadow: 0 1.5rem 4rem #0003; }
+.pattern-row span { background: linear-gradient(125deg, #fff1d320, transparent 42%), radial-gradient(circle at 27% 16%, #fff5d640, transparent 45%), linear-gradient(145deg, #e6c88e, #b9955e); color: #25283a; border-color: #cdae76; box-shadow: inset 0 1px 0 #fff0ce, inset 0 -3px 0 #866346, 0 5px 0 #5d493b, 0 13px 20px #0005; }
+.pattern-row span.is-missing { background: radial-gradient(circle at 35% 20%, #497782, #16333e); color: #ebd3a3; }
+.mirror-stage { background: radial-gradient(ellipse at 35% 20%, #4e7f843b, transparent 45%), radial-gradient(circle, #213d48, #0c192b 70%); box-shadow: inset 0 0 0 1px #d0ad6f55, inset 0 0 3rem #0006, 0 1rem 3rem #0004; }
+.mirror-ring { background: conic-gradient(from 24deg, #cead6f12, transparent 20%, #cead6f20 42%, transparent 65%); }
+.runner-stage-frame { background: linear-gradient(130deg, #c8ad76, #344450 1%, #152738 48%, #a57d47 99%, #e2c68c); box-shadow: 0 2rem 5rem #0005, 0 0 3rem #45808414; }
+@keyframes courtyard-arrive { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@media (hover: hover) and (pointer: fine) {
+  .category-door:hover .door-art { transform: translateX(-50%) translateY(-4px); }
+}
+@media (max-width: 1100px) and (min-width: 761px) {
+  .house-intro { grid-template-columns: 1fr .9fr; gap: 0; }
+  .category-door { min-height: 24rem; }
+}
+@media (max-width: 760px) {
+  .house-intro { grid-template-columns: minmax(0, 1fr); gap: 0; padding-block: 1.5rem 2rem; }
+  .house-intro-copy { padding-block: 1rem; }
+  .house-intro h1 { max-width: 15ch; font-size: clamp(3.1rem, 10vw, 4.8rem); }
+  .house-intro h1 em { font-size: .65em; }
+  .courtyard-art { max-width: 30rem; width: 100%; margin-inline: auto; }
+  .courtyard-art img { max-height: 24rem; object-fit: contain; }
+  .courtyard-art figcaption { margin-top: .35rem; font-size: .48rem; }
+  .floor-plan { gap: .8rem; }
+  .category-door { min-height: 22rem; }
+  .category-door-motion-route .door-art { top: .7rem; width: min(100%, 18rem); }
+}
+@media (max-width: 540px) {
+  .category-door { min-height: 16rem; padding: 1.35rem; }
+  .category-door .game-title, .category-door .game-line { max-width: 58%; }
+  .category-door .game-title { font-size: 1.9rem; }
+  .category-door .door-art { top: 1.3rem; left: 76%; width: 62%; opacity: .74; }
+  .category-door .game-enter { max-width: 60%; }
+  .category-door::before { border-radius: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .courtyard-art { animation: none; }
+  .door-art { transition: none; }
+  .category-door:hover .door-art { transform: translateX(-50%); }
 }
