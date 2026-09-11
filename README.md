@@ -20,7 +20,7 @@ Nindova is a private, offline-ready house of authored browser games for adults 1
   ·
   <a href="https://udhawan97.github.io/Nindova/docs/"><strong>Read the docs</strong></a>
   ·
-  <a href="https://github.com/udhawan97/Nindova/releases/tag/v0.4.3"><strong>Download v0.4.3</strong></a>
+  <a href="https://github.com/udhawan97/Nindova/releases/tag/v0.5.0"><strong>Download v0.5.0</strong></a>
 </p>
 
 ![The current Nindova House floor plan, with the separate Night Room, five Grand Salon doors, and local Gallery](./apps/site/public/media/nindova-house.png)
@@ -31,10 +31,10 @@ Nindova is a private, offline-ready house of authored browser games for adults 1
 | --- | --- | --- |
 | [Nindova House](https://udhawan97.github.io/Nindova/house/) | Eight current authored games and the local Gallery | Five fixed parts per table; replay begins only by choosing again |
 | [Night Room](https://udhawan97.github.io/Nindova/play/) | A bounded wind-down Session | Hidden automatic settle and a hard 15-minute ceiling |
-| [Standalone Night HTML](https://github.com/udhawan97/Nindova/releases/download/v0.4.3/nindova-v0.4.3.html) | One portable tagged file | Night Room only; no manifest or service worker |
+| [Standalone Night HTML](https://github.com/udhawan97/Nindova/releases/download/v0.5.0/nindova-v0.5.0.html) | One portable tagged file | Night Room only; no manifest or service worker |
 | [Current source](#run-current-source) | The full House, Night Room, site, docs, and standalone output | Requires Node.js 24 or newer |
 
-The live site is built from `main`. **v0.4.3 — Held Boundaries** packages the synchronized House, Night Room, public site, documentation, and standalone Night file. It keeps product behavior intact while concentrating House navigation, Salon lifecycle, Sector Sprint coordination, and browser evidence behind smaller interfaces.
+The live site is built from `main`. **v0.5.0 — Illustrated House** packages the synchronized House, Night Room, public site, documentation, and standalone Night file. It brings an original lantern-lit courtyard, illustrated Salon doors, richer game materials, and cached Sector Sprint scenery while preserving authored behavior and performance budgets.
 
 ## The Grand Salon
 
@@ -93,20 +93,20 @@ The Two-Loop Law governs the Night Room: satisfaction belongs inside one bounded
 
 ## Tagged downloads
 
-The [v0.4.3 release](https://github.com/udhawan97/Nindova/releases/tag/v0.4.3) contains:
+The [v0.5.0 release](https://github.com/udhawan97/Nindova/releases/tag/v0.5.0) contains:
 
-- [Standalone Night Room HTML](https://github.com/udhawan97/Nindova/releases/download/v0.4.3/nindova-v0.4.3.html)
-- [Complete static web archive](https://github.com/udhawan97/Nindova/releases/download/v0.4.3/nindova-web-v0.4.3.zip)
-- [SHA-256 checksums](https://github.com/udhawan97/Nindova/releases/download/v0.4.3/SHA256SUMS.txt)
+- [Standalone Night Room HTML](https://github.com/udhawan97/Nindova/releases/download/v0.5.0/nindova-v0.5.0.html)
+- [Complete static web archive](https://github.com/udhawan97/Nindova/releases/download/v0.5.0/nindova-web-v0.5.0.zip)
+- [SHA-256 checksums](https://github.com/udhawan97/Nindova/releases/download/v0.5.0/SHA256SUMS.txt)
 
 Verify only the tagged file you downloaded:
 
 ```sh
 # Standalone HTML
-grep ' nindova-v0.4.3.html$' SHA256SUMS.txt | shasum -a 256 -c -
+grep ' nindova-v0.5.0.html$' SHA256SUMS.txt | shasum -a 256 -c -
 
 # Static web archive
-grep ' nindova-web-v0.4.3.zip$' SHA256SUMS.txt | shasum -a 256 -c -
+grep ' nindova-web-v0.5.0.zip$' SHA256SUMS.txt | shasum -a 256 -c -
 ```
 
 These are ordinary HTML and ZIP files, not signed or notarized native applications. Nindova has no background native updater. Replace a tagged file manually; a live PWA refreshes its static cache after a successful online visit.
@@ -149,6 +149,8 @@ npm run check
 npm test
 npm run test:wall-clock
 ```
+
+After explicit release authorization, pushing a `v*` tag triggers `.github/workflows/release.yml`. The workflow requires a matching package version, release notes, and a commit already on `main`; it verifies the source and publishes the standalone HTML, root-hosted web archive, and checksums. Run the complete local browser gate and refresh Graphify before tagging, then freshly download and verify the published artifacts.
 
 Read [CONTEXT.md](./CONTEXT.md), [ADR 0013](./docs/adr/0013-add-the-adult-nindova-house.md), [ADR 0015](./docs/adr/0015-add-the-bounded-sector-sprint.md), [ADR 0019](./docs/adr/0019-group-the-grand-salon-and-add-classic-rule-studies.md), [ADR 0020](./docs/adr/0020-deepen-house-boundaries-and-browser-evidence.md), and the [Night Room product contract](./apps/site/src/content/docs/docs/product-contract.md) before changing a boundary.
 

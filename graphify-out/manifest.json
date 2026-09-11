@@ -145,8 +145,8 @@
     "semantic_hash": "da94eca85264068b4b26a0e0b7e0f141"
   },
   "README.md": {
-    "mtime": 1787379257.3663516,
-    "ast_hash": "353257eb60f17a05b2a0902053db719b",
+    "mtime": 1789087165.2707553,
+    "ast_hash": "070c8f7428ff54e87c91615fd318e6d8",
     "semantic_hash": ""
   },
   "apps/session/index.html": {
@@ -170,13 +170,13 @@
     "semantic_hash": "63ec946421747cc2e27a8bd06efc96b3"
   },
   "apps/site/src/content/docs/docs/getting-started.md": {
-    "mtime": 1786672861.0827374,
-    "ast_hash": "074a6e10426c93d5db3e15392d41815a",
+    "mtime": 1789087165.2779884,
+    "ast_hash": "a1d1278dc8172738ea2dda5d975cb7e1",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/index.md": {
-    "mtime": 1786672861.084347,
-    "ast_hash": "f26d6c52477553b57e2629b486c48996",
+    "mtime": 1789087165.2766929,
+    "ast_hash": "4ce0f7b63ef29e3fa6399abd69490273",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/ios-wall.md": {
@@ -215,8 +215,8 @@
     "semantic_hash": "d9652f2265ec6d5a346e085a592e8206"
   },
   "apps/site/src/content/docs/docs/roadmap.md": {
-    "mtime": 1786672861.0886972,
-    "ast_hash": "a76319599fc1a403154c5d1a2119d487",
+    "mtime": 1789087165.2773485,
+    "ast_hash": "0c837e077665d35ca50b66a6166a7d69",
     "semantic_hash": ""
   },
   "apps/site/src/content/docs/docs/testing.md": {
@@ -455,13 +455,13 @@
     "semantic_hash": "d82b998ec66d551fbdb0ae2215ebc8d1"
   },
   "apps/site/public/play-qr.svg": {
-    "mtime": 1789086812.7131276,
+    "mtime": 1789086871.9044278,
     "ast_hash": "9557448d4a3c6237efa8fe2648d21fa0",
     "semantic_hash": "9557448d4a3c6237efa8fe2648d21fa0"
   },
   "public-facts.json": {
-    "mtime": 1786672861.153999,
-    "ast_hash": "a2441f2e3cf78ad1a4cf9f97a53c0962",
+    "mtime": 1789087165.2721295,
+    "ast_hash": "8ab016200a57c554159e2869bcf5da8d",
     "semantic_hash": ""
   },
   "tests/fixtures/recipe-two.mjs": {
@@ -860,8 +860,8 @@
     "semantic_hash": "64922aedbc5d284a6490c0b35d0b6f8b"
   },
   "apps/site/src/content/docs/docs/downloads.md": {
-    "mtime": 1786672861.082059,
-    "ast_hash": "1683d5e3436853d68cf66f321997471b",
+    "mtime": 1789087165.276163,
+    "ast_hash": "79c4cd0537b20c4a54e0ac769efe6af1",
     "semantic_hash": ""
   },
   "apps/site/public/media/nindova-house.png": {
