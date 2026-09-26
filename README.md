@@ -20,7 +20,7 @@ Nindova is a private, offline-ready house of authored browser games for adults 1
   ·
   <a href="https://udhawan97.github.io/Nindova/docs/"><strong>Read the docs</strong></a>
   ·
-  <a href="https://github.com/udhawan97/Nindova/releases/tag/v0.6.1"><strong>Download v0.6.1</strong></a>
+  <a href="https://github.com/udhawan97/Nindova/releases/tag/v0.6.2"><strong>Download v0.6.2</strong></a>
 </p>
 
 ![The current Nindova House floor plan, with the separate Night Room, five Grand Salon doors, and local Gallery](./apps/site/public/media/nindova-house.png)
@@ -31,10 +31,10 @@ Nindova is a private, offline-ready house of authored browser games for adults 1
 | --- | --- | --- |
 | [Nindova House](https://udhawan97.github.io/Nindova/house/) | Eight current authored games and the local Gallery | Five fixed parts per table; replay begins only by choosing again |
 | [Night Room](https://udhawan97.github.io/Nindova/play/) | A bounded wind-down Session | Hidden automatic settle and a hard 15-minute ceiling |
-| [Standalone Night HTML](https://github.com/udhawan97/Nindova/releases/download/v0.6.1/nindova-v0.6.1.html) | One portable tagged file | Night Room only; no manifest or service worker |
+| [Standalone Night HTML](https://github.com/udhawan97/Nindova/releases/download/v0.6.2/nindova-v0.6.2.html) | One portable tagged file | Night Room only; no manifest or service worker |
 | [Current source](#run-current-source) | The full House, Night Room, site, docs, and standalone output | Requires Node.js 24 or newer |
 
-The live site is built from `main`. **v0.6.1 — The Long Way Home** is the current tagged release. It packages the synchronized House, Night Room, public site, documentation, and standalone Night file, and fixes the Sector Sprint camera in short, wide browser windows without changing jumping, dashing, power-ups, courses, or homecoming.
+The live site is built from `main`. **v0.6.2 — Clean Ledger** is the current tagged release. It packages the verified v0.6.1 House and Night Room behavior with the current engineering log, repaired public release facts, synchronized documentation, and standalone Night file. It does not change gameplay, persistence, timing, privacy, accessibility, or the deferred iOS Wall.
 
 ## The Grand Salon
 
@@ -93,20 +93,20 @@ The Two-Loop Law governs the Night Room: satisfaction belongs inside one bounded
 
 ## Tagged downloads
 
-The [v0.6.1 release](https://github.com/udhawan97/Nindova/releases/tag/v0.6.1) contains:
+The [v0.6.2 release](https://github.com/udhawan97/Nindova/releases/tag/v0.6.2) contains:
 
-- [Standalone Night Room HTML](https://github.com/udhawan97/Nindova/releases/download/v0.6.1/nindova-v0.6.1.html)
-- [Complete static web archive](https://github.com/udhawan97/Nindova/releases/download/v0.6.1/nindova-web-v0.6.1.zip)
-- [SHA-256 checksums](https://github.com/udhawan97/Nindova/releases/download/v0.6.1/SHA256SUMS.txt)
+- [Standalone Night Room HTML](https://github.com/udhawan97/Nindova/releases/download/v0.6.2/nindova-v0.6.2.html)
+- [Complete static web archive](https://github.com/udhawan97/Nindova/releases/download/v0.6.2/nindova-web-v0.6.2.zip)
+- [SHA-256 checksums](https://github.com/udhawan97/Nindova/releases/download/v0.6.2/SHA256SUMS.txt)
 
 Verify only the tagged file you downloaded:
 
 ```sh
 # Standalone HTML
-grep ' nindova-v0.6.1.html$' SHA256SUMS.txt | shasum -a 256 -c -
+grep ' nindova-v0.6.2.html$' SHA256SUMS.txt | shasum -a 256 -c -
 
 # Static web archive
-grep ' nindova-web-v0.6.1.zip$' SHA256SUMS.txt | shasum -a 256 -c -
+grep ' nindova-web-v0.6.2.zip$' SHA256SUMS.txt | shasum -a 256 -c -
 ```
 
 These are ordinary HTML and ZIP files, not signed or notarized native applications. Nindova has no background native updater. Replace a tagged file manually; a live PWA refreshes its static cache after a successful online visit.

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.2 — 2026-09-26
+
+- Publish the current engineering log and repaired release/download facts with a synchronized package identity and release record.
+- Preserve the v0.6.1 House and Night Room behavior: no gameplay, persistence, timing, privacy, accessibility, telemetry, or iOS Wall change.
+
 ## 0.6.1 — 2026-09-11
 
 - Fit the Chandigarh camera to short, wide windows so the painted city fills the canvas without an empty strip. Add a rendered 1280×720 regression and camera-bound checks.

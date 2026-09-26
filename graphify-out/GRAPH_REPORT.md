@@ -1,13 +1,18 @@
-# Graph Report - Nindova  (2026-09-11)
+# Graph Report - Nindova  (2026-09-26)
 
 ## Corpus Check
-- 242 files · ~287,224 words
+- 180 files · ~287,685 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1551 nodes · 1949 edges · 171 communities (130 shown, 41 thin omitted)
-- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 96 edges (avg confidence: 0.66)
-- Token accounting: AST is local; host-agent semantic token usage is unmetered, not zero.
+- 1437 nodes · 1791 edges · 189 communities (122 shown, 67 thin omitted)
+- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 97 edges (avg confidence: 0.66)
+- Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `02f7c244`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - house-state.ts
@@ -22,84 +27,84 @@
 - Nindova Master Brief
 - rasoi-core.ts
 - scripts
-- Nindova Research Receipts
+- BRAND-GUIDE source
 - dawn-core.ts
 - Automated Release Gates
 - Nindova game quality plan
 - salon-catalog.ts
-- Chandigarh Setting And Play
-- Chandigarh Setting And Play
-- NINDOVA — Brand Guide
+- Chandigarh setting evidence
+- house/package.json
+- Deepen House boundaries and browser evidence
 - restoreActiveSession
-- Chandigarh Setting And Play
+- BUILD-PLAN source
 - Layered Rasoi plan
 - Bedtime game evidence brief
 - evidence-harness.mjs
 - active-session.ts
 - Quiet Depth plan
 - devDependencies
-- Chandigarh Setting And Play
+- compilerOptions
 - dawn.mjs
 - assessment-readiness.ts
 - finishCompletedGame
 - session/package.json
-- The Grand Salon
-- Chandigarh Setting And Play
-- NINDOVA — Brand Guide
+- House room directory capture
+- Chandigarh playground capture
+- 0017-make-sector-sprint-a-one-hit-jetpack-gauntlet.md
 - house.mjs
-- house-navigation.ts
+- Visual system
 - color-contrast.test.mjs
 - house-navigation.test.mjs
 - escape
 - compilerOptions
-- Chandigarh Setting And Play
+- Ephemeral Chandigarh journey
 - bedtime-game-evidence.md
-- Chandigarh Setting And Play
+- chandigarh-world source
 - completeSalonChapter
-- RasoiDebug
+- contracts.ts
 - beginSession
-- Rendered Product Media
-- visual-identity.md
+- Layered kitchen tile capture
+- visual-identity source
 - dawn-core.test.mjs
 - finishSession
-- Rendered Product Media
+- Portrait Night Room capture
 - Night and Local State
-- Chandigarh Setting And Play
-- NINDOVA — Brand Guide
+- sector-sprint source
+- Group the Grand Salon and add sourced classic rule studies
 - Nindova Asset Manifest
-- Rendered Product Media
+- The Long Way Home 0.6.1
 - package.json
 - run-seed-observational.mjs
 - Nindova Rasoi Pairs App Icon
 - RasoiDebug
-- Chandigarh Setting And Play
-- Chandigarh Setting And Play
-- Nindova Research Receipts
-- Chandigarh Setting And Play
+- architecture source
+- Elf-at-work engineering log
+- ADR 0016 Flight and Illustration Deepening
+- index source
 - Nindova Rasoi Diamond Favicon
-- Chandigarh Setting And Play
-- Nindova Research Receipts
-- Chandigarh Setting And Play
+- Board contract
+- Board profiles
+- Nindova v0.6.2 — Clean Ledger
 - sector-sprint-feel.mjs
 - sector-sprint-diagnostics.mjs
 - session/sw.js
 - Nindova Social Preview
 - Rasoi Pairs Session Arc
-- NINDOVA — Brand Guide
-- Chandigarh Setting And Play
-- Conservative product constraints
-- Chandigarh Setting And Play
+- Independent offline caches
+- v0.6.0 source
+- Night state separation
+- sector-sprint-game-feel source
 - compose-build.mjs
 - layered-rasoi.mjs
 - portrait-accessibility.mjs
 - tile-latency.mjs
 - active-session.test.mjs
 - browser-evidence-harness.test.mjs
-- Nindova Research Receipts
-- evidence-harness.mjs
-- Chandigarh Setting And Play
-- Chandigarh Setting And Play
-- Chandigarh Setting And Play
+- index source
+- Replaceable entertainment Gallery
+- accessibility source
+- roadmap source
+- CHANGELOG source
 - session-architecture.test.mjs
 - Assessment readiness
 - Nindova v0.2.0 — Quiet Depth
@@ -110,42 +115,42 @@
 - Nindova v0.4.3 — Held Boundaries
 - Nindova v0.4.4 — Kept Nights
 - Nindova v0.5.0 — Illustrated House
-- Chandigarh Setting And Play
-- Chandigarh homecoming — setting evidence
-- Q: Independently review revised Rasoi
-- Q: Why does Rasoi Pairs
-- Q: Make the app theme
-- Q: rasoi dawn looks so
-- Q: Council coverage review of
-- Q: Build entertainment first for
-- Q: How is Sector Sprint
-- Q: How is Sector Sprint
-- Q: How does the polished
-- Q: How do the adult
-- Q: How do Sector Sprint
-- Q: How do House route
-- Q: Which recently changed Nindova
-- Q: Implement all three audited
+- Same-origin static privacy
+- Action traversal
+- Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks
+- Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?
+- Q: Make the app theme more royal and sophisticated
+- Q: rasoi dawn looks so ugly
+- Q: Council coverage review of the adult Nindova House entertainment implementation
+- Q: Build entertainment first for adults above 18, test it, run a council review, then implement assessment grade.
+- Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?
+- Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?
+- Q: How does the polished Sector Sprint connect rendering, state, audio, accessibility, and tests?
+- Q: How do the adult House and Sector Sprint connect through house source/core to Night state, public surface, and PWA/offline boundary?
+- Q: How do Sector Sprint hold-to-lift input, fixed-step flight, lazy illustrated art, deterministic complications, adaptive Canvas quality, audio suspension, narrated fallback, and offline caching connect without changing the House completion contract?
+- Q: How do House route exit confirmation, dialog focus restoration, website and README assets, documentation, standalone and PWA builds, release packaging, and GitHub Pages publication connect?
+- Q: Which recently changed Nindova House modules have credible deepening candidates, excluding already-deepened architecture?
+- Q: Implement all three audited Nindova tech-debt items: House optional art precache, Sector Sprint diagnostics, and public cache documentation drift
 - serve.mjs
 - self-closing.mjs
-- finishCompletedGame
+- renderCategory
 - First-Light Kitchen Setting
-- Chandigarh Setting And Play
+- Agency rationale
 - pwa-offline.mjs
 - 0011-layer-rasoi-and-keep-replay-deliberate.md
-- 2. Evening light, arousal, and
-- Q: How is Sector Sprint's
+- Bounded renderer
+- Q: How is Sector Sprint's runner state, input, Canvas renderer, audio loop, mobile performance, and reduced-motion route structured?
 - workspaces
 - seed-asserted.mjs
 - assessment-readiness.test.mjs
 - sector-sprint.test.mjs
-- Chandigarh homecoming — setting evidence
-- completeSalonChapter
-- Chandigarh Setting And Play
-- Chandigarh Setting And Play
+- Chandigarh playground decision
+- playChime
+- Narrated story access
+- Provenance version 2
 - Punjabi and Indian Material World
-- Chandigarh playground acceptance
-- beginSession
+- Ten-minute foreground arbiter
+- createHouseNavigation
 - brand-assets.test.mjs
 - copy-contract.test.mjs
 - house-state.test.mjs
@@ -154,54 +159,71 @@
 - session-boundary.test.mjs
 - astro.config.mjs
 - content.config.ts
-- Rasoi Pairs Session Interface
+- Deferred iOS Wall
 - generate-play-qr.mjs
 - classic-studies.test.mjs
 - house-architecture.test.mjs
 - stack-architect.test.mjs
-- Nindova Research Receipts
+- Session Asset Provenance
 - Restrained Kitchen Line Art
-- Distribution Boundary
+- Composed Release Surface
 - Hybrid Procedural Illustration
 - Hybrid Procedural and Composed Audio
 - Portrait-First Session
 - Public Site and Session Separation
-- v0.4.0 Five Doors and Classic
-- v0.4.2 Clean Return
-- Nindova Documentation Index
+- Five Doors and Classic Studies Evidence
+- Clean Return Release Candidate Evidence
+- Sector Sprint Progressive-Lane Evidence
 - Monotonic Fifteen-minute Session Cap
 - M5 Honest Verification Boundary
 - Observational Test Limitation
+- Chandigarh Tourism: Rose Garden source citation
+- Chandigarh Tourism itinerary source citation
+- Chandigarh Tourism map source citation
+- Compressed geography constraint
+- District Administration: Leisure Valley source citation
+- District Administration: Sukhna Lake source citation
+- Fictional encounter opportunities
+- heritage itineraries source citation
+- Ministry of Tourism: Rock Garden source citation
+- Ministry of Tourism: Sector 17 source citation
+- Ministry of Tourism source citation
+- official gallery source citation
+- Rock Garden setting
+- Rose Garden setting
+- Sector 22-D architectural drawing source citation
+- Sector 22 neighborhood
+- Shopping source citation
+- Sukhna Lake setting
 
 ## God Nodes (most connected - your core abstractions)
 1. `scripts` - 29 edges
 2. `createBrowserEvidenceHarness()` - 17 edges
-3. `escape()` - 14 edges
-4. `renderGame()` - 13 edges
-5. `NINDOVA — Brand Guide` - 13 edges
-6. `Quiet Depth plan` - 12 edges
-7. `House room directory capture` - 12 edges
-8. `Chandigarh playground capture` - 12 edges
-9. `Changelog` - 12 edges
+3. `Bedtime game evidence brief` - 17 edges
+4. `escape()` - 14 edges
+5. `GRAND_SALON` - 14 edges
+6. `renderGame()` - 13 edges
+7. `Quiet Depth plan` - 12 edges
+8. `House room directory capture` - 12 edges
+9. `Chandigarh playground capture` - 12 edges
 10. `finishSession()` - 11 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Fifteen-Minute Session Cap` --semantically_similar_to--> `Bounded Self-Ending Session`  [INFERRED] [semantically similar]
   docs/adr/0005-cap-the-real-session-at-fifteen-minutes.md → reference/nindova-master-brief.md
-- `createHouseNavigation()` --indirect_call--> `back()`  [INFERRED]
-  apps/house/src/house-navigation.ts → tests/unit/house-navigation.test.mjs
 - `User-Chosen Unguilted Wall` --semantically_similar_to--> `Between-Session Return System`  [INFERRED] [semantically similar]
   docs/adr/0003-keep-the-wall-user-chosen-and-unguilted.md → reference/nindova-master-brief.md
 - `Asymmetric Vista Memory` --semantically_similar_to--> `Between-Session Return System`  [INFERRED] [semantically similar]
   docs/adr/0004-use-asymmetric-vista-memory.md → reference/nindova-master-brief.md
 - `Browser and PWA Before iOS Wall` --semantically_similar_to--> `Browser Front Door`  [INFERRED] [semantically similar]
   docs/adr/0007-ship-browser-and-pwa-before-the-ios-wall.md → reference/nindova-master-brief.md
+- `Public-Surface Untested Risk` --semantically_similar_to--> `Known Evidence and Product Limits`  [INFERRED] [semantically similar]
+  docs/PUBLIC-SURFACE-EVIDENCE.md → apps/site/src/content/docs/docs/known-limitations.md
 
 ## Import Cycles
-- 1-file cycle: `apps/house/src/house.ts -> apps/house/src/house.ts`
+- None detected.
 
 ## Hyperedges (group relationships)
-- **Bounded Sector Sprint Route Contract** — context_sector_sprint, apps_site_src_content_docs_docs_product_contract_grand_salon_contract, apps_site_src_content_docs_docs_sector_sprint_fixed_five_act_route, docs_adr_0015_add_the_bounded_sector_sprint_fixed_route_boundaries, docs_adr_0016_deepen_sector_sprint_flight_and_illustration_fixed_step_engine [INFERRED 0.95]
 - **Public Media Evidence Pipeline** — docs_brand_asset_manifest_capture_public_media, docs_brand_asset_manifest_public_media_family [INFERRED 0.95]
 - **Featured Nindova Rooms** — apps_site_public_brand_nindova_og_night_room, apps_site_public_brand_nindova_og_gallery, apps_site_public_brand_nindova_og_grand_salon [EXTRACTED 1.00]
 - **Measured Production Wall-clock Result** — docs_testing_m6_release_hardening_722_330_wall_seconds, docs_testing_m6_release_hardening_722_289_internal_seconds, docs_testing_m6_release_hardening_900_000_ceiling, docs_testing_m6_release_hardening_production_cap, docs_testing_m6_release_hardening_zero_browser_errors [EXTRACTED 1.00]
@@ -212,43 +234,43 @@
 - **Rasoi Dawn Visual Composition** — apps_site_public_media_rasoi_dawn_rasoi_dawn_image, apps_site_public_media_rasoi_dawn_first_light_kitchen, apps_site_public_media_rasoi_dawn_brass_plate_arrangement, apps_site_public_media_rasoi_dawn_warm_dawn_palette [INFERRED 0.95]
 - **Bounded Session Decision and Proof** — reference_nindova_master_brief_two_loop_law, reference_nindova_demo_fixed_session_state_arc, docs_adr_0005_cap_the_real_session_at_fifteen_minutes_fifteen_minute_session_cap [INFERRED 0.95]
 
-## Communities (171 total, 41 thin omitted)
+## Communities (189 total, 67 thin omitted)
 
 ### Community 0 - "house-state.ts"
 Cohesion: 0.08
-Nodes (38): HOUSE_ACTIVE_SESSION_CODEC, ActiveDecodeResult, ActiveGame, ActiveSessionCodec, completeEntertainmentGame(), createHouseStateStore(), emptyHouseState(), EntertainmentResult (+30 more)
+Nodes (38): HOUSE_ACTIVE_SESSION_CODEC, validBase(), ActiveDecodeResult, ActiveGame, ActiveSessionCodec, completeEntertainmentGame(), createHouseStateStore(), emptyHouseState() (+30 more)
 
 ### Community 1 - "classic-studies.ts"
 Cohesion: 0.07
 Nodes (41): AADU_CHAPTERS, AADU_LINES, AADU_POINTS, AaduBoardView, AaduChapter, AaduPosition, aaduStep(), BoardPoint (+33 more)
 
 ### Community 2 - "house.ts"
-Cohesion: 0.05
-Nodes (32): audienceDialog, cancelGalleryClearButton, celebration, confirmGalleryClearButton, DebugHouse, describePeg(), enterHouseButton, galleryClearCount (+24 more)
+Cohesion: 0.06
+Nodes (29): audienceDialog, cancelGalleryClearButton, celebration, confirmGalleryClearButton, DebugHouse, describePeg(), enterHouseButton, galleryClearCount (+21 more)
 
 ### Community 3 - "Rasoi Pairs Redesign Evidence"
 Cohesion: 0.05
 Nodes (40): ADR 0010 Replace the Vista Arc with Rasoi Pairs, Legacy Dawn Migration, Preserved Nindova Contracts, Superseded Experience-specific ADRs, Authored and Exhaustively Verified Board Kernel, Punjabi-inspired Kitchen Cultural Direction, Enter Pair Settle Dawn Experience, Behavioral Design Evidence Boundary (+32 more)
 
 ### Community 4 - "sector-sprint-table.ts"
-Cohesion: 0.11
-Nodes (35): acceptEncounter(), canMeet(), cellPoint(), COLS, completedJourney(), corridors, COURSE_MARKS, createJourney() (+27 more)
+Cohesion: 0.10
+Nodes (38): acceptEncounter(), canMeet(), cellPoint(), COLS, completedJourney(), corridors, COURSE_MARKS, createJourney() (+30 more)
 
 ### Community 5 - "site/package.json"
-Cohesion: 0.06
-Nodes (35): dependencies, @fontsource-variable/geist, @fontsource-variable/newsreader, devDependencies, vite, vite, license, name (+27 more)
+Cohesion: 0.10
+Nodes (20): dependencies, astro, @astrojs/sitemap, @astrojs/starlight, @fontsource-variable/geist, @fontsource-variable/newsreader, @fontsource-variable/geist, @fontsource-variable/newsreader (+12 more)
 
 ### Community 6 - "compilerOptions"
-Cohesion: 0.06
-Nodes (35): compilerOptions, lib, module, moduleResolution, noEmit, skipLibCheck, strict, target (+27 more)
+Cohesion: 0.09
+Nodes (21): compilerOptions, lib, module, moduleResolution, noEmit, skipLibCheck, strict, target (+13 more)
 
 ### Community 7 - "session.ts"
 Cohesion: 0.08
-Nodes (32): NindovaDawn, boardElement, boardShell, boardStatus, closeDawn(), currentDawnEligibility(), dawnButton, dawnCanvas (+24 more)
+Nodes (34): NindovaDawn, RasoiCompletion, boardElement, boardShell, boardStatus, closeDawn(), currentDawnEligibility(), dawnButton (+26 more)
 
 ### Community 8 - "night-core.ts"
-Cohesion: 0.12
-Nodes (31): addCivilDays(), captureNight(), completeState(), decodeState(), emptyState(), isText(), LEGACY_HARBOR, LEGACY_MEADOW (+23 more)
+Cohesion: 0.13
+Nodes (30): addCivilDays(), captureNight(), completeState(), decodeState(), emptyState(), isText(), LEGACY_HARBOR, LEGACY_MEADOW (+22 more)
 
 ### Community 9 - "Nindova Master Brief"
 Cohesion: 0.09
@@ -262,9 +284,9 @@ Nodes (28): activeTiles(), availabilityReason(), BoardVerification, createBoard(
 Cohesion: 0.07
 Nodes (29): scripts, build, build:house, build:qr, build:session, build:site, capture:brand-social, capture:public-media (+21 more)
 
-### Community 12 - "Nindova Research Receipts"
-Cohesion: 0.09
-Nodes (25): Nindova contributor guidance, Two-Loop Law, Download Options, Standalone Night HTML Boundary, Tagged v0.4.2 Files, Nindova npm Workspace, Nindova Documentation Index, Known Evidence and Product Limits (+17 more)
+### Community 12 - "BRAND-GUIDE source"
+Cohesion: 0.05
+Nodes (46): Nindova contributor guidance, Two-Loop Law, Download Options, Standalone Night HTML Boundary, Tagged v0.4.2 Files, Nindova npm Workspace, Nindova Documentation Index, Known Evidence and Product Limits (+38 more)
 
 ### Community 13 - "dawn-core.ts"
 Cohesion: 0.12
@@ -279,56 +301,52 @@ Cohesion: 0.10
 Nodes (20): 1. Input and motion, 2. Visual hierarchy, 3. Intrinsic feedback, 4. Character and world, 5. Sound and tactility, Full-roadmap definition of done, Nindova game quality plan, North star (+12 more)
 
 ### Community 16 - "salon-catalog.ts"
+Cohesion: 0.07
+Nodes (26): HistoryMode, HouseDestination, HouseNavigationState, HouseView, HouseViewOptions, NavigationOptions, PendingDestination, ChoiceChapter (+18 more)
+
+### Community 18 - "house/package.json"
 Cohesion: 0.11
-Nodes (17): ChoiceChapter, ChoiceGameDefinition, ClassicGameDefinition, ClassicStudyId, DOOR_CATEGORIES, DoorCategory, GameBase, GameDefinition (+9 more)
+Nodes (17): dependencies, @fontsource-variable/geist, @fontsource-variable/newsreader, devDependencies, vite, @fontsource-variable/geist, @fontsource-variable/newsreader, vite (+9 more)
 
-### Community 17 - "Chandigarh Setting And Play"
-Cohesion: 0.10
-Nodes (19): Chandigarh setting evidence, Chandigarh Tourism: Rose Garden source citation, Chandigarh Tourism itinerary source citation, Chandigarh Tourism map source citation, Compressed geography constraint, District Administration: Leisure Valley source citation, District Administration: Sukhna Lake source citation, Fictional encounter opportunities (+11 more)
-
-### Community 18 - "Chandigarh Setting And Play"
-Cohesion: 0.22
-Nodes (18): 0.1.0 — 2026-08-03, 0.2.0 — 2026-08-03, 0.3.0 — 2026-08-03, 0.4.0 — 2026-08-05, 0.4.1 — 2026-08-09, 0.4.2 — 2026-08-13, 0.4.3 — 2026-08-13, 0.4.4 — 2026-08-20 (+10 more)
-
-### Community 19 - "NINDOVA — Brand Guide"
-Cohesion: 0.11
-Nodes (14): Language, Nindova, Deepen House boundaries and browser evidence, Evidence boundary, Preserved product constraints, Evidence and limits, License and identity, Private by design (+6 more)
+### Community 19 - "Deepen House boundaries and browser evidence"
+Cohesion: 0.50
+Nodes (3): Deepen House boundaries and browser evidence, Evidence boundary, Preserved product constraints
 
 ### Community 20 - "restoreActiveSession"
-Cohesion: 0.20
-Nodes (18): createHouseNavigation(), NindovaActiveSession, advanceBy(), anchorSessionClock(), beginSession(), clearActiveSession(), enforceBoundary(), finishSession() (+10 more)
+Cohesion: 0.33
+Nodes (7): NindovaActiveSession, anchorSessionClock(), clearActiveSession(), LEGACY_ACTIVE_SESSION_KEYS, readActiveSessionRaw(), restoreActiveSession(), safeStorage()
 
-### Community 21 - "Chandigarh Setting And Play"
-Cohesion: 0.11
-Nodes (17): Action traversal, Agency rationale, Bounded renderer, Chandigarh playground decision, Concept review before planning, Final behavior, Narrated story access, Ownership and performance (+9 more)
+### Community 21 - "BUILD-PLAN source"
+Cohesion: 0.33
+Nodes (6): ADR 0021 supersession, BUILD-PLAN source, Deferred native Wall, Historical browser-first baseline, Immutable Night delivery constraints, Verification before publication
 
 ### Community 22 - "Layered Rasoi plan"
-Cohesion: 0.12
-Nodes (17): Acceptance gates, Availability, Board contract, Desktop wireframe, Experience sequence, Explicitly out, Feedback contract, Geometry (+9 more)
+Cohesion: 0.25
+Nodes (8): Acceptance gates, Experience sequence, Explicitly out, Feedback contract, Layered Rasoi plan, Open access, Outcome, Rest and replay contract
 
 ### Community 23 - "Bedtime game evidence brief"
-Cohesion: 0.12
-Nodes (16): 0. Why sleep matters—and how to say it without fear, 1. Interactive screen games and sleepiness, 3. Cognitive distraction and serial diverse imagining, 4. Memory evidence: pair matching is not general memory improvement, 5. Why “dopamine effect” is not supportable, 6. Why rankings, streaks and weekly performance are the wrong layer, 7. Candidate post-board transitions, 8. Open-source reference-product scan (+8 more)
+Cohesion: 0.07
+Nodes (27): 0. Why sleep matters—and how to say it without fear, 1. Interactive screen games and sleepiness, 2. Evening light, arousal, and media displacement, 3. Cognitive distraction and serial diverse imagining, 4. Memory evidence: pair matching is not general memory improvement, 5. Why “dopamine effect” is not supportable, 6. Why rankings, streaks and weekly performance are the wrong layer, 7. Candidate post-board transitions (+19 more)
 
 ### Community 24 - "evidence-harness.mjs"
-Cohesion: 0.18
-Nodes (9): attemptAll(), availablePort(), createBrowserEvidenceHarness(), startPreview(), stopPreview(), root, DeniedAudioContext, root (+1 more)
+Cohesion: 0.26
+Nodes (7): attemptAll(), availablePort(), createBrowserEvidenceHarness(), startPreview(), stopPreview(), root, root
 
 ### Community 25 - "active-session.ts"
 Cohesion: 0.18
 Nodes (15): ActiveSessionDecoded, ActiveSessionEnding, ActiveSessionLimits, ActiveSessionPhase, ActiveSessionRecord, ActiveSessionRejection, decodeActiveSession(), decodeStoredSession() (+7 more)
 
 ### Community 26 - "Quiet Depth plan"
-Cohesion: 0.12
-Nodes (15): Board profiles, Decision, Deeper stack, Gentle stack, Global closure, Implementation slices, Match confirmation, No weekly grade (+7 more)
+Cohesion: 0.18
+Nodes (11): Decision, Global closure, Implementation slices, Match confirmation, No weekly grade, Open and local boundary, Quiet Depth plan, Rasoi Image Drift (+3 more)
 
 ### Community 27 - "devDependencies"
 Cohesion: 0.13
 Nodes (15): @astrojs/check, jsqr, devDependencies, @astrojs/check, jsqr, @playwright/test, pngjs, qrcode (+7 more)
 
-### Community 28 - "Chandigarh Setting And Play"
-Cohesion: 0.13
-Nodes (15): Could, Delivery boundary, Delivery contract, Explicitly out, M0 — Establish the public repository, public surfaces, and proven seed baseline, M1 — Make the complete Session portrait-first and semantically operable, M2 — Make every touch satisfying and every state self-closing, M3 — Add deterministic nightly variety and quiet memory (+7 more)
+### Community 28 - "compilerOptions"
+Cohesion: 0.12
+Nodes (16): compilerOptions, lib, module, moduleResolution, noEmit, skipLibCheck, strict, target (+8 more)
 
 ### Community 29 - "dawn.mjs"
 Cohesion: 0.16
@@ -346,25 +364,25 @@ Nodes (14): clearChapterTransition(), closeHouseAudio(), destinationForView(), f
 Cohesion: 0.15
 Nodes (12): devDependencies, vite, vite, license, name, private, scripts, build (+4 more)
 
-### Community 33 - "The Grand Salon"
+### Community 33 - "House room directory capture"
 Cohesion: 0.15
 Nodes (13): Count and Carry door, Gallery door, Grand Salon, House room directory capture, Illustrated category entrances, Local reading description, Memory and Sequence door, Motion and Route door (+5 more)
 
-### Community 34 - "Chandigarh Setting And Play"
+### Community 34 - "Chandigarh playground capture"
 Cohesion: 0.15
 Nodes (13): Bag pause and narrated controls, Chandigarh playground capture, City map control, Contextual conversation, Directional traveler, Directional walk pad, Fictional map disclosure, Fictional neighbors (+5 more)
 
-### Community 35 - "NINDOVA — Brand Guide"
-Cohesion: 0.15
-Nodes (13): Clear space & minimum sizes, Comparison (5 = best), Design rationale — three concepts explored, Final refinements applied, Icon family (Masala Mound motifs), Identity, Incorrect usage, Motion (+5 more)
+### Community 35 - "0017-make-sector-sprint-a-one-hit-jetpack-gauntlet.md"
+Cohesion: 0.40
+Nodes (3): Make Sector Sprint a one-hit jetpack gauntlet, Evidence boundary, Replace Sector Sprint altitude control with progressive lanes
 
 ### Community 36 - "house.mjs"
 Cohesion: 0.18
 Nodes (8): completeRunnerStory(), completeStackGame(), enterRunnerNarrated(), externalRequests, hanoiMoves(), output, publishedHouseText, root
 
-### Community 37 - "house-navigation.ts"
-Cohesion: 0.17
-Nodes (9): doorArt(), HistoryMode, HouseDestination, HouseNavigationState, HouseView, HouseViewOptions, NavigationOptions, PendingDestination (+1 more)
+### Community 37 - "Visual system"
+Cohesion: 0.40
+Nodes (5): Desktop wireframe, Phone wireframe, Self-critique, Tokens, Visual system
 
 ### Community 38 - "color-contrast.test.mjs"
 Cohesion: 0.24
@@ -378,47 +396,43 @@ Nodes (11): escape(), renderAaduStudy(), renderBoardLines(), renderChoice(), ren
 Cohesion: 0.18
 Nodes (10): compilerOptions, noEmit, noImplicitAny, strict, strictNullChecks, useUnknownInCatchVariables, extends, include (+2 more)
 
-### Community 42 - "Chandigarh Setting And Play"
-Cohesion: 0.18
-Nodes (10): Ephemeral Chandigarh journey, House records, Independent offline caches, Night Room long-lived record, Night Room same-tab resume, Night state separation, Offline cache, Replaceable entertainment Gallery (+2 more)
-
 ### Community 43 - "bedtime-game-evidence.md"
-Cohesion: 0.20
-Nodes (5): Add the adult Nindova House while preserving the Night Room, Add a fail-closed assessment-readiness contract, Make Sector Sprint a one-hit jetpack gauntlet, Evidence boundary, Replace Sector Sprint altitude control with progressive lanes
+Cohesion: 0.22
+Nodes (3): Add the adult Nindova House while preserving the Night Room, Add a fail-closed assessment-readiness contract, Third-party notices
 
-### Community 44 - "Chandigarh Setting And Play"
+### Community 44 - "chandigarh-world source"
 Cohesion: 0.20
 Nodes (10): Asset provenance, Chandigarh miniature environment, chandigarh-world source, Directional character atlas, Garden and waterfront zones, Neighborhood and market zones, Original generated city terrain, Terrain and runtime separation (+2 more)
 
 ### Community 45 - "completeSalonChapter"
-Cohesion: 0.24
-Nodes (10): answerChoice(), clearStackMove(), completeSalonChapter(), focusElement(), render(), renderGallery(), renderHome(), resetStackChapter() (+2 more)
+Cohesion: 0.28
+Nodes (9): answerChoice(), clearStackMove(), completeSalonChapter(), focusElement(), render(), renderGallery(), resetStackChapter(), selectPeg() (+1 more)
 
-### Community 46 - "RasoiDebug"
+### Community 46 - "contracts.ts"
 Cohesion: 0.24
 Nodes (8): RasoiTileSnapshot, SessionState, Window, RasoiMotifId, BoundaryOutcome, BoundaryThresholds, NindovaBoundary, NindovaBoundaryApi
 
 ### Community 47 - "beginSession"
-Cohesion: 0.36
-Nodes (10): NindovaRasoi, animatePair(), createBoardDom(), hint(), playPairSound(), selectTile(), tileButton(), tileById() (+2 more)
+Cohesion: 0.38
+Nodes (12): NindovaRasoi, animatePair(), beginSession(), createBoardDom(), hint(), persistActiveSession(), selectTile(), setStatus() (+4 more)
 
-### Community 48 - "Rendered Product Media"
+### Community 48 - "Layered kitchen tile capture"
 Cohesion: 0.20
 Nodes (10): Brass-edged tray, Foreground Belan, Foreground Masala, Foreground Tawa pair, Illustrated tile faces, Layered kitchen tile capture, Muted covered layers, Named kitchen forms (+2 more)
 
-### Community 49 - "visual-identity.md"
-Cohesion: 0.22
-Nodes (9): Canonical static lockup, Grand Salon table materials, Masala Mound silhouettes, Motion and provenance, Original art provenance, Phulkari lattice, Shahi Raat palette, Table-specific materials (+1 more)
+### Community 49 - "visual-identity source"
+Cohesion: 0.50
+Nodes (4): Canonical static lockup, Original art provenance, Table-specific materials, visual-identity source
 
 ### Community 50 - "dawn-core.test.mjs"
 Cohesion: 0.20
 Nodes (4): chicagoCompletion, legacyCompletion, MOTIF_ORDER, rasoiCompletion
 
 ### Community 51 - "finishSession"
-Cohesion: 0.28
-Nodes (9): clearClosureTimers(), element(), enterDrift(), enterRest(), iconSvg(), nowMs(), openDawn(), renderDrift() (+1 more)
+Cohesion: 0.22
+Nodes (15): advanceBy(), clearClosureTimers(), element(), enforceBoundary(), enterDrift(), enterRest(), finishSession(), iconSvg() (+7 more)
 
-### Community 52 - "Rendered Product Media"
+### Community 52 - "Portrait Night Room capture"
 Cohesion: 0.22
 Nodes (9): Canonical Nindova lockup, Deeper triple crown, Masala Mound heading, Open-side matching instruction, Portrait layered board, Portrait Night Room capture, Quiet layers caption, Safe pair help (+1 more)
 
@@ -426,21 +440,21 @@ Nodes (9): Canonical Nindova lockup, Deeper triple crown, Masala Mound heading, 
 Cohesion: 0.22
 Nodes (9): Captured-Zone Dawn Eligibility, Kitchen Dawn, Legacy Vista Dawn Composition, Local Dawn Keepsake Exports, Deterministic Recipe Version 2, Ephemeral Same-Tab Resume, Immutable Night ID, Night and Local State (+1 more)
 
-### Community 54 - "Chandigarh Setting And Play"
-Cohesion: 0.22
-Nodes (8): A bounded, private afternoon, Chandigarh controls, Play the city, Private bounded journey, Read the city, sector-sprint source, Three errands then home, Traversal power-ups
+### Community 54 - "sector-sprint source"
+Cohesion: 0.40
+Nodes (5): Chandigarh controls, Private bounded journey, sector-sprint source, Three errands then home, Traversal power-ups
 
-### Community 55 - "NINDOVA — Brand Guide"
-Cohesion: 0.22
+### Community 55 - "Group the Grand Salon and add sourced classic rule studies"
+Cohesion: 0.25
 Nodes (8): Aadu Puli Aattam, Deferred candidates, Evidence boundary, Group the Grand Salon and add sourced classic rule studies, Navakankari, Pallanguzhi, Product and state constraints, Selected rulesets and boundaries
 
 ### Community 56 - "Nindova Asset Manifest"
 Cohesion: 0.22
 Nodes (9): Public Brand Asset Family, Nindova Brand Guide, capture-brand-social.mjs, capture-public-media.mjs, CC0 Original Project Assets, Nindova Asset Manifest, Product Evidence Rather Than Marketing Mockups, Public Product Media Family (+1 more)
 
-### Community 57 - "Rendered Product Media"
-Cohesion: 0.22
-Nodes (8): Short wide viewport camera fit, Native acceptance limitations, Nindova v0.6.1 — The Long Way Home, Patch sampled performance, The Long Way Home 0.6.1, Release files, Unchanged Chandigarh action mechanics, Camera regression evidence
+### Community 57 - "The Long Way Home 0.6.1"
+Cohesion: 0.33
+Nodes (6): Short wide viewport camera fit, Native acceptance limitations, Patch sampled performance, The Long Way Home 0.6.1, Unchanged Chandigarh action mechanics, Camera regression evidence
 
 ### Community 58 - "package.json"
 Cohesion: 0.22
@@ -454,19 +468,19 @@ Nodes (8): child, disposablePath, output, portable, root, seedPath, sourcePath, 
 Cohesion: 0.32
 Nodes (8): Four Cardinal Textile Diamonds, Symmetrical Central Focal Mark, Brass Masala Dabba, Indigo Madder Brass and Cream Palette, Phulkari-Inspired Diamond, Indian Kitchen Brand Identity, Five Radial Spice Bowls, Nindova Rasoi Pairs App Icon
 
-### Community 62 - "Chandigarh Setting And Play"
+### Community 62 - "architecture source"
 Cohesion: 0.25
 Nodes (8): architecture source, Assessment readiness exclusion, House local-state ownership, House navigation transaction, Independent offline surfaces, Night legality and closure, Salon lifecycle, Sector Sprint module ownership
 
-### Community 63 - "Chandigarh Setting And Play"
-Cohesion: 0.25
-Nodes (8): BRAND-GUIDE source, Brand motion limits, Drawn wordmark, Original asset licensing, Phulkari lattice identity, Quincunx favicon, Selected identity rationale, Shahi Raat colors
+### Community 63 - "Elf-at-work engineering log"
+Cohesion: 0.50
+Nodes (3): 2026-09-14 — Manual extra run, 2026-09-19 — Daily maintenance run, Elf-at-work engineering log
 
-### Community 64 - "Nindova Research Receipts"
+### Community 64 - "ADR 0016 Flight and Illustration Deepening"
 Cohesion: 0.33
 Nodes (7): Original Character Art Provenance, Sector Sprint Character Sprite Sheet, ADR 0015 Bounded Sector Sprint, Fixed Route, Privacy, and Accessibility Boundaries, Adaptive Quality Tiers, Fixed-Step Foreground Engine, ADR 0016 Flight and Illustration Deepening
 
-### Community 65 - "Chandigarh Setting And Play"
+### Community 65 - "index source"
 Cohesion: 0.29
 Nodes (7): Immutable ending, Immutable intake promise, index source, Inline Night identity, Local Dawn export, Masala Mound profiles, Rest and Image Drift
 
@@ -474,17 +488,13 @@ Nodes (7): Immutable ending, Immutable intake promise, index source, Inline Nigh
 Cohesion: 0.33
 Nodes (7): Brass Circular Spice Box, Compact Geometric Legibility, Indigo Brass Cream and Madder Palette, Indigo Rasoi Diamond, Dark Rounded-Square Field, Radial Madder Spice Wells, Nindova Rasoi Diamond Favicon
 
-### Community 67 - "Chandigarh Setting And Play"
-Cohesion: 0.29
-Nodes (6): Browser and local state, Browser evidence boundary, Distribution boundary, House boundary, Legality kernel, Workspace
+### Community 67 - "Board contract"
+Cohesion: 0.50
+Nodes (4): Availability, Board contract, Geometry, Solvability
 
-### Community 68 - "Nindova Research Receipts"
-Cohesion: 0.29
-Nodes (7): CONTEXT source, Deferred iOS Wall, Foreground closure, Gallery provenance, Night Room Two-Loop vocabulary, Nindova House, Sector Sprint homecoming
-
-### Community 69 - "Chandigarh Setting And Play"
-Cohesion: 0.29
-Nodes (7): Adult browser House, Chandigarh playground, Independent Night Room, README source, Release workflow gate, Tagged downloads, Unverified human acceptance
+### Community 68 - "Board profiles"
+Cohesion: 0.50
+Nodes (4): Board profiles, Deeper stack, Gentle stack, Shared proof
 
 ### Community 70 - "sector-sprint-feel.mjs"
 Cohesion: 0.29
@@ -506,19 +516,11 @@ Nodes (6): A House of Authored Games for Adults 18+, West Wing Gallery, The Cent
 Cohesion: 0.33
 Nodes (6): Universal 343-state Board Guarantee, Voluntary Pair-removal Session Path, Mahjong-solitaire Rule Inspiration, Rasoi Pairs Session Arc, Semantic Safe-pair Hint, Twelve-minute Settle and Fifteen-minute Ceiling
 
-### Community 75 - "NINDOVA — Brand Guide"
-Cohesion: 0.33
-Nodes (5): Cultural direction, Grand Salon contract, Immutable language, Night Room contract, Two deliberately separate loops
-
-### Community 76 - "Chandigarh Setting And Play"
+### Community 76 - "v0.6.0 source"
 Cohesion: 0.33
 Nodes (6): Active-play sampled performance, Bounded private release behavior, Canonical identity synchronization, Release asset contract, The Long Way Home release, v0.6.0 source
 
-### Community 77 - "Conservative product constraints"
-Cohesion: 0.33
-Nodes (6): Accessibility and trust, Challenge, Conservative product constraints, Light and transition away from the screen, Match feedback, Session and stopping
-
-### Community 78 - "Chandigarh Setting And Play"
+### Community 78 - "sector-sprint-game-feel source"
 Cohesion: 0.33
 Nodes (6): Chandigarh acceptance contract, Cold-offline complete art, Evidence limits, Median sampling rationale, Responsive action performance, sector-sprint-game-feel source
 
@@ -527,30 +529,26 @@ Cohesion: 0.33
 Nodes (5): houseOutput, output, root, sessionOutput, siteOutput
 
 ### Community 82 - "tile-latency.mjs"
-Cohesion: 0.47
-Nodes (5): cpuThrottle, elapsedUntil(), measureTarget(), root, tapTile()
+Cohesion: 0.22
+Nodes (8): label(), output, root, cpuThrottle, elapsedUntil(), measureTarget(), root, tapTile()
 
 ### Community 83 - "active-session.test.mjs"
 Cohesion: 0.33
 Nodes (3): board, capture, startedAtMs
 
-### Community 85 - "Nindova Research Receipts"
+### Community 85 - "index source"
 Cohesion: 0.40
 Nodes (5): Adult entry acknowledgement, Canonical House branding, Gallery clear confirmation, index source, Unfinished-table confirmation
 
-### Community 86 - "evidence-harness.mjs"
-Cohesion: 0.40
-Nodes (3): label(), output, root
-
-### Community 87 - "Chandigarh Setting And Play"
+### Community 87 - "accessibility source"
 Cohesion: 0.40
 Nodes (5): accessibility source, Narrated homecoming access, Native semantic controls, Reduced motion routing, Unverified physical assistive technology
 
-### Community 88 - "Chandigarh Setting And Play"
+### Community 88 - "roadmap source"
 Cohesion: 0.40
 Nodes (5): Current browser distribution, Current Chandigarh playground, Deferred assessment and Wall, Human and device hardening, roadmap source
 
-### Community 89 - "Chandigarh Setting And Play"
+### Community 89 - "CHANGELOG source"
 Cohesion: 0.40
 Nodes (5): Version 0.6.1 camera correction, Canonical brand integration, CHANGELOG source, Historical releases, Version 0.6.0 Chandigarh redesign
 
@@ -594,67 +592,59 @@ Nodes (4): Evidence boundary, Highlights, Nindova v0.4.4 — Kept Nights, Notes
 Cohesion: 0.40
 Nodes (4): Highlights, Nindova v0.5.0 — Illustrated House, Release files, Verification
 
-### Community 100 - "Chandigarh Setting And Play"
-Cohesion: 0.40
-Nodes (4): Boundaries and verification, Highlights, Nindova v0.6.0 — The Long Way Home, Release files
-
-### Community 101 - "Chandigarh homecoming — setting evidence"
-Cohesion: 0.40
-Nodes (5): Chandigarh homecoming — setting evidence and story opportunities, Five finite story opportunities, Production implications and evidence limits, Setting direction, Verified anchors → original visual vocabulary
-
-### Community 102 - "Q: Independently review revised Rasoi"
+### Community 102 - "Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: Independently review revised Rasoi Pairs plan for Nindova product contract, timing, state, Dawn, and migration risks, Source Nodes
 
-### Community 103 - "Q: Why does Rasoi Pairs"
+### Community 103 - "Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: Why does Rasoi Pairs lack Mahjong-like layered challenge and visible replay?, Source Nodes
 
-### Community 104 - "Q: Make the app theme"
+### Community 104 - "Q: Make the app theme more royal and sophisticated"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: Make the app theme more royal and sophisticated, Source Nodes
 
-### Community 105 - "Q: rasoi dawn looks so"
+### Community 105 - "Q: rasoi dawn looks so ugly"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: rasoi dawn looks so ugly, Source Nodes
 
-### Community 106 - "Q: Council coverage review of"
+### Community 106 - "Q: Council coverage review of the adult Nindova House entertainment implementation"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: Council coverage review of the adult Nindova House entertainment implementation, Source Nodes
 
-### Community 107 - "Q: Build entertainment first for"
+### Community 107 - "Q: Build entertainment first for adults above 18, test it, run a council review, then implement assessment grade."
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: Build entertainment first for adults above 18, test it, run a council review, then implement assessment grade., Source Nodes
 
-### Community 108 - "Q: How is Sector Sprint"
+### Community 108 - "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?, Source Nodes
 
-### Community 109 - "Q: How is Sector Sprint"
+### Community 109 - "Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: How is Sector Sprint registered, rendered, persisted, completed, tested, and isolated from the Night Room?, Source Nodes
 
-### Community 110 - "Q: How does the polished"
+### Community 110 - "Q: How does the polished Sector Sprint connect rendering, state, audio, accessibility, and tests?"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: How does the polished Sector Sprint connect rendering, state, audio, accessibility, and tests?, Source Nodes
 
-### Community 111 - "Q: How do the adult"
+### Community 111 - "Q: How do the adult House and Sector Sprint connect through house source/core to Night state, public surface, and PWA/offline boundary?"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: How do the adult House and Sector Sprint connect through house source/core to Night state, public surface, and PWA/offline boundary?, Source Nodes
 
-### Community 112 - "Q: How do Sector Sprint"
+### Community 112 - "Q: How do Sector Sprint hold-to-lift input, fixed-step flight, lazy illustrated art, deterministic complications, adaptive Canvas quality, audio suspension, narrated fallback, and offline caching connect without changing the House completion contract?"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: How do Sector Sprint hold-to-lift input, fixed-step flight, lazy illustrated art, deterministic complications, adaptive Canvas quality, audio suspension, narrated fallback, and offline caching connect without changing the House completion contract?, Source Nodes
 
-### Community 113 - "Q: How do House route"
+### Community 113 - "Q: How do House route exit confirmation, dialog focus restoration, website and README assets, documentation, standalone and PWA builds, release packaging, and GitHub Pages publication connect?"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: How do House route exit confirmation, dialog focus restoration, website and README assets, documentation, standalone and PWA builds, release packaging, and GitHub Pages publication connect?, Source Nodes
 
-### Community 114 - "Q: Which recently changed Nindova"
+### Community 114 - "Q: Which recently changed Nindova House modules have credible deepening candidates, excluding already-deepened architecture?"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: Which recently changed Nindova House modules have credible deepening candidates, excluding already-deepened architecture?, Source Nodes
 
-### Community 115 - "Q: Implement all three audited"
+### Community 115 - "Q: Implement all three audited Nindova tech-debt items: House optional art precache, Sector Sprint diagnostics, and public cache documentation drift"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: Implement all three audited Nindova tech-debt items: House optional art precache, Sector Sprint diagnostics, and public cache documentation drift, Source Nodes
 
@@ -662,23 +652,19 @@ Nodes (4): Answer, Outcome, Q: Implement all three audited Nindova tech-debt ite
 Cohesion: 0.40
 Nodes (4): mime, port, root, server
 
-### Community 118 - "finishCompletedGame"
-Cohesion: 0.50
-Nodes (4): gameSigil(), getDoorCategory, openCategory(), renderCategory()
+### Community 118 - "renderCategory"
+Cohesion: 0.33
+Nodes (6): doorArt(), gameSigil(), getDoorCategory, openCategory(), renderCategory(), renderHome()
 
 ### Community 119 - "First-Light Kitchen Setting"
 Cohesion: 0.50
 Nodes (4): Brass Plate Motif Arrangement, First-Light Kitchen Setting, Rasoi Dawn First-Light Kitchen Image, Warm Dawn Palette
 
-### Community 120 - "Chandigarh Setting And Play"
-Cohesion: 0.50
-Nodes (3): Deliberately deferred, In the current source, Next hardening
+### Community 121 - "pwa-offline.mjs"
+Cohesion: 0.25
+Nodes (5): base, href(), tables, DeniedAudioContext, root
 
-### Community 123 - "2. Evening light, arousal, and"
-Cohesion: 0.50
-Nodes (4): 2. Evening light, arousal, and media displacement, Cognitive and emotional arousal, Light, Time displacement and bedtime boundaries
-
-### Community 124 - "Q: How is Sector Sprint's"
+### Community 124 - "Q: How is Sector Sprint's runner state, input, Canvas renderer, audio loop, mobile performance, and reduced-motion route structured?"
 Cohesion: 0.50
 Nodes (3): Answer, Outcome, Q: How is Sector Sprint's runner state, input, Canvas renderer, audio loop, mobile performance, and reduced-motion route structured?
 
@@ -690,7 +676,7 @@ Nodes (4): workspaces, apps/house, apps/session, apps/site
 Cohesion: 0.50
 Nodes (3): output, root, states
 
-### Community 130 - "completeSalonChapter"
+### Community 130 - "playChime"
 Cohesion: 1.00
 Nodes (3): playChime(), playSectorTone(), playToneSequence()
 
@@ -698,25 +684,43 @@ Nodes (3): playChime(), playSectorTone(), playToneSequence()
 Cohesion: 0.67
 Nodes (3): Cultural Visual Guardrails, Punjabi and Indian Material World, Theme and Behavior Independence
 
+### Community 137 - "createHouseNavigation"
+Cohesion: 0.33
+Nodes (5): createHouseNavigation(), errors, page, state(), back()
+
 ## Knowledge Gaps
-- **790 isolated node(s):** `ASSESSMENT_PROTOCOL_VERSION`, `ASSESSMENT_AUTHORIZATION`, `VALIDATION_GATES`, `ValidationGate`, `EvidenceStatus` (+785 more)
+- **724 isolated node(s):** `name`, `version`, `license`, `private`, `type` (+719 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **41 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **67 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+
+## Work-memory lessons
+
+**Preferred sources** — corroborated by past sessions; start here.
+- `house.ts` (6× useful, score=3.838908682) _(code changed — re-verify)_
+- `sector-sprint.ts` (4× useful, score=2.46663823) _(code changed — re-verify)_
+- `requestRoute()` (2× useful, score=1.505421323) _(code changed — re-verify)_
+- `sector-sprint.test.mjs` (2× useful, score=1.229710475) _(code changed — re-verify)_
+- `Theme and Behavior Independence` (2× useful, score=1.218842512)
+- `Rasoi Pairs Session Interface` (2× useful, score=1.20443834) _(code changed — re-verify)_
+- `Dawn` (2× useful, score=1.204240031) _(code changed — re-verify)_
+
+**Known dead ends** — questions that led nowhere; don't re-derive.
+- "Council coverage review of the adult Nindova House entertainment implementation" -> `Offline PWA and Public Surface`, `pwa-offline.mjs`
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `createHouseNavigation()` connect `restoreActiveSession` to `house.ts`, `house-navigation.ts`, `house-navigation.test.mjs`?**
-  _High betweenness centrality (0.062) - this node is a cross-community bridge._
-- **Why does `settle()` connect `restoreActiveSession` to `beginSession`, `session.ts`?**
-  _High betweenness centrality (0.053) - this node is a cross-community bridge._
-- **Why does `label()` connect `evidence-harness.mjs` to `sector-sprint-table.ts`?**
-  _High betweenness centrality (0.036) - this node is a cross-community bridge._
-- **What connects `ASSESSMENT_PROTOCOL_VERSION`, `ASSESSMENT_AUTHORIZATION`, `VALIDATION_GATES` to the rest of the system?**
-  _790 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Why does `createHouseNavigation()` connect `createHouseNavigation` to `salon-catalog.ts`, `house.ts`, `beginSession`?**
+  _High betweenness centrality (0.082) - this node is a cross-community bridge._
+- **Why does `settle()` connect `beginSession` to `createHouseNavigation`, `finishSession`, `restoreActiveSession`, `session.ts`?**
+  _High betweenness centrality (0.077) - this node is a cross-community bridge._
+- **Why does `label()` connect `tile-latency.mjs` to `sector-sprint-table.ts`?**
+  _High betweenness centrality (0.049) - this node is a cross-community bridge._
+- **What connects `name`, `version`, `license` to the rest of the system?**
+  _724 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `house-state.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.07777777777777778 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08350951374207188 - nodes in this community are weakly interconnected._
 - **Should `classic-studies.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.07308970099667775 - nodes in this community are weakly interconnected._
 - **Should `house.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.052564102564102565 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.057057057057057055 - nodes in this community are weakly interconnected._
