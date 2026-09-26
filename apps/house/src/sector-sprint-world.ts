@@ -329,6 +329,32 @@ export function drawWorld(
     c.restore();
     label(c, p.x, p.y - 42, pickup.label);
   }
+  const craftMarksReady = COURSE_MARKS.filter((mark) => mark.owner === "craft").every(
+    (mark) => state.marks.includes(mark.id),
+  );
+  if (craftMarksReady && !state.visited.includes("craft")) {
+    const toy = PLACES.find((entry) => entry.id === "craft")!.point;
+    const signaling = state.toySignalMs <= 0;
+    ellipse(c, toy.x, toy.y + 3, 27, 8, "#25382666");
+    c.fillStyle = "#9b7040";
+    c.fillRect(toy.x - 16, toy.y - 31, 32, 31);
+    c.fillStyle = signaling ? "#ffe186" : "#d3a85c";
+    c.fillRect(toy.x - 12, toy.y - 27, 24, 18);
+    c.strokeStyle = signaling ? "#fff1b8" : "#5d4a35";
+    c.lineWidth = signaling ? 5 : 3;
+    c.beginPath();
+    c.moveTo(toy.x + 12, toy.y - 22);
+    c.lineTo(toy.x + (signaling ? 33 : 23), toy.y - (signaling ? 43 : 28));
+    c.stroke();
+    ellipse(c, toy.x + 29, toy.y - 4, 7, 7, "#efe2bd");
+    label(
+      c,
+      toy.x,
+      toy.y - 57,
+      signaling ? "DEFLECT NOW" : `COURTYARD TOY · ${state.toyPhase}/3`,
+      signaling,
+    );
+  }
   const actors: { y: number; draw: () => void }[] = [];
   for (const p of PLACES) {
     if (
@@ -505,7 +531,7 @@ export function drawWorld(
         c,
         p.point.x,
         p.point.y + 23,
-        p.id === "home" ? "Home · Sector 22" : p.district.split(" · ")[0],
+        p.id === "home" ? "Sector 17 plaza" : p.district.split(" · ")[0],
         near,
       );
   }

@@ -3,7 +3,6 @@ import { resolve } from "node:path";
 import test from "node:test";
 
 const root = resolve(import.meta.dirname, "../..");
-const Catalog = await import(resolve(root, "apps/house/dist/salon-catalog.js"));
 const Lifecycle = await import(resolve(root, "apps/house/dist/salon-table-lifecycle.js"));
 
 function create(initial = null) {
@@ -19,15 +18,18 @@ function create(initial = null) {
   return { lifecycle, persisted, changed };
 }
 
-test("the Grand Salon lifecycle owns opening, answer resolution, and chapter advance", () => {
+test("the Grand Salon lifecycle owns Pattern Court construction and chapter advance", () => {
   const { lifecycle, persisted } = create();
   lifecycle.open("pattern-court", false);
   const first = lifecycle.view().active;
   assert.equal(first.runId, "run-1");
   assert.equal(lifecycle.hasMeaningfulProgress(), false);
 
-  const answerIndex = Catalog.GRAND_SALON.game("pattern-court").chapters[0].answerIndex;
-  const solved = lifecycle.interact({ type: "answer", choiceIndex: answerIndex });
+  assert.equal(lifecycle.interact({ type: "answer", choiceIndex: 0 }).kind, "noop");
+  let solved;
+  while (lifecycle.view().active.pattern.tray.length) {
+    solved = lifecycle.interact({ type: "pattern-assist" });
+  }
   assert.equal(solved.kind, "chapter-complete");
   assert.equal(lifecycle.view().active.resolving, true);
   assert.equal(lifecycle.hasMeaningfulProgress(), true);

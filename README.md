@@ -20,7 +20,7 @@ Nindova is a private, offline-ready house of authored browser games for adults 1
   ·
   <a href="https://udhawan97.github.io/Nindova/docs/"><strong>Read the docs</strong></a>
   ·
-  <a href="https://github.com/udhawan97/Nindova/releases/tag/v0.6.2"><strong>Download v0.6.2</strong></a>
+  <a href="https://github.com/udhawan97/Nindova/releases/tag/v0.7.0"><strong>Download v0.7.0</strong></a>
 </p>
 
 ![The current Nindova House floor plan, with the separate Night Room, five Grand Salon doors, and local Gallery](./apps/site/public/media/nindova-house.png)
@@ -31,10 +31,10 @@ Nindova is a private, offline-ready house of authored browser games for adults 1
 | --- | --- | --- |
 | [Nindova House](https://udhawan97.github.io/Nindova/house/) | Eight current authored games and the local Gallery | Five fixed parts per table; replay begins only by choosing again |
 | [Night Room](https://udhawan97.github.io/Nindova/play/) | A bounded wind-down Session | Hidden automatic settle and a hard 15-minute ceiling |
-| [Standalone Night HTML](https://github.com/udhawan97/Nindova/releases/download/v0.6.2/nindova-v0.6.2.html) | One portable tagged file | Night Room only; no manifest or service worker |
+| [Standalone Night HTML](https://github.com/udhawan97/Nindova/releases/download/v0.7.0/nindova-v0.7.0.html) | One portable tagged file | Night Room only; no manifest or service worker |
 | [Current source](#run-current-source) | The full House, Night Room, site, docs, and standalone output | Requires Node.js 24 or newer |
 
-The live site is built from `main`. **v0.6.2 — Clean Ledger** is the current tagged release. It packages the verified v0.6.1 House and Night Room behavior with the current engineering log, repaired public release facts, synchronized documentation, and standalone Night file. It does not change gameplay, persistence, timing, privacy, accessibility, or the deferred iOS Wall.
+The live site is built from `main`. **v0.7.0 — The Long Way Home** is the current tagged release. It turns Pattern Court into a five-part construction game, gives every Salon table a visible goal and instructions, and rebuilds the Chandigarh route around an authored Sector 22 to Sector 17 outing. The Night Room and its boundaries are unchanged.
 
 ## The Grand Salon
 
@@ -42,21 +42,21 @@ Every table has five fixed chapters, studies, or Acts and a designed curtain cal
 
 | Door | Tables | Authored scope |
 | --- | --- | --- |
-| Pattern & Line | Pattern Court · Navakankari | Order and placement on a documented 24-point board |
+| Pattern & Line | Pattern Court · Navakankari | Inlay construction and placement on a documented 24-point board |
 | Turn & Trap | Mirror Forge · Aadu Puli Aattam | Bearing changes and one documented goat-and-tiger passage |
 | Count & Carry | Stack Architect · Pallanguzhi | Three-plinth law and one-turn sowing studies |
 | Memory & Sequence | Lantern Ledger | One fixed procession of light |
-| Motion & Route | Sector Sprint | A Chandigarh playground with jumping, dashing, power-ups and a narrated homecoming |
+| Motion & Route | Chandigarh: The Long Way Home | A staged Sector 22 to Sector 17 outing with movement, route choice, a scarf encounter and a narrated equivalent |
 
 The three classic additions are explicitly labeled authored tactical rule studies. Each names its source and documented scope and discloses the full-match rules it omits; Nindova does not present them as definitive or complete traditional matches.
 
 The current source gives each table its own physical stage without making decoration part of the rules: geometric inlay for Pattern Court, smoked glass and brass for Mirror Forge, carved line and pit boards for the three classic studies, a velvet lantern procession, and a rosewood tower table. Every required action remains a native control with the same text and nonvisual state.
 
-Sector Sprint is now a connected Chandigarh playground. Walk, jump and dash through market ribbons, garden petals and courtyard chimes. Spring juttis, a monsoon scarf and a paper-wing pin change how you move. Meet the neighbors, bring useful things home, and find Ma by Sukhna. The first three courses can be explored in any order; a city map, guided help and a complete narrated route keep the journey approachable.
+Chandigarh: The Long Way Home is a staged outing from a Sector 22 verandah to the Sector 17 pedestrian plaza. Repair a paper display, choose a route through the sector, read and deflect a fictional courtyard toy with Gurpreet’s scarf, align a wayfinder, and finish beside the plaza fountain. The map separates short Chandigarh facts from invented people and mechanics, while guided actions and the complete narrated route preserve the same order and outcome without timing or precision.
 
 The original painted world, directional character animation, moving obstacles, spring pads and water accents stay local and work offline. This is a fictional, compressed Chandigarh, grounded in [official setting research](./docs/research/chandigarh-homecoming.md). The bag and power-ups are temporary. No score, lives, random rewards, persistent collection or third-party runtime service. Early homecoming and the ten-minute foreground boundary never claim an unfinished completion.
 
-![Sector Sprint's Chandigarh playground with original city scenery and jump/dash controls](./apps/site/public/media/sector-sprint.png)
+![Chandigarh: The Long Way Home with original city scenery and movement controls](./apps/site/public/media/sector-sprint.png)
 
 The Salon has no score, streak, randomized reward, social comparison, or assessment output. Its Gallery may keep only the latest completion fact for each game, and the whole Gallery can be cleared from the interface.
 
@@ -93,20 +93,20 @@ The Two-Loop Law governs the Night Room: satisfaction belongs inside one bounded
 
 ## Tagged downloads
 
-The [v0.6.2 release](https://github.com/udhawan97/Nindova/releases/tag/v0.6.2) contains:
+The [v0.7.0 release](https://github.com/udhawan97/Nindova/releases/tag/v0.7.0) contains:
 
-- [Standalone Night Room HTML](https://github.com/udhawan97/Nindova/releases/download/v0.6.2/nindova-v0.6.2.html)
-- [Complete static web archive](https://github.com/udhawan97/Nindova/releases/download/v0.6.2/nindova-web-v0.6.2.zip)
-- [SHA-256 checksums](https://github.com/udhawan97/Nindova/releases/download/v0.6.2/SHA256SUMS.txt)
+- [Standalone Night Room HTML](https://github.com/udhawan97/Nindova/releases/download/v0.7.0/nindova-v0.7.0.html)
+- [Complete static web archive](https://github.com/udhawan97/Nindova/releases/download/v0.7.0/nindova-web-v0.7.0.zip)
+- [SHA-256 checksums](https://github.com/udhawan97/Nindova/releases/download/v0.7.0/SHA256SUMS.txt)
 
 Verify only the tagged file you downloaded:
 
 ```sh
 # Standalone HTML
-grep ' nindova-v0.6.2.html$' SHA256SUMS.txt | shasum -a 256 -c -
+grep ' nindova-v0.7.0.html$' SHA256SUMS.txt | shasum -a 256 -c -
 
 # Static web archive
-grep ' nindova-web-v0.6.2.zip$' SHA256SUMS.txt | shasum -a 256 -c -
+grep ' nindova-web-v0.7.0.zip$' SHA256SUMS.txt | shasum -a 256 -c -
 ```
 
 These are ordinary HTML and ZIP files, not signed or notarized native applications. Nindova has no background native updater. Replace a tagged file manually; a live PWA refreshes its static cache after a successful online visit.

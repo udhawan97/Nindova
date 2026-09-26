@@ -42,7 +42,7 @@ test("completion is copy-on-write and failed writes do not invent a Gallery read
   const completed = store.complete("pattern-court", "run-one", "2026-08-04T10:00:00.000Z");
   assert.equal(completed.persisted, true);
   assert.equal(completed.result.mode, "entertainment");
-  assert.equal(completed.result.completionFacts.finalChapter, "Court lattice");
+  assert.equal(completed.result.completionFacts.finalChapter, "The finished courtyard");
 
   const replacement = store.complete("pattern-court", "run-two", "2026-08-04T11:00:00.000Z");
   assert.equal(Object.keys(replacement.state.latestByGame).length, 1);

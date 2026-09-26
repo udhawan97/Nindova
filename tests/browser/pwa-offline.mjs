@@ -93,11 +93,11 @@ try {
   const houseRegistration = await housePage.evaluate(async () => {
     const ready = await navigator.serviceWorker.ready;
     const keys = await caches.keys();
-    const cache = await caches.open("nindova-house-v14");
+    const cache = await caches.open("nindova-house-v15");
     return { scope: ready.scope, keys, entries: (await cache.keys()).map((request) => request.url) };
   });
   assert.equal(houseRegistration.scope, houseBase);
-  assert.ok(houseRegistration.keys.includes("nindova-house-v14"));
+  assert.ok(houseRegistration.keys.includes("nindova-house-v15"));
   assert.equal(houseRegistration.keys.includes("nindova-house-v13"), false);
   assert.ok(houseRegistration.entries.length > 0);
   for (const selector of ['.wordmark-logo', 'link[rel="apple-touch-icon"]']) {

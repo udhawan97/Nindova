@@ -5,7 +5,7 @@ description: Product contract and implementation notes for Nindova House, the Gr
 
 Nindova House is private, offline-ready authored entertainment for adults 18 and over. Every room knows when to close: five Grand Salon doors group eight finite games, while the deliberately separate **Night Room** holds one bounded Masala Mound Session.
 
-The tables are Pattern Court with Navakankari, Mirror Forge with Aadu Puli Aattam, Stack Architect with Pallanguzhi, Lantern Ledger, and Sector Sprint. Each has five fixed chapters, tactical studies, or Acts. In the Night Room, match two identical kitchen Tiles when nothing covers them and one side is open; the board grows lighter and then the whole Session closes itself within 15 minutes.
+The tables are Pattern Court with Navakankari, Mirror Forge with Aadu Puli Aattam, Stack Architect with Pallanguzhi, Lantern Ledger, and Chandigarh: The Long Way Home. Each has five fixed chapters, tactical studies, or encounters. In the Night Room, match two identical kitchen Tiles when nothing covers them and one side is open; the board grows lighter and then the whole Session closes itself within 15 minutes.
 
 Navakankari, Aadu Puli Aattam, and Pallanguzhi are presented as sourced authored tactical rule studies—not complete traditional matches. Each play surface names its source and documented scope and discloses the full-match rules it omits.
 
@@ -14,9 +14,9 @@ Navakankari, Aadu Puli Aattam, and Pallanguzhi are presented as sourced authored
 ## Start here
 
 - [Getting started](./getting-started/) covers the House, Night standalone file, local workspace, and composed PWA build.
-- [Downloads](./downloads/) separates the current live House, live Night PWA, tagged v0.5.0 files, checksums, and source build.
+- [Downloads](./downloads/) separates the current live House, live Night PWA, tagged v0.7.0 files, checksums, and source build.
 - [Product contract](./product-contract/) records the promises every implementation must keep.
-- [Sector Sprint](./sector-sprint/) explains the complete Action and Narrated routes, controls, recovery, boundary, and evidence limits.
+- [Chandigarh: The Long Way Home](./sector-sprint/) explains the complete Action and Narrated routes, controls, recovery, boundary, and evidence limits.
 - [Rasoi Pairs Session](./nightly-arc/) defines free tiles, pairing, help, settlement, and closure.
 - [Night and local state](./night-and-local-state/) explains deterministic boards and safe v1/v2 migration.
 - [Privacy and local state](./privacy-local-state/) inventories long-lived, ephemeral, and cached data.
@@ -28,4 +28,4 @@ Navakankari, Aadu Puli Aattam, and Pallanguzhi are presented as sourced authored
 - [Research receipts](./research-receipts/) states the behavioral evidence and its limits.
 - [Roadmap](./roadmap/), [Known limitations](./known-limitations/), and [Deferred iOS Wall](./ios-wall/) distinguish the release from future work.
 
-The current House is live from `main`; v0.5.0 packages the synchronized House, Night Room, site, docs, and standalone Night file. The iOS Wall remains deferred. “Not now” in the browser demonstrates voluntary re-entry; it is not proof of native Screen Time interception.
+The current House is live from `main`; v0.7.0 packages the synchronized House, Night Room, site, docs, and standalone Night file. The iOS Wall remains deferred. “Not now” in the browser demonstrates voluntary re-entry; it is not proof of native Screen Time interception.

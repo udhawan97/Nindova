@@ -8,7 +8,8 @@ description: What exists in the current source and what remains deliberately unc
 - Nindova House for adults 18 and over, with a spatial Grand Salon and separate Night Room.
 - Five category doors grouping eight games: Pattern Court with Navakankari, Mirror Forge with Aadu Puli Aattam, Stack Architect with Pallanguzhi, Lantern Ledger, and Sector Sprint.
 - Three sourced classic tactical rule studies with visible documented-scope/source/included/omitted disclosures, pure deterministic rules, and no claim of complete traditional-match coverage.
-- Sector Sprint is an original Chandigarh exploration playground: deliberate walking, jump/dash courses, temporary power-ups, ordinary errand props, and a five-encounter homecoming. The first three courses are open in any order. Guided help and a complete narrated route require no precision, motion, vision or sound. Ten foreground minutes replace the old runner boundary; pause/hide/blur/exit suspend it, and unfinished or early closure records no completion. Positions, power-ups, ribbons, bag and timing stay in memory. No scores, lives, random rewards, persistent collection or sleep claims. The Night Room is unchanged.
+- Pattern Court is a five-part construction table with loose inlay pieces, swapping, undo, reset, conflict feedback and optional one-piece assistance. Every Salon table now states its goal and instructions before play.
+- Chandigarh: The Long Way Home is a five-encounter Sector 22 to Sector 17 outing with movement, route choice, a fictional three-signal scarf encounter, separated city facts and a complete narrated equivalent. Its ten-minute foreground boundary and memory-only detailed route state remain intact. No scores, lives, random rewards, persistent collection or sleep claims. The Night Room is unchanged.
 - Versioned `mode: "entertainment"` completion provenance, one replaceable local result per game, strict active-state recovery, and a visible Gallery clear action.
 - Independently scoped House and Night PWAs with cold-offline and base-path browser evidence.
 
@@ -22,7 +23,7 @@ description: What exists in the current source and what remains deliberately unc
 - Self-contained standalone HTML and separately tested installable offline PWA.
 - Synchronized brand kit, landing page, Starlight docs, rendered source media, Apache-2.0 code licensing, CC0-1.0 original-art provenance, and a locally verified QR artifact for the canonical public route.
 
-The pinned GitHub Pages workflow publishes the static build from `main`. The deployed `main` revision exposes the live House, Night, docs, and standalone routes. v0.5.0 packages that complete static surface with an illustrated House, richer game materials, and cached Sector Sprint scenery while preserving the authored product. The rendered QR destination, service-worker control, and offline reload are browser-verified; a physical-device QR scan remains pending.
+The pinned GitHub Pages workflow publishes the static build from `main`. The deployed `main` revision exposes the live House, Night, docs, and standalone routes. v0.7.0 packages the constructed Pattern Court, shared game instructions, and the Sector 22 to Sector 17 Chandigarh outing while preserving the Night Room contract. The rendered QR destination, service-worker control, and offline reload are browser-verified; a physical-device QR scan remains pending.
 
 ## Next hardening
 

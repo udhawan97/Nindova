@@ -2,6 +2,7 @@ import characterUrl from "./assets/gurpreet-walk.webp?url";
 import worldUrl from "./assets/chandigarh-world.webp?url";
 import {
   PLACES,
+  CITY_FACTS,
   COURSE_MARKS,
   POWERUPS,
   JOURNEY_BOUNDARY_MS,
@@ -25,7 +26,7 @@ export {
   WORLD_WIDTH as SECTOR_SPRINT_WIDTH,
 } from "./sector-sprint.js";
 export type SectorSprintRunnerSnapshot = JourneyState & {
-  readonly mechanicsVersion: 2;
+  readonly mechanicsVersion: 3;
   readonly elapsedMs: number;
   readonly paused: boolean;
 };
@@ -239,7 +240,7 @@ export function createSectorSprintTable(options: TableOptions) {
     const renderFacts = {
       art: art?.complete && art.naturalWidth ? "illustrated" : "fallback",
       quality: lowQuality ? "balanced" : "high",
-      mechanicsVersion: "2",
+      mechanicsVersion: "3",
       character: characterSheet?.complete && characterSheet.naturalWidth ? "atlas" : "vector",
     };
     for (const [name, value] of Object.entries(renderFacts)) {
@@ -293,6 +294,11 @@ export function createSectorSprintTable(options: TableOptions) {
       jumpQueued = false;
       dashQueued = false;
       if (state.message !== previous.message) updateLive(state.message);
+      if (state.toyPhase !== previous.toyPhase) {
+        const objectiveNode = document.querySelector(".journey-objective p");
+        if (objectiveNode) objectiveNode.textContent = objective(state);
+        options.audio.tone("impact", state.toyPhase);
+      }
       if (state.bag.length !== previous.bag.length) {
         session = {
           ...session!,
@@ -341,7 +347,7 @@ export function createSectorSprintTable(options: TableOptions) {
     narrated = route === "narrated";
     dialog = narrated ? "plaza" : null;
     statusMessage =
-      "Jump, dash, find a power-up. The city is yours to play with.";
+      "Carry the paper city from Sector 22 to the Sector 17 plaza. The route opens one encounter at a time.";
     boundaryTimer = window.setInterval(enforceBoundary, 250);
     startClock();
     publish();
@@ -375,7 +381,11 @@ export function createSectorSprintTable(options: TableOptions) {
       ...state,
       route: routeTo(
         state,
-        COURSE_MARKS.find((m) => m.owner === id && !state!.marks.includes(m.id))
+        COURSE_MARKS.find((m) =>
+          (id === "market" || id === "craft") &&
+          m.owner === id &&
+          !state!.marks.includes(m.id),
+        )
           ?.point ?? place(id).point,
       ),
       walking: false,
@@ -395,7 +405,7 @@ export function createSectorSprintTable(options: TableOptions) {
     if (terminalOutcome) return;
     if (!canMeet(state, dialog)) {
       updateLive(
-        "The first three neighbors are ready to meet you. Ma will wait by the water.",
+        "This stop opens after the encounter before it. Follow the paper route from Sector 22 toward Sector 17.",
       );
       return;
     }
@@ -470,26 +480,40 @@ export function createSectorSprintTable(options: TableOptions) {
     return PLACES.filter((p) => p.id !== "plaza")
       .map(
         (p) =>
-          `<button type="button" data-visit="${p.id}"><span>${escape(p.district)}</span><strong>${escape(p.title)}</strong><small>${state?.visited.includes(p.id) ? "Visit again" : p.id === "home" ? "You can always head home" : canMeet(state!, p.id) ? (!narrated && p.item && p.id !== "lake" ? "Play the ribbon course" : "Someone to meet") : "Ma is waiting; meet the neighbors first"}</small></button>`,
+          `<button type="button" data-visit="${p.id}"><span>${escape(p.district)}</span><strong>${escape(p.title)}</strong><small>${state?.visited.includes(p.id) ? "Visit again" : canMeet(state!, p.id) ? (!narrated && (p.id === "market" || p.id === "craft") ? "A playable encounter" : "Ready to visit") : "Follow the route to open this stop"}</small></button>`,
       )
       .join("");
   }
   function dialogue() {
     if (!dialog || !state) return "";
+    const current = state;
     const p = place(dialog);
-    const blocked = !canMeet(state, dialog);
+    const blocked = !canMeet(current, dialog);
     const text = reply
-      ? p.replies[state.choices[dialog] === 1 ? 1 : 0]
+      ? p.replies[current.choices[dialog] === 1 ? 1 : 0]
       : blocked
         ? "“Take your time with the neighbors. I will be right here when you are ready.”"
         : p.introduction;
-    return `<section class="journey-dialog" aria-labelledby="encounterTitle" role="region"><div class="journey-portrait" style="--person-color:${p.color}" aria-hidden="true"><i></i></div><div class="journey-dialog-copy"><p class="kicker">${escape(p.person)}</p><h2 id="encounterTitle" tabindex="-1">${escape(p.title)}</h2><p>${escape(text)}</p><div class="journey-dialog-actions">${reply || blocked ? `<button class="primary-action" type="button" data-dialog-close>${state.finished ? "Close the afternoon" : "Back to the city"}</button>` : (!narrated && ["market", "roses", "craft"].includes(dialog ?? "") ? ["Play the ribbon course", "Help me through it"] : p.choices).map((choice, i) => `<button class="${i ? "quiet-action" : "primary-action"}" type="button" ${!narrated && ["market", "roses", "craft"].includes(dialog ?? "") && i === 0 ? "data-course-start" : `data-encounter-choice="${i}"`}>${escape(choice)}</button>`).join("")}${!reply && !blocked && dialog !== "plaza" ? '<button class="text-action" type="button" data-dialog-close>Maybe in a moment</button>' : ""}</div></div></section>`;
+    const actionChoices =
+      !narrated && dialog === "market"
+        ? ["Cross the verandah course", "Ask Simran to set the tab"]
+        : !narrated && dialog === "craft"
+          ? [
+              COURSE_MARKS.filter((mark) => mark.owner === "craft").every((mark) => current.marks.includes(mark.id))
+                ? "Face the courtyard toy"
+                : "Follow its three paper signals",
+              "Let Iqbal hold the toy still",
+            ]
+          : p.choices;
+    return `<section class="journey-dialog" aria-labelledby="encounterTitle" role="region"><div class="journey-portrait" style="--person-color:${p.color}" aria-hidden="true"><i></i></div><div class="journey-dialog-copy"><p class="kicker">${escape(p.person)}</p><h2 id="encounterTitle" tabindex="-1">${escape(p.title)}</h2><p>${escape(text)}</p><div class="journey-dialog-actions">${reply || blocked ? `<button class="primary-action" type="button" data-dialog-close>${current.finished ? "Close the afternoon" : "Back to the city"}</button>` : actionChoices.map((choice, i) => `<button class="${i ? "quiet-action" : "primary-action"}" type="button" ${!narrated && (dialog === "market" || dialog === "craft") && i === 0 ? "data-course-start" : `data-encounter-choice="${i}"`}>${escape(choice)}</button>`).join("")}${!reply && !blocked && dialog !== "plaza" ? '<button class="text-action" type="button" data-dialog-close>Maybe in a moment</button>' : ""}</div></div></section>`;
   }
   function render() {
     if (!state || !session) return "";
+    const current = state;
     if (narrated)
-      return `<section class="journey-narrated runner-story"><header><p class="kicker">Chandigarh · a narrated homecoming</p><h2>The city, at your pace.</h2><p>${escape(state.companion ? "Walk home together." : state.bag.length >= 3 ? "Meet Ma on the Sukhna promenade." : "Visit the market, Rose Garden and craft table in any order.")}</p><p>Choose a place, speak with its neighbor, and bring the afternoon home. The same people, objects and ending, without movement or visual interpretation.</p></header><div class="journey-bag" aria-label="Your bag">${bag()}</div>${dialogue()}${!dialog ? `<div class="journey-destinations">${destinations()}</div>` : ""}<button type="button" class="quiet-action" data-runner-pause aria-pressed="${paused}">${paused ? "Resume city" : "Pause city"}</button><p class="journey-disclosure">An original fictional walk inspired by Chandigarh. Places are compressed; this is not a navigation map. The table closes after ten foreground minutes; Pause holds that boundary while conversations remain available.</p></section>`;
-    return `<section class="journey-shell" aria-label="Chandigarh homecoming"><div class="journey-world"><canvas id="runnerCanvas" width="960" height="620" tabindex="0" aria-label="Walkable Chandigarh. Arrow keys or W A S D move; release to stop. Tap a path to walk there. Space or J jumps. Shift or K dashes. E or Enter talks. Escape stops walking." aria-describedby="journeyHelp"></canvas><div class="journey-topline"><div><span class="journey-eyebrow">THE CITY BEAUTIFUL</span><strong data-location>Chandigarh · the long way home</strong></div><button type="button" data-map aria-expanded="${mapOpen}">City map <span aria-hidden="true">↗</span></button></div><div class="journey-toast" data-toast>${escape(state.message)}</div><div class="journey-objective"><span data-power-name>${escape(state.power ? POWERUPS.find((p) => p.id === state!.power)!.label : "Jump + dash")}</span><p>${escape(objective(state))}</p></div>${paused ? '<div class="journey-paused">The afternoon is on hold.<button type="button" data-runner-pause>Resume city</button></div>' : ""}${mapOpen || journalOpen ? `<section class="journey-map" aria-label="${mapOpen ? "City map" : "Your afternoon"}"><header><h2>${mapOpen ? "Find your way" : "In your bag"}</h2><button type="button" data-close-panel aria-label="Close ${mapOpen ? "city map" : "bag"}">×</button></header>${mapOpen ? `<img src="${worldUrl}" alt="A fictional compact city: Rose Garden northwest, Rock Garden north, Sukhna northeast, Sector 17 plaza central, Sector 22 home southwest and market southeast.">` : ""}<div class="journey-bag">${bag()}</div><div class="journey-destinations">${destinations()}</div></section>` : ""}</div>${dialogue()}<div class="journey-controls"><div class="journey-pad" role="group" aria-label="Walk"><button type="button" data-walk="ArrowUp" aria-label="Walk north">↑</button><button type="button" data-walk="ArrowLeft" aria-label="Walk west">←</button><button type="button" data-walk="ArrowDown" aria-label="Walk south">↓</button><button type="button" data-walk="ArrowRight" aria-label="Walk east">→</button></div><div class="journey-moves"><button type="button" data-jump>Jump <small>J / Space</small></button><button type="button" data-dash>Dash <small>K / Shift</small></button></div><button class="journey-interact" type="button" data-interact disabled>Find a neighbor</button><div class="journey-utilities"><button type="button" data-bag aria-expanded="${journalOpen}">Bag</button><button type="button" data-runner-pause aria-pressed="${paused}">${paused ? "Resume" : "Pause"}</button><button type="button" data-runner-story>Read the city</button></div></div><p id="journeyHelp" class="journey-help">Move: WASD / arrows · Jump: Space / J · Dash: Shift / K · Talk: E · tap paths to travel. <span>Fictional, compressed Chandigarh. A complete afternoon, then home.</span></p></section>`;
+      return `<section class="journey-narrated runner-story"><header><p class="kicker">Chandigarh · Sector 22 to Sector 17</p><h2>The long way home, at your pace.</h2><p>${escape(objective(state))}</p><p>Choose the next open stop. Every action route, route choice, city fact and ending is available here without timing, movement or visual interpretation.</p></header><div class="journey-bag" aria-label="Route objects">${bag()}</div>${dialogue()}${!dialog ? `<div class="journey-destinations">${destinations()}</div>` : ""}<aside class="journey-facts" aria-label="Chandigarh facts"><strong>City notes</strong><ul>${CITY_FACTS.map((fact) => `<li>${escape(fact)}</li>`).join("")}</ul></aside><button type="button" class="quiet-action" data-runner-pause aria-pressed="${paused}">${paused ? "Resume city" : "Pause city"}</button><p class="journey-disclosure">The places are based on Chandigarh; the people, paper-display errand and courtyard toy are fictional. Distances are compressed and this is not a navigation map. The table closes after ten foreground minutes.</p></section>`;
+    const toyReady = COURSE_MARKS.filter((mark) => mark.owner === "craft").every((mark) => current.marks.includes(mark.id)) && !current.visited.includes("craft");
+    return `<section class="journey-shell" aria-label="Chandigarh: The Long Way Home"><div class="journey-world"><canvas id="runnerCanvas" width="960" height="620" tabindex="0" aria-label="Playable Chandigarh route. Arrow keys or W A S D move; release to stop. Tap a path to walk there. Space or J jumps. Shift or K uses the scarf. E or Enter talks. Escape stops walking." aria-describedby="journeyHelp"></canvas><div class="journey-topline"><div><span class="journey-eyebrow">SECTOR 22 → SECTOR 17</span><strong data-location>Chandigarh · the long way home</strong></div><button type="button" data-map aria-expanded="${mapOpen}">Route + facts <span aria-hidden="true">↗</span></button></div><div class="journey-toast" data-toast>${escape(state.message)}</div><div class="journey-objective"><span data-power-name>${escape(state.power ? POWERUPS.find((p) => p.id === state!.power)!.label : "Jump + scarf")}</span><p>${escape(objective(state))}</p></div>${paused ? '<div class="journey-paused">The afternoon is on hold.<button type="button" data-runner-pause>Resume city</button></div>' : ""}${mapOpen || journalOpen ? `<section class="journey-map" aria-label="${mapOpen ? "Route and Chandigarh facts" : "Route objects"}"><header><h2>${mapOpen ? "Sector 22 → Sector 17" : "What you carry"}</h2><button type="button" data-close-panel aria-label="Close ${mapOpen ? "route and facts" : "bag"}">×</button></header>${mapOpen ? `<img src="${worldUrl}" alt="A fictional compressed play space connecting a Sector 22 home and market to a crossing, courtyard, wayfinder and Sector 17 plaza."><aside class="journey-facts"><strong>City notes</strong><ul>${CITY_FACTS.map((fact) => `<li>${escape(fact)}</li>`).join("")}</ul></aside>` : ""}<div class="journey-bag">${bag()}</div><div class="journey-destinations">${destinations()}</div></section>` : ""}</div>${dialogue()}<div class="journey-controls"><div class="journey-pad" role="group" aria-label="Walk"><button type="button" data-walk="ArrowUp" aria-label="Walk north">↑</button><button type="button" data-walk="ArrowLeft" aria-label="Walk west">←</button><button type="button" data-walk="ArrowDown" aria-label="Walk south">↓</button><button type="button" data-walk="ArrowRight" aria-label="Walk east">→</button></div><div class="journey-moves"><button type="button" data-jump>Jump <small>J / Space</small></button><button type="button" data-dash>${toyReady ? "Scarf deflect" : "Scarf dash"} <small>K / Shift</small></button></div><button class="journey-interact" type="button" data-interact disabled>Find the next encounter</button><div class="journey-utilities"><button type="button" data-bag aria-expanded="${journalOpen}">Carry</button><button type="button" data-runner-pause aria-pressed="${paused}">${paused ? "Resume" : "Pause"}</button><button type="button" data-runner-story>Read the route</button></div></div><p id="journeyHelp" class="journey-help">Move: WASD / arrows · Jump: Space / J · Scarf: Shift / K · Talk: E · tap paths to travel. <span>Real city references, fictional story and compressed distances.</span></p></section>`;
   }
   document.addEventListener("click", (event) => {
     if (!session || terminalOutcome || exitSuspended || interrupted) return;
@@ -739,7 +763,7 @@ export function createSectorSprintTable(options: TableOptions) {
         runner: state
           ? {
               ...structuredClone(state),
-              mechanicsVersion: 2,
+              mechanicsVersion: 3,
               elapsedMs: elapsed(),
               paused: isSuspended(),
             }

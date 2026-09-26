@@ -38,6 +38,7 @@ import {
   type SectorSprintTerminal,
   type SectorSprintTone,
 } from "./sector-sprint-table";
+import { PATTERN_PUZZLES, patternConflicts, patternMarkLabel } from "./pattern-court";
 
 type PendingCompletion = { readonly gameId: GameId; readonly runId: string; readonly completedAt: string };
 type StackMovePresentation = NonNullable<SalonTableEffect["placedDisk"]>;
@@ -315,7 +316,7 @@ function renderHome() {
     ${runnerRestoreWasDiscarded ? `
       <section class="runner-restore-banner" aria-labelledby="runnerRestoreTitle" role="status">
         <p class="kicker">Route settled safely</p>
-        <h2 id="runnerRestoreTitle">Sector Sprint closed on reload.</h2>
+        <h2 id="runnerRestoreTitle">The Chandigarh outing closed on reload.</h2>
         <p>Its remaining boundary could not be extended, so no completion was recorded.</p>
         <button class="primary-action" type="button" data-browse-salon>Browse five doors</button>
       </section>
@@ -448,6 +449,7 @@ function renderGame() {
         <h1 id="gameTitle" tabindex="-1">${escape(game.title)}</h1>
         <p>${escape(game.description)}</p>
       </div>
+      ${pendingRunnerChoice || restoreDecisionPending ? "" : renderTableGuide(game)}
       <div class="game-chamber game-chamber-${game.id}">
         ${pendingRunnerChoice
           ? renderRunnerPrelude()
@@ -455,7 +457,9 @@ function renderGame() {
             ? renderRestoreGate(game)
             : game.kind === "runner"
               ? runnerView?.markup ?? ""
-              : game.kind === "stack"
+              : game.id === "pattern-court"
+                ? renderPatternCourt()
+                : game.kind === "stack"
                 ? renderStack(game)
                 : game.kind === "classic"
                   ? renderClassicStudy(game)
@@ -465,6 +469,16 @@ function renderGame() {
     </section>
   `;
   if (game.kind === "runner" && active && !restoreDecisionPending) sectorTable.afterRender();
+}
+
+function renderTableGuide(game: GameDefinition): string {
+  return `<aside class="table-guide" aria-label="How to play ${escape(game.title)}">
+    <div><span>Goal</span><strong>${escape(game.goal)}</strong></div>
+    <details>
+      <summary>How to play</summary>
+      <ol>${game.howToPlay.map((step) => `<li>${escape(step)}</li>`).join("")}</ol>
+    </details>
+  </aside>`;
 }
 
 function renderRestoreGate(game: GameDefinition): string {
@@ -487,7 +501,8 @@ function renderRestoreGate(game: GameDefinition): string {
 }
 
 function renderRunnerPrelude(): string {
-  return `<section class="table-gate journey-prelude" aria-labelledby="runnerPreludeTitle"><div class="journey-prelude-art" aria-hidden="true"></div><p class="kicker">A Chandigarh homecoming</p><h2 id="runnerPreludeTitle">The long way home.</h2><p>Spring over crates. Dash through the courtyard chimes. Float through the garden petals. Find playful power-ups, bring a little of Chandigarh home, and meet Ma by Sukhna.</p><div class="route-choices"><button class="route-choice route-choice-action" type="button" data-runner-route="action"><span>Explore the city</span><strong>Step into Chandigarh</strong><small>Move · jump · dash · explore</small></button><button class="route-choice" type="button" data-runner-route="narrated"><span>Narrated homecoming</span><strong>Read the city</strong><small>The same objects and ending, without movement</small></button></div><p class="gate-note">An original fictional walk through a compressed Chandigarh. Your bag belongs only to this afternoon. You can always head home. The table closes after ten foreground minutes; pause whenever you need.</p></section>`;
+  const game = getGame("sector-sprint");
+  return `<section class="table-gate journey-prelude" aria-labelledby="runnerPreludeTitle"><div class="journey-prelude-art" aria-hidden="true"></div><p class="kicker">A Chandigarh outing · Sector 22 to Sector 17</p><h2 id="runnerPreludeTitle">The long way home.</h2><p>Repair Gurpreet's paper display, choose your path through the sector, read the courtyard toy's signals, align the city wayfinder, and carry the story into the plaza.</p>${renderTableGuide(game)}<div class="route-choices"><button class="route-choice route-choice-action" type="button" data-runner-route="action"><span>Action route</span><strong>Cross the city</strong><small>Move · jump · scarf · choose</small></button><button class="route-choice" type="button" data-runner-route="narrated"><span>Text-led route</span><strong>Read the route</strong><small>The same encounters and choices without movement</small></button></div><p class="gate-note">Real place facts and invented adventure mechanics are labelled separately. This is a compressed orientation, not navigation. The outing closes after ten foreground minutes; pause whenever you need.</p></section>`;
 }
 
 function renderChoice(game: ChoiceGameDefinition | MemoryGameDefinition): string {
@@ -511,6 +526,39 @@ function renderChoice(game: ChoiceGameDefinition | MemoryGameDefinition): string
       </div>
     </div>
   `;
+}
+
+function renderPatternCourt(): string {
+  if (!active?.pattern) return "";
+  const pattern = active.pattern;
+  const puzzle = PATTERN_PUZZLES[active.chapter] ?? PATTERN_PUZZLES[0];
+  const conflicts = new Set(patternConflicts(pattern, active.chapter));
+  const fixed = new Set(puzzle.fixed);
+  const mark = (value: string) => ({ diamond: "◇", sun: "☀", leaf: "❧", arch: "⌒" } as Record<string, string>)[value] ?? "";
+  return `<section class="pattern-workbench" aria-labelledby="patternGoal">
+    <div class="pattern-brief">
+      <p class="prompt-label">Construction rule</p>
+      <h2 id="patternGoal">${escape(puzzle.goal)}</h2>
+      <p>${escape(puzzle.rule)}</p>
+      <div class="pattern-tools">
+        <button class="quiet-action" type="button" data-pattern-undo ${active.pattern.history.length ? "" : "disabled"}>Undo</button>
+        <button class="quiet-action" type="button" data-pattern-reset>Reset</button>
+        <button class="text-action" type="button" data-pattern-assist>Place one for me</button>
+      </div>
+    </div>
+    <div class="pattern-construction">
+      <div class="pattern-court-grid" role="group" aria-label="Nine-cell inlay court">
+        ${pattern.board.map((value, index) => fixed.has(index)
+          ? `<span class="pattern-cell is-fixed" data-mark="${value}" aria-label="Fixed ${patternMarkLabel(value!)}"><i aria-hidden="true">${mark(value!)}</i><small>Fixed</small></span>`
+          : `<button class="pattern-cell ${value ? "has-piece" : "is-open"} ${conflicts.has(index) ? "is-conflict" : ""}" type="button" data-pattern-cell="${index}" data-mark="${value ?? "open"}" aria-label="${value ? `${patternMarkLabel(value)} in changeable cell${conflicts.has(index) ? ", breaks the current rule" : ""}` : "Open changeable cell"}"><i aria-hidden="true">${value ? mark(value) : "+"}</i><small>${value ? "Change" : "Place"}</small></button>`).join("")}
+      </div>
+      <div class="pattern-tray" aria-label="Loose inlay pieces">
+        <span>Loose pieces</span>
+        <div>${pattern.tray.map((value, index) => `<button type="button" data-pattern-piece="${index}" data-mark="${value}" aria-pressed="${pattern.selected === index}" aria-label="${patternMarkLabel(value)} piece${pattern.selected === index ? ", selected" : ""}"><i aria-hidden="true">${mark(value)}</i><small>${patternMarkLabel(value)}</small></button>`).join("")}</div>
+        ${pattern.tray.length ? "" : '<p>Every loose piece is on the court. Resolve any glowing conflict.</p>'}
+      </div>
+    </div>
+  </section>`;
 }
 
 function renderChoiceVisual(game: GameDefinition, display: string, covered: boolean): string {
@@ -698,6 +746,18 @@ function answerChoice(choiceIndex: number) {
   completeSalonChapter(effect);
 }
 
+function interactPattern(action: Parameters<typeof tableLifecycle.interact>[0], fallbackFocus: string) {
+  const effect = tableLifecycle.interact(action);
+  if (effect.kind === "noop") return;
+  statusMessage = effect.message ?? "";
+  render();
+  if (effect.kind === "chapter-complete") {
+    completeSalonChapter(effect);
+    return;
+  }
+  focusElement(effect.focusSelector ?? fallbackFocus);
+}
+
 function completeSalonChapter(effect: SalonTableEffect) {
   if (effect.kind !== "chapter-complete" || effect.completedChapter === undefined) return;
   statusMessage = "";
@@ -763,7 +823,7 @@ function renderRunnerBoundary() {
     <section class="curtain-call" aria-labelledby="curtainTitle">
       <p class="kicker">The afternoon closes</p>
       <div class="curtain-ornament" aria-hidden="true"><span></span><i></i><span></span></div>
-      <h1 id="curtainTitle">Sector Sprint<br><em>has closed.</em></h1>
+      <h1 id="curtainTitle">The Long Way Home<br><em>has closed.</em></h1>
       <p>The afternoon has come to a close. The rest of the city can wait. No completed journey was added to the Gallery.</p>
       <p class="result-boundary">Entertainment boundary · private by design · nothing added to the Gallery</p>
       <div class="curtain-actions">
@@ -956,6 +1016,28 @@ document.addEventListener("click", (event) => {
   const answerButton = target.closest<HTMLElement>("[data-answer]");
   if (answerButton) {
     answerChoice(Number(answerButton.dataset.answer));
+    return;
+  }
+  const patternPiece = target.closest<HTMLElement>("[data-pattern-piece]");
+  if (patternPiece) {
+    interactPattern({ type: "pattern-select", pieceIndex: Number(patternPiece.dataset.patternPiece) }, `[data-pattern-piece="${patternPiece.dataset.patternPiece}"]`);
+    return;
+  }
+  const patternCell = target.closest<HTMLElement>("[data-pattern-cell]");
+  if (patternCell) {
+    interactPattern({ type: "pattern-place", cellIndex: Number(patternCell.dataset.patternCell) }, `[data-pattern-cell="${patternCell.dataset.patternCell}"]`);
+    return;
+  }
+  if (target.closest("[data-pattern-undo]")) {
+    interactPattern({ type: "pattern-undo" }, "[data-pattern-undo]");
+    return;
+  }
+  if (target.closest("[data-pattern-reset]")) {
+    interactPattern({ type: "pattern-reset" }, '[data-pattern-piece="0"]');
+    return;
+  }
+  if (target.closest("[data-pattern-assist]")) {
+    interactPattern({ type: "pattern-assist" }, '[data-pattern-piece="0"]');
     return;
   }
   if (target.closest("[data-cover-memory]") && active) {

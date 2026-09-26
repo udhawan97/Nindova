@@ -174,7 +174,7 @@ try {
     await cdp.send("Emulation.setCPUThrottlingRate", { rate: 1 });
     if (viewport.width === 1440) {
       // Play every course with real movement and jump input; no state teleports or item injection.
-      for (const id of ["craft", "roses", "market"]) {
+      for (const id of ["market"]) {
         for (let ribbon = 0; ribbon < 3; ribbon++) {
           await page.click("[data-map]");
           await page.click(`[data-visit="${id}"]`);
@@ -187,7 +187,7 @@ try {
           await page.keyboard.press("Space");
           await page.waitForFunction(
             (expected) => window.__house.runner?.marks.length >= expected,
-            ribbon + 1 + (id === "craft" ? 0 : id === "roses" ? 3 : 6),
+            ribbon + 1,
           );
           await page.waitForFunction(() => window.__house.runner?.z === 0);
         }
@@ -196,6 +196,32 @@ try {
           fullPage: true,
         });
       }
+      await page.click("[data-map]");
+      await page.click('[data-visit="roses"]');
+      await page.waitForFunction(() => window.__house.runner?.route.length === 0, null, { timeout: 35000 });
+      await page.click("[data-interact]");
+      await page.click('[data-encounter-choice="0"]');
+      await page.click("[data-dialog-close]");
+
+      for (let signal = 0; signal < 3; signal++) {
+        await page.click("[data-map]");
+        await page.click('[data-visit="craft"]');
+        await page.waitForFunction(() => window.__house.runner?.route.length === 0, null, { timeout: 35000 });
+        await page.locator("#runnerCanvas").focus();
+        await page.keyboard.press("Space");
+        await page.waitForFunction((expected) => window.__house.runner?.marks.length >= expected, signal + 4);
+        await page.waitForFunction(() => window.__house.runner?.z === 0);
+      }
+      await page.click("[data-map]");
+      await page.click('[data-visit="craft"]');
+      await page.waitForFunction(() => window.__house.runner?.route.length === 0, null, { timeout: 35000 });
+      for (let deflection = 1; deflection <= 3; deflection++) {
+        await page.waitForFunction(() => window.__house.runner?.toySignalMs <= 0);
+        await page.locator("#runnerCanvas").focus();
+        await page.keyboard.press("k");
+        await page.waitForFunction((expected) => window.__house.runner?.toyPhase >= expected, deflection);
+      }
+      await page.screenshot({ path: resolve(output, "courtyard-toy.png"), fullPage: true });
       for (const id of ["lake", "home"]) {
         await page.click("[data-map]");
         await page.click(`[data-visit="${id}"]`);
@@ -216,8 +242,8 @@ try {
       const result = await page.evaluate(
         () => window.__house.memory.latestByGame["sector-sprint"],
       );
-      assert.equal(result.gameVersion, "2.0.0");
-      assert.equal(result.completionFacts.finalChapter, "Ghar wapsi");
+      assert.equal(result.gameVersion, "3.0.0");
+      assert.equal(result.completionFacts.finalChapter, "Paper in the plaza");
       assert.doesNotMatch(
         await page.evaluate(() => localStorage.getItem("nindova:house:v2")),
         /\"(?:bag|visited|x|y|elapsedMs|choices)\"/,
@@ -232,11 +258,41 @@ try {
   );
   await story.page.click("[data-runner-pause]");
   await story.page.clock.fastForward(700000);
-  for (const id of ["roses", "market", "craft", "lake", "home"])
+  for (const id of ["market", "roses", "craft", "lake", "home"])
     await talk(story.page, id);
   await story.page.waitForSelector(".curtain-call");
   assert.equal(await story.page.locator("#runnerCanvas").count(), 0);
   await story.context.close();
+  // A runtime reduced-motion change keeps action progress, choices and elapsed budget.
+  const liveSwitch = await open({ width: 375, height: 812 });
+  for (let ribbon = 0; ribbon < 3; ribbon++) {
+    await liveSwitch.page.click("[data-map]");
+    await liveSwitch.page.click('[data-visit="market"]');
+    await liveSwitch.page.waitForFunction(
+      () => window.__house.runner?.route.length === 0,
+      null,
+      { timeout: 35000 },
+    );
+    await liveSwitch.page.locator("#runnerCanvas").focus();
+    await liveSwitch.page.keyboard.press("Space");
+    await liveSwitch.page.waitForFunction(
+      (expected) => window.__house.runner?.marks.length >= expected,
+      ribbon + 1,
+    );
+    await liveSwitch.page.waitForFunction(() => window.__house.runner?.z === 0);
+  }
+  const beforeSwitch = await liveSwitch.page.evaluate(() => window.__house.runner);
+  assert.deepEqual(beforeSwitch.visited, ["market"]);
+  assert.equal(beforeSwitch.choices.market, 0);
+  assert.ok(beforeSwitch.elapsedMs > 0);
+  await liveSwitch.page.emulateMedia({ reducedMotion: "reduce" });
+  await liveSwitch.page.waitForSelector(".runner-story");
+  const afterSwitch = await liveSwitch.page.evaluate(() => window.__house.runner);
+  for (const key of ["visited", "choices", "bag", "marks", "x", "y"])
+    assert.deepEqual(afterSwitch[key], beforeSwitch[key], `${key} survives the route switch`);
+  assert.ok(afterSwitch.elapsedMs >= beforeSwitch.elapsedMs, "the foreground budget continues instead of restarting");
+  assert.match(await liveSwitch.page.locator(".runner-story").innerText(), /raised sign route|shaded street/i);
+  await liveSwitch.context.close();
   const capped = await open(
     { width: 375, height: 812 },
     { narrated: true, clock: true },
@@ -251,7 +307,8 @@ try {
   );
   await capped.context.close();
   const early = await open({ width: 375, height: 812 }, { narrated: true });
-  await talk(early.page, "home");
+  await early.page.click('[data-visit="home"]');
+  assert.match(await early.page.locator(".journey-dialog").innerText(), /Follow the paper route|ready/i);
   assert.equal(
     await early.page.evaluate(
       () => window.__house.memory.latestByGame["sector-sprint"],

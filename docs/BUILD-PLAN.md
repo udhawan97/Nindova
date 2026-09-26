@@ -4,6 +4,8 @@
 
 [ADR 0021](./adr/0021-rebuild-sector-sprint-as-a-chandigarh-playground.md) supersedes the Sector Sprint runner with the owner-requested Chandigarh exploration playground, action power-ups, and ten-minute foreground boundary. The Night Room remains unchanged. The owner explicitly authorized the v0.6.0 integration and release.
 
+[ADR 0022](./adr/0022-deepen-house-play-with-an-authored-chandigarh-outing.md) records the v0.7.0 gameplay checkpoint: shared teaching, a constructed Pattern Court, and the directed Sector 22 to Sector 17 outing. The owner explicitly authorized implementation, push, and release on 2026-09-26.
+
 ## Delivery boundary
 
 This build ships the browser, installable PWA, public website, documentation, and local return system. The iOS Wall is deliberately deferred by [ADR 0007](./adr/0007-ship-browser-and-pwa-before-the-ios-wall.md); this build must not present it as implemented or verified.

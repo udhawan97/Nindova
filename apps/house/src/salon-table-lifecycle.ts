@@ -2,6 +2,7 @@ import { evaluateClassicChoice, getClassicStudy } from "./classic-studies.js";
 import type { ActiveGame } from "./house-state.js";
 import { GRAND_SALON, type GameId } from "./salon-catalog.js";
 import { initialPegs, isLegalStackMove, moveStackDisc, stackSolved } from "./stack-architect.js";
+import { assistPattern, createPatternState, patternConflicts, patternSolved, placePatternPiece, selectPatternPiece, undoPattern } from "./pattern-court.js";
 
 export type SalonTableView = {
   readonly active: ActiveGame | null;
@@ -14,7 +15,12 @@ export type SalonTableInteraction =
   | { readonly type: "answer"; readonly choiceIndex: number }
   | { readonly type: "memory"; readonly covered: boolean }
   | { readonly type: "peg"; readonly pegIndex: number }
-  | { readonly type: "reset-stack" };
+  | { readonly type: "reset-stack" }
+  | { readonly type: "pattern-select"; readonly pieceIndex: number }
+  | { readonly type: "pattern-place"; readonly cellIndex: number }
+  | { readonly type: "pattern-undo" }
+  | { readonly type: "pattern-reset" }
+  | { readonly type: "pattern-assist" };
 
 export type SalonTableEffect = {
   readonly kind: "noop" | "updated" | "blocked" | "wrong" | "chapter-complete";
@@ -32,7 +38,16 @@ type LifecycleOptions = {
 };
 
 function cloneActive(active: ActiveGame | null): ActiveGame | null {
-  return active ? { ...active, pegs: active.pegs.map((peg) => [...peg]) } : null;
+  return active ? {
+    ...active,
+    pegs: active.pegs.map((peg) => [...peg]),
+    pattern: active.pattern ? {
+      board: [...active.pattern.board],
+      tray: [...active.pattern.tray],
+      selected: active.pattern.selected,
+      history: active.pattern.history.map((entry) => ({ board: [...entry.board], tray: [...entry.tray] })),
+    } : undefined,
+  } : null;
 }
 
 function initialSession(gameId: GameId, runId: string): ActiveGame {
@@ -47,6 +62,7 @@ function initialSession(gameId: GameId, runId: string): ActiveGame {
     resolving: false,
     storyBeat: null,
     touched: false,
+    pattern: game.id === "pattern-court" ? createPatternState(0) : undefined,
   };
 }
 
@@ -54,6 +70,7 @@ function preferredFocus(active: ActiveGame | null, runnerFocus = '#runnerCanvas'
   if (!active) return runnerFocus;
   const game = GRAND_SALON.game(active.gameId);
   if (game.kind === "runner") return runnerFocus;
+  if (active.gameId === "pattern-court") return active.pattern?.tray.length ? '[data-pattern-piece="0"]' : "[data-pattern-cell]";
   if (game.kind === "stack") return '[data-peg="0"]';
   if (game.kind === "memory" && !active.memoryCovered) return "[data-cover-memory]";
   return '[data-answer="0"]';
@@ -146,6 +163,52 @@ export function createSalonTableLifecycle(options: LifecycleOptions) {
   function interact(action: SalonTableInteraction): SalonTableEffect {
     if (!active || active.resolving) return { kind: "noop" };
     const game = GRAND_SALON.game(active.gameId);
+    if (active.gameId === "pattern-court") {
+      if (!active.pattern) active.pattern = createPatternState(active.chapter);
+      if (action.type === "pattern-select") {
+        active.pattern = selectPatternPiece(active.pattern, action.pieceIndex);
+        active.touched = true;
+        publish();
+        return { kind: "updated", message: active.pattern.selected === null ? "Piece returned to the tray." : "Piece lifted. Choose a changeable cell.", focusSelector: `[data-pattern-piece="${Math.min(action.pieceIndex, Math.max(0, active.pattern.tray.length - 1))}"]` };
+      }
+      if (action.type === "pattern-place") {
+        const before = active.pattern;
+        active.pattern = placePatternPiece(active.pattern, active.chapter, action.cellIndex);
+        if (active.pattern === before) return { kind: "blocked", message: before.selected === null ? "Choose a loose piece first." : "That stone is fixed into the court. Choose another cell." };
+        active.touched = true;
+        const solved = patternSolved(active.pattern, active.chapter);
+        if (solved) active.resolving = true;
+        const conflicts = patternConflicts(active.pattern, active.chapter);
+        publish();
+        return solved
+          ? { kind: "chapter-complete", completedChapter: active.chapter }
+          : { kind: "updated", message: conflicts.includes(action.cellIndex) ? "That piece sits securely, but it breaks this court's rule. Swap it or use Undo." : "Piece set. Read the neighboring line before choosing the next one.", focusSelector: active.pattern.tray.length ? '[data-pattern-piece="0"]' : "[data-pattern-undo]" };
+      }
+      if (action.type === "pattern-undo") {
+        const before = active.pattern;
+        active.pattern = undoPattern(active.pattern);
+        if (before === active.pattern) return { kind: "blocked", message: "There is no placement to undo yet." };
+        active.touched = true;
+        publish();
+        return { kind: "updated", message: "The last placement returned to the tray.", focusSelector: '[data-pattern-piece="0"]' };
+      }
+      if (action.type === "pattern-reset") {
+        active.pattern = createPatternState(active.chapter);
+        active.touched = true;
+        publish();
+        return { kind: "updated", message: "This court is reset to its fixed stones.", focusSelector: '[data-pattern-piece="0"]' };
+      }
+      if (action.type === "pattern-assist") {
+        active.pattern = assistPattern(active.pattern, active.chapter);
+        active.touched = true;
+        const solved = patternSolved(active.pattern, active.chapter);
+        if (solved) active.resolving = true;
+        publish();
+        return solved
+          ? { kind: "chapter-complete", completedChapter: active.chapter }
+          : { kind: "updated", message: "One piece has been set where the rule requires it. Continue from the changed row.", focusSelector: active.pattern.tray.length ? '[data-pattern-piece="0"]' : "[data-pattern-undo]" };
+      }
+    }
     if (action.type === "memory") {
       if (game.kind !== "memory") return { kind: "noop" };
       active.memoryCovered = action.covered;
@@ -159,6 +222,7 @@ export function createSalonTableLifecycle(options: LifecycleOptions) {
     }
     if (action.type === "answer") {
       if (game.kind === "stack" || game.kind === "runner") return { kind: "noop" };
+      if (active.gameId === "pattern-court") return { kind: "noop" };
       if (game.kind === "memory" && !active.memoryCovered) return { kind: "blocked", message: "Cover the procession before choosing." };
       const chapter = game.kind === "classic" ? getClassicStudy(game.classicStudyId).chapters[active.chapter] : game.chapters[active.chapter];
       if (!chapter) return { kind: "noop" };
@@ -187,7 +251,7 @@ export function createSalonTableLifecycle(options: LifecycleOptions) {
       publish();
       return { kind: "updated", message: `The ${diskCount}-disc tower is reset to the first plinth.`, focusSelector: '[data-peg="0"]' };
     }
-    if (game.kind !== "stack") return { kind: "noop" };
+    if (game.kind !== "stack" || action.type !== "peg") return { kind: "noop" };
     const pegIndex = action.pegIndex;
     if (active.selectedPeg === null) {
       if ((active.pegs[pegIndex]?.length ?? 0) === 0) return { kind: "updated", message: "That plinth is empty.", focusSelector: `[data-peg="${pegIndex}"]` };
@@ -228,6 +292,7 @@ export function createSalonTableLifecycle(options: LifecycleOptions) {
     active.memoryCovered = false;
     active.selectedPeg = null;
     active.pegs = initialPegs(game.kind === "stack" ? game.diskCounts[active.chapter] ?? 0 : 0);
+    active.pattern = active.gameId === "pattern-court" ? createPatternState(active.chapter) : undefined;
     active.resolving = false;
     publish();
     return { kind: "advanced", focusSelector: preferredFocus(active, runnerFocus) };

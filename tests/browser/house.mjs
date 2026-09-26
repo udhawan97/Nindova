@@ -176,6 +176,38 @@ async function completeChoiceGame(page, gameId, answers, { memory = false } = {}
   }
 }
 
+async function solvePatternChapter(page, chapter) {
+  for (let placement = 0; placement < 9; placement += 1) {
+    if (await page.evaluate(() => Boolean(window.__house.active?.resolving))) break;
+    await page.click("[data-pattern-assist]");
+  }
+  await page.waitForFunction(
+    (expected) => window.__house.active?.chapter === expected && window.__house.active?.resolving,
+    chapter,
+  );
+}
+
+async function completePatternGame(page, { start = true } = {}) {
+  if (start) await page.evaluate(() => window.__house.start("pattern-court"));
+  for (let chapter = 0; chapter < 5; chapter += 1) {
+    await solvePatternChapter(page, chapter);
+    if (chapter < 4)
+      await page.waitForFunction((next) => window.__house.active?.chapter === next, chapter + 1);
+    else await page.waitForSelector(".curtain-call");
+  }
+}
+
+async function solvePatternChapterKeyboard(page, chapter) {
+  for (let placement = 0; placement < 9; placement += 1) {
+    if (await page.evaluate(() => Boolean(window.__house.active?.resolving))) break;
+    await keyboardActivate(page, "[data-pattern-assist]");
+  }
+  await page.waitForFunction(
+    (expected) => window.__house.active?.chapter === expected && window.__house.active?.resolving,
+    chapter,
+  );
+}
+
 function hanoiMoves(discCount, from = 0, to = 2, spare = 1, moves = []) {
   if (discCount === 0) return moves;
   hanoiMoves(discCount - 1, from, spare, to, moves);
@@ -329,7 +361,7 @@ try {
     const confirmedCategoryScroll = await confirmedBack.page.evaluate(() => window.scrollY);
     assert.ok(confirmedCategoryScroll > 0, `${backMethod} confirmation starts from a meaningful category position`);
     await confirmedBack.page.click('[data-game="pattern-court"]');
-    await confirmedBack.page.click('[data-answer="1"]');
+    await confirmedBack.page.click('[data-pattern-assist]');
     if (backMethod === "browser") await confirmedBack.page.goBack();
     else await confirmedBack.page.click('.game-view [data-history-back="category"]');
     await confirmedBack.page.waitForSelector("#leaveDialog[open]");
@@ -344,7 +376,7 @@ try {
     { reducedMotion: "reduce" },
     { galleryWriteDenied: true },
   );
-  await completeChoiceGame(deniedCompletion.page, "pattern-court", [0, 1, 2, 1, 2]);
+  await completePatternGame(deniedCompletion.page);
   assert.match(await deniedCompletion.page.locator(".result-boundary").innerText(), /could not be stored/i);
   assert.equal(await deniedCompletion.page.locator("[data-retry-completion]").isVisible(), true);
   assert.equal(await deniedCompletion.page.locator('[data-route="gallery"]').count(), 0, "an unsaved completion does not offer a misleading Gallery path");
@@ -468,7 +500,7 @@ try {
 
   const recovery = await openHouse({ width: 375, height: 812 });
   await recovery.page.evaluate(() => window.__house.start("pattern-court"));
-  await recovery.page.click('[data-answer="1"]');
+  await recovery.page.click('[data-pattern-assist]');
   await recovery.page.click('[data-history-back="category"]');
   assert.equal(await recovery.page.locator("#leaveDialog").getAttribute("open"), "", "unfinished progress asks before leaving");
   await recovery.page.click("#keepPlayingButton");
@@ -512,12 +544,11 @@ try {
 
   const finalChoiceExit = await openHouse({ width: 375, height: 812 });
   await finalChoiceExit.page.evaluate(() => window.__house.start("pattern-court"));
-  for (const [chapter, answer] of [0, 1, 2, 1].entries()) {
-    await finalChoiceExit.page.click(`[data-answer="${answer}"]`);
+  for (let chapter = 0; chapter < 4; chapter += 1) {
+    await solvePatternChapter(finalChoiceExit.page, chapter);
     await finalChoiceExit.page.waitForFunction((next) => window.__house.active?.chapter === next, chapter + 1);
   }
-  await finalChoiceExit.page.click('[data-answer="2"]');
-  await finalChoiceExit.page.waitForFunction(() => window.__house.active?.chapter === 4 && window.__house.active?.resolving);
+  await solvePatternChapter(finalChoiceExit.page, 4);
   await finalChoiceExit.page.click('[data-history-back="category"]');
   await finalChoiceExit.page.waitForTimeout(900);
   assert.equal(await finalChoiceExit.page.locator("#leaveDialog").getAttribute("open"), "", "the final-chapter confirmation remains open past the completion delay");
@@ -532,21 +563,38 @@ try {
   const pattern = await openHouse({ width: 375, height: 812 });
   await pattern.page.evaluate(() => window.__house.start("pattern-court"));
   assert.equal(await pattern.page.evaluate(() => window.__house.active?.chapter), 0);
-  assert.notEqual(await pattern.page.locator(".pattern-row span").first().evaluate((element) => getComputedStyle(element).animationName), "none", "Pattern Court has an enabled-motion inlay entrance");
-  assert.ok(
-    await pattern.page.locator(".pattern-row span").first().evaluate((element) => getComputedStyle(element).backgroundImage.split("gradient").length - 1 >= 3),
-    "Pattern Court tokens render layered stone, inlay, and highlight treatments",
-  );
+  assert.equal(await pattern.page.locator(".pattern-court-grid .pattern-cell").count(), 9, "Pattern Court presents a complete nine-cell construction board");
+  assert.ok(await pattern.page.locator("[data-pattern-piece]").count() >= 5, "loose pieces make the rule playable rather than a multiple-choice prompt");
+  await pattern.page.locator('[data-pattern-piece][data-mark="sun"]').first().click();
+  await pattern.page.click('[data-pattern-cell="2"]');
+  assert.equal(await pattern.page.locator('[data-pattern-cell="2"]').getAttribute("data-mark"), "sun");
+  assert.equal(await pattern.page.locator('[data-pattern-cell="2"]').getAttribute("class").then((value) => value.includes("is-conflict")), true, "a wrong manual placement gets clear conflict feedback");
+  assert.match(await pattern.page.locator("#gameStatus").innerText(), /breaks this court's rule/i);
+  await pattern.page.locator('[data-pattern-piece][data-mark="diamond"]').first().click();
+  await pattern.page.click('[data-pattern-cell="2"]');
+  assert.equal(await pattern.page.locator('[data-pattern-cell="2"]').getAttribute("data-mark"), "diamond", "placing onto a filled cell swaps the loose piece");
+  const inProgressPattern = await pattern.page.evaluate(() => window.__house.active?.pattern);
+  await pattern.page.reload();
+  await pattern.page.waitForSelector(".restore-gate");
+  await pattern.page.click('[data-restore="continue"]');
+  assert.deepEqual(await pattern.page.evaluate(() => window.__house.active?.pattern), inProgressPattern, "an in-progress construction restores exactly");
+  await pattern.page.click("[data-pattern-undo]");
+  assert.equal(await pattern.page.locator('[data-pattern-cell="2"]').getAttribute("data-mark"), "sun", "Undo restores the displaced piece");
+  await pattern.page.click("[data-pattern-reset]");
+  assert.equal(await pattern.page.locator('[data-pattern-cell="2"]').getAttribute("data-mark"), "open", "Reset returns every changeable cell to the authored start");
+  for (const [mark, cell] of [["sun", 1], ["diamond", 2], ["sun", 5], ["diamond", 6], ["sun", 7]]) {
+    await pattern.page.locator(`[data-pattern-piece][data-mark="${mark}"]`).first().click();
+    await pattern.page.click(`[data-pattern-cell="${cell}"]`);
+  }
+  await pattern.page.waitForFunction(() => Boolean(window.__house.active?.resolving));
   await pattern.page.screenshot({ path: resolve(output, "pattern-court-375x812.png"), fullPage: true, animations: "disabled" });
-  await pattern.page.click('[data-answer="1"]');
-  assert.match(await pattern.page.locator("#gameStatus").innerText(), /Not this inscription/);
-  for (const answer of [0, 1, 2, 1, 2]) {
-    await pattern.page.evaluate((choice) => window.__house.answer(choice), answer);
+  assert.equal(await pattern.page.locator("#celebration").isVisible(), true);
+  await pattern.page.screenshot({ path: resolve(output, "pattern-celebration-375x812.png"), fullPage: true });
+  await pattern.page.waitForFunction(() => window.__house.active?.chapter === 1);
+  for (let chapter = 1; chapter < 5; chapter += 1) {
+    await solvePatternChapter(pattern.page, chapter);
     assert.equal(await pattern.page.locator("#celebration").isVisible(), true);
-    if (answer === 0) await pattern.page.screenshot({ path: resolve(output, "pattern-celebration-375x812.png"), fullPage: true });
-    if (answer !== 2 || await pattern.page.evaluate(() => window.__house.active?.chapter) !== 4) {
-      await pattern.page.waitForTimeout(760);
-    }
+    if (chapter < 4) await pattern.page.waitForFunction((next) => window.__house.active?.chapter === next, chapter + 1);
   }
   await pattern.page.waitForSelector(".curtain-call");
   assert.match(await pattern.page.locator(".curtain-call").innerText(), /five authored chapters/);
@@ -559,21 +607,11 @@ try {
 
   for (const viewport of [{ width: 320, height: 568 }, { width: 375, height: 812 }]) {
     const patternBounds = await openHouse(viewport);
-    const assertPatternRowsFit = async (label) => {
-      assert.equal(await patternBounds.page.locator(".prompt-column").count(), 1, `${label} renders the Pattern prompt container`);
-      assert.equal(await patternBounds.page.locator(".pattern-row").count(), 1, `${label} renders the authored Pattern row`);
-      assert.equal(await patternBounds.page.locator(".pattern-row span").count(), 7, `${label} renders all seven authored Pattern tokens`);
-      const bounds = await patternBounds.page.locator(".pattern-row").evaluateAll((rows) => rows.map((row) => {
-        const prompt = row.closest(".prompt-column")?.getBoundingClientRect();
-        const tokens = [...row.querySelectorAll("span")].map((token) => token.getBoundingClientRect());
-        return {
-          promptLeft: prompt?.left ?? 0,
-          promptRight: prompt?.right ?? 0,
-          firstLeft: tokens[0]?.left ?? 0,
-          lastRight: tokens.at(-1)?.right ?? 0,
-        };
-      }));
-      assert.ok(bounds.every((row) => row.firstLeft >= row.promptLeft - 0.5 && row.lastRight <= row.promptRight + 0.5), `${label} keeps every required Pattern token inside the visible prompt column: ${JSON.stringify(bounds)}`);
+    const assertPatternBoardFits = async (label) => {
+      assert.equal(await patternBounds.page.locator(".pattern-court-grid .pattern-cell").count(), 9, `${label} renders all nine construction cells`);
+      const bounds = await patternBounds.page.locator(".pattern-court-grid").boundingBox();
+      assert.ok(bounds && bounds.x >= 0 && bounds.x + bounds.width <= viewport.width + 0.5, `${label} keeps the court inside the viewport`);
+      assert.equal(await patternBounds.page.evaluate(() => document.documentElement.scrollWidth), viewport.width, `${label} creates no horizontal overflow`);
     };
     await patternBounds.page.evaluate(() => window.__house.start("pattern-court"));
     const mastheadLines = await patternBounds.page.locator('[data-history-back="category"]').evaluate((button) => {
@@ -582,23 +620,21 @@ try {
       return new Set([...range.getClientRects()].filter((rect) => rect.width > 0).map((rect) => Math.round(rect.top))).size;
     });
     assert.equal(mastheadLines, 1, `${viewport.width}px keeps the full game destination on one visible line`);
-    await patternBounds.page.click('[data-answer="0"]');
+    await solvePatternChapter(patternBounds.page, 0);
     await patternBounds.page.waitForFunction(() => window.__house.active?.chapter === 1);
-    await patternBounds.page.waitForTimeout(700);
-    await assertPatternRowsFit(`${viewport.width}px chapter 2`);
+    await assertPatternBoardFits(`${viewport.width}px chapter 2`);
     await patternBounds.page.evaluate(() => { document.documentElement.style.fontSize = "200%"; });
     assert.equal(await patternBounds.page.evaluate(() => document.documentElement.scrollWidth), viewport.width, `${viewport.width}px Pattern Court reflows at 200% text scaling`);
-    await assertPatternRowsFit(`${viewport.width}px chapter 2 at 200% text scaling`);
+    await assertPatternBoardFits(`${viewport.width}px chapter 2 at 200% text scaling`);
     await patternBounds.page.evaluate(() => { document.documentElement.style.fontSize = ""; });
-    await patternBounds.page.click('[data-answer="1"]');
+    await solvePatternChapter(patternBounds.page, 1);
     await patternBounds.page.waitForFunction(() => window.__house.active?.chapter === 2);
-    await patternBounds.page.click('[data-answer="2"]');
+    await solvePatternChapter(patternBounds.page, 2);
     await patternBounds.page.waitForFunction(() => window.__house.active?.chapter === 3);
-    await patternBounds.page.waitForTimeout(700);
-    await assertPatternRowsFit(`${viewport.width}px chapter 4`);
+    await assertPatternBoardFits(`${viewport.width}px chapter 4`);
     await patternBounds.page.evaluate(() => { document.documentElement.style.fontSize = "200%"; });
     assert.equal(await patternBounds.page.evaluate(() => document.documentElement.scrollWidth), viewport.width, `${viewport.width}px chapter 4 reflows at 200% text scaling`);
-    await assertPatternRowsFit(`${viewport.width}px chapter 4 at 200% text scaling`);
+    await assertPatternBoardFits(`${viewport.width}px chapter 4 at 200% text scaling`);
     await patternBounds.context.close();
   }
 
@@ -763,10 +799,10 @@ try {
   await keyboard.page.evaluate(() => document.querySelector("#houseMain")?.focus());
   await keyboardActivate(keyboard.page, '[data-category="pattern-line"]');
   await keyboardActivate(keyboard.page, '[data-game="pattern-court"]');
-  await keyboardActivate(keyboard.page, '[data-answer="1"]');
-  await keyboard.page.waitForFunction(() => document.activeElement?.matches('[data-answer="1"]'));
-  for (const [chapter, answer] of [0, 1, 2, 1, 2].entries()) {
-    await keyboardActivate(keyboard.page, `[data-answer="${answer}"]`);
+  await keyboardActivate(keyboard.page, '[data-pattern-piece="0"]');
+  await keyboardActivate(keyboard.page, '.pattern-cell.is-open');
+  for (let chapter = 0; chapter < 5; chapter += 1) {
+    await solvePatternChapterKeyboard(keyboard.page, chapter);
     if (chapter < 4) await keyboard.page.waitForFunction((next) => window.__house.active?.chapter === next, chapter + 1);
     else await keyboard.page.waitForSelector(".curtain-call");
   }
@@ -802,8 +838,10 @@ try {
   await keyboard.context.close();
 
   const catalog = await openHouse({ width: 768, height: 1024 }, { reducedMotion: "reduce" });
+  await completePatternGame(catalog.page);
+  assert.equal(await catalog.page.evaluate(() => window.__house.memory.latestByGame["pattern-court"]?.mode), "entertainment");
+  await catalog.page.click('[data-route="home"]');
   const definitions = [
-    ["pattern-court", [0, 1, 2, 1, 2], false],
     ["navakankari", [0, 1, 2, 0, 1], false],
     ["mirror-forge", [1, 0, 0, 0, 0], false],
     ["aadu-puli-attam", [0, 1, 2, 0, 1], false],
@@ -819,7 +857,7 @@ try {
   assert.equal(await catalog.page.evaluate(() => window.__house.memory.latestByGame["stack-architect"]?.completionFacts.authoredChapters), 5);
   await catalog.page.click('[data-route="home"]');
   await completeRunnerStory(catalog.page);
-  assert.equal(await catalog.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]?.completionFacts.finalChapter), "Ghar wapsi");
+  assert.equal(await catalog.page.evaluate(() => window.__house.memory.latestByGame["sector-sprint"]?.completionFacts.finalChapter), "Paper in the plaza");
   await catalog.page.click('[data-route="gallery"]');
   assert.equal(await catalog.page.locator(".gallery-ledger article").filter({ hasText: "authored chapters completed" }).count(), 4);
   assert.equal(await catalog.page.locator(".gallery-ledger article").filter({ hasText: "authored studies completed" }).count(), 3);
@@ -902,7 +940,7 @@ try {
   const reduced = await openHouse({ width: 375, height: 812 }, { reducedMotion: "reduce" });
   assert.match(await reduced.page.locator(".game-door").first().evaluate((element) => getComputedStyle(element).transitionDuration), /0\.00001s|1e-05s|1e-08s|0s/);
   await reduced.page.evaluate(() => window.__house.start("pattern-court"));
-  assert.equal(await reduced.page.locator(".pattern-row span").first().evaluate((element) => getComputedStyle(element).animationName), "none", "reduced motion removes decorative inlay movement");
+  assert.equal(await reduced.page.locator(".pattern-cell").first().evaluate((element) => getComputedStyle(element).animationName), "none", "reduced motion removes decorative inlay movement");
   await reduced.page.evaluate(() => window.__house.start("sector-sprint"));
   assert.equal(await reduced.page.locator(".runner-story").isVisible(), true, "reduced motion starts with the complete narrated route");
   assert.equal(await reduced.page.locator("#runnerCanvas").count(), 0);
@@ -911,13 +949,13 @@ try {
 
   const sound = await openHouse({ width: 375, height: 812 }, { reducedMotion: "reduce" }, { audioProbe: true });
   await sound.page.evaluate(() => window.__house.start("pattern-court"));
-  await sound.page.click('[data-answer="0"]');
+  await solvePatternChapter(sound.page, 0);
   await sound.page.waitForFunction(() => window.__house.active?.chapter === 1);
   assert.equal(await sound.page.evaluate(() => globalThis.__houseAudioContexts), 0);
   await sound.page.click("#soundButton");
   assert.equal(await sound.page.locator("#soundButton").getAttribute("aria-pressed"), "true");
   assert.equal((await sound.page.locator("#soundButton").innerText()).trim(), "Sound on");
-  await sound.page.click('[data-answer="1"]');
+  await solvePatternChapter(sound.page, 1);
   await sound.page.waitForFunction(() => window.__house.active?.chapter === 2);
   assert.equal(await sound.page.evaluate(() => globalThis.__houseAudioContexts), 1);
   await sound.page.click("#soundButton");
@@ -928,7 +966,7 @@ try {
   const deniedSound = await openHouse({ width: 375, height: 812 }, { reducedMotion: "reduce" }, { audioDenied: true });
   await deniedSound.page.click("#soundButton");
   await deniedSound.page.evaluate(() => window.__house.start("pattern-court"));
-  await deniedSound.page.click('[data-answer="0"]');
+  await solvePatternChapter(deniedSound.page, 0);
   await deniedSound.page.waitForFunction(() => window.__house.active?.chapter === 1);
   assert.equal(await deniedSound.page.evaluate(() => window.__house.active?.resolving), false, "denied audio cannot stall chapter progression");
   await deniedSound.context.close();

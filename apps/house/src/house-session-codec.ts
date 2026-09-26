@@ -2,6 +2,7 @@ import { restoreStackPegs, initialPegs } from "./stack-architect.js";
 import { GRAND_SALON, type GameId } from "./salon-catalog.js";
 import type { ActiveGame, ActiveSessionCodec } from "./house-state.js";
 import { decodeSectorSprintActive, encodeSectorSprintActive } from "./sector-sprint-session.js";
+import { sanitizePatternState } from "./pattern-court.js";
 
 function validBase(value: unknown): { record: Partial<ActiveGame>; gameId: GameId; chapter: number } | null {
   if (!value || typeof value !== "object") return null;
@@ -34,6 +35,7 @@ export const HOUSE_ACTIVE_SESSION_CODEC: ActiveSessionCodec = Object.freeze({
         resolving: false,
         storyBeat: null,
         touched: Boolean(base.record.touched) || base.chapter > 0 || Boolean(base.record.memoryCovered) || stackChanged,
+        pattern: game.id === "pattern-court" ? sanitizePatternState(base.record.pattern, base.chapter) : undefined,
       },
     };
   },
@@ -47,6 +49,7 @@ export const HOUSE_ACTIVE_SESSION_CODEC: ActiveSessionCodec = Object.freeze({
       memoryCovered: active.memoryCovered,
       pegs: active.pegs.map((peg) => [...peg]),
       touched: active.touched,
+      ...(active.gameId === "pattern-court" && active.pattern ? { pattern: active.pattern } : {}),
     };
   },
 });

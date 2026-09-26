@@ -1,4 +1,5 @@
 import { GRAND_SALON, type GameId } from "./salon-catalog.js";
+import type { PatternState } from "./pattern-court.js";
 
 export const HOUSE_STORAGE_KEY = "nindova:house:v2";
 export const HOUSE_LEGACY_STORAGE_KEY = "nindova:house:v1";
@@ -11,7 +12,7 @@ export type EntertainmentResult = {
   schemaVersion: 1 | typeof HOUSE_SCHEMA_VERSION;
   mode: "entertainment";
   gameId: GameId;
-  gameVersion: "1.0.0" | "2.0.0";
+  gameVersion: "1.0.0" | "2.0.0" | "3.0.0";
   rulesetVersion: typeof HOUSE_RULESET_VERSION;
   runId: string;
   completedAt: string;
@@ -36,6 +37,7 @@ export type ActiveGame = {
   resolving: boolean;
   storyBeat: number | null;
   touched: boolean;
+  pattern?: PatternState;
 };
 
 type StorageReader = Pick<Storage, "getItem">;
@@ -59,7 +61,11 @@ function isResult(value: unknown): value is EntertainmentResult {
   return (result.schemaVersion === 1 || result.schemaVersion === HOUSE_SCHEMA_VERSION)
     && result.mode === "entertainment"
     && GRAND_SALON.hasGame(result.gameId)
-    && (result.gameVersion === "1.0.0" || (result.gameId === "sector-sprint" && result.gameVersion === "2.0.0"))
+    && (
+      result.gameVersion === "1.0.0"
+      || (result.gameId === "pattern-court" && result.gameVersion === "2.0.0")
+      || (result.gameId === "sector-sprint" && (result.gameVersion === "2.0.0" || result.gameVersion === "3.0.0"))
+    )
     && result.rulesetVersion === HOUSE_RULESET_VERSION
     && typeof result.runId === "string"
     && typeof result.completedAt === "string"

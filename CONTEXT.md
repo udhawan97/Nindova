@@ -11,12 +11,12 @@ _Avoid_: casino, arcade, assessment platform
 
 **Grand Salon**
 
-The entertainment room containing five authored games of five chapters or Acts each. Progress is local to the current chosen game and never becomes a population comparison, intelligence claim, streak, randomized reward, or endless attention loop.
+The entertainment room containing eight authored games, organized behind five category doors, with five chapters, studies, or encounters each. Progress is local to the current chosen game and never becomes a population comparison, intelligence claim, streak, randomized reward, or endless attention loop.
 _Avoid_: test center, leaderboard, daily challenge
 
-**Sector Sprint**
+**Chandigarh: The Long Way Home**
 
-An original Chandigarh homecoming playground. Explore a connected fictional city, jump and dash through three small courses in any order, find power-ups, bring useful things home, meet Harjit by Sukhna, and walk home together. Arrow/WASD movement stops on release; tap-to-walk is explicit. Guided help and the complete narrated route preserve the same story and objects without precision, motion, sound or visual interpretation. Power-ups and the errand bag belong only to this bounded journey. Ten foreground minutes close an unfinished table without claiming completion; pause, hide, blur and exit suspend it, and reload fails closed. The latest completed five-encounter provenance is the only retained result. See ADR 0021.
+An original five-encounter outing from a Sector 22 home and market to the Sector 17 pedestrian plaza. The stable internal route remains `sector-sprint`. Walk, jump, choose a street, repair a fictional paper display, read and deflect a fictional courtyard toy's three signals, align the city wayfinder, and carry the story into the plaza. Arrow/WASD movement stops on release; tap-to-walk is explicit. The complete narrated route preserves the same encounters, objects, choices, place facts and ending without precision, motion, sound or visual interpretation. Real Chandigarh notes remain separate from the fictional people, errand, toy and compressed adventure scene. Ten foreground minutes close an unfinished table without claiming completion; pause, hide, blur and exit suspend it, reduced-motion switching preserves progress and elapsed budget, and reload fails closed. The latest completed five-encounter provenance is the only retained result. See ADR 0022, which supersedes ADR 0021 for this route.
 _Avoid_: endless runner, score attack, lives, health, franchise clone, sleep inducer
 
 **Gallery**

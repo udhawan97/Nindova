@@ -636,6 +636,132 @@ button.pallanguzhi-pit:active { transform: translateY(1px); }
   .stack-move-trace { display: none; }
 }
 
+/* v0.7 teaching rail and constructed Pattern Court */
+.table-guide {
+  width: min(1120px, calc(100% - 2 * var(--space-5)));
+  margin: calc(var(--space-5) * -0.2) auto var(--space-5);
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(15rem, .65fr);
+  border-block: 1px solid color-mix(in srgb, var(--house-gold) 34%, transparent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--house-gold) 8%, transparent), transparent 58%);
+}
+.table-guide > div,
+.table-guide details { padding: 1rem 1.2rem; }
+.table-guide > div { display: grid; gap: .32rem; }
+.table-guide > div span,
+.table-guide summary {
+  font: 650 .7rem/1.2 var(--font-sans);
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--house-gold);
+}
+.table-guide > div strong { font: 500 clamp(.95rem, 1.6vw, 1.12rem)/1.45 var(--font-serif); color: var(--house-cream); }
+.table-guide details { border-inline-start: 1px solid color-mix(in srgb, var(--house-gold) 25%, transparent); }
+.table-guide summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; }
+.table-guide ol { margin: .65rem 0 .15rem; padding-inline-start: 1.15rem; color: var(--house-muted); }
+.table-guide li + li { margin-block-start: .35rem; }
+.journey-prelude .table-guide { width: 100%; margin: 1.2rem 0; text-align: start; }
+
+.game-view-pattern-court .game-title-block { padding-block-end: clamp(1.25rem, 3vw, 2.4rem); }
+.game-chamber-pattern-court { display: block; padding: 0; overflow: clip; }
+.pattern-workbench {
+  display: grid;
+  grid-template-columns: minmax(15rem, .75fr) minmax(24rem, 1.25fr);
+  min-height: 35rem;
+  background:
+    radial-gradient(circle at 76% 36%, rgba(210, 158, 83, .11), transparent 28%),
+    linear-gradient(120deg, #19132d 0 37%, #221a38 37% 100%);
+}
+.pattern-brief {
+  padding: clamp(1.4rem, 4vw, 3.5rem);
+  border-inline-end: 1px solid color-mix(in srgb, var(--house-gold) 28%, transparent);
+  align-self: stretch;
+}
+.pattern-brief h2 { margin: .55rem 0 1rem; font: 500 clamp(1.8rem, 3.4vw, 3.5rem)/.98 var(--font-serif); color: var(--house-cream); }
+.pattern-brief > p:last-of-type { color: var(--house-muted); max-width: 31rem; }
+.pattern-tools { display: flex; flex-wrap: wrap; gap: .65rem; margin-block-start: 1.7rem; }
+.pattern-construction {
+  position: relative;
+  padding: clamp(1.35rem, 4vw, 3.3rem);
+  display: grid;
+  align-content: center;
+  gap: 1.5rem;
+  container-type: inline-size;
+}
+.pattern-construction::before {
+  content: "";
+  position: absolute;
+  inset: 4% 8%;
+  border: 1px solid rgba(227, 184, 113, .18);
+  transform: rotate(-1.2deg);
+  pointer-events: none;
+}
+.pattern-court-grid {
+  position: relative;
+  z-index: 1;
+  justify-self: center;
+  width: min(30rem, 82cqw);
+  aspect-ratio: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(.4rem, 1.8cqw, .85rem);
+  padding: clamp(.65rem, 2cqw, 1.2rem);
+  background: #261a32;
+  border: .7rem solid #5c352b;
+  box-shadow: inset 0 0 0 2px #bb7b49, 0 1.4rem 3rem rgba(0,0,0,.35);
+}
+.pattern-cell,
+.pattern-tray button {
+  position: relative;
+  border: 1px solid rgba(248, 220, 168, .34);
+  background:
+    radial-gradient(circle at 32% 25%, rgba(255,255,255,.16), transparent 13%),
+    linear-gradient(145deg, #a85f48, #643949 58%, #33243d);
+  color: #ffe7b5;
+  box-shadow: inset 0 0 0 3px rgba(32,17,36,.24), .18rem .24rem .5rem rgba(0,0,0,.26);
+}
+.pattern-cell { min-width: 0; min-height: 0; display: grid; place-items: center; }
+.pattern-cell i,
+.pattern-tray button i { font: normal 500 clamp(1.55rem, 8cqw, 3.4rem)/1 var(--font-serif); }
+.pattern-cell small,
+.pattern-tray button small { font: 650 .58rem/1 var(--font-sans); letter-spacing: .09em; text-transform: uppercase; opacity: .72; }
+.pattern-cell.is-fixed { background: linear-gradient(145deg, #a98456, #5d463f); cursor: default; }
+.pattern-cell.is-open { background: rgba(255,255,255,.025); border-style: dashed; color: var(--house-gold); box-shadow: inset 0 0 1.6rem rgba(0,0,0,.25); }
+.pattern-cell.is-conflict { outline: 3px solid #ed9a75; outline-offset: -5px; }
+.pattern-cell.is-conflict::after { content: "Rule breaks here"; position: absolute; inset-block-end: .25rem; font: 650 .52rem/1 var(--font-sans); letter-spacing: .04em; color: #fff4df; }
+.pattern-cell:not(.is-fixed):hover,
+.pattern-cell:not(.is-fixed):focus-visible,
+.pattern-tray button:hover,
+.pattern-tray button:focus-visible { transform: translateY(-2px); border-color: var(--house-gold); }
+.pattern-tray { position: relative; z-index: 1; }
+.pattern-tray > span { display: block; margin-block-end: .6rem; font: 650 .7rem/1 var(--font-sans); letter-spacing: .15em; text-transform: uppercase; color: var(--house-gold); }
+.pattern-tray > div { display: flex; flex-wrap: wrap; gap: .65rem; min-height: 4.4rem; }
+.pattern-tray button { width: 4.4rem; min-height: 4.4rem; display: grid; place-items: center; padding: .35rem; }
+.pattern-tray button i { font-size: 1.65rem; }
+.pattern-tray button[aria-pressed="true"] { outline: 3px solid var(--house-gold); outline-offset: 3px; transform: translateY(-4px); }
+.pattern-tray p { color: var(--house-muted); }
+
+@media (max-width: 760px) {
+  .game-view-pattern-court .game-title-block { margin-block: var(--space-lg) var(--space-md); padding-block-end: 0; }
+  .table-guide { width: calc(100% - 2 * var(--space-4)); grid-template-columns: 1fr; }
+  .table-guide details { border-inline-start: 0; border-block-start: 1px solid color-mix(in srgb, var(--house-gold) 25%, transparent); }
+  .pattern-workbench { grid-template-columns: 1fr; min-height: 0; }
+  .pattern-brief { border-inline-end: 0; border-block-end: 1px solid color-mix(in srgb, var(--house-gold) 28%, transparent); }
+  .pattern-brief h2 { font-size: clamp(1.7rem, 8vw, 2.55rem); }
+  .pattern-court-grid { width: min(30rem, 92cqw); border-width: .5rem; }
+  .pattern-cell { min-height: 4.5rem; }
+  .pattern-tray button small { max-width: 100%; overflow: hidden; font-size: .5rem; letter-spacing: .04em; white-space: nowrap; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pattern-cell,
+  .pattern-tray button { transition: none; }
+  .pattern-cell:hover,
+  .pattern-cell:focus-visible,
+  .pattern-tray button:hover,
+  .pattern-tray button:focus-visible { transform: none; }
+}
+
 /* The illuminated courtyard: static vector craft, with one finite entrance. */
 .house-intro {
   display: grid;
@@ -773,6 +899,10 @@ button.pallanguzhi-pit:active { transform: translateY(1px); }
 .journey-bag { display:flex; flex-wrap:wrap; gap:.4rem; padding:.75rem 0; }
 .journey-item { display:flex; align-items:center; gap:.5rem; padding:.5rem .7rem; border-radius:6px; background:#e3d8b9; color:#304433; font-size:.8rem; }
 .journey-item i { position:relative; width:17px; height:19px; background:#b08752; border:2px solid #805c36; border-radius:3px 3px 7px 7px; }
+.journey-item[data-item="paper"] i { background:linear-gradient(135deg,#f4e2af 48%,#b87952 49% 54%,#e8c87d 55%); border-color:#9a7148; border-radius:1px; }
+.journey-item[data-item="route"] i { background:linear-gradient(45deg,#d6ca9b 45%,#4f7f6a 46% 54%,#e8ddb4 55%); border-color:#667b60; border-radius:1px; }
+.journey-item[data-item="spring"] i { background:repeating-linear-gradient(0deg,#c38d4b 0 2px,#f0d38c 2px 5px); border-color:#765632; }
+.journey-item[data-item="wayfinder"] i { background:radial-gradient(circle,#f3d477 0 23%,#49766a 25% 45%,#e9ddba 47%); border-color:#47685f; border-radius:50%; }
 .journey-item[data-item="sketch"] i { background:radial-gradient(circle,#b9717e 30%,#e9e2bd 35%);border-color:#cfbb86;border-radius:0; }
 .journey-item[data-item="mosaic"] i { background:conic-gradient(#779fa9 25%,#e4bc6c 25% 50%,#66858e 50% 75%,#a8bfac 75%); border-radius:3px; }
 .journey-item[data-item="book"] i { background:#5c7e77;border-color:#3c5954;border-left:4px solid #e2d3ad;border-radius:0; }
@@ -784,6 +914,11 @@ button.pallanguzhi-pit:active { transform: translateY(1px); }
 .journey-narrated > header p { max-width:70ch; color:#c5cfb8; }
 .journey-narrated .journey-destinations { grid-template-columns:repeat(2,minmax(0,1fr)); }
 .journey-disclosure { font-size:.8rem; color:#bcc6ad; }
+.journey-facts { margin:.7rem 0; padding:.8rem 1rem; border-left:3px solid #d3ac5b; background:#273f35; color:#f0e5c7; }
+.journey-map .journey-facts { background:#e5dcc2; color:#304536; }
+.journey-facts strong { font:600 .7rem var(--font-body); letter-spacing:.12em; text-transform:uppercase; }
+.journey-facts ul { margin:.45rem 0 0; padding-left:1.1rem; }
+.journey-facts li { margin:.35rem 0; font-size:.78rem; line-height:1.45; }
 .journey-prelude { position:relative; overflow:hidden; isolation:isolate; min-height:570px; padding-top:4rem; background:#192c23; border-radius:16px; }
 .journey-prelude-art { position:absolute; z-index:-1; inset:0; background:linear-gradient(90deg,#14281ef5 5%,#14281ed9 47%,#14281e55),url('./assets/chandigarh-world.webp') center 52%/cover; }
 .journey-prelude h2 { max-width:11ch; font-size:clamp(3rem,7vw,6.6rem); line-height:.95; }

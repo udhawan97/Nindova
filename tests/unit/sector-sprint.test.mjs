@@ -18,8 +18,8 @@ const G = await import(
 test("standing still never advances the character or animates walking", () => {
   let s = G.createJourney();
   for (let i = 0; i < 600; i++) s = G.stepJourney(s, { x: 0, y: 0 }, 16.67);
-  assert.equal(s.x, 720);
-  assert.equal(s.y, 600);
+  assert.equal(s.x, 310);
+  assert.equal(s.y, 946);
   assert.equal(s.walking, false);
   assert.equal(s.stride, 0);
 });
@@ -61,33 +61,30 @@ test("buildings, rose beds and lake are solid; diagonal travel has no speed bonu
     ) < 0.001,
   );
 });
-test("three errands work in every order; meeting Ma is gated and props are idempotent", () => {
-  for (const order of [
-    ["market", "roses", "craft"],
-    ["craft", "market", "roses"],
-    ["roses", "craft", "market"],
-  ]) {
-    let s = G.createJourney();
-    assert.equal(G.acceptEncounter(s, "lake", 0), s);
-    for (const id of order) {
-      s = G.acceptEncounter(s, id, 1);
-      assert.equal(G.acceptEncounter(s, id, 0), s);
-    }
-    assert.equal(s.bag.length, 3);
-    s = G.acceptEncounter(s, "lake", 0);
-    assert.equal(s.companion, true);
-    s = G.acceptEncounter(s, "home", 0);
-    assert.equal(G.completedJourney(s), true);
-    assert.equal(s.finished, true);
-    assert.equal(G.stepJourney(s, { x: 1, y: 0 }, 50), s);
+test("the authored Chandigarh route opens in order and encounter results are idempotent", () => {
+  let s = G.createJourney();
+  for (const blocked of ["roses", "craft", "lake", "home"])
+    assert.equal(G.acceptEncounter(s, blocked, 0), s);
+  for (const id of ["market", "roses", "craft", "lake", "home"]) {
+    const before = s;
+    s = G.acceptEncounter(s, id, 1);
+    assert.notEqual(s, before, id);
+    assert.equal(G.acceptEncounter(s, id, 0), s);
   }
+  assert.deepEqual(s.bag, ["paper", "route", "spring", "wayfinder"]);
+  assert.equal(s.companion, true);
+  assert.equal(G.completedJourney(s), true);
+  assert.equal(s.finished, true);
+  assert.equal(G.stepJourney(s, { x: 1, y: 0 }, 50), s);
 });
 test("early home does not claim a full journey; long frames are bounded", () => {
-  let s = G.acceptEncounter(G.createJourney(), "home", 0);
-  assert.equal(s.finished, true);
+  const initial = G.createJourney();
+  let s = G.acceptEncounter(initial, "home", 0);
+  assert.equal(s, initial);
+  assert.equal(s.finished, false);
   assert.equal(G.completedJourney(s), false);
   s = G.stepJourney(G.createJourney(), { x: 1, y: 0 }, 20000);
-  assert.ok(s.x - 720 <= G.WALK_SPEED * 0.05 + 0.001);
+  assert.ok(s.x - 310 <= G.WALK_SPEED * 0.05 + 0.001);
   assert.equal(G.JOURNEY_BOUNDARY_MS, 600000);
 });
 test("power-ups change jump height, air time and dash reach", () => {
@@ -132,17 +129,38 @@ test("airborne marks require a jump and completed courses put one real errand pr
     for (let i = 0; i < 65; i++) s = G.stepJourney(s, { x: 0, y: 0 }, 16);
     assert.ok(s.marks.includes(mark.id));
   }
-  assert.deepEqual(s.bag, ["sabzi"]);
+  assert.deepEqual(s.bag, ["paper"]);
   assert.ok(s.visited.includes("market"));
 });
 test("spring pads bounce and grounded crates stop travel without erasing progress", () => {
   let s = { ...G.createJourney(), x: 745, y: 583 };
   s = G.stepJourney(s, { x: 0, y: 0 }, 16);
   assert.ok(s.vz > 300);
-  s = { ...G.createJourney(), x: 1173, y: 682, bag: ["sketch"] };
+  s = { ...G.createJourney(), x: 1173, y: 682, bag: ["paper"] };
   s = G.stepJourney(s, { x: 1, y: 0 }, 50);
   assert.ok(s.bumpMs > 0);
-  assert.deepEqual(s.bag, ["sketch"]);
+  assert.deepEqual(s.bag, ["paper"]);
+});
+
+test("the courtyard toy opens through three readable scarf deflections with an assisted equivalent", () => {
+  const craftMarks = G.COURSE_MARKS.filter((mark) => mark.owner === "craft").map((mark) => mark.id);
+  let s = G.createJourney();
+  for (const id of ["market", "roses"]) s = G.acceptEncounter(s, id, 0);
+  s = { ...s, x: G.place("craft").point.x, y: G.place("craft").point.y, marks: craftMarks };
+  for (let phase = 1; phase <= 3; phase++) {
+    while (s.toySignalMs > 0) s = G.stepJourney(s, { x: 0, y: 0 }, 50);
+    s = G.stepJourney(s, { x: 0, y: 0, dash: true }, 16);
+    assert.equal(s.toyPhase, phase);
+  }
+  assert.ok(s.visited.includes("craft"));
+  assert.ok(s.bag.includes("spring"));
+
+  let assisted = G.createJourney();
+  assisted = G.acceptEncounter(assisted, "market", 0);
+  assisted = G.acceptEncounter(assisted, "roses", 1);
+  assisted = G.acceptEncounter(assisted, "craft", 1);
+  assert.equal(assisted.toyPhase, 3);
+  assert.equal(assisted.choices.craft, 1);
 });
 
 const worldSource = await readFile(new URL('../../apps/house/src/sector-sprint-world.ts', import.meta.url), 'utf8');

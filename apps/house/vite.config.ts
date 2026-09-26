@@ -30,6 +30,7 @@ function emitHouseArtifacts(): Plugin {
       await emitTypedModule(resolve("src/salon-catalog.ts"), resolve("dist/salon-catalog.js"));
       await emitTypedModule(resolve("src/classic-studies.ts"), resolve("dist/classic-studies.js"));
       await emitTypedModule(resolve("src/stack-architect.ts"), resolve("dist/stack-architect.js"));
+      await emitTypedModule(resolve("src/pattern-court.ts"), resolve("dist/pattern-court.js"));
       await emitTypedModule(resolve("src/salon-table-lifecycle.ts"), resolve("dist/salon-table-lifecycle.js"));
       await emitTypedModule(resolve("src/house-navigation.ts"), resolve("dist/house-navigation.js"));
       await emitTypedModule(resolve("src/house-state.ts"), resolve("dist/house-state.js"));

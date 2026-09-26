@@ -4,9 +4,14 @@ export const WORLD_HEIGHT = 1024;
 export const JOURNEY_BOUNDARY_MS = 600_000;
 export const WALK_SPEED = 112;
 export const GRID = 12;
+export const CITY_FACTS = Object.freeze([
+  "Sector 17 is Chandigarh's city-centre district and includes a large pedestrian plaza.",
+  "The numbered-sector plan uses broad roads, neighborhood markets and green space to make each sector a self-contained unit.",
+  "This playable route compresses distance and adds fictional people and a courtyard toy; it is not a navigation map.",
+]);
 export type Point = { x: number; y: number };
 export type PlaceId = "plaza" | "market" | "roses" | "craft" | "lake" | "home";
-export type Keepsake = "sabzi" | "sketch" | "mosaic" | "book";
+export type Keepsake = "paper" | "route" | "spring" | "wayfinder";
 export type Encounter = {
   id: PlaceId;
   title: string;
@@ -23,103 +28,103 @@ export type Encounter = {
 export const PLACES: readonly Encounter[] = [
   {
     id: "plaza",
-    title: "An afternoon to bring home",
-    district: "Sector 17 · the plaza",
+    title: "A paper city needs carrying",
+    district: "Sector 22 · home verandah",
     person: "Gurpreet",
-    point: { x: 730, y: 594 },
+    point: { x: 310, y: 946 },
     color: "#285e77",
     introduction:
-      "Ma is waiting by Sukhna. The market has our vegetables ready. There is time to take the garden paths, say hello, and bring a little of the city home.",
-    choices: ["Take the long way", "Show me around"],
+      "Gurpreet's folded paper display has come loose before it reaches the Sector 17 plaza. The brass tabs need finding along the route from Sector 22.",
+    choices: ["Carry the paper city", "Show me the route first"],
     replies: [
-      "The fountain catches the afternoon light. Your feet, your route.",
-      "Open City map to choose a place. Tap a path to walk, or use the arrow keys. Nothing moves you without your say.",
+      "The paper city rests under your arm. Start at the market verandah, then choose the shaded street or the raised sign route.",
+      "Open City map for the five encounter route. Tap a stop to walk, or use the arrow keys. Nothing moves you without your say.",
     ],
   },
   {
     id: "market",
-    title: "The bag with the good handle",
+    title: "Leave the verandah",
     district: "Sector 22 · market verandahs",
-    person: "Simran · the neighbor",
+    person: "Simran · sign painter",
     point: { x: 1237, y: 666 },
     color: "#bb7047",
-    item: "sabzi",
-    itemLabel: "Market bag",
+    item: "paper",
+    itemLabel: "Repaired paper display",
     introduction:
-      "“Harjit said you would come by. Tomatoes on top, please. I have finally tied that handle properly.” A cloth bag waits beside the baskets.",
-    choices: ["Pack the tomatoes carefully", "Ask about the cloth handle"],
+      "Simran presses the first brass tab into Gurpreet's folded display. “The verandahs keep this shopping street shaded. Try the jump marks before you leave.”",
+    choices: ["Cross the verandah course", "Ask Simran to set the tab"],
     replies: [
-      "“Exactly. No tomato chutney before we reach the kitchen.” You tuck the vegetables into the repaired bag.",
-      "“An old dupatta. Still useful.” Simran shows you the knot, then hands over the vegetables.",
+      "You cross the market awnings and set the tab yourself. The paper city holds its shape.",
+      "Simran sets the same brass tab and traces the next street on the paper. You leave with the same repaired display.",
     ],
   },
   {
     id: "roses",
-    title: "A rose that stays in the garden",
-    district: "Sector 16 · Rose Garden",
-    person: "Meher · the gardener",
+    title: "Choose a way through",
+    district: "Sector 22 · neighborhood crossing",
+    person: "Meher · cycle mechanic",
     point: { x: 253, y: 183 },
     color: "#b5526a",
-    item: "sketch",
-    itemLabel: "Rose sketch",
+    item: "route",
+    itemLabel: "Chosen route",
     introduction:
-      "Meher has found your mother’s little sketchbook on the bench. “One more drawing before you take it back? The flowers can stay where they are.”",
-    choices: ["Sketch the pink roses", "Sketch the golden roses"],
+      "The route splits beside Meher's cycle stand. The shaded street is level; the raised sign route asks for spring jumps. Both lead to the same courtyard.",
+    choices: ["Take the raised sign route", "Take the shaded street"],
     replies: [
-      "You draw a loose pink spiral and a pair of leaves. The real roses stay in their bed.",
-      "You shade a golden bloom. “She will know exactly which corner you stopped at,” Meher says.",
+      "You read the sector markers above the street and land beside the courtyard gate.",
+      "You follow the shade beneath the trees and arrive at the same courtyard gate.",
     ],
   },
   {
     id: "craft",
-    title: "Something useful again",
-    district: "Rock Garden · a fictional craft table",
-    person: "Iqbal · the artisan",
+    title: "The wind-up courtyard toy",
+    district: "Between sectors · fictional courtyard",
+    person: "Iqbal · repairer",
     point: { x: 755, y: 267 },
     color: "#7774a6",
-    item: "mosaic",
-    itemLabel: "Mosaic coaster",
+    item: "spring",
+    itemLabel: "Courtyard spring",
     introduction:
-      "At a small craft table, Iqbal sets out three spare tiles. “For a cup at home, not a museum.” None of these pieces comes from the garden’s artworks.",
-    choices: ["Arrange a river-blue pattern", "Arrange with Iqbal"],
+      "A fictional brass toy blocks the gate. Its paper arm flashes before it rolls a harmless cork ball. Three well-timed scarf deflections will unwind it.",
+    choices: ["Read and deflect its three signals", "Let Iqbal hold the toy still"],
     replies: [
-      "Blue pieces make a little river around the center tile. Iqbal wraps your finished coaster in paper.",
-      "Together you turn the pieces into a simple river pattern. Iqbal wraps the same little coaster for the journey.",
+      "The final cork ball returns to the toy. Its spring relaxes and the courtyard gate opens.",
+      "Iqbal holds the toy while you release the same spring. The gate opens without timing or precision.",
     ],
   },
   {
     id: "lake",
-    title: "Meet me by the water",
-    district: "Sukhna Lake · the promenade",
-    person: "Harjit · Ma",
-    point: { x: 1230, y: 304 },
+    title: "Find Sector 17",
+    district: "City wayfinder · Sector 17 approach",
+    person: "Harjit · map reader",
+    point: { x: 567, y: 480 },
     color: "#a34c55",
-    item: "book",
-    itemLabel: "Ma’s borrowed book",
+    item: "wayfinder",
+    itemLabel: "Aligned wayfinder",
     introduction:
-      "Harjit watches the boats rock against their ropes. “You took the long way. Good.” She holds out the book she borrowed. “Shall we take this home together?”",
-    choices: ["Tell her about the afternoon", "Sit together for a moment"],
+      "Harjit points to the city wayfinder. “Sector 17 is Chandigarh's city centre. Turn the paper grid until its heart faces the plaza.”",
+    choices: ["Align Sector 17 at the city heart", "Align it together"],
     replies: [
-      "You trade the small stories of the afternoon. Harjit puts the book in your bag and joins you for the walk home.",
-      "For a moment there is only the water. Then Harjit smiles, hands you the book, and walks beside you.",
+      "The sector grid clicks into place. The plaza fountain appears at the end of the concourse.",
+      "Harjit turns one edge while you turn the other. The same plaza route appears.",
     ],
   },
   {
     id: "home",
-    title: "Ghar wapsi",
-    district: "Sector 22 · home",
+    title: "Paper in the plaza",
+    district: "Sector 17 · city-centre plaza",
     person: "Harjit · Ma",
-    point: { x: 310, y: 946 },
+    point: { x: 730, y: 594 },
     color: "#d9a951",
     introduction:
-      "The front light is on. Through the open door: a kettle, two cups, and somewhere to put down the bag. Chandigarh can keep the rest of the afternoon.",
+      "The wide pedestrian plaza opens around the fountain. Gurpreet's repaired paper city stands upright beside the real city centre.",
     choices: [
-      "Put the bag down. We’re home.",
-      "Tell one last story at the door",
+      "Set the paper city by the fountain",
+      "Tell the route before setting it down",
     ],
     replies: [
-      "The things you brought find their places. The kettle is already on. You are home.",
-      "You linger over one last little story, then step inside. The kettle is already on. You are home.",
+      "The last brass tab settles. Sector 22, the crossing, the courtyard and Chandigarh's city-centre heart hold together.",
+      "You tell the route once, then set the display down. The paper city and the plaza finally face one another.",
     ],
   },
 ];
@@ -201,12 +206,14 @@ export type JourneyState = {
   marks: string[];
   playTime: number;
   bumpMs: number;
+  toyPhase: 0 | 1 | 2 | 3;
+  toySignalMs: number;
   message: string;
 };
 export function createJourney(): JourneyState {
   return {
-    x: 720,
-    y: 600,
+    x: 310,
+    y: 946,
     facing: { x: 1, y: 0 },
     walking: false,
     stride: 0,
@@ -224,8 +231,10 @@ export function createJourney(): JourneyState {
     marks: [],
     playTime: 0,
     bumpMs: 0,
+    toyPhase: 0,
+    toySignalMs: 950,
     message:
-      "Jump with Space or J. Dash with Shift or K. Try the golden spring juttis beside you.",
+      "Carry the paper city to Sector 17. Start with Simran beneath the Sector 22 market verandah.",
   };
 }
 export function place(id: PlaceId): Encounter {
@@ -364,12 +373,41 @@ export function stepJourney(
   let dashMs = Math.max(0, state.dashMs - dt * 1000),
     dashCooldown = Math.max(0, state.dashCooldown - dt * 1000),
     bumpMs = Math.max(0, state.bumpMs - dt * 1000),
+    toySignalMs = state.toySignalMs,
+    toyPhase = state.toyPhase,
     message = state.message;
   if (direction.jump && z === 0) {
     vz = power === "spring" ? 340 : power === "glide" ? 210 : 245;
     route = [];
   }
-  if (direction.dash && dashCooldown === 0) {
+  const craftReady = COURSE_MARKS.filter((mark) => mark.owner === "craft").every(
+    (mark) => state.marks.includes(mark.id),
+  );
+  const nearToy =
+    craftReady &&
+    !state.visited.includes("craft") &&
+    Math.hypot(state.x - place("craft").point.x, state.y - place("craft").point.y) < 82;
+  if (nearToy) {
+    toySignalMs -= Math.min(50, Math.max(0, deltaMs));
+    if (toySignalMs < -360) {
+      toySignalMs = 900;
+      message = "The cork ball rolls back. Watch for the paper arm to flash, then use Scarf deflect.";
+    }
+  }
+  const toyDeflect = direction.dash && nearToy;
+  if (toyDeflect) {
+    route = [];
+    if (toySignalMs <= 0 && toySignalMs >= -360) {
+      toyPhase = Math.min(3, toyPhase + 1) as 0 | 1 | 2 | 3;
+      toySignalMs = 760 - toyPhase * 70;
+      message =
+        toyPhase === 3
+          ? "Three scarf deflections! The toy unwinds and the courtyard gate opens."
+          : `Scarf deflection ${toyPhase} of 3. Read the next flash.`;
+    } else {
+      message = "A little early. Wait for the paper arm to flash, then deflect.";
+    }
+  } else if (direction.dash && dashCooldown === 0) {
     dashMs = power === "dash" ? 310 : 160;
     dashCooldown = 650;
     route = [];
@@ -470,8 +508,12 @@ export function stepJourney(
     dashCooldown,
     playTime,
     bumpMs,
+    toyPhase,
+    toySignalMs,
     message,
   };
+  if (toyPhase === 3 && !next.visited.includes("craft"))
+    next = acceptEncounter(next, "craft", 0);
   for (const mark of COURSE_MARKS) {
     if (
       next.marks.includes(mark.id) ||
@@ -489,13 +531,22 @@ export function stepJourney(
         next.marks.includes(m.id),
       )
     ) {
-      next = acceptEncounter(next, mark.owner, 0);
-      next = {
-        ...next,
-        message:
-          place(mark.owner).itemLabel +
-          " is in your bag. A little of the city to take home.",
-      };
+      if (mark.owner === "craft") {
+        next = {
+          ...next,
+          toySignalMs: 800,
+          message:
+            "The courtyard toy winds awake. Stand near it, wait for the paper arm to flash, then use Scarf deflect three times.",
+        };
+      } else {
+        next = acceptEncounter(next, mark.owner, 0);
+        next = {
+          ...next,
+          message:
+            place(mark.owner).itemLabel +
+            " is in your bag. The next Chandigarh stop is open.",
+        };
+      }
     }
   }
   return next;
@@ -506,12 +557,14 @@ export function nearby(state: Point): Encounter | undefined {
   );
 }
 export function canMeet(state: JourneyState, id: PlaceId): boolean {
-  return (
-    id !== "lake" ||
-    ["market", "roses", "craft"].every((p) =>
-      state.visited.includes(p as PlaceId),
-    )
-  );
+  const prerequisite: Partial<Record<PlaceId, PlaceId>> = {
+    roses: "market",
+    craft: "roses",
+    lake: "craft",
+    home: "lake",
+  };
+  const required = prerequisite[id];
+  return !required || state.visited.includes(required);
 }
 export function acceptEncounter(
   state: JourneyState,
@@ -531,6 +584,7 @@ export function acceptEncounter(
     choices: { ...state.choices, [id]: choice === 1 ? 1 : 0 },
     companion: state.companion || id === "lake",
     finished: id === "home",
+    toyPhase: id === "craft" ? 3 : state.toyPhase,
   };
 }
 export function completedJourney(state: JourneyState): boolean {
@@ -539,12 +593,19 @@ export function completedJourney(state: JourneyState): boolean {
   );
 }
 export function objective(state: JourneyState): string {
-  if (
-    !["market", "roses", "craft"].every((id) =>
-      state.visited.includes(id as PlaceId),
-    )
-  )
-    return "Jump for the market ribbons, garden petals and courtyard chimes. Find power-ups along the way.";
-  if (!state.companion) return "Meet Ma on the Sukhna promenade.";
-  return "Walk home together. Sector 22 is waiting.";
+  if (!state.visited.includes("market"))
+    return "Reach Simran under the Sector 22 market verandah and repair the paper display.";
+  if (!state.visited.includes("roses"))
+    return "Meet Meher at the crossing and choose the raised signs or shaded street.";
+  if (!state.visited.includes("craft")) {
+    const craftMarks = COURSE_MARKS.filter((mark) => mark.owner === "craft");
+    if (!craftMarks.every((mark) => state.marks.includes(mark.id)))
+      return "Follow the courtyard signals. Catch the three blue paper marks.";
+    return `Courtyard toy: ${state.toyPhase} of 3 scarf deflections. Wait for its paper arm to flash.`;
+  }
+  if (!state.visited.includes("lake"))
+    return "Ask Harjit at the wayfinder to align Sector 17 at the city-centre heart.";
+  if (!state.finished)
+    return "Enter the Sector 17 pedestrian plaza and set the paper city beside the fountain.";
+  return "The paper city has reached Sector 17.";
 }

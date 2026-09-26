@@ -45,7 +45,7 @@ try {
       await page.locator(".table-directory a.table-action").evaluateAll((links) => links.map((link) => new URL(link.href).hash)),
       ["#door/pattern-line", "#door/turn-trap", "#door/count-carry", "#door/memory-sequence", "#door/motion-route"],
     );
-    const sectorLink = page.getByRole("link", { name: /^Play Sector Sprint/ });
+    const sectorLink = page.getByRole("link", { name: /^Play The Long Way Home/ });
     assert.equal(await sectorLink.count(), 1);
     assert.deepEqual(await sectorLink.evaluate((link) => {
       const url = new URL(link.href);
@@ -66,7 +66,7 @@ try {
     const sectorGuideResponse = await page.goto(`${previewRoot}docs/sector-sprint/`);
     assert.equal(sectorGuideResponse?.ok(), true);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), viewport.width);
-    const guidePlayLink = page.getByRole("link", { name: "Step into Chandigarh" });
+    const guidePlayLink = page.getByRole("link", { name: "Start the outing" });
     assert.deepEqual(await guidePlayLink.evaluate((link) => {
       const url = new URL(link.href);
       return { pathname: url.pathname, hash: url.hash };
@@ -74,12 +74,12 @@ try {
     if (viewport.width === 320) {
       const gettingStartedResponse = await page.goto(`${previewRoot}docs/getting-started/`);
       assert.equal(gettingStartedResponse?.ok(), true);
-      for (const label of ["Sector Sprint guide", "Downloads guide"]) {
+      for (const label of ["The Long Way Home guide", "Downloads guide"]) {
         const linkedResponse = await page.request.get(await page.getByRole("link", { name: label }).evaluate((link) => link.href));
         assert.equal(linkedResponse.ok(), true, `${label} resolves from Getting started at ${prefix}`);
       }
       await page.goto(previewRoot);
-      await page.getByRole("link", { name: /^Play Sector Sprint/ }).click();
+      await page.getByRole("link", { name: /^Play The Long Way Home/ }).click();
       assert.deepEqual({ pathname: new URL(page.url()).pathname, hash: new URL(page.url()).hash }, {
         pathname: `${prefix}house/`.replace(/\/+/g, "/"),
         hash: "#game/sector-sprint",
