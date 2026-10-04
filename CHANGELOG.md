@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0 — 2026-09-26
+
+- Turn Pattern Court into a five-part construction table with clearer goals, controls, conflict feedback, undo/reset, and optional one-piece assistance.
+- Rebuild Chandigarh as “The Long Way Home,” preserving equivalent action and narrated routes while separating real Chandigarh notes from fictional people and mechanics.
+- Keep the ten-minute foreground boundary, local-only state, zero telemetry, finite five-part structure, and Night Room Two-Loop contract unchanged.
+
 ## 0.6.2 — 2026-09-26
 
 - Publish the current engineering log and repaired release/download facts with a synchronized package identity and release record.
