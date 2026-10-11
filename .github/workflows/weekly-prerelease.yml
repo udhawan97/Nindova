@@ -96,6 +96,12 @@ jobs:
         if: steps.selection.outputs.needed == 'true'
         run: npm run test:public
 
+      # The browser regression suite finishes with a Pages-base build. Release
+      # downloads must use the root-hosted build contract, not /Nindova URLs.
+      - name: Restore root-hosted release build after browser tests
+        if: steps.selection.outputs.needed == 'true'
+        run: npm run build
+
       - name: Package verifiable weekly release assets
         if: steps.selection.outputs.needed == 'true'
         shell: bash
