@@ -32,10 +32,20 @@ jobs:
           test "$GITHUB_REF_NAME" = "v$(node -p 'JSON.parse(require("fs").readFileSync("package.json")).version')"
           test -f "docs/releases/$GITHUB_REF_NAME.md"
           git merge-base --is-ancestor HEAD origin/main
+      - name: Use the declared npm version
+        run: npm install --global npm@11.17.0 --ignore-scripts
       - name: Install pinned dependencies
         run: npm ci --ignore-scripts
+      - name: Reject high and critical production findings
+        run: npm audit --omit=dev --audit-level=high
       - name: Verify and build root-hosted release
         run: npm run check
+      - name: Install Chromium
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Verify public browser surfaces
+        run: npm run test:public
+      - name: Restore root-hosted release
+        run: npm run build
       - name: Package and verify downloads
         run: |
           mkdir release-assets

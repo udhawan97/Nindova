@@ -40,8 +40,8 @@
     "semantic_hash": ""
   },
   "apps/site/package.json": {
-    "mtime": 1790415023.806287,
-    "ast_hash": "2d66ef484ce6912c078f30557768ec87",
+    "mtime": 1792350260.9886086,
+    "ast_hash": "4552e2666d14311bd236e13d3835ed42",
     "semantic_hash": ""
   },
   "apps/site/src/content.config.ts": {
@@ -380,8 +380,8 @@
     "semantic_hash": ""
   },
   "docs/PUBLIC-SURFACE-EVIDENCE.md": {
-    "mtime": 1790416459.3858495,
-    "ast_hash": "8a3f85c6c25157d2312d425006ab6e42",
+    "mtime": 1792350200.0452414,
+    "ast_hash": "059bd674925fcdb93122d87bc0079d28",
     "semantic_hash": ""
   },
   "docs/REDESIGN-PLAN.md": {
@@ -1155,9 +1155,9 @@
     "semantic_hash": "c83e3990740817e36da091744025f5be"
   },
   ".github/workflows/release.yml": {
-    "mtime": 1789086225.3959172,
-    "ast_hash": "693a1d3beac9b46621ec6e9980baafaa",
-    "semantic_hash": "693a1d3beac9b46621ec6e9980baafaa"
+    "mtime": 1792350662.7692115,
+    "ast_hash": "7a5026ec4cdd616bb07eea075fd44c6c",
+    "semantic_hash": ""
   },
   "docs/releases/v0.5.0.md": {
     "mtime": 1789086799.0643885,
@@ -1247,6 +1247,11 @@
   "docs/releases/v0.7.0.md": {
     "mtime": 1790415044.7030783,
     "ast_hash": "3f6b4bdb52e2790fb8610d23d1eea4d0",
+    "semantic_hash": ""
+  },
+  ".github/workflows/ci.yml": {
+    "mtime": 1792350298.191961,
+    "ast_hash": "c1eb978615bb0ee7369925f1c524dd1e",
     "semantic_hash": ""
   }
 }
