@@ -1,0 +1,47 @@
+name: Validate source and dependencies
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Use Node.js 24
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+          cache: npm
+      - name: Use the declared npm version
+        run: npm install --global npm@11.17.0 --ignore-scripts
+      - name: Install pinned dependencies
+        run: npm ci --ignore-scripts
+      - name: Reject high and critical production findings
+        run: npm audit --omit=dev --audit-level=high
+      - name: Verify source
+        run: npm run check
+      - name: Install Chromium
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Verify browser journeys
+        run: npm test
+      - name: Restore root-hosted build
+        run: npm run build
+      - name: Verify portable downloads
+        run: |
+          mkdir -p artifacts/dependency-validation
+          cp dist/nindova.html artifacts/dependency-validation/nindova.html
+          (cd dist && zip -q -r ../artifacts/dependency-validation/nindova-web.zip .)
+          cd artifacts/dependency-validation
+          sha256sum nindova.html nindova-web.zip > SHA256SUMS.txt
+          sha256sum -c SHA256SUMS.txt
+          unzip -tq nindova-web.zip
