@@ -1,0 +1,192 @@
+name: Weekly validated prerelease
+
+# Only publish the source already merged to main. Branches and Dependabot PRs
+# must pass their own review and required checks before becoming release input.
+on:
+  schedule:
+    - cron: "23 10 * * 0"
+      timezone: "America/Chicago"
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nindova-weekly-prerelease
+  cancel-in-progress: false
+
+jobs:
+  verify-package:
+    name: Verify and package exact main commit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      needed: ${{ steps.selection.outputs.needed }}
+      tag: ${{ steps.selection.outputs.tag }}
+      source_sha: ${{ steps.selection.outputs.source_sha }}
+    steps:
+      - name: Check out immutable source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Skip duplicate and unchanged weekly releases
+        id: selection
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+
+          # PR validation tests the candidate merge commit, never publishing it.
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            echo "tag=pr-validation" >> "$GITHUB_OUTPUT"
+            echo "source_sha=$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          test "$GITHUB_REF" = "refs/heads/main"
+
+          tag="weekly-$(TZ=America/Chicago date +%G-W%V)"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "source_sha=$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+
+          if git show-ref --verify --quiet "refs/tags/$tag"; then
+            echo "A release tag already exists for $tag; never replace it."
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          previous="$(git tag --list 'weekly-*' | LC_ALL=C sort -r | head -n 1)"
+          if [[ -z "$previous" ]]; then
+            previous="$(git tag --list 'v*' | sort -V | tail -n 1)"
+          fi
+          if [[ -n "$previous" ]]; then
+            if ! git merge-base --is-ancestor "$previous" "$GITHUB_SHA"; then
+              echo "::error::The previous release tag is not an ancestor of main."
+              exit 1
+            fi
+            if [[ "$(git rev-list --count "$previous..$GITHUB_SHA")" = "0" ]]; then
+              echo "No new merged commits since $previous; no release needed."
+              echo "needed=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+
+          echo "Publishing immutable prerelease from $GITHUB_SHA."
+          echo "needed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Node.js 24
+        if: steps.selection.outputs.needed == 'true'
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install pinned dependencies
+        if: steps.selection.outputs.needed == 'true'
+        run: npm ci --ignore-scripts
+
+      - name: Block known high and critical production dependency findings
+        if: steps.selection.outputs.needed == 'true'
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Build and run unit/type verification
+        if: steps.selection.outputs.needed == 'true'
+        run: npm run check
+
+      - name: Install required Chromium browser for public-surface regressions
+        if: steps.selection.outputs.needed == 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Verify packaged browser and PWA surfaces
+        if: steps.selection.outputs.needed == 'true'
+        run: npm run test:public
+
+      # The browser regression suite finishes with a Pages-base build. Release
+      # downloads must use the root-hosted build contract, not /Nindova URLs.
+      - name: Restore root-hosted release build after browser tests
+        if: steps.selection.outputs.needed == 'true'
+        run: npm run build
+
+      - name: Package verifiable weekly release assets
+        if: steps.selection.outputs.needed == 'true'
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ steps.selection.outputs.tag }}
+        run: |
+          set -euo pipefail
+          test -f dist/nindova.html
+          mkdir -p release-assets
+          cp dist/nindova.html "release-assets/nindova-$RELEASE_TAG.html"
+          (cd dist && zip -q -r "../release-assets/nindova-web-$RELEASE_TAG.zip" .)
+          (
+            cd release-assets
+            sha256sum "nindova-$RELEASE_TAG.html" "nindova-web-$RELEASE_TAG.zip" > SHA256SUMS.txt
+            sha256sum -c SHA256SUMS.txt
+            unzip -tq "nindova-web-$RELEASE_TAG.zip"
+          )
+
+      - name: Upload tested assets
+        if: steps.selection.outputs.needed == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: weekly-nindova
+          path: release-assets/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish immutable GitHub prerelease
+    if: github.event_name != 'pull_request' && needs.verify-package.outputs.needed == 'true'
+    needs: verify-package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download exactly verified build assets
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: weekly-nindova
+          path: release-assets/
+
+      - name: Verify asset checksums and publish once
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.verify-package.outputs.tag }}
+          SOURCE_SHA: ${{ needs.verify-package.outputs.source_sha }}
+        run: |
+          set -euo pipefail
+          test "$SOURCE_SHA" = "$GITHUB_SHA"
+          (cd release-assets && sha256sum -c SHA256SUMS.txt)
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "::error::Release $RELEASE_TAG already exists; will not overwrite."
+            exit 1
+          fi
+          cat > "$RUNNER_TEMP/weekly-notes.md" <<EOF
+          Automated weekly **prerelease** of Nindova's validated, already-merged main branch.
+
+          - Immutable source commit: $SOURCE_SHA
+          - Includes only code, fixes, and reviewed dependencies merged before this build.
+          - Full source/type/build, public browser surfaces, and production dependency audit passed.
+          - This is NOT a stable version bump and does not replace the current v* release.
+
+          Only merge approved PRs separately. Open, failing, or unreviewed branches
+          and Dependabot PRs are intentionally excluded.
+          EOF
+          gh release create "$RELEASE_TAG" release-assets/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$SOURCE_SHA" \
+            --prerelease \
+            --latest=false \
+            --title "Nindova weekly build $RELEASE_TAG" \
+            --notes-file "$RUNNER_TEMP/weekly-notes.md"
+          actual="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG" --jq '.object.sha')"
+          if [[ "$actual" != "$SOURCE_SHA" ]]; then
+            echo "::error::Published tag points to $actual rather than $SOURCE_SHA."
+            exit 1
+          fi
